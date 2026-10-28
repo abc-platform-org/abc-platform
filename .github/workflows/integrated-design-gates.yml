@@ -1,0 +1,50 @@
+name: Integrated ABC P00 P01 P02 design gate audit
+
+on:
+  push:
+    branches:
+      - audit/integrated-gates-00-02-20261029
+  pull_request:
+    paths:
+      - 'contracts/v1/**'
+      - 'docs/00-governance/**'
+      - 'docs/01-product/**'
+      - 'docs/02-architecture/**'
+      - 'scripts/validate_integrated_gates.py'
+      - 'scripts/validate_baseline.py'
+      - 'scripts/validate_wp00002.py'
+      - 'scripts/validate_wp00003.py'
+      - 'scripts/validate_phase01.py'
+      - 'scripts/validate_phase02.py'
+      - 'scripts/validate_gate_reconciliation.py'
+      - 'PACKAGE_MANIFEST.json'
+      - '.github/workflows/integrated-design-gates.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-integrated-design:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned contract validator
+        run: python -m pip install 'jsonschema==4.23.0' 'referencing==0.35.1'
+      - name: Baseline 70-file structural validator
+        run: python scripts/validate_baseline.py
+      - name: Phase-00 authority/integrity WP-000-02
+        run: python scripts/validate_wp00002.py
+      - name: Phase-00 governance WP-000-03
+        run: python scripts/validate_wp00003.py
+      - name: Phase-01 requirement and release matrix
+        run: python scripts/validate_phase01.py
+      - name: Phase-02 engine API event contract test suite
+        run: python scripts/validate_phase02.py
+      - name: Delegated design governance and release hard-stop
+        run: python scripts/validate_gate_reconciliation.py
+      - name: Cross-phase SHA256 provenance and all-layer integration
+        run: python scripts/validate_integrated_gates.py

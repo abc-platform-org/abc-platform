@@ -28,4 +28,3 @@ The *AI Studio critical path* is prioritized over optional business-platform exp
 ## Change control
 
 Architecture proposals require an ADR, linked requirement IDs, tests, review, and PR. No direct unreviewed writes to `main`; no automatic production deployment. See [engineering rules](docs/08-operations/REPOSITORY_WORKFLOW.md).
-

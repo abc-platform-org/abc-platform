@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/session.schema.json",
+  "title": "session",
+  "description": "Draft Phase-02 interface. No runtime claim.",
+  "type": "object",
+  "required": [
+    "session_id",
+    "tenant_id",
+    "branch_id",
+    "specialist_id",
+    "state",
+    "state_version",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "specialist_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "client_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "appointment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "service_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "CREATED",
+        "CONSENTED",
+        "INTENT_DEFINED",
+        "INPUTS_COLLECTING",
+        "INPUT_READY",
+        "ANALYZED",
+        "OPTIONS_READY",
+        "PREVIEW_REVIEW",
+        "REVISION_REQUESTED",
+        "LOOK_SELECTED",
+        "FEASIBILITY_REVIEW",
+        "PLAN_DRAFTED",
+        "SPECIALIST_REVIEW",
+        "HANDOFF",
+        "CLOSED",
+        "CLOSED_WITHOUT_DECISION",
+        "PAUSED",
+        "CANCELLED",
+        "FAILED_RECOVERABLE",
+        "SAFETY_BLOCKED"
+      ]
+    },
+    "state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "selected_look_version_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "consent_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_event_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "scope": {
+      "type": "string",
+      "const": "IN_SALON_SHARED_SCREEN"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "LOOK_SELECTED"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "selected_look_version_id"
+        ]
+      }
+    }
+  ]
+}

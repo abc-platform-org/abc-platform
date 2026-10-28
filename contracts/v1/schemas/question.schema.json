@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/question.schema.json",
+  "title": "question",
+  "description": "Draft Phase-02 interface. No runtime claim.",
+  "type": "object",
+  "required": [
+    "question_id",
+    "profile_version",
+    "service_id",
+    "text",
+    "reason",
+    "evidence_gap_keys",
+    "state",
+    "asked_by"
+  ],
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "profile_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "service_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "DECISION_IMPACT",
+        "SAFETY_NECESSITY",
+        "CONTRADICTION",
+        "PROFESSIONAL_CHECK",
+        "CLARIFICATION"
+      ]
+    },
+    "evidence_gap_keys": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "PROPOSED",
+        "ASKED",
+        "ANSWERED",
+        "SKIPPED_KNOWN",
+        "SKIPPED_IRRELEVANT",
+        "NEEDS_PROFESSIONAL_CHECK"
+      ]
+    },
+    "asked_by": {
+      "type": "string",
+      "enum": [
+        "ABC",
+        "SPECIALIST"
+      ]
+    },
+    "answer": {
+      "type": [
+        "string",
+        "number",
+        "boolean",
+        "array",
+        "null"
+      ]
+    },
+    "answer_source": {
+      "type": "string",
+      "enum": [
+        "CLIENT",
+        "SPECIALIST"
+      ]
+    },
+    "answered_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "asked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "priority_reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "ANSWERED"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "answer",
+          "answer_source",
+          "answered_at"
+        ]
+      }
+    }
+  ]
+}

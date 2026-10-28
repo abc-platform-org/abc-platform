@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/media.schema.json",
+  "title": "media",
+  "description": "Draft Phase-02 interface. No runtime claim.",
+  "type": "object",
+  "required": [
+    "asset_id",
+    "session_id",
+    "consent_id",
+    "asset_role",
+    "storage_key",
+    "mime_type",
+    "checksum_sha256",
+    "created_at",
+    "access_policy"
+  ],
+  "properties": {
+    "asset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "consent_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "asset_role": {
+      "type": "string",
+      "enum": [
+        "CLIENT_ORIGINAL",
+        "STYLE_REFERENCE",
+        "GENERATED_CANDIDATE",
+        "COMPOSITED_PREVIEW",
+        "MASK",
+        "QA_EVIDENCE"
+      ]
+    },
+    "storage_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mime_type": {
+      "type": "string",
+      "enum": [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/octet-stream"
+      ]
+    },
+    "checksum_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "access_policy": {
+      "type": "string",
+      "enum": [
+        "SHARED_CURRENT_SESSION",
+        "SPECIALIST_ONLY",
+        "RESTRICTED_INTERNAL",
+        "SERVICE_WORKER_ONLY"
+      ]
+    },
+    "width_px": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "height_px": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "camera_view": {
+      "type": "string",
+      "enum": [
+        "FRONT",
+        "SIDE_LEFT",
+        "SIDE_RIGHT",
+        "BACK",
+        "OTHER",
+        "UNKNOWN"
+      ]
+    },
+    "retention_policy_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "derived_from_asset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

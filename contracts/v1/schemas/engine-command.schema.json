@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/engine-command.schema.json",
+  "title": "engine-command",
+  "type": "object",
+  "required": [
+    "command_id",
+    "engine_id",
+    "contract_version",
+    "correlation_id",
+    "tenant_id",
+    "actor",
+    "input_schema_id",
+    "input_ref",
+    "idempotency_key",
+    "requested_at"
+  ],
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "engine_id": {
+      "type": "string",
+      "pattern": "^ENG-(0[1-9]|1[0-9])$"
+    },
+    "contract_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actor": {
+      "$ref": "common.schema.json#/$defs/actor"
+    },
+    "input_schema_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expected_state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "policy_decision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deadline_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

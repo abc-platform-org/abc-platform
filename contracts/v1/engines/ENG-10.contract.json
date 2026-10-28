@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-10",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Deterministic Compositing",
+  "purpose": "Composite generated editable region with original hard-locked pixels.",
+  "non_goals": "No arbitrary retouch of eyes/skin/face during hair-only change.",
+  "typed_input_ref": "../schemas/visual-job.schema.json",
+  "typed_output_ref": "../schemas/media.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Same canonical frame, mask position, source version",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Masked change leaked into locked region => fail and do not publish.",
+  "tests": [
+    "VIS-02",
+    "VIS-04"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/staff.schema.json",
+  "title": "staff",
+  "type": "object",
+  "required": [
+    "staff_id",
+    "tenant_id",
+    "branch_ids",
+    "roles",
+    "qualification_service_ids",
+    "active"
+  ],
+  "properties": {
+    "staff_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER",
+          "ORG_OWNER"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "qualification_service_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "shift_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "qualification_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false
+}

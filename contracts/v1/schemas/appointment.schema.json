@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/appointment.schema.json",
+  "title": "appointment",
+  "type": "object",
+  "required": [
+    "appointment_id",
+    "tenant_id",
+    "branch_id",
+    "client_id",
+    "specialist_id",
+    "service_id",
+    "start_at",
+    "end_at",
+    "state",
+    "record_version"
+  ],
+  "properties": {
+    "appointment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "client_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "specialist_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "service_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "start_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timezone": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "REQUESTED",
+        "CONFIRMED",
+        "IN_SERVICE",
+        "COMPLETED",
+        "CANCELLED",
+        "BLOCKED"
+      ]
+    },
+    "record_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "linked_session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payment_state": {
+      "type": "string",
+      "enum": [
+        "UNPAID",
+        "PARTIAL",
+        "PAID",
+        "REFUNDED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "capability_check_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

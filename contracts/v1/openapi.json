@@ -1,0 +1,4678 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ABC Platform — Contract-First Draft API",
+    "version": "1.0.0-draft",
+    "description": "Specification only. No endpoints are deployed. One in-salon shared screen; specialist-operated; tenant from verified auth."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.invalid",
+      "description": "Placeholder only — no live endpoint"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Consultations"
+    },
+    {
+      "name": "Visual"
+    },
+    {
+      "name": "Professional"
+    },
+    {
+      "name": "Operations"
+    },
+    {
+      "name": "Catalog"
+    },
+    {
+      "name": "Business"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/consultations": {
+      "post": {
+        "operationId": "createConsultation",
+        "summary": "Open in-salon shared-screen consultation",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "AUTHENTICATED_SPECIALIST",
+          "BRANCH_MEMBERSHIP",
+          "NO_CLIENT_PORTAL"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "branch_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "appointment_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "service_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "scope": {
+                    "type": "string",
+                    "const": "IN_SALON_SHARED_SCREEN"
+                  }
+                },
+                "required": [
+                  "branch_id",
+                  "scope"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/session.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}": {
+      "get": {
+        "operationId": "getConsultation",
+        "summary": "Retrieve authorized session and version",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "responses": {
+          "200": {
+            "description": "Authorized scoped data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/session.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-abc-policy-guards": [
+          "EXACT_TENANT_BRANCH_SCOPE",
+          "SESSION_FIELD_LEVEL_PROJECTION",
+          "SHARED_VIEW_NO_PRIVATE_DATA"
+        ]
+      }
+    },
+    "/v1/consultations/{session_id}/consents": {
+      "post": {
+        "operationId": "recordConsent",
+        "summary": "Record purpose-bound photo consent",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "CLIENT_PRESENT",
+          "CONSENT_DISCLOSURE",
+          "CONSENT_EVIDENCE_VERIFIED_NOT_SPECIALIST_SELF_ASSERTED",
+          "CLIENT_PRESENT_OR_LEGALLY_VALID_AUTHORIZED_PROXY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "purpose": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "CAPTURE",
+                        "AI_PROCESSING",
+                        "PREVIEW_STORAGE",
+                        "INTERNAL_HANDOFF"
+                      ]
+                    },
+                    "minItems": 1
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "IN_SALON_ACKNOWLEDGEMENT",
+                      "SIGNED_CONSENT"
+                    ]
+                  },
+                  "disclosure_version": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "retention_policy_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "consent_evidence_ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Tamper-evident proof of specific client acknowledgement; validated server-side"
+                  }
+                },
+                "required": [
+                  "client_id",
+                  "purpose",
+                  "source",
+                  "disclosure_version",
+                  "consent_evidence_ref"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/consent.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/questions/next": {
+      "post": {
+        "operationId": "nextConsultationQuestion",
+        "summary": "Suggest next service-adaptive relevant question",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "SERVICE_ENABLED",
+          "EVIDENCE_PROVENANCE"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "service_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "question_profile_version": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "previous_question_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": [
+                  "service_id",
+                  "question_profile_version",
+                  "evidence_ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/question.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/answers": {
+      "post": {
+        "operationId": "recordConsultationAnswer",
+        "summary": "Record client or specialist answer with provenance",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "QUESTION_ACTIVE",
+          "ANSWER_PROVENANCE"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "question_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "answer": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "array",
+                      "null"
+                    ]
+                  },
+                  "answer_source": {
+                    "type": "string",
+                    "enum": [
+                      "CLIENT",
+                      "SPECIALIST"
+                    ]
+                  },
+                  "answer_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "question_id",
+                  "answer",
+                  "answer_source"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/question.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/media-upload-intents": {
+      "post": {
+        "operationId": "requestMediaUpload",
+        "summary": "Create scoped private media upload intent; no raw image bytes",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "ACTIVE_MEDIA_CONSENT",
+          "STORAGE_TENANT_SCOPE"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "asset_role": {
+                    "type": "string",
+                    "enum": [
+                      "CLIENT_ORIGINAL",
+                      "STYLE_REFERENCE"
+                    ]
+                  },
+                  "mime_type": {
+                    "type": "string",
+                    "enum": [
+                      "image/png",
+                      "image/jpeg",
+                      "image/webp"
+                    ]
+                  },
+                  "checksum_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "consent_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "asset_role",
+                  "mime_type",
+                  "checksum_sha256",
+                  "consent_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "asset_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "upload_url": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "asset_id",
+                    "upload_url",
+                    "expires_at"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/analysis-requests": {
+      "post": {
+        "operationId": "requestBeautyAnalysis",
+        "summary": "Request service-scoped evidence analysis",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "SERVICE_SCOPE",
+          "POLICY_ALLOW"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "service_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "service_id",
+                  "evidence_ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/analysis.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/recommendations": {
+      "post": {
+        "operationId": "requestRecommendations",
+        "summary": "Generate grounded bounded recommendations",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "SAFETY_FILTER",
+          "SALON_CAPABILITY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "analysis_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "service_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "consultation_profile_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "analysis_id",
+                  "service_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/recommendation.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/looks": {
+      "post": {
+        "operationId": "createLookVersion",
+        "summary": "Create immutable typed LookSpec version",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "SPEC_VALID",
+          "IMMUTABLE_PARENT",
+          "REFERENCE_ASSETS_TENANT_SCOPED",
+          "REFERENCE_NOT_CLIENT_IDENTITY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "service_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "desired_attributes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "value": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "value"
+                      ]
+                    },
+                    "minItems": 1
+                  },
+                  "editable_regions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "parent_look_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reference_asset_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": [
+                  "service_id",
+                  "desired_attributes",
+                  "editable_regions"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/look.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listSessionLookVersions",
+        "summary": "listSessionLookVersions",
+        "tags": [
+          "AI Studio"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "ONLY_SESSION_LOOKS"
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "./schemas/look.schema.json"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/looks/{look_version_id}/visual-jobs": {
+      "post": {
+        "operationId": "requestVisualPreview",
+        "summary": "Queue controlled visual job for exact LookVersion",
+        "description": "",
+        "tags": [
+          "Visual"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "look_version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "ACTIVE_MEDIA_CONSENT",
+          "LOOK_VERSION_CURRENT",
+          "MODEL_POLICY_ALLOW"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "source_asset_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reference_asset_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "TRANSFORM",
+                      "TRY_ON",
+                      "INSPIRATION"
+                    ]
+                  },
+                  "consent_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "mask_policy_version": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "source_asset_id",
+                  "mode",
+                  "consent_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/visual-job.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/visual-jobs/{job_id}": {
+      "get": {
+        "operationId": "getVisualJob",
+        "summary": "Retrieve job status; not image content",
+        "tags": [
+          "Visual"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "responses": {
+          "200": {
+            "description": "Authorized scoped data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/visual-job.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-abc-policy-guards": [
+          "JOB_SESSION_TENANT_SCOPE",
+          "NO_UNRELEASED_MEDIA_URL",
+          "MODEL_RUNTIME_NOT_CLAIMED"
+        ]
+      }
+    },
+    "/v1/consultations/{session_id}/selected-looks": {
+      "post": {
+        "operationId": "selectLookVersion",
+        "summary": "Record preference for QA-passed selected LookVersion",
+        "description": "",
+        "tags": [
+          "Consultations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "QA_PASS",
+          "CLIENT_PREFERENCE",
+          "SELECT_NOT_VALIDATION",
+          "QA_REPORT_LOOK_VERSION_MATCH_SERVER_VERIFIED"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "look_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "client_preference_recorded": {
+                    "type": "boolean"
+                  },
+                  "qa_report_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "look_version_id",
+                  "client_preference_recorded",
+                  "qa_report_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/look.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/feasibility": {
+      "post": {
+        "operationId": "requestFeasibilityReview",
+        "summary": "Assess physical feasibility separately from visual QA",
+        "description": "",
+        "tags": [
+          "Professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "PROFESSIONAL_EVIDENCE_CHECK",
+          "SAFETY_POLICY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "selected_look_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "service_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": [
+                  "selected_look_version_id",
+                  "service_id",
+                  "evidence_ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/feasibility.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/technical-plans": {
+      "post": {
+        "operationId": "draftTechnicalPlan",
+        "summary": "Draft SOP-grounded plan subject to missing evidence",
+        "description": "",
+        "tags": [
+          "Professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "SOP_APPROVED_WHEN_NEEDED",
+          "NO_UNSUPPORTED_CHEMISTRY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "selected_look_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "feasibility_assessment_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sop_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": [
+                  "selected_look_version_id",
+                  "feasibility_assessment_id",
+                  "evidence_ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/technical-plan.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/technical-plans/{plan_id}/validations": {
+      "post": {
+        "operationId": "validateTechnicalPlan",
+        "summary": "Authenticated qualified human decision tied to exact versions",
+        "description": "",
+        "tags": [
+          "Professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "HUMAN_SPECIALIST_AUTHENTICATED",
+          "QUALIFIED_SERVICE",
+          "EXACT_DEPENDENCY_FINGERPRINT",
+          "QUALIFICATION_DERIVED_FROM_SERVER_PRINCIPAL",
+          "NEVER_TRUST_CLIENT_QUALIFICATION_ID",
+          "SERVER_RECOMPUTES_EVIDENCE_FINGERPRINT"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "VALIDATED",
+                      "CONDITIONALLY_VALIDATED",
+                      "REJECTED",
+                      "NEEDS_REVISION"
+                    ]
+                  },
+                  "plan_version": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "look_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sop_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_fingerprint": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": [
+                  "decision",
+                  "plan_version",
+                  "look_version_id",
+                  "sop_version_id",
+                  "evidence_fingerprint"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/specialist-validation.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/handoffs": {
+      "post": {
+        "operationId": "createInternalHandoff",
+        "summary": "Create locally authorized appointment/work-order handoff",
+        "description": "",
+        "tags": [
+          "Operations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "VALIDATION_CURRENT",
+          "INTERNAL_AUTHORIZED_ONLY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "selected_look_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "technical_plan_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "validation_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "target_domain": {
+                    "type": "string",
+                    "enum": [
+                      "APPOINTMENTS",
+                      "WORK_ORDER",
+                      "CLIENT_RECORD",
+                      "POS"
+                    ]
+                  }
+                },
+                "required": [
+                  "selected_look_version_id",
+                  "validation_id",
+                  "target_domain"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/handoff.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/service-packs/{service_id}": {
+      "get": {
+        "operationId": "getServicePack",
+        "summary": "Inspect current release/capability state",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "responses": {
+          "200": {
+            "description": "Authorized scoped data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/service-pack.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-abc-policy-guards": [
+          "TENANT_SERVICE_CATALOG_SCOPE",
+          "RELEASE_STATE_VISIBLE",
+          "SERVICE_DISABLED_UNTIL_RELEASED"
+        ]
+      }
+    },
+    "/v1/business-insights": {
+      "get": {
+        "operationId": "getBusinessInsights",
+        "summary": "Read source-linked, authorized salon insight",
+        "tags": [
+          "Business"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "x-abc-roles": [
+          "SALON_MANAGER",
+          "ORG_OWNER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "responses": {
+          "200": {
+            "description": "Authorized scoped data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "./schemas/business-insight.schema.json"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-abc-policy-guards": [
+          "TENANT_SCOPED_FINANCIAL_DATA",
+          "SOURCE_EVENT_LINEAGE",
+          "NO_MOCK_KPI_AS_LIVE"
+        ]
+      }
+    },
+    "/v1/business-actions": {
+      "post": {
+        "operationId": "proposeBusinessAction",
+        "summary": "Create typed proposal; no execution by inference",
+        "description": "",
+        "tags": [
+          "Business"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          }
+        ],
+        "x-abc-roles": [
+          "SALON_MANAGER",
+          "ORG_OWNER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "ACTION_POLICY",
+          "NO_DIRECT_AI_MUTATION",
+          "SERVER_COMPUTES_REQUIRES_CONFIRMATION",
+          "SERVER_DOMAIN_POLICY_CONTROLS_APPROVAL"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "domain": {
+                    "type": "string",
+                    "enum": [
+                      "CALENDAR",
+                      "CLIENTS",
+                      "POS",
+                      "INVENTORY",
+                      "MARKETING",
+                      "NOTIFICATIONS"
+                    ]
+                  },
+                  "action_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "branch_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "domain",
+                  "action_type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/business-action.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/business-actions/{action_id}/approve": {
+      "post": {
+        "operationId": "approveBusinessAction",
+        "summary": "Approve authorized business action explicitly",
+        "description": "",
+        "tags": [
+          "Business"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "action_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SALON_MANAGER",
+          "ORG_OWNER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "MANAGEMENT_ROLE",
+          "CONFIRMATION_REQUIRED_IF_SENSITIVE",
+          "SERVER_DERIVED_POLICY_REQUIREMENT",
+          "HUMAN_DECISION_AUDITED"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "confirmation": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "confirmation"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/business-action.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/business-actions/{action_id}/execute": {
+      "post": {
+        "operationId": "executeBusinessAction",
+        "summary": "Execute through real domain adapter and receipt",
+        "description": "",
+        "tags": [
+          "Business"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "action_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Stable per actor and mutation intent; replay same payload is idempotent"
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Optimistic compare-and-swap against authoritative aggregate"
+          }
+        ],
+        "x-abc-roles": [
+          "SALON_MANAGER",
+          "ORG_OWNER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "AUTHORIZATION_CURRENT",
+          "NO_DOUBLE_MUTATION",
+          "REAL_DOMAIN_RECEIPT"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "approved_action_version": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "approved_action_version"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted command outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/business-action.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized / privacy / consent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Evidence or policy constraint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clients": {
+      "post": {
+        "operationId": "createClient",
+        "summary": "Register scoped salon client record",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "CLIENT_DATA_MINIMIZATION",
+          "BRANCH_MEMBERSHIP"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "branch_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "display_name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "preferred_language": {
+                    "type": "string",
+                    "enum": [
+                      "fa",
+                      "en",
+                      "other"
+                    ]
+                  }
+                },
+                "required": [
+                  "branch_id",
+                  "display_name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized domain result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/client.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clients/{client_id}": {
+      "get": {
+        "operationId": "getClient",
+        "summary": "Retrieve authorized client record with field projection",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "TENANT_SCOPED",
+          "SHARED_VIEW_FIELD_PROJECTION"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/client.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/appointments": {
+      "post": {
+        "operationId": "createAppointment",
+        "summary": "Book a real staff/service slot with conflict checks",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "RECEPTION",
+          "SALON_MANAGER",
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "SERVICE_RELEASED",
+          "STAFF_QUALIFIED",
+          "SLOT_CONFLICT_CHECK",
+          "NO_FAKE_BOOKING_RECEIPT"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "branch_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "specialist_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "service_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "start_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "end_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "branch_id",
+                  "client_id",
+                  "specialist_id",
+                  "service_id",
+                  "start_at",
+                  "end_at"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized domain result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/appointment.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/appointments/{appointment_id}": {
+      "get": {
+        "operationId": "getAppointment",
+        "summary": "Retrieve appointment and true status",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "appointment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "TENANT_AND_BRANCH_SCOPE"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/appointment.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/appointments/{appointment_id}/reschedule": {
+      "post": {
+        "operationId": "rescheduleAppointment",
+        "summary": "Reschedule with version CAS and no double-booking",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "appointment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "EXACT_APPOINTMENT_VERSION",
+          "CHECK_CAPACITY",
+          "ATOMIC_SCHEDULE_UPDATE"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "start_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "end_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "start_at",
+                  "end_at"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized domain result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/appointment.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staff": {
+      "get": {
+        "operationId": "listBranchStaff",
+        "summary": "List authorized staff availability/capability",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "BRANCH_SCOPED",
+          "LIMIT_PRIVATE_FIELDS"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "./schemas/staff.schema.json"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/services": {
+      "get": {
+        "operationId": "listServices",
+        "summary": "Show real salon service availability/capabilities",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "NO_UNRELEASED_SERVICE_PROMISE"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "./schemas/service-catalog.schema.json"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/search": {
+      "get": {
+        "operationId": "searchSalonRecords",
+        "summary": "Permission-scoped global search",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "TENANT_SCOPE",
+          "FIELD_PROJECTION",
+          "NO_PRIVATE_RESULT_LEAK"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/search-result.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/branches/{branch_id}": {
+      "get": {
+        "operationId": "getBranch",
+        "summary": "Read authorized tenant branch metadata",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "branch_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER",
+          "ORG_OWNER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "TENANT_SCOPE"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/branch.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/notifications": {
+      "get": {
+        "operationId": "listNotifications",
+        "summary": "Retrieve filtered role/user notifications",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "RECIPIENT_SCOPE",
+          "DEDUPE"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "./schemas/notification.schema.json"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/notifications/{notification_id}/acknowledge": {
+      "post": {
+        "operationId": "ackNotification",
+        "summary": "Mark authorized notification read",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST",
+          "RECEPTION",
+          "SALON_MANAGER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "RECIPIENT_AUTHORIZED"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "acknowledge": {
+                    "type": "boolean",
+                    "const": true
+                  }
+                },
+                "required": [
+                  "acknowledge"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized domain result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/notification.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/salon-config": {
+      "get": {
+        "operationId": "getSalonConfig",
+        "summary": "Read branch configuration with safe projection",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "x-abc-roles": [
+          "SALON_MANAGER",
+          "ORG_OWNER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "CONFIG_READ_SCOPE"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/salon-config.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "updateSalonConfig",
+        "summary": "Update config without bypassing service release gates",
+        "tags": [
+          "Salon OS"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SALON_MANAGER",
+          "ORG_OWNER"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "SERVICE_PACK_RELEASE_GATES",
+          "CONFIG_CHANGE_AUDIT",
+          "PRIVILEGED_ROLE"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "branch_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "enabled_service_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true
+                  },
+                  "language": {
+                    "type": "string",
+                    "enum": [
+                      "fa",
+                      "en"
+                    ]
+                  },
+                  "feature_flags": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "required": [
+                  "branch_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized domain result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/salon-config.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/looks/{look_version_id}": {
+      "get": {
+        "operationId": "getLookVersion",
+        "summary": "getLookVersion",
+        "tags": [
+          "AI Studio"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "look_version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "LOOK_IN_CURRENT_TENANT"
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/look.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/visual-qa/{qa_report_id}": {
+      "get": {
+        "operationId": "getPreviewQualityReport",
+        "summary": "getPreviewQualityReport",
+        "tags": [
+          "AI Studio"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "qa_report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "PRIVILEGED_VIEW",
+          "QA_NOT_FEASIBILITY"
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/visual-qa.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/technical-plans/{plan_id}": {
+      "get": {
+        "operationId": "getPrivilegedTechnicalPlan",
+        "summary": "getPrivilegedTechnicalPlan",
+        "tags": [
+          "AI Studio"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "STEP_UP_AUTH",
+          "QUALIFIED_SERVICE_SCOPE"
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/technical-plan.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/media/{asset_id}/read-intent": {
+      "get": {
+        "operationId": "getMediaReadIntent",
+        "summary": "getMediaReadIntent",
+        "tags": [
+          "AI Studio"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "asset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "ACTIVE_CONSENT",
+          "SHORT_LIVED_SIGNED_URL",
+          "TENANT_OBJECT_SCOPE"
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "asset_id",
+                    "read_url",
+                    "expires_at"
+                  ],
+                  "properties": {
+                    "asset_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "read_url": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/questions": {
+      "get": {
+        "operationId": "listConsultationQuestions",
+        "summary": "listConsultationQuestions",
+        "tags": [
+          "AI Studio"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-policy-guards": [
+          "SESSION_SCOPED_QUESTION_HISTORY"
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "./schemas/question.schema.json"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/consultations/{session_id}/shortlist": {
+      "post": {
+        "operationId": "recordLookPreference",
+        "summary": "Record preference without execution authorization",
+        "tags": [
+          "AI Studio"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "X-Expected-State-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "x-abc-roles": [
+          "SPECIALIST"
+        ],
+        "x-abc-tenant-source": "VERIFIED_AUTH_CONTEXT",
+        "x-abc-idempotent": true,
+        "x-abc-policy-guards": [
+          "ACTIVE_SESSION",
+          "PREFERENCE_NOT_VALIDATION"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "look_version_id",
+                  "kind",
+                  "client_participated"
+                ],
+                "properties": {
+                  "look_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "FAVORITE",
+                      "SHORTLIST",
+                      "REJECTED"
+                    ]
+                  },
+                  "client_participated": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recorded preference",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/look-preference.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "trace_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "required_evidence_keys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "trace_id",
+          "retryable"
+        ]
+      }
+    }
+  },
+  "x-abc-contract-state": "DRAFT_NOT_DEPLOYED",
+  "x-abc-client-tenant-field-policy": "NEVER_TRUST_CLIENT_TENANT_ID",
+  "x-abc-state-authority": "SERVER_ONLY",
+  "x-abc-shared-screen-scope": "IN_SALON"
+}

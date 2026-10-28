@@ -1,0 +1,32 @@
+{
+  "engine_id": "ENG-02",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Adaptive Consultation",
+  "purpose": "Dynamic service-specific question choice, decision impact, evidence gaps, contradictions and stop rule.",
+  "non_goals": "Does not diagnose disease or declare physical feasibility.",
+  "typed_input_ref": "../schemas/session.schema.json",
+  "typed_output_ref": "../schemas/consultation-profile.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "QuestionProfile version and evidence history; prioritize safety over convenience",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "ASK or SKIP with recorded reason; question budget is contextual.",
+  "tests": [
+    "PQ-01",
+    "PQ-02",
+    "PQ-03",
+    "PQ-04"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

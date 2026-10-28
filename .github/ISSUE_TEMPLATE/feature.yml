@@ -1,0 +1,35 @@
+name: Engineering Feature
+description: Contract-driven feature implementation request
+title: "[Feature] "
+labels: ["type:feature"]
+body:
+  - type: input
+    id: feature_id
+    attributes:
+      label: Feature ID
+      description: ABC-Fxx or AIS-xxx
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Scope and contract
+      description: Owner, input/output schema, state, failures, ADRs
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and required tests
+    validations:
+      required: true
+  - type: input
+    id: wp
+    attributes:
+      label: Work package / Phase
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Proof and release gate (fill on completion)

@@ -1,0 +1,15 @@
+blocker_id,original_finding,severity,reviewer_role,action,gap,blocking_gate,status
+B-001,P00-001,CRITICAL,Product/Architecture,Review ADR-001 and source precedence,Missing formal replacement contract,G-00,OPEN_REVIEW
+B-002,P00-002,HIGH,Product/Architecture,Recover or sign SRC-EXC-001..003,No exact verified parent bytes,G-00,SOURCE_BLOCKED
+B-003,P00-003,HIGH,Security,Approve tenant vs per-GPT architecture (ADR-010),Security boundary not signed,G-00,OPEN_REVIEW
+B-004,P00-004,HIGH,Product/UX/Security,Approve ADR-002 shared-view/private data policy,No reviewed role visibility matrix,G-00,OPEN_REVIEW
+B-005,P00-005,CRITICAL,Vision/QA,Approve POC and distinguish inside/outside mask guarantees,No image benchmark or runtime,G-03,DEFER_TO_POC_WITH_REVIEW
+B-006,P00-009,CRITICAL,Specialist/Safety,Establish named SOP approver and ADR-008 evidence rule,No approved per-service SOP in platform,G-00,OPEN_REVIEW
+B-007,P00-010,CRITICAL,Specialist/Security,Approve look-bound validation/expiration,Approval contract not signed,G-00,OPEN_REVIEW
+B-008,P00-011,CRITICAL,Safety,Approve backend safety gate policy,Prompt-only protection insufficient,G-00,OPEN_REVIEW
+B-009,P00-013,CRITICAL,Privacy,Approve consent/photo lifecycle and shared screen disclosures,Legal/security policy missing,G-00,OPEN_REVIEW
+B-010,P00-014,HIGH,Knowledge,Recover 16 derivative knowledge bytes and validate mapping,Freeze metadata but no file hash verification,G-01,DOWNSTREAM_EXPORT
+B-011,P00-015,CRITICAL,QA,Record 120 tests NOT_RUN; approve rollout test plan,Authoring proof not execution proof,G-00,REVIEW_REQUIRED
+B-012,P00-021,MEDIUM,Program/Architecture,"Review draft PR and ADR disposition, avoid merge pending approvals",No formal review signoff,G-00,OPEN_REVIEW
+B-013,P00-025,MEDIUM,Source Owner,Get current source export and metadata where feasible,Historical Notion snapshot date limitation,G-00,OPEN_EVIDENCE
+B-014,WP-000-03,HIGH,Program Owner,Assign actual accountable named reviewers/engine owners,Role-only owner map,G-00,UNASSIGNED

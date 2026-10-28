@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-07",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Look Specification",
+  "purpose": "Translate desired style into immutable semantic LookSpec independent of imagery.",
+  "non_goals": "No technical execution parameters or signoffs.",
+  "typed_input_ref": "../schemas/recommendation.schema.json",
+  "typed_output_ref": "../schemas/look.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Service typed attributes, edit regions, references and parent version",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Reject incompatible style schema or version conflict.",
+  "tests": [
+    "LOOK-01",
+    "LOOK-02"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

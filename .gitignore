@@ -1,0 +1,23 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+node_modules/
+.next/
+dist/
+coverage/
+.venv/
+*.sqlite
+.DS_Store
+*.pem
+*.key
+*.p12
+*.pfx
+*.zip
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.heic
+# Never store real client images or secrets in Git.

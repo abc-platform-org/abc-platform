@@ -1,0 +1,739 @@
+{
+  "schema_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "provenance": "Phase-01 and historic ENG-01..19 design registry",
+  "state": "DRAFT_NOT_DEPLOYED",
+  "engines": [
+    {
+      "engine_id": "ENG-01",
+      "name": "Durable Orchestration",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/engine-command.schema.json",
+      "output_schema": "schemas/session.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "AUTHENTICATED_USER",
+        "TENANT_CONTEXT",
+        "SESSION_VERSION"
+      ],
+      "error_codes": [
+        "CONFLICT",
+        "STALE_VERSION",
+        "NOT_AUTHORIZED"
+      ],
+      "emits": [
+        "SESSION_CREATED",
+        "SESSION_CLOSED",
+        "CONSENT_RECORDED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-02",
+      "name": "Adaptive Consultation",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/session.schema.json",
+      "output_schema": "schemas/consultation-profile.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "CONSENT_IF_MEDIA",
+        "SERVICE_SCOPE",
+        "EVIDENCE_PROVENANCE"
+      ],
+      "error_codes": [
+        "MISSING_EVIDENCE",
+        "POLICY_BLOCKED"
+      ],
+      "emits": [
+        "QUESTION_ASKED",
+        "ANSWER_RECORDED",
+        "INTENT_SET"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-03",
+      "name": "Evidence and Input Quality",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/media.schema.json",
+      "output_schema": "schemas/evidence.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "ACTIVE_MEDIA_CONSENT",
+        "ASSET_SCOPE",
+        "IMAGE_QA"
+      ],
+      "error_codes": [
+        "CONSENT_REQUIRED",
+        "BAD_INPUT"
+      ],
+      "emits": [
+        "INPUT_QA_COMPLETED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-04",
+      "name": "Beauty Analysis",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/evidence.schema.json",
+      "output_schema": "schemas/analysis.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "SERVICE_SCOPE",
+        "NO_MEDICAL_DIAGNOSIS",
+        "PROVENANCE"
+      ],
+      "error_codes": [
+        "MISSING_EVIDENCE",
+        "POLICY_BLOCKED"
+      ],
+      "emits": [
+        "ANALYSIS_READY"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-05",
+      "name": "Knowledge and Ontology",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/service-pack.schema.json",
+      "output_schema": "schemas/knowledge.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "SOURCE_VERSION",
+        "TRUSTED_KB",
+        "SERVICE_SCOPE"
+      ],
+      "error_codes": [
+        "SOURCE_UNVERIFIED",
+        "MISSING_EVIDENCE"
+      ],
+      "emits": [
+        "KNOWLEDGE_RESOLVED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-06",
+      "name": "Decision and Recommendation",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/analysis.schema.json",
+      "output_schema": "schemas/recommendation.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "SAFETY_FILTER",
+        "SALON_CAPABILITY",
+        "NO_FABRICATED_SCORES"
+      ],
+      "error_codes": [
+        "POLICY_BLOCKED",
+        "MISSING_EVIDENCE"
+      ],
+      "emits": [
+        "RECOMMENDATIONS_READY"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-07",
+      "name": "Look Specification",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/recommendation.schema.json",
+      "output_schema": "schemas/look.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "SPEC_SEMANTIC_VALIDITY",
+        "IMMUTABLE_VERSION",
+        "SERVICE_SCOPE"
+      ],
+      "error_codes": [
+        "BAD_INPUT",
+        "OUTDATED_VERSION"
+      ],
+      "emits": [
+        "LOOK_SPEC_VERSIONED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-08",
+      "name": "Visual Segmentation",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/look.schema.json",
+      "output_schema": "schemas/visual-mask.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "MEDIA_CONSENT",
+        "REGION_POLICY",
+        "CANONICAL_COORDINATES"
+      ],
+      "error_codes": [
+        "BAD_INPUT",
+        "VISUAL_QA_FAILED"
+      ],
+      "emits": [
+        "MASKS_READY"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-09",
+      "name": "Controlled Visual Generation",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/visual-mask.schema.json",
+      "output_schema": "schemas/visual-job.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "ACTIVE_MEDIA_CONSENT",
+        "POLICY_ALLOW",
+        "REFERENCES_ISOLATED"
+      ],
+      "error_codes": [
+        "MODEL_TIMEOUT",
+        "RETRYABLE_UPSTREAM_ERROR"
+      ],
+      "emits": [
+        "VISUAL_JOB_CREATED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-10",
+      "name": "Deterministic Compositing",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/visual-job.schema.json",
+      "output_schema": "schemas/media.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "LOCKED_REGIONS_UNCHANGED",
+        "SOURCE_VERSION_MATCH"
+      ],
+      "error_codes": [
+        "VISUAL_QA_FAILED",
+        "OUTDATED_VERSION"
+      ],
+      "emits": [
+        "COMPOSITE_READY"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-11",
+      "name": "Visual Quality Assurance",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/media.schema.json",
+      "output_schema": "schemas/visual-qa.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "IDENTITY_PRESERVATION",
+        "REGION_FIDELITY",
+        "NO_FALSE_QA_PASS"
+      ],
+      "error_codes": [
+        "VISUAL_QA_FAILED",
+        "MISSING_EVIDENCE"
+      ],
+      "emits": [
+        "PREVIEW_QA_COMPLETED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": true
+    },
+    {
+      "engine_id": "ENG-12",
+      "name": "Visual State and Version",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/look.schema.json",
+      "output_schema": "schemas/look.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "ACCEPTED_STATE_PRESERVED",
+        "CAS_EXPECTED_VERSION",
+        "IMMUTABLE_PARENT"
+      ],
+      "error_codes": [
+        "OUTDATED_VERSION",
+        "CONFLICT"
+      ],
+      "emits": [
+        "LOOK_SELECTED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-13",
+      "name": "Service Feasibility",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/look.schema.json",
+      "output_schema": "schemas/feasibility.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "SOP_REQUIRED_WHEN_APPLICABLE",
+        "PROFESSIONAL_EVIDENCE",
+        "VISUAL_NOT_FEASIBLE"
+      ],
+      "error_codes": [
+        "MISSING_EVIDENCE",
+        "SOP_UNAVAILABLE"
+      ],
+      "emits": [
+        "FEASIBILITY_REVIEWED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": true
+    },
+    {
+      "engine_id": "ENG-14",
+      "name": "Safety and Policy",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/engine-command.schema.json",
+      "output_schema": "schemas/policy-decision.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "S0_TO_S3_ENFORCED",
+        "NO_BYPASS",
+        "AUTH_CONTEXT"
+      ],
+      "error_codes": [
+        "POLICY_BLOCKED",
+        "NOT_AUTHORIZED"
+      ],
+      "emits": [
+        "POLICY_BLOCKED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": true
+    },
+    {
+      "engine_id": "ENG-15",
+      "name": "Technical Planning",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/feasibility.schema.json",
+      "output_schema": "schemas/technical-plan.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "APPROVED_SOP",
+        "CLIENT_FACTS",
+        "NO_INVENTED_PARAMETERS"
+      ],
+      "error_codes": [
+        "SOP_UNAVAILABLE",
+        "MISSING_EVIDENCE",
+        "HUMAN_APPROVAL_REQUIRED"
+      ],
+      "emits": [
+        "PLAN_DRAFTED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": true
+    },
+    {
+      "engine_id": "ENG-16",
+      "name": "Specialist Validation",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/technical-plan.schema.json",
+      "output_schema": "schemas/specialist-validation.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "AUTHENTICATED_QUALIFIED_HUMAN",
+        "VERSION_BOUND_APPROVAL",
+        "NO_SELF_APPROVAL_BY_ENGINE"
+      ],
+      "error_codes": [
+        "NOT_AUTHORIZED",
+        "STALE_VERSION",
+        "HUMAN_APPROVAL_REQUIRED"
+      ],
+      "emits": [
+        "PLAN_VALIDATED",
+        "VALIDATION_INVALIDATED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": true
+    },
+    {
+      "engine_id": "ENG-17",
+      "name": "Output and Handoff",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/specialist-validation.schema.json",
+      "output_schema": "schemas/handoff.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "AUTHORIZED_INTERNAL_ONLY",
+        "VALID_PLAN_VERSION",
+        "TENANT_CONTEXT"
+      ],
+      "error_codes": [
+        "NOT_AUTHORIZED",
+        "CONFLICT"
+      ],
+      "emits": [
+        "HANDOFF_CREATED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": true
+    },
+    {
+      "engine_id": "ENG-18",
+      "name": "Business Intelligence",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/event.schema.json",
+      "output_schema": "schemas/business-insight.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "REAL_EVENT_PROVENANCE",
+        "PERMISSION_SCOPE",
+        "NO_DEMO_KPI"
+      ],
+      "error_codes": [
+        "MISSING_EVIDENCE",
+        "TENANT_SCOPE_VIOLATION"
+      ],
+      "emits": [
+        "BUSINESS_INSIGHT_READY"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    },
+    {
+      "engine_id": "ENG-19",
+      "name": "Opportunity and Automation",
+      "owner": "saleheebrahimi2029-hub",
+      "contract_version": "1.0.0-draft",
+      "deployment_status": "DESIGN_ONLY",
+      "invocation": "TYPED_COMMAND_OR_EVENT",
+      "input_schema": "schemas/business-insight.schema.json",
+      "output_schema": "schemas/business-action.schema.json",
+      "auth_context": "SERVER_VERIFIED_TENANT_AND_ROLE",
+      "preconditions": [
+        "READ_RECOMMEND_EXECUTE",
+        "CONFIRMATION_REQUIRED",
+        "IDEMPOTENT_MUTATION"
+      ],
+      "error_codes": [
+        "NOT_AUTHORIZED",
+        "CONFLICT",
+        "HUMAN_APPROVAL_REQUIRED"
+      ],
+      "emits": [
+        "ACTION_APPROVAL_REQUESTED",
+        "ACTION_CONFIRMED"
+      ],
+      "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
+      "observability": [
+        "correlation_id",
+        "trace_id",
+        "engine_version",
+        "outcome",
+        "error_code",
+        "duration_ms"
+      ],
+      "tests": [
+        "CT-SCHEMA-01",
+        "CT-ID-01",
+        "CT-SEC-01"
+      ],
+      "human_approval_may_be_required": false
+    }
+  ]
+}

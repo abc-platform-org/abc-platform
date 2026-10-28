@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/handoff.schema.json",
+  "title": "handoff",
+  "type": "object",
+  "required": [
+    "handoff_id",
+    "session_id",
+    "service_id",
+    "selected_look_version_id",
+    "status",
+    "created_at",
+    "target_domain"
+  ],
+  "properties": {
+    "handoff_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "service_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "selected_look_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "READY_FOR_INTERNAL_REVIEW",
+        "AUTHORIZED",
+        "SUBMITTED",
+        "CONFIRMED",
+        "FAILED",
+        "CANCELLED"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "target_domain": {
+      "type": "string",
+      "enum": [
+        "APPOINTMENTS",
+        "WORK_ORDER",
+        "CLIENT_RECORD",
+        "POS"
+      ]
+    },
+    "appointment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "client_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "technical_plan_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "validation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authorized_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authorized_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "business_action_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "operation_receipt_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "AUTHORIZED",
+              "SUBMITTED",
+              "CONFIRMED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "authorized_by",
+          "authorized_at",
+          "validation_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "CONFIRMED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "operation_receipt_id",
+          "business_action_id"
+        ]
+      }
+    }
+  ]
+}

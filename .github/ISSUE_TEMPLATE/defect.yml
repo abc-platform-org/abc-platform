@@ -1,0 +1,25 @@
+name: Defect
+description: Reproducible code or behavior defect
+title: "[Bug] "
+labels: ["type:defect"]
+body:
+  - type: input
+    id: build
+    attributes:
+      label: Build / engine version
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce and expected vs actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact, severity, tenant/safety/privacy implications
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Safe evidence (no client PII)

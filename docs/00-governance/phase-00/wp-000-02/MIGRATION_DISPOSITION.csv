@@ -1,0 +1,21 @@
+migration_id,bounded_obligation,decision_or_exception,accountable_role,wp00002_state,closure_evidence,gate
+MIG-01,Legacy GPT runtime vs independent platform,ADR-001,Product & Architecture Authority,REVIEW_REQUIRED,Reviewed runtime ADR + legacy compatibility map,G-00
+MIG-02,10 logical agents to 19 target responsibilities,ADR-001;ADR-009,Architecture Authority,REVIEW_REQUIRED,Approved engine mapping; Phase-02 contracts and tests,G-00
+MIG-03,Progressive questioning -> adaptive registry,ADR-002,Consultation Owner,DOWNSTREAM_CONTRACT,Question profile schema + PQ tests,G-01
+MIG-04,39 service IDs and 45 attributes,ADR-003,Knowledge Owner,DOWNSTREAM_EXPORT,Versioned ontology + 16 KB derivative hash review,G-01
+MIG-05,Qualitative decision productization lineage,ADR-007;SRC-EXC-001..003,Product & QA Authority,SOURCE_EXCEPTION_PENDING,Verified parents or signed bounded exception,G-00
+MIG-06,GPT visual deferral -> platform segmentation,ADR-004,Vision Owner,DOWNSTREAM_POC,Mask/generation/compositing contract + benchmark,G-03
+MIG-07,Visual quality and threshold calibration,ADR-005,QA/Vision Owner,DOWNSTREAM_CALIBRATION,Expert review and representative VIS runs,G-03
+MIG-08,Text state -> durable session/events,ADR-009,Runtime Owner,REVIEW_REQUIRED,Reviewed state/persistence decision + SES contract,G-00
+MIG-09,Remote handoff -> in-salon scoped output,ADR-002;ADR-010,Product/Output Owner,REVIEW_REQUIRED,Role-scoped OUT mapping and specialist-only handoff,G-00
+MIG-10,Prompt safety -> backend policy gate,ADR-008;ADR-010,Safety Authority,REVIEW_REQUIRED,Reviewed safety authority; nonbypassable tests,G-00
+MIG-11,One GPT per salon -> tenant/branch model,ADR-010,Security Authority,REVIEW_REQUIRED,Tenant boundary and negative auth test plan,G-00
+MIG-12,New technical plan and SOP validation,ADR-008,Specialist/Safety Authority,REVIEW_REQUIRED,"SOP provenance, domain expert owner, signed gates",G-00
+MIG-13,Shared-screen specialist session,ADR-002,Product/UX Authority,REVIEW_REQUIRED,Screen privacy threat review and role matrix,G-00
+MIG-14,Business OS data and UI mocks,ADR-010,Business Systems Owner,DOWNSTREAM_DATA,"Data lineage, real KPIs and transactional workflow",G-07
+MIG-15,120 authored tests productization overlays,QA_EVIDENCE_REQUIREMENTS,QA Authority,REVIEW_REQUIRED,Reviewer adopts 120-ID overlay; runtime NOT_RUN retained,G-00
+MIG-16,Master GPT build-ready -> platform implementation,ADR-001,Delivery Authority,DOWNSTREAM_BUILD,"Actual code, CI, smoke and contract tests",G-04
+MIG-17,Legacy readiness placeholders,QA_EVIDENCE_REQUIREMENTS,Release Authority,DOWNSTREAM_RELEASE,New platform readiness review and pilot plan,G-08
+MIG-18,Missing three productization parent sources,SRC-EXC-001..003,Product & Architecture Authority,SOURCE_EXCEPTION_PENDING,Recovered sources or signed bounded exceptions,G-00
+MIG-19,Mode-specific visual contracts,ADR-004;ADR-005,AI Studio Owner,DOWNSTREAM_CONTRACT,Service x transformation compatibility and VIS tests,G-03
+MIG-20,Phase/feature/engine/test traceability,ADR_REVIEW_PACKAGE,Program Owner,DOWNSTREAM_OWNERSHIP,"Named owners, issue IDs, contract/test links",G-01

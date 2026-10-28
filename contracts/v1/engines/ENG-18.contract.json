@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-18",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Business Intelligence",
+  "purpose": "Compute source-linked salon metrics with periods/currency/freshness.",
+  "non_goals": "Never turn screenshot sample KPIs into live transaction data.",
+  "typed_input_ref": "../schemas/event.schema.json",
+  "typed_output_ref": "../schemas/business-insight.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Verified operations event lineage and scoped query",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Unknown or stale input clearly labeled.",
+  "tests": [
+    "BUS-01",
+    "BUS-02"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

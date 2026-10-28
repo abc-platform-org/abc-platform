@@ -1,0 +1,186 @@
+{
+  "version": "1.0.0-draft",
+  "schema": "ProblemDetails-style response with code, message, trace_id, retryable and optional required_evidence_keys",
+  "errors": [
+    {
+      "code": "BAD_INPUT",
+      "http_status": 400,
+      "retryable": false,
+      "meaning": "Request contract or semantic input invalid",
+      "public_message_code": "ABC_BAD_INPUT",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "MISSING_EVIDENCE",
+      "http_status": 422,
+      "retryable": false,
+      "meaning": "Required decision/safety evidence absent",
+      "public_message_code": "ABC_MISSING_EVIDENCE",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "NOT_AUTHORIZED",
+      "http_status": 403,
+      "retryable": false,
+      "meaning": "Actor lacks permission for command",
+      "public_message_code": "ABC_NOT_AUTHORIZED",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "TENANT_SCOPE_VIOLATION",
+      "http_status": 403,
+      "retryable": false,
+      "meaning": "Cross-tenant or branch scope denied",
+      "public_message_code": "ABC_TENANT_SCOPE_VIOLATION",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "CONSENT_REQUIRED",
+      "http_status": 403,
+      "retryable": false,
+      "meaning": "Photo AI processing not permitted",
+      "public_message_code": "ABC_CONSENT_REQUIRED",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "CONSENT_WITHDRAWN",
+      "http_status": 403,
+      "retryable": false,
+      "meaning": "Processing blocked by consent revocation",
+      "public_message_code": "ABC_CONSENT_WITHDRAWN",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "POLICY_BLOCKED",
+      "http_status": 403,
+      "retryable": false,
+      "meaning": "Non-bypassable safety or policy decision",
+      "public_message_code": "ABC_POLICY_BLOCKED",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "CAPABILITY_UNAVAILABLE",
+      "http_status": 422,
+      "retryable": false,
+      "meaning": "Salon/service pack capability absent",
+      "public_message_code": "ABC_CAPABILITY_UNAVAILABLE",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "MODEL_TIMEOUT",
+      "http_status": 504,
+      "retryable": true,
+      "meaning": "Generation provider timed out",
+      "public_message_code": "ABC_MODEL_TIMEOUT",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "VISUAL_QA_FAILED",
+      "http_status": 422,
+      "retryable": false,
+      "meaning": "Preview failed identity/region/quality review",
+      "public_message_code": "ABC_VISUAL_QA_FAILED",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "SOP_UNAVAILABLE",
+      "http_status": 422,
+      "retryable": false,
+      "meaning": "Approved protocol not available",
+      "public_message_code": "ABC_SOP_UNAVAILABLE",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "HUMAN_APPROVAL_REQUIRED",
+      "http_status": 409,
+      "retryable": false,
+      "meaning": "Qualified specialist or action confirmation required",
+      "public_message_code": "ABC_HUMAN_APPROVAL_REQUIRED",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "OUTDATED_VERSION",
+      "http_status": 409,
+      "retryable": false,
+      "meaning": "Immutable look/SOP/evidence dependency superseded",
+      "public_message_code": "ABC_OUTDATED_VERSION",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "STALE_VERSION",
+      "http_status": 409,
+      "retryable": false,
+      "meaning": "Expected aggregate version no longer current",
+      "public_message_code": "ABC_STALE_VERSION",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "meaning": "Idempotency mismatch or concurrent update",
+      "public_message_code": "ABC_CONFLICT",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "RETRYABLE_UPSTREAM_ERROR",
+      "http_status": 503,
+      "retryable": true,
+      "meaning": "Temporary dependency failure",
+      "public_message_code": "ABC_RETRYABLE_UPSTREAM_ERROR",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "SOURCE_UNVERIFIED",
+      "http_status": 422,
+      "retryable": false,
+      "meaning": "Knowledge or manufacturer evidence not verified",
+      "public_message_code": "ABC_SOURCE_UNVERIFIED",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "EXTERNAL_ACTION_FAILED",
+      "http_status": 502,
+      "retryable": true,
+      "meaning": "Real domain operation failed; no success receipt",
+      "public_message_code": "ABC_EXTERNAL_ACTION_FAILED",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "NO_RELEASED_SERVICE_PACK",
+      "http_status": 422,
+      "retryable": false,
+      "meaning": "Service not released in tenant",
+      "public_message_code": "ABC_NO_RELEASED_SERVICE_PACK",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    },
+    {
+      "code": "PRIVATE_VIEW_LOCKED",
+      "http_status": 403,
+      "retryable": false,
+      "meaning": "Privileged view requires reauthentication",
+      "public_message_code": "ABC_PRIVATE_VIEW_LOCKED",
+      "require_trace_id": true,
+      "allowed_retry": "IDEMPOTENT_ONLY"
+    }
+  ]
+}

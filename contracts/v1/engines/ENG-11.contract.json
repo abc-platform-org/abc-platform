@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-11",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Visual Quality Assurance",
+  "purpose": "Assess region fidelity, identity/reference isolation, perceptual QA and uncertainty.",
+  "non_goals": "Does not certify real-world reproducibility or service feasibility.",
+  "typed_input_ref": "../schemas/media.schema.json",
+  "typed_output_ref": "../schemas/visual-qa.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Measured evaluators and review labels; never fabricates PASS.",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "FAIL or INDETERMINATE blocks QA_PASSED preview.",
+  "tests": [
+    "VIS-QA-01",
+    "VIS-QA-02"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "REQUIRES_QUALIFIED_HUMAN_WHEN_APPLICABLE"
+}

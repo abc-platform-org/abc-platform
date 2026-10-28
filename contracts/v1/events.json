@@ -1,0 +1,302 @@
+{
+  "version": "1.0.0-draft",
+  "delivery": "TRANSACTIONAL_OUTBOX_AT_LEAST_ONCE",
+  "ordering": "PER_AGGREGATE_VERSION",
+  "deduplication": "consumer_id:event_id",
+  "envelope_schema": "schemas/event.schema.json",
+  "max_delivery_attempts": "TO_BE_BENCHMARKED",
+  "event_types": [
+    {
+      "event_type": "SESSION_CREATED",
+      "producer_engine_id": "ENG-01",
+      "required_payload_keys": [
+        "session_id",
+        "branch_id"
+      ],
+      "payload_reference_schema": "schemas/session.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "CONSENT_RECORDED",
+      "producer_engine_id": "ENG-01",
+      "required_payload_keys": [
+        "session_id",
+        "consent_id",
+        "status"
+      ],
+      "payload_reference_schema": "schemas/consent.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "INTENT_SET",
+      "producer_engine_id": "ENG-02",
+      "required_payload_keys": [
+        "session_id",
+        "service_id"
+      ],
+      "payload_reference_schema": "schemas/session.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "QUESTION_ASKED",
+      "producer_engine_id": "ENG-02",
+      "required_payload_keys": [
+        "question_id",
+        "session_id"
+      ],
+      "payload_reference_schema": "schemas/question.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "ANSWER_RECORDED",
+      "producer_engine_id": "ENG-02",
+      "required_payload_keys": [
+        "question_id",
+        "session_id",
+        "answer_id"
+      ],
+      "payload_reference_schema": "schemas/question.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "INPUT_QA_COMPLETED",
+      "producer_engine_id": "ENG-03",
+      "required_payload_keys": [
+        "session_id",
+        "asset_id",
+        "status"
+      ],
+      "payload_reference_schema": "schemas/media.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "ANALYSIS_READY",
+      "producer_engine_id": "ENG-04",
+      "required_payload_keys": [
+        "analysis_id",
+        "session_id"
+      ],
+      "payload_reference_schema": "schemas/analysis.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "KNOWLEDGE_RESOLVED",
+      "producer_engine_id": "ENG-05",
+      "required_payload_keys": [
+        "knowledge_package_id",
+        "service_id"
+      ],
+      "payload_reference_schema": "schemas/knowledge.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "RECOMMENDATIONS_READY",
+      "producer_engine_id": "ENG-06",
+      "required_payload_keys": [
+        "recommendation_set_id",
+        "session_id"
+      ],
+      "payload_reference_schema": "schemas/recommendation.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "LOOK_SPEC_VERSIONED",
+      "producer_engine_id": "ENG-07",
+      "required_payload_keys": [
+        "look_spec_id",
+        "look_version_id"
+      ],
+      "payload_reference_schema": "schemas/look.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "MASKS_READY",
+      "producer_engine_id": "ENG-08",
+      "required_payload_keys": [
+        "mask_set_id",
+        "look_version_id"
+      ],
+      "payload_reference_schema": "schemas/visual-mask.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "VISUAL_JOB_CREATED",
+      "producer_engine_id": "ENG-09",
+      "required_payload_keys": [
+        "job_id",
+        "look_version_id"
+      ],
+      "payload_reference_schema": "schemas/visual-job.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "COMPOSITE_READY",
+      "producer_engine_id": "ENG-10",
+      "required_payload_keys": [
+        "job_id",
+        "asset_id"
+      ],
+      "payload_reference_schema": "schemas/media.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "PREVIEW_QA_COMPLETED",
+      "producer_engine_id": "ENG-11",
+      "required_payload_keys": [
+        "qa_report_id",
+        "job_id",
+        "qa_status"
+      ],
+      "payload_reference_schema": "schemas/visual-qa.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "LOOK_SELECTED",
+      "producer_engine_id": "ENG-12",
+      "required_payload_keys": [
+        "session_id",
+        "look_version_id"
+      ],
+      "payload_reference_schema": "schemas/look.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "FEASIBILITY_REVIEWED",
+      "producer_engine_id": "ENG-13",
+      "required_payload_keys": [
+        "assessment_id",
+        "look_version_id",
+        "status"
+      ],
+      "payload_reference_schema": "schemas/feasibility.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "POLICY_BLOCKED",
+      "producer_engine_id": "ENG-14",
+      "required_payload_keys": [
+        "policy_decision_id",
+        "reason_codes"
+      ],
+      "payload_reference_schema": "schemas/policy-decision.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": true
+    },
+    {
+      "event_type": "PLAN_DRAFTED",
+      "producer_engine_id": "ENG-15",
+      "required_payload_keys": [
+        "plan_id",
+        "selected_look_version_id",
+        "plan_version"
+      ],
+      "payload_reference_schema": "schemas/technical-plan.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "PLAN_VALIDATED",
+      "producer_engine_id": "ENG-16",
+      "required_payload_keys": [
+        "validation_id",
+        "plan_id",
+        "specialist_id"
+      ],
+      "payload_reference_schema": "schemas/specialist-validation.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": true
+    },
+    {
+      "event_type": "VALIDATION_INVALIDATED",
+      "producer_engine_id": "ENG-16",
+      "required_payload_keys": [
+        "validation_id",
+        "plan_id",
+        "reason"
+      ],
+      "payload_reference_schema": "schemas/specialist-validation.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "HANDOFF_CREATED",
+      "producer_engine_id": "ENG-17",
+      "required_payload_keys": [
+        "handoff_id",
+        "session_id",
+        "status"
+      ],
+      "payload_reference_schema": "schemas/handoff.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "BUSINESS_INSIGHT_READY",
+      "producer_engine_id": "ENG-18",
+      "required_payload_keys": [
+        "insight_id",
+        "tenant_id"
+      ],
+      "payload_reference_schema": "schemas/business-insight.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "ACTION_APPROVAL_REQUESTED",
+      "producer_engine_id": "ENG-19",
+      "required_payload_keys": [
+        "action_id",
+        "requires_confirmation"
+      ],
+      "payload_reference_schema": "schemas/business-action.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    },
+    {
+      "event_type": "ACTION_CONFIRMED",
+      "producer_engine_id": "ENG-19",
+      "required_payload_keys": [
+        "action_id",
+        "operation_receipt_id"
+      ],
+      "payload_reference_schema": "schemas/business-action.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": true
+    },
+    {
+      "event_type": "SESSION_CLOSED",
+      "producer_engine_id": "ENG-01",
+      "required_payload_keys": [
+        "session_id",
+        "closure_reason"
+      ],
+      "payload_reference_schema": "schemas/session.schema.json",
+      "payload_contract_status": "DRAFT_FIELDS_ONLY; semantic cross-aggregate rules pending",
+      "safety_interceptor": false
+    }
+  ],
+  "consumer_rules": {
+    "unknown_type": "DLQ_AND_REVIEW",
+    "future_schema_version": "DLQ_AND_REVIEW",
+    "same_id_replayed": "ACK_NO_DUPLICATE",
+    "causation": "REQUIRE_CORRELATION_AND_TRACE",
+    "cross_tenant": "DENY_AND_AUDIT",
+    "stale_version": "DO_NOT_PUBLISH_CURRENT_STATE"
+  }
+}

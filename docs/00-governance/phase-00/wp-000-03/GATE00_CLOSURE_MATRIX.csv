@@ -1,0 +1,15 @@
+blocker_id,source_finding,target_gate,classification,github_issue,accountable_role,minimum_close_evidence,state
+B-001,P00-001,G-00,HARD,03,Product+Architecture,ADR-001 authority and legacy-vs-target precedence,OPEN_NEEDS_HUMAN_DECISION
+B-002,P00-002,G-00,HARD,02,Product+Architecture+QA,All 3 recovered parent documents OR 3 signed bounded exceptions,UNRECOVERED
+B-003,P00-003,G-00,HARD,05,Security,Reviewed tenancy vs per-GPT decision/ADR-010,OPEN_NEEDS_HUMAN_DECISION
+B-004,P00-004,G-00,HARD,05,Product+UX+Security,Accepted shared-screen disclosure / private view / permitted roles,OPEN_NEEDS_HUMAN_DECISION
+B-005,P00-005,G-03,DEFERABLE_ONLY_WITH_G00_RISK_ACCEPTANCE,07,Vision+QA,Approved visual POC/benchmark scope; actual runtime evidence at G-03,REVIEW_PENDING
+B-006,P00-009,G-00,HARD,06,Qualified Specialist+Safety,Named SOP authority and human validation policy,OPEN_NEEDS_QUALIFIED_REVIEW
+B-007,P00-010,G-00,HARD,06,Specialist+Security,Version-bounded human validation contract and invalidation review,OPEN_NEEDS_HUMAN_DECISION
+B-008,P00-011,G-00,HARD,06,Safety+Security,Non-bypassable policy placement and negative test plan reviewed,OPEN_NEEDS_HUMAN_DECISION
+B-009,P00-013,G-00,HARD,05,Privacy+Legal counsel as relevant,Consent/image retention/deletion and shared-display threat model signed,OPEN_NEEDS_HUMAN_DECISION
+B-010,P00-014,G-01,DEFERABLE_ONLY_WITH_G00_RISK_ACCEPTANCE,08,Knowledge/Ontology,16 derivative KB bytes/hash + 39 services/45 attributes lineage,SOURCE_BYTES_NOT_VERIFIED
+B-011,P00-015,G-00,HARD_EVIDENCE_CLASSIFICATION,07,QA,Signed authored-vs-executed distinction and accepted evaluation plan; 120-run evidence only at later release gate,OPEN_NEEDS_QA_REVIEW
+B-012,P00-021,G-00,HARD,09,Program+Architecture,PR review and signed Gate decision; no auto-merge,OPEN_NEEDS_GOVERNANCE
+B-013,P00-025,G-00,HARD_SOURCE_SCOPE,02,Source/Product,Verified latest source export OR accepted snapshot/lineage exception,SOURCE_SNAPSHOT_LIMITATION
+B-014,WP-000-03,G-00,HARD,04,Program,Named actual individuals and conflict-of-interest controls for six governance approvals/19 engines,UNASSIGNED

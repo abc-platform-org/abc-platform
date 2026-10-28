@@ -1,0 +1,2473 @@
+{
+  "version": "1.0.0-draft",
+  "scope": "Versioned synthetic EVENT ENVELOPE and payload tests (not runtime producer/consumer tests)",
+  "positive": [
+    {
+      "event_type": "SESSION_CREATED",
+      "instance": {
+        "event_id": "id-SESSION_CREATED",
+        "event_type": "SESSION_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "branch_id": "branch_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "CONSENT_RECORDED",
+      "instance": {
+        "event_id": "id-CONSENT_RECORDED",
+        "event_type": "CONSENT_RECORDED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "consent_id": "consent_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "INTENT_SET",
+      "instance": {
+        "event_id": "id-INTENT_SET",
+        "event_type": "INTENT_SET",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "service_id": "service_id-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "QUESTION_ASKED",
+      "instance": {
+        "event_id": "id-QUESTION_ASKED",
+        "event_type": "QUESTION_ASKED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "question_id": "question_id-sample",
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "ANSWER_RECORDED",
+      "instance": {
+        "event_id": "id-ANSWER_RECORDED",
+        "event_type": "ANSWER_RECORDED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "question_id": "question_id-sample",
+          "session_id": "session_id-sample",
+          "answer_id": "answer_id-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "INPUT_QA_COMPLETED",
+      "instance": {
+        "event_id": "id-INPUT_QA_COMPLETED",
+        "event_type": "INPUT_QA_COMPLETED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "asset_id": "asset_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-03",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "ANALYSIS_READY",
+      "instance": {
+        "event_id": "id-ANALYSIS_READY",
+        "event_type": "ANALYSIS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "analysis_id": "analysis_id-sample",
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-04",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "KNOWLEDGE_RESOLVED",
+      "instance": {
+        "event_id": "id-KNOWLEDGE_RESOLVED",
+        "event_type": "KNOWLEDGE_RESOLVED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "knowledge_package_id": "knowledge_package_id-sample",
+          "service_id": "service_id-sample"
+        },
+        "producer_engine_id": "ENG-05",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "RECOMMENDATIONS_READY",
+      "instance": {
+        "event_id": "id-RECOMMENDATIONS_READY",
+        "event_type": "RECOMMENDATIONS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "recommendation_set_id": "recommendation_set_id-sample",
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-06",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "LOOK_SPEC_VERSIONED",
+      "instance": {
+        "event_id": "id-LOOK_SPEC_VERSIONED",
+        "event_type": "LOOK_SPEC_VERSIONED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "look_spec_id": "look_spec_id-sample",
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-07",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "MASKS_READY",
+      "instance": {
+        "event_id": "id-MASKS_READY",
+        "event_type": "MASKS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "mask_set_id": "mask_set_id-sample",
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-08",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "VISUAL_JOB_CREATED",
+      "instance": {
+        "event_id": "id-VISUAL_JOB_CREATED",
+        "event_type": "VISUAL_JOB_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "job_id": "job_id-sample",
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-09",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "COMPOSITE_READY",
+      "instance": {
+        "event_id": "id-COMPOSITE_READY",
+        "event_type": "COMPOSITE_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "job_id": "job_id-sample",
+          "asset_id": "asset_id-sample"
+        },
+        "producer_engine_id": "ENG-10",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "PREVIEW_QA_COMPLETED",
+      "instance": {
+        "event_id": "id-PREVIEW_QA_COMPLETED",
+        "event_type": "PREVIEW_QA_COMPLETED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "qa_report_id": "qa_report_id-sample",
+          "job_id": "job_id-sample",
+          "qa_status": "PASS"
+        },
+        "producer_engine_id": "ENG-11",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "LOOK_SELECTED",
+      "instance": {
+        "event_id": "id-LOOK_SELECTED",
+        "event_type": "LOOK_SELECTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-12",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "FEASIBILITY_REVIEWED",
+      "instance": {
+        "event_id": "id-FEASIBILITY_REVIEWED",
+        "event_type": "FEASIBILITY_REVIEWED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "assessment_id": "assessment_id-sample",
+          "look_version_id": "look_version_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-13",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "POLICY_BLOCKED",
+      "instance": {
+        "event_id": "id-POLICY_BLOCKED",
+        "event_type": "POLICY_BLOCKED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "policy_decision_id": "policy_decision_id-sample",
+          "reason_codes": [
+            "policy-1"
+          ]
+        },
+        "producer_engine_id": "ENG-14",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "PLAN_DRAFTED",
+      "instance": {
+        "event_id": "id-PLAN_DRAFTED",
+        "event_type": "PLAN_DRAFTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "plan_id": "plan_id-sample",
+          "selected_look_version_id": "selected_look_version_id-sample",
+          "plan_version": 1
+        },
+        "producer_engine_id": "ENG-15",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "PLAN_VALIDATED",
+      "instance": {
+        "event_id": "id-PLAN_VALIDATED",
+        "event_type": "PLAN_VALIDATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "validation_id": "validation_id-sample",
+          "plan_id": "plan_id-sample",
+          "specialist_id": "specialist_id-sample"
+        },
+        "producer_engine_id": "ENG-16",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "VALIDATION_INVALIDATED",
+      "instance": {
+        "event_id": "id-VALIDATION_INVALIDATED",
+        "event_type": "VALIDATION_INVALIDATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "validation_id": "validation_id-sample",
+          "plan_id": "plan_id-sample",
+          "reason": "reason-sample"
+        },
+        "producer_engine_id": "ENG-16",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "HANDOFF_CREATED",
+      "instance": {
+        "event_id": "id-HANDOFF_CREATED",
+        "event_type": "HANDOFF_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "handoff_id": "handoff_id-sample",
+          "session_id": "session_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-17",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "BUSINESS_INSIGHT_READY",
+      "instance": {
+        "event_id": "id-BUSINESS_INSIGHT_READY",
+        "event_type": "BUSINESS_INSIGHT_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "insight_id": "insight_id-sample",
+          "tenant_id": "tenant_id-sample"
+        },
+        "producer_engine_id": "ENG-18",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "ACTION_APPROVAL_REQUESTED",
+      "instance": {
+        "event_id": "id-ACTION_APPROVAL_REQUESTED",
+        "event_type": "ACTION_APPROVAL_REQUESTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "action_id": "action_id-sample",
+          "requires_confirmation": true
+        },
+        "producer_engine_id": "ENG-19",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "ACTION_CONFIRMED",
+      "instance": {
+        "event_id": "id-ACTION_CONFIRMED",
+        "event_type": "ACTION_CONFIRMED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "action_id": "action_id-sample",
+          "operation_receipt_id": "operation_receipt_id-sample"
+        },
+        "producer_engine_id": "ENG-19",
+        "trace_id": "trace-1"
+      }
+    },
+    {
+      "event_type": "SESSION_CLOSED",
+      "instance": {
+        "event_id": "id-SESSION_CLOSED",
+        "event_type": "SESSION_CLOSED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "closure_reason": "closure_reason-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      }
+    }
+  ],
+  "negative": [
+    {
+      "event_type": "SESSION_CREATED",
+      "instance": {
+        "event_id": "id-SESSION_CREATED",
+        "event_type": "SESSION_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "branch_id": "branch_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "SESSION_CREATED",
+      "instance": {
+        "event_id": "id-SESSION_CREATED",
+        "event_type": "SESSION_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "branch_id": "branch_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "CONSENT_RECORDED",
+      "instance": {
+        "event_id": "id-CONSENT_RECORDED",
+        "event_type": "CONSENT_RECORDED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "consent_id": "consent_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "CONSENT_RECORDED",
+      "instance": {
+        "event_id": "id-CONSENT_RECORDED",
+        "event_type": "CONSENT_RECORDED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "consent_id": "consent_id-sample",
+          "status": "status-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "INTENT_SET",
+      "instance": {
+        "event_id": "id-INTENT_SET",
+        "event_type": "INTENT_SET",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "service_id": "service_id-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "INTENT_SET",
+      "instance": {
+        "event_id": "id-INTENT_SET",
+        "event_type": "INTENT_SET",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "service_id": "service_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "QUESTION_ASKED",
+      "instance": {
+        "event_id": "id-QUESTION_ASKED",
+        "event_type": "QUESTION_ASKED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "QUESTION_ASKED",
+      "instance": {
+        "event_id": "id-QUESTION_ASKED",
+        "event_type": "QUESTION_ASKED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "question_id": "question_id-sample",
+          "session_id": "session_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "ANSWER_RECORDED",
+      "instance": {
+        "event_id": "id-ANSWER_RECORDED",
+        "event_type": "ANSWER_RECORDED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "answer_id": "answer_id-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "ANSWER_RECORDED",
+      "instance": {
+        "event_id": "id-ANSWER_RECORDED",
+        "event_type": "ANSWER_RECORDED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "question_id": "question_id-sample",
+          "session_id": "session_id-sample",
+          "answer_id": "answer_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "INPUT_QA_COMPLETED",
+      "instance": {
+        "event_id": "id-INPUT_QA_COMPLETED",
+        "event_type": "INPUT_QA_COMPLETED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "asset_id": "asset_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-03",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "INPUT_QA_COMPLETED",
+      "instance": {
+        "event_id": "id-INPUT_QA_COMPLETED",
+        "event_type": "INPUT_QA_COMPLETED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "asset_id": "asset_id-sample",
+          "status": "status-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-03",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "ANALYSIS_READY",
+      "instance": {
+        "event_id": "id-ANALYSIS_READY",
+        "event_type": "ANALYSIS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-04",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "ANALYSIS_READY",
+      "instance": {
+        "event_id": "id-ANALYSIS_READY",
+        "event_type": "ANALYSIS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "analysis_id": "analysis_id-sample",
+          "session_id": "session_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-04",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "KNOWLEDGE_RESOLVED",
+      "instance": {
+        "event_id": "id-KNOWLEDGE_RESOLVED",
+        "event_type": "KNOWLEDGE_RESOLVED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "service_id": "service_id-sample"
+        },
+        "producer_engine_id": "ENG-05",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "KNOWLEDGE_RESOLVED",
+      "instance": {
+        "event_id": "id-KNOWLEDGE_RESOLVED",
+        "event_type": "KNOWLEDGE_RESOLVED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "knowledge_package_id": "knowledge_package_id-sample",
+          "service_id": "service_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-05",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "RECOMMENDATIONS_READY",
+      "instance": {
+        "event_id": "id-RECOMMENDATIONS_READY",
+        "event_type": "RECOMMENDATIONS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-06",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "RECOMMENDATIONS_READY",
+      "instance": {
+        "event_id": "id-RECOMMENDATIONS_READY",
+        "event_type": "RECOMMENDATIONS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "recommendation_set_id": "recommendation_set_id-sample",
+          "session_id": "session_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-06",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "LOOK_SPEC_VERSIONED",
+      "instance": {
+        "event_id": "id-LOOK_SPEC_VERSIONED",
+        "event_type": "LOOK_SPEC_VERSIONED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-07",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "LOOK_SPEC_VERSIONED",
+      "instance": {
+        "event_id": "id-LOOK_SPEC_VERSIONED",
+        "event_type": "LOOK_SPEC_VERSIONED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "look_spec_id": "look_spec_id-sample",
+          "look_version_id": "look_version_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-07",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "MASKS_READY",
+      "instance": {
+        "event_id": "id-MASKS_READY",
+        "event_type": "MASKS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-08",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "MASKS_READY",
+      "instance": {
+        "event_id": "id-MASKS_READY",
+        "event_type": "MASKS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "mask_set_id": "mask_set_id-sample",
+          "look_version_id": "look_version_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-08",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "VISUAL_JOB_CREATED",
+      "instance": {
+        "event_id": "id-VISUAL_JOB_CREATED",
+        "event_type": "VISUAL_JOB_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-09",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "VISUAL_JOB_CREATED",
+      "instance": {
+        "event_id": "id-VISUAL_JOB_CREATED",
+        "event_type": "VISUAL_JOB_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "job_id": "job_id-sample",
+          "look_version_id": "look_version_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-09",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "COMPOSITE_READY",
+      "instance": {
+        "event_id": "id-COMPOSITE_READY",
+        "event_type": "COMPOSITE_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "asset_id": "asset_id-sample"
+        },
+        "producer_engine_id": "ENG-10",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "COMPOSITE_READY",
+      "instance": {
+        "event_id": "id-COMPOSITE_READY",
+        "event_type": "COMPOSITE_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "job_id": "job_id-sample",
+          "asset_id": "asset_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-10",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "PREVIEW_QA_COMPLETED",
+      "instance": {
+        "event_id": "id-PREVIEW_QA_COMPLETED",
+        "event_type": "PREVIEW_QA_COMPLETED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "job_id": "job_id-sample",
+          "qa_status": "PASS"
+        },
+        "producer_engine_id": "ENG-11",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "PREVIEW_QA_COMPLETED",
+      "instance": {
+        "event_id": "id-PREVIEW_QA_COMPLETED",
+        "event_type": "PREVIEW_QA_COMPLETED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "qa_report_id": "qa_report_id-sample",
+          "job_id": "job_id-sample",
+          "qa_status": "PASS",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-11",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "LOOK_SELECTED",
+      "instance": {
+        "event_id": "id-LOOK_SELECTED",
+        "event_type": "LOOK_SELECTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-12",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "LOOK_SELECTED",
+      "instance": {
+        "event_id": "id-LOOK_SELECTED",
+        "event_type": "LOOK_SELECTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "look_version_id": "look_version_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-12",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "FEASIBILITY_REVIEWED",
+      "instance": {
+        "event_id": "id-FEASIBILITY_REVIEWED",
+        "event_type": "FEASIBILITY_REVIEWED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "look_version_id": "look_version_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-13",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "FEASIBILITY_REVIEWED",
+      "instance": {
+        "event_id": "id-FEASIBILITY_REVIEWED",
+        "event_type": "FEASIBILITY_REVIEWED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "assessment_id": "assessment_id-sample",
+          "look_version_id": "look_version_id-sample",
+          "status": "status-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-13",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "POLICY_BLOCKED",
+      "instance": {
+        "event_id": "id-POLICY_BLOCKED",
+        "event_type": "POLICY_BLOCKED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "reason_codes": [
+            "policy-1"
+          ]
+        },
+        "producer_engine_id": "ENG-14",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "POLICY_BLOCKED",
+      "instance": {
+        "event_id": "id-POLICY_BLOCKED",
+        "event_type": "POLICY_BLOCKED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "policy_decision_id": "policy_decision_id-sample",
+          "reason_codes": [
+            "policy-1"
+          ],
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-14",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "PLAN_DRAFTED",
+      "instance": {
+        "event_id": "id-PLAN_DRAFTED",
+        "event_type": "PLAN_DRAFTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "selected_look_version_id": "selected_look_version_id-sample",
+          "plan_version": 1
+        },
+        "producer_engine_id": "ENG-15",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "PLAN_DRAFTED",
+      "instance": {
+        "event_id": "id-PLAN_DRAFTED",
+        "event_type": "PLAN_DRAFTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "plan_id": "plan_id-sample",
+          "selected_look_version_id": "selected_look_version_id-sample",
+          "plan_version": 1,
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-15",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "PLAN_VALIDATED",
+      "instance": {
+        "event_id": "id-PLAN_VALIDATED",
+        "event_type": "PLAN_VALIDATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "plan_id": "plan_id-sample",
+          "specialist_id": "specialist_id-sample"
+        },
+        "producer_engine_id": "ENG-16",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "PLAN_VALIDATED",
+      "instance": {
+        "event_id": "id-PLAN_VALIDATED",
+        "event_type": "PLAN_VALIDATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "validation_id": "validation_id-sample",
+          "plan_id": "plan_id-sample",
+          "specialist_id": "specialist_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-16",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "VALIDATION_INVALIDATED",
+      "instance": {
+        "event_id": "id-VALIDATION_INVALIDATED",
+        "event_type": "VALIDATION_INVALIDATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "plan_id": "plan_id-sample",
+          "reason": "reason-sample"
+        },
+        "producer_engine_id": "ENG-16",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "VALIDATION_INVALIDATED",
+      "instance": {
+        "event_id": "id-VALIDATION_INVALIDATED",
+        "event_type": "VALIDATION_INVALIDATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "validation_id": "validation_id-sample",
+          "plan_id": "plan_id-sample",
+          "reason": "reason-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-16",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "HANDOFF_CREATED",
+      "instance": {
+        "event_id": "id-HANDOFF_CREATED",
+        "event_type": "HANDOFF_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-17",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "HANDOFF_CREATED",
+      "instance": {
+        "event_id": "id-HANDOFF_CREATED",
+        "event_type": "HANDOFF_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "handoff_id": "handoff_id-sample",
+          "session_id": "session_id-sample",
+          "status": "status-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-17",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "BUSINESS_INSIGHT_READY",
+      "instance": {
+        "event_id": "id-BUSINESS_INSIGHT_READY",
+        "event_type": "BUSINESS_INSIGHT_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "tenant_id": "tenant_id-sample"
+        },
+        "producer_engine_id": "ENG-18",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "BUSINESS_INSIGHT_READY",
+      "instance": {
+        "event_id": "id-BUSINESS_INSIGHT_READY",
+        "event_type": "BUSINESS_INSIGHT_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "insight_id": "insight_id-sample",
+          "tenant_id": "tenant_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-18",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "ACTION_APPROVAL_REQUESTED",
+      "instance": {
+        "event_id": "id-ACTION_APPROVAL_REQUESTED",
+        "event_type": "ACTION_APPROVAL_REQUESTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "requires_confirmation": true
+        },
+        "producer_engine_id": "ENG-19",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "ACTION_APPROVAL_REQUESTED",
+      "instance": {
+        "event_id": "id-ACTION_APPROVAL_REQUESTED",
+        "event_type": "ACTION_APPROVAL_REQUESTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "action_id": "action_id-sample",
+          "requires_confirmation": true,
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-19",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "ACTION_CONFIRMED",
+      "instance": {
+        "event_id": "id-ACTION_CONFIRMED",
+        "event_type": "ACTION_CONFIRMED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "operation_receipt_id": "operation_receipt_id-sample"
+        },
+        "producer_engine_id": "ENG-19",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "ACTION_CONFIRMED",
+      "instance": {
+        "event_id": "id-ACTION_CONFIRMED",
+        "event_type": "ACTION_CONFIRMED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "action_id": "action_id-sample",
+          "operation_receipt_id": "operation_receipt_id-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-19",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "SESSION_CLOSED",
+      "instance": {
+        "event_id": "id-SESSION_CLOSED",
+        "event_type": "SESSION_CLOSED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "closure_reason": "closure_reason-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "MISSING_REQUIRED_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "SESSION_CLOSED",
+      "instance": {
+        "event_id": "id-SESSION_CLOSED",
+        "event_type": "SESSION_CLOSED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "closure_reason": "closure_reason-sample",
+          "UNDECLARED_FIELD": "should be rejected"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNKNOWN_PAYLOAD_KEY"
+    },
+    {
+      "event_type": "UNKNOWN_EVENT",
+      "instance": {
+        "event_id": "event-schema-1",
+        "event_type": "UNKNOWN_EVENT",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session-1"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNREGISTERED_EVENT_TYPE"
+    },
+    {
+      "event_type": "SESSION_CREATED",
+      "instance": {
+        "event_id": "id-SESSION_CREATED",
+        "event_type": "SESSION_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "branch_id": "branch_id-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "CONSENT_RECORDED",
+      "instance": {
+        "event_id": "id-CONSENT_RECORDED",
+        "event_type": "CONSENT_RECORDED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "consent_id": "consent_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "INTENT_SET",
+      "instance": {
+        "event_id": "id-INTENT_SET",
+        "event_type": "INTENT_SET",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "service_id": "service_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "QUESTION_ASKED",
+      "instance": {
+        "event_id": "id-QUESTION_ASKED",
+        "event_type": "QUESTION_ASKED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "question_id": "question_id-sample",
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "ANSWER_RECORDED",
+      "instance": {
+        "event_id": "id-ANSWER_RECORDED",
+        "event_type": "ANSWER_RECORDED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "question_id": "question_id-sample",
+          "session_id": "session_id-sample",
+          "answer_id": "answer_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "INPUT_QA_COMPLETED",
+      "instance": {
+        "event_id": "id-INPUT_QA_COMPLETED",
+        "event_type": "INPUT_QA_COMPLETED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "asset_id": "asset_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "ANALYSIS_READY",
+      "instance": {
+        "event_id": "id-ANALYSIS_READY",
+        "event_type": "ANALYSIS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "analysis_id": "analysis_id-sample",
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "KNOWLEDGE_RESOLVED",
+      "instance": {
+        "event_id": "id-KNOWLEDGE_RESOLVED",
+        "event_type": "KNOWLEDGE_RESOLVED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "knowledge_package_id": "knowledge_package_id-sample",
+          "service_id": "service_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "RECOMMENDATIONS_READY",
+      "instance": {
+        "event_id": "id-RECOMMENDATIONS_READY",
+        "event_type": "RECOMMENDATIONS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "recommendation_set_id": "recommendation_set_id-sample",
+          "session_id": "session_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "LOOK_SPEC_VERSIONED",
+      "instance": {
+        "event_id": "id-LOOK_SPEC_VERSIONED",
+        "event_type": "LOOK_SPEC_VERSIONED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "look_spec_id": "look_spec_id-sample",
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "MASKS_READY",
+      "instance": {
+        "event_id": "id-MASKS_READY",
+        "event_type": "MASKS_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "mask_set_id": "mask_set_id-sample",
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "VISUAL_JOB_CREATED",
+      "instance": {
+        "event_id": "id-VISUAL_JOB_CREATED",
+        "event_type": "VISUAL_JOB_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "job_id": "job_id-sample",
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "COMPOSITE_READY",
+      "instance": {
+        "event_id": "id-COMPOSITE_READY",
+        "event_type": "COMPOSITE_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "job_id": "job_id-sample",
+          "asset_id": "asset_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "PREVIEW_QA_COMPLETED",
+      "instance": {
+        "event_id": "id-PREVIEW_QA_COMPLETED",
+        "event_type": "PREVIEW_QA_COMPLETED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "qa_report_id": "qa_report_id-sample",
+          "job_id": "job_id-sample",
+          "qa_status": "PASS"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "LOOK_SELECTED",
+      "instance": {
+        "event_id": "id-LOOK_SELECTED",
+        "event_type": "LOOK_SELECTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "look_version_id": "look_version_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "FEASIBILITY_REVIEWED",
+      "instance": {
+        "event_id": "id-FEASIBILITY_REVIEWED",
+        "event_type": "FEASIBILITY_REVIEWED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "assessment_id": "assessment_id-sample",
+          "look_version_id": "look_version_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "POLICY_BLOCKED",
+      "instance": {
+        "event_id": "id-POLICY_BLOCKED",
+        "event_type": "POLICY_BLOCKED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "policy_decision_id": "policy_decision_id-sample",
+          "reason_codes": [
+            "policy-1"
+          ]
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "PLAN_DRAFTED",
+      "instance": {
+        "event_id": "id-PLAN_DRAFTED",
+        "event_type": "PLAN_DRAFTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "plan_id": "plan_id-sample",
+          "selected_look_version_id": "selected_look_version_id-sample",
+          "plan_version": 1
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "PLAN_VALIDATED",
+      "instance": {
+        "event_id": "id-PLAN_VALIDATED",
+        "event_type": "PLAN_VALIDATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "validation_id": "validation_id-sample",
+          "plan_id": "plan_id-sample",
+          "specialist_id": "specialist_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "VALIDATION_INVALIDATED",
+      "instance": {
+        "event_id": "id-VALIDATION_INVALIDATED",
+        "event_type": "VALIDATION_INVALIDATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "validation_id": "validation_id-sample",
+          "plan_id": "plan_id-sample",
+          "reason": "reason-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "HANDOFF_CREATED",
+      "instance": {
+        "event_id": "id-HANDOFF_CREATED",
+        "event_type": "HANDOFF_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "handoff_id": "handoff_id-sample",
+          "session_id": "session_id-sample",
+          "status": "status-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "BUSINESS_INSIGHT_READY",
+      "instance": {
+        "event_id": "id-BUSINESS_INSIGHT_READY",
+        "event_type": "BUSINESS_INSIGHT_READY",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "insight_id": "insight_id-sample",
+          "tenant_id": "tenant_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "ACTION_APPROVAL_REQUESTED",
+      "instance": {
+        "event_id": "id-ACTION_APPROVAL_REQUESTED",
+        "event_type": "ACTION_APPROVAL_REQUESTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "action_id": "action_id-sample",
+          "requires_confirmation": true
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "ACTION_CONFIRMED",
+      "instance": {
+        "event_id": "id-ACTION_CONFIRMED",
+        "event_type": "ACTION_CONFIRMED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "action_id": "action_id-sample",
+          "operation_receipt_id": "operation_receipt_id-sample"
+        },
+        "producer_engine_id": "ENG-01",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "SESSION_CLOSED",
+      "instance": {
+        "event_id": "id-SESSION_CLOSED",
+        "event_type": "SESSION_CLOSED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "closure_reason": "closure_reason-sample"
+        },
+        "producer_engine_id": "ENG-02",
+        "trace_id": "trace-1"
+      },
+      "reason": "UNAUTHORIZED_PRODUCER_ENGINE"
+    },
+    {
+      "event_type": "SESSION_CREATED",
+      "instance": {
+        "event_id": "id-SESSION_CREATED",
+        "event_type": "SESSION_CREATED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "aggregate-1",
+        "aggregate_version": 3,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session_id-sample",
+          "branch_id": "branch_id-sample"
+        },
+        "producer_engine_id": "ENG-01"
+      },
+      "reason": "MISSING_TRACE_ID"
+    }
+  ]
+}

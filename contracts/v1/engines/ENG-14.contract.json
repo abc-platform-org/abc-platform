@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-14",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Safety and Policy",
+  "purpose": "Server-side S0–S3 risk enforcement across intake, generation, plan and actions.",
+  "non_goals": "Never bypassed by LLM response or marketing config.",
+  "typed_input_ref": "../schemas/engine-command.schema.json",
+  "typed_output_ref": "../schemas/policy-decision.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Policy version and backend identity; S3 blocks unsafe actions",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Policy BLOCK overrides AI generated choices.",
+  "tests": [
+    "SEC-SAFETY-01",
+    "TEC-STOP-01"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "REQUIRES_QUALIFIED_HUMAN_WHEN_APPLICABLE"
+}

@@ -1,0 +1,1676 @@
+{
+  "version": "1.0.0-draft",
+  "control_plane": "SERVER_TRANSITION_SERVICE_ONLY",
+  "optimistic_concurrency": "expected_state_version_required",
+  "machines": [
+    {
+      "id": "CONSULTATION_SESSION",
+      "states": [
+        "CREATED",
+        "CONSENTED",
+        "INTENT_DEFINED",
+        "INPUTS_COLLECTING",
+        "INPUT_READY",
+        "ANALYZED",
+        "OPTIONS_READY",
+        "PREVIEW_REVIEW",
+        "REVISION_REQUESTED",
+        "LOOK_SELECTED",
+        "FEASIBILITY_REVIEW",
+        "PLAN_DRAFTED",
+        "SPECIALIST_REVIEW",
+        "HANDOFF",
+        "CLOSED",
+        "CLOSED_WITHOUT_DECISION",
+        "PAUSED",
+        "CANCELLED",
+        "FAILED_RECOVERABLE",
+        "SAFETY_BLOCKED"
+      ],
+      "initial": "CREATED",
+      "terminal": [
+        "CLOSED",
+        "CLOSED_WITHOUT_DECISION",
+        "CANCELLED"
+      ],
+      "transitions": [
+        {
+          "from": "CREATED",
+          "to": "CONSENTED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "consent_recorded_or_explicit_no_photo_mode"
+          ]
+        },
+        {
+          "from": "CONSENTED",
+          "to": "INTENT_DEFINED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "session_actor_authorized",
+            "service_selected"
+          ]
+        },
+        {
+          "from": "INTENT_DEFINED",
+          "to": "INPUTS_COLLECTING",
+          "actor": "ENG-02",
+          "guards": [
+            "service_profile_enabled"
+          ]
+        },
+        {
+          "from": "INPUTS_COLLECTING",
+          "to": "INPUT_READY",
+          "actor": "ENG-01",
+          "guards": [
+            "sufficient_recommendation_evidence_or_limited_mode"
+          ]
+        },
+        {
+          "from": "INPUT_READY",
+          "to": "ANALYZED",
+          "actor": "ENG-04",
+          "guards": [
+            "analysis_schema_and_evidence_provenance"
+          ]
+        },
+        {
+          "from": "ANALYZED",
+          "to": "OPTIONS_READY",
+          "actor": "ENG-06",
+          "guards": [
+            "recommendation_filtered_by_policy"
+          ]
+        },
+        {
+          "from": "OPTIONS_READY",
+          "to": "PREVIEW_REVIEW",
+          "actor": "ENG-01",
+          "guards": [
+            "visual_consent_valid_if_media",
+            "preview_published_only_with_qa_pass"
+          ]
+        },
+        {
+          "from": "PREVIEW_REVIEW",
+          "to": "REVISION_REQUESTED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "revision_target_explicit"
+          ]
+        },
+        {
+          "from": "REVISION_REQUESTED",
+          "to": "PREVIEW_REVIEW",
+          "actor": "ENG-12",
+          "guards": [
+            "parent_accepted_version_preserved",
+            "visual_qa_pass"
+          ]
+        },
+        {
+          "from": "PREVIEW_REVIEW",
+          "to": "LOOK_SELECTED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "client_preference_recorded",
+            "look_version_qa_pass",
+            "selected_look_version_immutable"
+          ]
+        },
+        {
+          "from": "LOOK_SELECTED",
+          "to": "FEASIBILITY_REVIEW",
+          "actor": "SPECIALIST",
+          "guards": [
+            "evidence_snapshot_pinned"
+          ]
+        },
+        {
+          "from": "FEASIBILITY_REVIEW",
+          "to": "PLAN_DRAFTED",
+          "actor": "ENG-15",
+          "guards": [
+            "plan_draft_constrained_by_sop_and_evidence"
+          ]
+        },
+        {
+          "from": "PLAN_DRAFTED",
+          "to": "SPECIALIST_REVIEW",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_eligible_specialist",
+            "plan_version_bound"
+          ]
+        },
+        {
+          "from": "SPECIALIST_REVIEW",
+          "to": "HANDOFF",
+          "actor": "ENG-17",
+          "guards": [
+            "human_validation_on_exact_versions",
+            "authorized_internal_destination"
+          ]
+        },
+        {
+          "from": "HANDOFF",
+          "to": "CLOSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "handoff_outcome_recorded"
+          ]
+        },
+        {
+          "from": "CREATED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "CREATED",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "CONSENTED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "CONSENTED",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "INTENT_DEFINED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "INTENT_DEFINED",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "INPUTS_COLLECTING",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "INPUTS_COLLECTING",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "INPUT_READY",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "INPUT_READY",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "ANALYZED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "ANALYZED",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "OPTIONS_READY",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "OPTIONS_READY",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "PREVIEW_REVIEW",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "PREVIEW_REVIEW",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "REVISION_REQUESTED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "REVISION_REQUESTED",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "LOOK_SELECTED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "LOOK_SELECTED",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "FEASIBILITY_REVIEW",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "FEASIBILITY_REVIEW",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "PLAN_DRAFTED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "PLAN_DRAFTED",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "SPECIALIST_REVIEW",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "SPECIALIST_REVIEW",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "CONSENTED",
+          "to": "CLOSED_WITHOUT_DECISION",
+          "actor": "SPECIALIST",
+          "guards": [
+            "reason_no_selection_recorded"
+          ]
+        },
+        {
+          "from": "INTENT_DEFINED",
+          "to": "CLOSED_WITHOUT_DECISION",
+          "actor": "SPECIALIST",
+          "guards": [
+            "reason_no_selection_recorded"
+          ]
+        },
+        {
+          "from": "INPUTS_COLLECTING",
+          "to": "CLOSED_WITHOUT_DECISION",
+          "actor": "SPECIALIST",
+          "guards": [
+            "reason_no_selection_recorded"
+          ]
+        },
+        {
+          "from": "INPUT_READY",
+          "to": "CLOSED_WITHOUT_DECISION",
+          "actor": "SPECIALIST",
+          "guards": [
+            "reason_no_selection_recorded"
+          ]
+        },
+        {
+          "from": "ANALYZED",
+          "to": "CLOSED_WITHOUT_DECISION",
+          "actor": "SPECIALIST",
+          "guards": [
+            "reason_no_selection_recorded"
+          ]
+        },
+        {
+          "from": "OPTIONS_READY",
+          "to": "CLOSED_WITHOUT_DECISION",
+          "actor": "SPECIALIST",
+          "guards": [
+            "reason_no_selection_recorded"
+          ]
+        },
+        {
+          "from": "PREVIEW_REVIEW",
+          "to": "CLOSED_WITHOUT_DECISION",
+          "actor": "SPECIALIST",
+          "guards": [
+            "reason_no_selection_recorded"
+          ]
+        },
+        {
+          "from": "REVISION_REQUESTED",
+          "to": "CLOSED_WITHOUT_DECISION",
+          "actor": "SPECIALIST",
+          "guards": [
+            "reason_no_selection_recorded"
+          ]
+        },
+        {
+          "from": "CREATED",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "CONSENTED",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "INTENT_DEFINED",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "INPUTS_COLLECTING",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "INPUT_READY",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "INPUT_READY",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "ANALYZED",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "ANALYZED",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "OPTIONS_READY",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "OPTIONS_READY",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "PREVIEW_REVIEW",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "PREVIEW_REVIEW",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "REVISION_REQUESTED",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "REVISION_REQUESTED",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "LOOK_SELECTED",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "LOOK_SELECTED",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "FEASIBILITY_REVIEW",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "FEASIBILITY_REVIEW",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "PLAN_DRAFTED",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "PLAN_DRAFTED",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "SPECIALIST_REVIEW",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "SPECIALIST_REVIEW",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "HANDOFF",
+          "to": "SAFETY_BLOCKED",
+          "actor": "ENG-14",
+          "guards": [
+            "non_bypassable_policy_block",
+            "record_policy_decision_and_reason",
+            "revoke_sensitive_jobs"
+          ]
+        },
+        {
+          "from": "HANDOFF",
+          "to": "FAILED_RECOVERABLE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_classified",
+            "checkpoint_persisted",
+            "idempotent_recovery_token"
+          ]
+        },
+        {
+          "from": "HANDOFF",
+          "to": "PAUSED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "persist_checkpoint"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "CREATED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "CONSENTED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "INTENT_DEFINED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "INPUTS_COLLECTING",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "INPUT_READY",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "ANALYZED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "OPTIONS_READY",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "PREVIEW_REVIEW",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "REVISION_REQUESTED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "LOOK_SELECTED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "FEASIBILITY_REVIEW",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "PLAN_DRAFTED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "SPECIALIST_REVIEW",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_specialist",
+            "checkpoint_state_equals_target",
+            "checkpoint_version_unchanged",
+            "tenant_and_branch_scope_valid",
+            "consent_still_sufficient",
+            "policy_recheck_passed",
+            "stale_async_outputs_rejected"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "INTENT_DEFINED",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "INPUTS_COLLECTING",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "INPUT_READY",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "ANALYZED",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "OPTIONS_READY",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "PREVIEW_REVIEW",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "REVISION_REQUESTED",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "LOOK_SELECTED",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "FEASIBILITY_REVIEW",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "PLAN_DRAFTED",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "SPECIALIST_REVIEW",
+          "actor": "ENG-01",
+          "guards": [
+            "authorized_specialist_recovery",
+            "checkpoint_state_equals_target",
+            "exact_checkpoint_version",
+            "retry_budget_available",
+            "idempotency_and_policy_revalidated",
+            "stale_outputs_discarded"
+          ]
+        },
+        {
+          "from": "PAUSED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "FAILED_RECOVERABLE",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_closure_reason"
+          ]
+        },
+        {
+          "from": "SAFETY_BLOCKED",
+          "to": "CANCELLED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_actor",
+            "audit_safety_and_closure_reason"
+          ]
+        },
+        {
+          "from": "SAFETY_BLOCKED",
+          "to": "INTENT_DEFINED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "qualified_specialist_review",
+            "non_bypassable_policy_recheck_passed",
+            "evidence_revalidated",
+            "consent_still_sufficient",
+            "no_automatic_approval_from_resume"
+          ]
+        }
+      ],
+      "suspension_rules": {
+        "from": "PAUSED",
+        "to": "EXACT_SAVED_CHECKPOINT_STATE",
+        "guards": [
+          "authenticated_specialist",
+          "checkpoint_state_equals_target",
+          "tenant_and_branch_scope_valid",
+          "consent_still_sufficient",
+          "policy_recheck_passed"
+        ]
+      },
+      "failure_recovery_rules": {
+        "from": "FAILED_RECOVERABLE",
+        "to": "EXACT_SAVED_CHECKPOINT_STATE",
+        "guards": [
+          "retry_policy",
+          "idempotent_recovery",
+          "checkpoint_state_equals_target",
+          "no_stale_result"
+        ]
+      },
+      "safety_block_rules": {
+        "from": "SAFETY_BLOCKED",
+        "to": "INTENT_DEFINED_ONLY_AFTER_QUALIFIED_REVIEW",
+        "guards": [
+          "qualified_specialist_review",
+          "policy_recheck_passed",
+          "no_automatic_approval"
+        ]
+      }
+    },
+    {
+      "id": "VISUAL_JOB",
+      "states": [
+        "SUBMITTED",
+        "VALIDATING_INPUT",
+        "SEGMENTING",
+        "GENERATING",
+        "COMPOSITING",
+        "QA_CHECKING",
+        "QA_PASSED",
+        "NEEDS_REVISION",
+        "QA_FAILED",
+        "CANCELLED",
+        "RETRYABLE_FAILURE"
+      ],
+      "initial": "SUBMITTED",
+      "terminal": [
+        "QA_PASSED",
+        "NEEDS_REVISION",
+        "QA_FAILED",
+        "CANCELLED"
+      ],
+      "transitions": [
+        {
+          "from": "SUBMITTED",
+          "to": "VALIDATING_INPUT",
+          "actor": "ENG-03",
+          "guards": [
+            "active_consent",
+            "valid_asset"
+          ]
+        },
+        {
+          "from": "VALIDATING_INPUT",
+          "to": "SEGMENTING",
+          "actor": "ENG-08",
+          "guards": [
+            "input_quality_accepted",
+            "look_version_current"
+          ]
+        },
+        {
+          "from": "SEGMENTING",
+          "to": "GENERATING",
+          "actor": "ENG-09",
+          "guards": [
+            "mask_policy_passed"
+          ]
+        },
+        {
+          "from": "GENERATING",
+          "to": "COMPOSITING",
+          "actor": "ENG-10",
+          "guards": [
+            "generated_candidate_available"
+          ]
+        },
+        {
+          "from": "COMPOSITING",
+          "to": "QA_CHECKING",
+          "actor": "ENG-11",
+          "guards": [
+            "hard_locked_region_preserved"
+          ]
+        },
+        {
+          "from": "QA_CHECKING",
+          "to": "QA_PASSED",
+          "actor": "ENG-11",
+          "guards": [
+            "visual_qa_report_passed",
+            "source_version_current"
+          ]
+        },
+        {
+          "from": "QA_CHECKING",
+          "to": "NEEDS_REVISION",
+          "actor": "ENG-11",
+          "guards": [
+            "visual_qa_failed_or_review_required"
+          ]
+        },
+        {
+          "from": "QA_CHECKING",
+          "to": "QA_FAILED",
+          "actor": "ENG-11",
+          "guards": [
+            "unrecoverable_visual_qa_failure"
+          ]
+        },
+        {
+          "from": "RETRYABLE_FAILURE",
+          "to": "SUBMITTED",
+          "actor": "ENG-01",
+          "guards": [
+            "idempotent_retry",
+            "retry_budget_remaining",
+            "consent_still_active"
+          ]
+        },
+        {
+          "from": "SUBMITTED",
+          "to": "CANCELLED",
+          "actor": "ENG-01",
+          "guards": [
+            "cancel_authorized_or_consent_withdrawn"
+          ]
+        },
+        {
+          "from": "SUBMITTED",
+          "to": "RETRYABLE_FAILURE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_code"
+          ]
+        },
+        {
+          "from": "VALIDATING_INPUT",
+          "to": "CANCELLED",
+          "actor": "ENG-01",
+          "guards": [
+            "cancel_authorized_or_consent_withdrawn"
+          ]
+        },
+        {
+          "from": "VALIDATING_INPUT",
+          "to": "RETRYABLE_FAILURE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_code"
+          ]
+        },
+        {
+          "from": "SEGMENTING",
+          "to": "CANCELLED",
+          "actor": "ENG-01",
+          "guards": [
+            "cancel_authorized_or_consent_withdrawn"
+          ]
+        },
+        {
+          "from": "SEGMENTING",
+          "to": "RETRYABLE_FAILURE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_code"
+          ]
+        },
+        {
+          "from": "GENERATING",
+          "to": "CANCELLED",
+          "actor": "ENG-01",
+          "guards": [
+            "cancel_authorized_or_consent_withdrawn"
+          ]
+        },
+        {
+          "from": "GENERATING",
+          "to": "RETRYABLE_FAILURE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_code"
+          ]
+        },
+        {
+          "from": "COMPOSITING",
+          "to": "CANCELLED",
+          "actor": "ENG-01",
+          "guards": [
+            "cancel_authorized_or_consent_withdrawn"
+          ]
+        },
+        {
+          "from": "COMPOSITING",
+          "to": "RETRYABLE_FAILURE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_code"
+          ]
+        },
+        {
+          "from": "QA_CHECKING",
+          "to": "CANCELLED",
+          "actor": "ENG-01",
+          "guards": [
+            "cancel_authorized_or_consent_withdrawn"
+          ]
+        },
+        {
+          "from": "QA_CHECKING",
+          "to": "RETRYABLE_FAILURE",
+          "actor": "ENG-01",
+          "guards": [
+            "retryable_failure_code"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "TECHNICAL_PLAN",
+      "states": [
+        "DRAFT",
+        "AWAITING_SPECIALIST_INPUT",
+        "REQUIRES_REVIEW",
+        "CONDITIONALLY_VALIDATED",
+        "VALIDATED",
+        "INVALIDATED",
+        "REJECTED"
+      ],
+      "initial": "DRAFT",
+      "terminal": [
+        "REJECTED"
+      ],
+      "transitions": [
+        {
+          "from": "DRAFT",
+          "to": "AWAITING_SPECIALIST_INPUT",
+          "actor": "ENG-15",
+          "guards": [
+            "critical_evidence_missing"
+          ]
+        },
+        {
+          "from": "AWAITING_SPECIALIST_INPUT",
+          "to": "DRAFT",
+          "actor": "ENG-15",
+          "guards": [
+            "new_specialist_evidence"
+          ]
+        },
+        {
+          "from": "DRAFT",
+          "to": "REQUIRES_REVIEW",
+          "actor": "ENG-15",
+          "guards": [
+            "sop_approved",
+            "sufficient_for_review",
+            "no_unsafe_parameters"
+          ]
+        },
+        {
+          "from": "REQUIRES_REVIEW",
+          "to": "CONDITIONALLY_VALIDATED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_qualified_specialist",
+            "version_bound_validation",
+            "conditions_recorded"
+          ]
+        },
+        {
+          "from": "REQUIRES_REVIEW",
+          "to": "VALIDATED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "authenticated_qualified_specialist",
+            "sop_and_evidence_current",
+            "version_bound_validation"
+          ]
+        },
+        {
+          "from": "REQUIRES_REVIEW",
+          "to": "REJECTED",
+          "actor": "SPECIALIST",
+          "guards": [
+            "review_reason_recorded"
+          ]
+        },
+        {
+          "from": "REJECTED",
+          "to": "DRAFT",
+          "actor": "ENG-15",
+          "guards": [
+            "new_plan_version"
+          ]
+        },
+        {
+          "from": "VALIDATED",
+          "to": "INVALIDATED",
+          "actor": "ENG-16",
+          "guards": [
+            "look_sop_evidence_or_plan_material_change"
+          ]
+        },
+        {
+          "from": "CONDITIONALLY_VALIDATED",
+          "to": "INVALIDATED",
+          "actor": "ENG-16",
+          "guards": [
+            "look_sop_evidence_or_plan_material_change"
+          ]
+        },
+        {
+          "from": "REQUIRES_REVIEW",
+          "to": "INVALIDATED",
+          "actor": "ENG-16",
+          "guards": [
+            "look_sop_evidence_or_plan_material_change"
+          ]
+        },
+        {
+          "from": "INVALIDATED",
+          "to": "DRAFT",
+          "actor": "ENG-15",
+          "guards": [
+            "new_plan_version_and_recheck"
+          ]
+        }
+      ],
+      "invalidation": "EXACT_LOOK_SOP_EVIDENCE_OR_PLAN_CHANGE"
+    },
+    {
+      "id": "BUSINESS_ACTION",
+      "states": [
+        "PROPOSED",
+        "AUTHORIZED",
+        "PREVIEWED",
+        "APPROVED_IF_REQUIRED",
+        "EXECUTING",
+        "CONFIRMED",
+        "FAILED",
+        "COMPENSATION_REQUIRED",
+        "CANCELLED"
+      ],
+      "initial": "PROPOSED",
+      "terminal": [
+        "CONFIRMED",
+        "CANCELLED",
+        "COMPENSATION_REQUIRED"
+      ],
+      "transitions": [
+        {
+          "from": "PROPOSED",
+          "to": "AUTHORIZED",
+          "actor": "MANAGER",
+          "guards": [
+            "actor_has_action_scope"
+          ]
+        },
+        {
+          "from": "AUTHORIZED",
+          "to": "PREVIEWED",
+          "actor": "ENG-19",
+          "guards": [
+            "draft_of_real_transaction"
+          ]
+        },
+        {
+          "from": "PREVIEWED",
+          "to": "APPROVED_IF_REQUIRED",
+          "actor": "MANAGER",
+          "guards": [
+            "explicit_confirmation_if_required"
+          ]
+        },
+        {
+          "from": "APPROVED_IF_REQUIRED",
+          "to": "EXECUTING",
+          "actor": "ENG-19",
+          "guards": [
+            "idempotency_key",
+            "authorization_current"
+          ]
+        },
+        {
+          "from": "EXECUTING",
+          "to": "CONFIRMED",
+          "actor": "DOMAIN_ADAPTER",
+          "guards": [
+            "real_operation_receipt"
+          ]
+        },
+        {
+          "from": "EXECUTING",
+          "to": "FAILED",
+          "actor": "DOMAIN_ADAPTER",
+          "guards": [
+            "real_failure_receipt"
+          ]
+        },
+        {
+          "from": "FAILED",
+          "to": "COMPENSATION_REQUIRED",
+          "actor": "DOMAIN_ADAPTER",
+          "guards": [
+            "partial_effect_detected"
+          ]
+        },
+        {
+          "from": "PROPOSED",
+          "to": "CANCELLED",
+          "actor": "MANAGER",
+          "guards": [
+            "authorized_cancellation"
+          ]
+        },
+        {
+          "from": "AUTHORIZED",
+          "to": "CANCELLED",
+          "actor": "MANAGER",
+          "guards": [
+            "authorized_cancellation"
+          ]
+        },
+        {
+          "from": "PREVIEWED",
+          "to": "CANCELLED",
+          "actor": "MANAGER",
+          "guards": [
+            "authorized_cancellation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SERVICE_PACK_RELEASE",
+      "states": [
+        "SPECIFIED",
+        "CONTRACTED",
+        "IMPLEMENTED",
+        "TESTED",
+        "PROFESSIONALLY_REVIEWED",
+        "RELEASED",
+        "BLOCKED",
+        "RETIRED"
+      ],
+      "initial": "SPECIFIED",
+      "terminal": [
+        "BLOCKED",
+        "RETIRED"
+      ],
+      "transitions": [
+        {
+          "from": "SPECIFIED",
+          "to": "CONTRACTED",
+          "actor": "PRODUCT_OWNER",
+          "guards": [
+            "contract_gate_approved"
+          ]
+        },
+        {
+          "from": "CONTRACTED",
+          "to": "IMPLEMENTED",
+          "actor": "ENGINEERING_OWNER",
+          "guards": [
+            "implementation_exists"
+          ]
+        },
+        {
+          "from": "IMPLEMENTED",
+          "to": "TESTED",
+          "actor": "QA",
+          "guards": [
+            "executed_test_artifacts"
+          ]
+        },
+        {
+          "from": "TESTED",
+          "to": "PROFESSIONALLY_REVIEWED",
+          "actor": "QUALIFIED_SPECIALIST",
+          "guards": [
+            "sop_and_safety_review_evidence"
+          ]
+        },
+        {
+          "from": "PROFESSIONALLY_REVIEWED",
+          "to": "RELEASED",
+          "actor": "PRODUCT_OWNER",
+          "guards": [
+            "release_gate_passed",
+            "privacy_security_passed"
+          ]
+        },
+        {
+          "from": "RELEASED",
+          "to": "RETIRED",
+          "actor": "PRODUCT_OWNER",
+          "guards": [
+            "deprecation_recorded"
+          ]
+        },
+        {
+          "from": "SPECIFIED",
+          "to": "BLOCKED",
+          "actor": "SAFETY",
+          "guards": [
+            "safety_block_or_missing_required_evidence"
+          ]
+        },
+        {
+          "from": "CONTRACTED",
+          "to": "BLOCKED",
+          "actor": "SAFETY",
+          "guards": [
+            "safety_block_or_missing_required_evidence"
+          ]
+        },
+        {
+          "from": "IMPLEMENTED",
+          "to": "BLOCKED",
+          "actor": "SAFETY",
+          "guards": [
+            "safety_block_or_missing_required_evidence"
+          ]
+        },
+        {
+          "from": "TESTED",
+          "to": "BLOCKED",
+          "actor": "SAFETY",
+          "guards": [
+            "safety_block_or_missing_required_evidence"
+          ]
+        },
+        {
+          "from": "PROFESSIONALLY_REVIEWED",
+          "to": "BLOCKED",
+          "actor": "SAFETY",
+          "guards": [
+            "safety_block_or_missing_required_evidence"
+          ]
+        },
+        {
+          "from": "RELEASED",
+          "to": "BLOCKED",
+          "actor": "SAFETY",
+          "guards": [
+            "safety_block_or_missing_required_evidence"
+          ]
+        }
+      ]
+    }
+  ],
+  "forbidden_transitions": [
+    [
+      "CONSULTATION_SESSION",
+      "CREATED",
+      "LOOK_SELECTED"
+    ],
+    [
+      "CONSULTATION_SESSION",
+      "PREVIEW_REVIEW",
+      "HANDOFF"
+    ],
+    [
+      "TECHNICAL_PLAN",
+      "DRAFT",
+      "VALIDATED"
+    ],
+    [
+      "TECHNICAL_PLAN",
+      "DRAFT",
+      "CONDITIONALLY_VALIDATED"
+    ],
+    [
+      "VISUAL_JOB",
+      "GENERATING",
+      "QA_PASSED"
+    ],
+    [
+      "BUSINESS_ACTION",
+      "PROPOSED",
+      "CONFIRMED"
+    ],
+    [
+      "SERVICE_PACK_RELEASE",
+      "SPECIFIED",
+      "RELEASED"
+    ]
+  ]
+}

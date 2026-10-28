@@ -1,0 +1,21 @@
+name: Phase 01 product integrity
+on:
+  pull_request:
+    paths:
+      - 'docs/01-product/phase-01/**'
+      - 'docs/05-delivery/PHASE_00_TRACEABILITY.csv'
+      - 'scripts/validate_phase01.py'
+      - '.github/workflows/phase01-product-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  product-contract-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate Phase-01 product documentation only
+        run: python scripts/validate_phase01.py

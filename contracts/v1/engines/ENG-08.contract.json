@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-08",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Visual Segmentation",
+  "purpose": "Identify service-specific editable regions/locked areas and canonical masks.",
+  "non_goals": "Cannot claim correct mask from unverified generation.",
+  "typed_input_ref": "../schemas/look.schema.json",
+  "typed_output_ref": "../schemas/visual-mask.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Client original locked, region policy, canonical coordinate system",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Inadequate mask returns QA fail/needs specialist correction.",
+  "tests": [
+    "VIS-01",
+    "VIS-02"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

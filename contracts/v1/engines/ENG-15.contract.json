@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-15",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Technical Planning",
+  "purpose": "Build conditional versioned SOP/evidence-dependent procedure, tools/checkpoints and aftercare.",
+  "non_goals": "No invented ratios, duration, concentrations or own signoff.",
+  "typed_input_ref": "../schemas/feasibility.schema.json",
+  "typed_output_ref": "../schemas/technical-plan.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Approved SOP for executable plan, exact selected Look, baseline facts",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "If evidence absent, DRAFT/NEEDS_INPUT with blocked steps.",
+  "tests": [
+    "TEC-03",
+    "TEC-PLAN-01"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "REQUIRES_QUALIFIED_HUMAN_WHEN_APPLICABLE"
+}

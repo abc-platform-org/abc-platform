@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/notification.schema.json",
+  "title": "notification",
+  "type": "object",
+  "required": [
+    "notification_id",
+    "tenant_id",
+    "recipient_role",
+    "kind",
+    "state",
+    "created_at",
+    "message_code"
+  ],
+  "properties": {
+    "notification_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recipient_role": {
+      "type": "string",
+      "enum": [
+        "SPECIALIST",
+        "RECEPTION",
+        "SALON_MANAGER",
+        "ORG_OWNER"
+      ]
+    },
+    "recipient_user_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "ARRIVAL",
+        "APPOINTMENT",
+        "PLAN_REVIEW",
+        "STOCK",
+        "PAYMENT",
+        "VISUAL_JOB",
+        "SYSTEM_ALERT"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "UNREAD",
+        "READ",
+        "ARCHIVED"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "message_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "related_entity_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "read_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deduplication_key": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "READ"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "read_at"
+        ]
+      }
+    }
+  ]
+}

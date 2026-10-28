@@ -1,0 +1,13 @@
+risk_id,severity,description,review_authority,required_gate,mitigation,test_evidence
+C02-R01,Critical,Phase-00 missing parent source versions,Architecture authority,G-00,Recover or individually sign bounded source exceptions,GitHub issue #2
+C02-R02,Critical,Same-display privileged info leak,Security/Privacy review,G-06,Server field projection; role and step-up review; negative UX test,SEC-SHARED
+C02-R03,Critical,Unqualified technical plan approval / chemistry hallucination,Qualified salon specialist,G-05,SOP-verified parameters; qualified human signature and stop gates,TEC-03..05
+C02-R04,High,Visual mask leakage and identity drift,Independent visual QA,G-03,"Physical dataset, deterministic composite, independent human assessment",VIS-01..05
+C02-R05,High,Event payload schema checks are only partial,Architecture owner,G-04,"Per-event payload schema, consumer behavior, dedupe and replay test",CT-EVENT-02
+C02-R06,High,Stale visual job overwrites accepted version,Platform owner,G-04,State CAS and visual-job expected version concurrency test,SES-REC-01
+C02-R07,High,Deferred accounting / inventory semantics not transactional,Business domain owner,G-07,Ledger schemas and operation receipts before POS/inventory release,BUS-01
+C02-R08,Critical,"Consent withdraw, deletion and legal rules incomplete",Privacy/legal qualified review,G-09,Retention/withdrawal and asset deletion integration tests,SEC-CONSENT
+C02-R09,Medium,Choice of orchestrator/provider/runtime not benchmarked,Architecture owner,G-04,"Benchmark Temporal vs DB workflow, cost/latency budget ADR",ADR-CANDIDATE
+C02-R10,High,Schema version interoperability unknown,Architecture owner,G-02,"Version migration, backward-compat tests, event unknown-type DLQ",CT-VER
+C02-R11,High,Only synthetic schema fixtures available,QA owner,G-08,120 Golden scenario execution + qualified professional evaluation,GOLDEN-120
+C02-R12,Medium,Limited multiview and advanced service geometry,Visual/Domain owner,G-03/G-08,Service-specific multi-view capture and QA,VIS-MULTIVIEW

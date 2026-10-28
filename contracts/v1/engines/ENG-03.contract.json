@@ -1,0 +1,31 @@
+{
+  "engine_id": "ENG-03",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Evidence and Input Quality",
+  "purpose": "Validate image quality/angles and classify provenance into evidence records.",
+  "non_goals": "Image quality does not establish chemical history or diagnosis.",
+  "typed_input_ref": "../schemas/media.schema.json",
+  "typed_output_ref": "../schemas/evidence.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Purpose-scoped consent and media hash; distinguish observed and reported",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Retake/limited path instead of fabricating unseen state.",
+  "tests": [
+    "INP-01",
+    "INP-02",
+    "SEC-CONSENT"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

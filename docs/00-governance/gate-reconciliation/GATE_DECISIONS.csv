@@ -1,4 +1,4 @@
 gate_id,scope,reviewed_original_head_sha,recorded_ci,submitted_reviews,present_state,required_formal_close,approval_state,tracking_issue
 G-00,PHASE_00_ARCHITECTURE_GOVERNANCE,9d7a8ed1d079059ce99d6165664cf49b64579fa6,3 DOCUMENT_CI_SUCCESS,0 reviews,PENDING_OWNER_SOURCE_EXCEPTIONS_AND_ADR,3 source exceptions; 10 ADRs; owner adopts phased proof policy; reviewed risks; then merge authorization,NOT_APPROVED,9
 G-01,PHASE_01_PRODUCT_SCOPE,7f940efdfeebd373825179abe3f94a11299e2749,2 DOCUMENT_CI_SUCCESS,0 reviews,PENDING_G00_AND_OWNER_PRODUCT_SCOPE,"64 features/stories, 11 service families MVP/V2/V3, shared-screen; owner exact-SHA approval",NOT_APPROVED,11
-G-02,PHASE_02_ENGINE_API_CONTRACT,d8fa9feed609970836a958fe804ea3a65e105ac1,1 SCHEMA_FIXTURE_CI_SUCCESS,0 reviews,PENDING_G00_G01_AND_OWNER_CONTRACT_REVIEW,"19 engines, 34 schemas, 39 paths/41 ops, 25 events, 5 machines; owner exact-SHA review",NOT_APPROVED,14
+G-02,PHASE_02_ENGINE_API_CONTRACT,396289f55c9dde74164386b56c64281059f7dd43,1 SCHEMA_FIXTURE_CI_SUCCESS,0 reviews,PENDING_G00_G01_AND_OWNER_CONTRACT_REVIEW,"19 engines, 34 schemas, 39 paths/41 ops, 25 events, 5 machines; owner exact-SHA review",NOT_APPROVED,14

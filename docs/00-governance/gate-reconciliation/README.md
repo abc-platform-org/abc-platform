@@ -3,7 +3,7 @@
 **Status:** REVIEW_DOSSIER_PREPARED; **G00 BLOCKED**, **G01 PENDING**, **G02 PENDING**. This document is NOT a human signature or expert audit.
 **Accountable internal owner:** `saleheebrahimi2029-hub` per user directive; no other fictional staff assigned.
 **Scope:** design and contract freeze only. No live-client data, executable chemical procedures, payment release or production claim is authorized by this package.
-**Base:** PR #1 head `9d7a8ed1d079059ce99d6165664cf49b64579fa6`. Downstream PR #10 head `7f940efdfeebd373825179abe3f94a11299e2749`; PR #12 head `d8fa9feed609970836a958fe804ea3a65e105ac1`.
+**Base:** PR #1 head `9d7a8ed1d079059ce99d6165664cf49b64579fa6`. Downstream PR #10 head `7f940efdfeebd373825179abe3f94a11299e2749`; PR #12 hardened head `396289f55c9dde74164386b56c64281059f7dd43` (11 draft contract defects corrected; CI SUCCESS).
 
 ## Delivered
 

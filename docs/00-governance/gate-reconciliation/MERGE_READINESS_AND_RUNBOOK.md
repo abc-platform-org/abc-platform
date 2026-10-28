@@ -5,7 +5,7 @@
 | 0 | Gate reconciliation PR (this dossier) | governance/gates-00-02-disposition-20261029 | docs/engineering-baseline-20261028 | to be captured at PR creation |
 | 1 | #1 | docs/engineering-baseline-20261028 | main | 9d7a8ed1d079059ce99d6165664cf49b64579fa6 |
 | 2 | #10 | docs/phase-01-product-definition-20261029 | main after retarget | 7f940efdfeebd373825179abe3f94a11299e2749 |
-| 3 | #12 | contracts/phase-02-interface-baseline-20261029 | main after retarget | d8fa9feed609970836a958fe804ea3a65e105ac1 |
+| 3 | #12 | contracts/phase-02-interface-baseline-20261029 | main after retarget | 396289f55c9dde74164386b56c64281059f7dd43 |
 
 ## Preconditions
 

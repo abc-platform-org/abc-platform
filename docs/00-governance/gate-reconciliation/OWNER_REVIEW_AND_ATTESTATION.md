@@ -8,7 +8,7 @@
 |---|---|---|
 | Phase-00 architecture and WP-000-01/02/03 | `9d7a8ed1d079059ce99d6165664cf49b64579fa6` | [#1](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/1) |
 | Phase-01 PRD, 64 requirement stories, 11 service packs | `7f940efdfeebd373825179abe3f94a11299e2749` | [#10](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/10) |
-| Phase-02 engineering schemas and contracts | `d8fa9feed609970836a958fe804ea3a65e105ac1` | [#12](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/12) |
+| Phase-02 engineering schemas and contracts | `396289f55c9dde74164386b56c64281059f7dd43` | [#12](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/12) |
 | Ten ADRs | exact Git **blob** hashes in [ADR_DECISION_MATRIX.csv](ADR_DECISION_MATRIX.csv) | [#1](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/1) |
 | Three source exceptions | [SOURCE_EXCEPTION_PROPOSALS.csv](SOURCE_EXCEPTION_PROPOSALS.csv), at the exact future governance PR commit | new governance PR |
 
@@ -36,7 +36,7 @@ reviewed_gate_dossier_sha: "<actual commit/blob SHA>"
 reviewed_original_shas:
   phase_00: 9d7a8ed1d079059ce99d6165664cf49b64579fa6
   phase_01: 7f940efdfeebd373825179abe3f94a11299e2749
-  phase_02: d8fa9feed609970836a958fe804ea3a65e105ac1
+  phase_02: 396289f55c9dde74164386b56c64281059f7dd43
 source_exception_decisions:
   SRC-EXC-001: "ACCEPTED | REJECTED | RECOVERED"
   SRC-EXC-002: "ACCEPTED | REJECTED | RECOVERED"
@@ -57,3 +57,5 @@ actual_review_or_issue_url: "<real GitHub evidence>"
 No real client data, qualified salon/chemical SOP certification, no production build, no 120 Golden tests PASS, no 19 runtimes built, no regulatory compliance claim, no automatic service release. These require their own evidence and specialist/independent review.
 
 **Current state: NO OWNER ATTESTATION RECEIVED ON THE REVIEWED SHA.**
+
+**Audit update:** PR #12 hardened 2026-10-29 with 11 actual draft-contract remediations and 148 synthetic contract cases; the updated SHA above is the only current contract candidate. The earlier `d8fa9feed` commit is superseded for G-02 review. Still no human GitHub approval.

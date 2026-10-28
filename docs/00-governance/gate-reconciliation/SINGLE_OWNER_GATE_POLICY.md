@@ -1,5 +1,7 @@
 # Owner-led Governance — proposed phased signoff policy
 
+**Recorded user decision (2026-10-29):** The owner explicitly directed adoption of the governance split: design/architecture/contract review is distinct from production release authorization. This is a PRODUCT_GOVERNANCE_DIRECTION, **not** approval of every ADR, source exception, technical contract hash or external professional qualification.
+
 **Authoritative owner for all internal product/architecture/implementation work:** `saleheebrahimi2029-hub`, confirmed by project user. This is a responsibility assignment, not domain qualification or a formal recorded product/ADR signature.
 
 ## Design freeze vs release
@@ -26,4 +28,4 @@ Earlier WP-000-03 classed specialist, privacy and QA reviewers as mandatory *hum
 
 Owner can approve **product and design decisions** after exact version review; cannot claim independent regulatory, clinical, qualified salon SOP, security penetration or third-party QA attestations. Required reviewers/records remain assigned as **future release obligations**, not fictitious team members.
 
-**Status: PROPOSED — awaiting owner adoption and Gate-specific signoffs.**
+**Status: PRODUCT_GOVERNANCE_DIRECTION_ADOPTED_FROM_USER / FORMAL_GATES_UNAPPROVED.** The nine individual release-deferral rows, three source exceptions and 10 ADRs still need independently auditable decisions on exact revised artifacts; no runtime, legal, security or SOP evidence has been signed.

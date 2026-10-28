@@ -33,3 +33,15 @@ D. Retarget #12 to main, re-check its **75 intended file** diff (72 original fil
 E. Read back final main tree, file hashes/count and results; retain source branches if needed; never force-push or claim runtime build.
 
 Any failed condition → STOP at safe point. No PR must auto-merge merely because docs CI passed or user earlier asked to build the project.
+
+## Delegated design-only merge mandate — superseding the prior unapproved proposal
+
+ABC-DDR-20261029-001 conditionally authorizes merging these **documentation/design-only branches** when all current head SHAs and CI/permissions/mergeability are checked. The owner explicitly requested completing the design phases and then delegated engineering decisions to the assistant. Do **not** use this to merge executable production releases, bypass independent protection rules or claim an authenticated human PR signature. The original runbook order and stop conditions remain in force.
+
+- PR #15 → PR #1 documentation branch; inspect CI and diff.
+- PR #1 → main; avoid deleting files, preserve original baseline.
+- PR #10 → main after P00; re-evaluate last SHA and requirements file diff.
+- PR #12 → main after P01; re-evaluate last SHA and all 75 contract files, including 12-defect fix and 174 synthetic case CI.
+- Runtime Gates G03+ and [Issue #18](https://github.com/saleheebrahimi2029-hub/abc-platform/issues/18) remain blocking for any real customer/service release.
+
+If repository branch protection requires a separate human review or checks fail on the **current** candidate, STOP. The delegated decision is not a fabricated GitHub review.

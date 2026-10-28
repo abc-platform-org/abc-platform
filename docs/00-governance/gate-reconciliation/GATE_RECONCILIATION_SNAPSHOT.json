@@ -88,5 +88,15 @@
     "verified_ci_run_id": 40778026510,
     "engine_implementations": "NONE_VERIFIED",
     "total_synthetic_fixtures": 174
-  }
+  },
+  "owner_governance_direction": {
+    "status": "USER_DIRECTIVE_ADOPTED",
+    "date": "2026-10-29",
+    "scope": "SEPARATE_DESIGN_APPROVAL_FROM_RELEASE_PROOF",
+    "source": "User's explicit instruction in this ABC project conversation",
+    "does_not_infer_signed_git_review": true
+  },
+  "policy_change_approved_in_pr": false,
+  "owner_formal_gate_approval_recorded": false,
+  "amendment_note": "The single-owner design/release split was explicitly requested by user, while 3 source exceptions / 10 ADR itemized approvals and 9 hard release conditions remain pending recorded review."
 }

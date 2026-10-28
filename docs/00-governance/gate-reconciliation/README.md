@@ -1,5 +1,7 @@
 # ABC-MEP-01.1 — Gate 00/01/02 reconciliation (2026-10-29)
 
+**Governance direction update (2026-10-29):** The user explicitly adopted design-versus-release separation. See [decision record](OWNER_GOVERNANCE_DIRECTIVE.md). This does not approve individual historical exceptions, ADR revisions, expert safety tests, or any merge.
+
 **Status:** REVIEW_DOSSIER_PREPARED; **G00 BLOCKED**, **G01 PENDING**, **G02 PENDING**. This document is NOT a human signature or expert audit.
 **Accountable internal owner:** `saleheebrahimi2029-hub` per user directive; no other fictional staff assigned.
 **Scope:** design and contract freeze only. No live-client data, executable chemical procedures, payment release or production claim is authorized by this package.

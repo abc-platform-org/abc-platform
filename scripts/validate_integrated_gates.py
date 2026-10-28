@@ -199,4 +199,28 @@ for p in [ROOT/"docs/00-governance/phase-00/wp-000-03/GATE00_DECISION.md",
     require("PENDING" in content or "BLOCKED" in content, "historic gate doc must remain immutable with original status")
 require("G02_FORMAL_PASS_PENDING" in (P2/"gate-02-decision.md").read_text(), "G02 formal independent review still pending")
 
+# High-confidence accidental credential/key signatures across source docs and
+# scripts (not a replacement for GitHub secret scanning or manual threat review).
+credential_patterns = {
+    "GitHub personal access token": re.compile(r"ghp_[A-Za-z0-9]{36}\b"),
+    "GitHub fine-grained personal access token": re.compile(r"github_pat_[A-Za-z0-9_]{50,}"),
+    "OpenAI-style secret": re.compile(r"sk-[A-Za-z0-9]{30,}\b"),
+    "AWS access key ID": re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
+    "Private signing key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
+}
+# Avoid scanning archival literal copies twice; only current tracked artifacts.
+suspicious = []
+for suffix in ("*.md", "*.py", "*.json", "*.csv", "*.yml", "*.yaml"):
+    for file in ROOT.rglob(suffix):
+        if "original-package" in file.parts:
+            continue
+        if ".git" in file.parts:
+            continue
+        if file.is_file() and file.stat().st_size <= 2_000_000:
+            body=file.read_text(encoding="utf-8")
+            for label, pattern in credential_patterns.items():
+                if pattern.search(body):
+                    suspicious.append((str(file.relative_to(ROOT)), label))
+require(not suspicious, f"credential-like material in engineering artifacts: {suspicious}")
+
 print("INTEGRATED_ABC_DESIGN_AUDIT_PASS: 70 ZIP source bytes preserved (10 explicitly archived original paths, 59 unchanged; active revisions intact), 3 delegated bounded source exceptions, 10 ADR blob matches, 9 hard release blockers, 64 P01 requirements, 11 NOT_RELEASED packs, 19 engines, 34 schemas, 41 API operations, 25 event types, 5 state machines, 174 synthetic fixtures. NO RUNTIME OR EXPERT/PRODUCTION CLAIM.")

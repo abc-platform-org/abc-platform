@@ -1,0 +1,26 @@
+name: Documentation integrity
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - 'scripts/validate_baseline.py'
+      - '.github/workflows/docs-integrity.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - 'scripts/validate_baseline.py'
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate reference documents and feature coverage
+        run: python scripts/validate_baseline.py

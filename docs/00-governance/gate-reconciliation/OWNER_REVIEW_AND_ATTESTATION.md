@@ -59,3 +59,7 @@ No real client data, qualified salon/chemical SOP certification, no production b
 **Current state: NO OWNER ATTESTATION RECEIVED ON THE REVIEWED SHA.**
 
 **Audit update:** PR #12 hardened 2026-10-29 with 12 actual draft-contract remediations and 174 synthetic contract cases; the updated SHA above is the only current contract candidate. The earlier `d8fa9feed` commit is superseded for G-02 review. Still no human GitHub approval.
+
+## Delegated technical design decision (separate from unsigned human attestation)
+
+[ABC-DDR-20261029-001](DELEGATED_DESIGN_DECISION_2026-10-29.md) documents the owner's **explicit delegation of technical decision-making** and an engineering consultant's conditional architecture/product/contract choices against versioned file hashes. Thus the *technical decision* is now recorded; the human GitHub review worksheet above remains **NOT SIGNED**, and must not be presented as if a person reviewed every line. Expert safety/privacy/visual release attestations also remain missing. Any automated merge must respect branch protection and last-commit CI.

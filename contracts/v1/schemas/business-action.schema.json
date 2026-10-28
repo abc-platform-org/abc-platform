@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/business-action.schema.json",
+  "title": "business-action",
+  "type": "object",
+  "required": [
+    "action_id",
+    "tenant_id",
+    "requested_by",
+    "domain",
+    "action_type",
+    "state",
+    "created_at",
+    "idempotency_key",
+    "requires_confirmation"
+  ],
+  "properties": {
+    "action_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "CALENDAR",
+        "CLIENTS",
+        "POS",
+        "INVENTORY",
+        "MARKETING",
+        "NOTIFICATIONS"
+      ]
+    },
+    "action_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "PROPOSED",
+        "AUTHORIZED",
+        "PREVIEWED",
+        "APPROVED_IF_REQUIRED",
+        "EXECUTING",
+        "CONFIRMED",
+        "FAILED",
+        "COMPENSATION_REQUIRED",
+        "CANCELLED"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requires_confirmation": {
+      "type": "boolean"
+    },
+    "confirmed_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "confirmation_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "operation_receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "read_scopes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "mutation_description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "error_code": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "CONFIRMED"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "operation_receipt_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "requires_confirmation": {
+            "const": true
+          },
+          "state": {
+            "enum": [
+              "EXECUTING",
+              "CONFIRMED"
+            ]
+          }
+        },
+        "required": [
+          "requires_confirmation",
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "confirmed_by",
+          "confirmation_at"
+        ]
+      }
+    }
+  ]
+}

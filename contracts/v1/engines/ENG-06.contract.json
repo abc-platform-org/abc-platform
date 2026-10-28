@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-06",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Decision and Recommendation",
+  "purpose": "Hard-filter candidates, rank useful qualified alternatives and explain tradeoffs.",
+  "non_goals": "Cannot synthesize three options if only one valid; no fake scores.",
+  "typed_input_ref": "../schemas/analysis.schema.json",
+  "typed_output_ref": "../schemas/recommendation.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Salon capability, safety and maintenance constraints",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Uncertain decision returns conditional option or clarification.",
+  "tests": [
+    "DEC-01",
+    "DEC-02"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

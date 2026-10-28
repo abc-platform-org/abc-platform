@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/look.schema.json",
+  "title": "look",
+  "type": "object",
+  "required": [
+    "look_spec_id",
+    "look_version_id",
+    "session_id",
+    "service_id",
+    "version",
+    "desired_attributes",
+    "editable_regions",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "look_spec_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "look_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "service_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "parent_look_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "desired_attributes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "value",
+          "evidence_class"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "evidence_class": {
+            "$ref": "common.schema.json#/$defs/evidenceClass"
+          },
+          "source_question_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "editable_regions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "HAIR",
+          "BEARD",
+          "SKIN_COSMETIC",
+          "EYES_MAKEUP",
+          "LIPS_MAKEUP",
+          "NAILS",
+          "CLOTHING_STYLE"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "locked_regions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "reference_asset_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "original_asset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "view_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "FRONT",
+          "BACK",
+          "SIDE_LEFT",
+          "SIDE_RIGHT"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "CANDIDATE",
+        "QA_PASSED",
+        "SELECTED",
+        "SUPERSEDED",
+        "REJECTED"
+      ]
+    },
+    "provider_independent": true,
+    "selection_record": {
+      "type": "object",
+      "required": [
+        "selected_at",
+        "selected_by_specialist_id"
+      ],
+      "properties": {
+        "selected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "selected_by_specialist_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "client_preference_recorded": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-04",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Beauty Analysis",
+  "purpose": "Service-specific feature and baseline analysis constrained by evidence.",
+  "non_goals": "Cannot infer medical diagnosis or chemical material state from image alone.",
+  "typed_input_ref": "../schemas/evidence.schema.json",
+  "typed_output_ref": "../schemas/analysis.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "No unsupported observations; preserve unknowns and evidence IDs",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Uncertain output returns unknowns / professional check.",
+  "tests": [
+    "ANA-01",
+    "PQ-03"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

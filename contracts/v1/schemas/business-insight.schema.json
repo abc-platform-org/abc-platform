@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/business-insight.schema.json",
+  "title": "business-insight",
+  "type": "object",
+  "required": [
+    "insight_id",
+    "tenant_id",
+    "as_of",
+    "metric_key",
+    "metric_value",
+    "source_event_ids",
+    "currency_or_unit",
+    "data_freshness_state",
+    "engine_version"
+  ],
+  "properties": {
+    "insight_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metric_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metric_value": {
+      "type": "number"
+    },
+    "source_event_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "currency_or_unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "data_freshness_state": {
+      "type": "string",
+      "enum": [
+        "CURRENT",
+        "DELAYED",
+        "STALE",
+        "PARTIAL"
+      ]
+    },
+    "engine_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "definition_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "period_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "explanation": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

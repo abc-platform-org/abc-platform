@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/common.schema.json",
+  "title": "ABC Common Contract Types",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "iso": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "actor": {
+      "type": "object",
+      "required": [
+        "user_id",
+        "role"
+      ],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "SPECIALIST",
+            "RECEPTION",
+            "SALON_MANAGER",
+            "ORG_OWNER",
+            "PLATFORM_OPERATOR",
+            "SYSTEM"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidenceClass": {
+      "type": "string",
+      "enum": [
+        "KNOWN",
+        "OBSERVED",
+        "USER_REPORTED",
+        "INFERRED",
+        "UNKNOWN",
+        "REQUIRES_PROFESSIONAL_CHECK"
+      ]
+    },
+    "serviceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "audit": {
+      "type": "object",
+      "required": [
+        "actor_id",
+        "occurred_at",
+        "trace_id"
+      ],
+      "properties": {
+        "actor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trace_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "statusSafety": {
+      "type": "string",
+      "enum": [
+        "ALLOW",
+        "ALLOW_CONDITIONAL",
+        "BLOCK",
+        "REQUIRES_PROFESSIONAL_CHECK"
+      ]
+    }
+  }
+}

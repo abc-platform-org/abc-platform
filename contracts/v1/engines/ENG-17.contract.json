@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-17",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Output and Handoff",
+  "purpose": "Render authorized shared/professional output and internal work-order handoff.",
+  "non_goals": "No automatic remote send to customer and no unsupported booking claim.",
+  "typed_input_ref": "../schemas/specialist-validation.schema.json",
+  "typed_output_ref": "../schemas/handoff.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Current validation, role-scoped payload, receipt consistency",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "No receipt => action not CONFIRMED.",
+  "tests": [
+    "INT-01",
+    "SEC-SHARED"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "REQUIRES_QUALIFIED_HUMAN_WHEN_APPLICABLE"
+}

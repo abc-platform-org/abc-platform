@@ -1,0 +1,753 @@
+{
+  "version": "1.0.0-draft",
+  "description": "Synthetic contract-only examples; no real customer info or executed model tests",
+  "valid": [
+    {
+      "schema": "session",
+      "instance": {
+        "session_id": "session-1",
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "specialist_id": "specialist-1",
+        "state": "CREATED",
+        "state_version": 0,
+        "created_at": "2026-10-29T12:00:00Z",
+        "updated_at": "2026-10-29T12:00:00Z",
+        "scope": "IN_SALON_SHARED_SCREEN"
+      }
+    },
+    {
+      "schema": "consent",
+      "instance": {
+        "consent_id": "consent-1",
+        "session_id": "session-1",
+        "client_id": "client-1",
+        "purpose": [
+          "CAPTURE",
+          "AI_PROCESSING"
+        ],
+        "status": "ACTIVE",
+        "policy_version": "consent-1.0",
+        "recorded_at": "2026-10-29T12:00:00Z",
+        "recorded_by": "specialist-1",
+        "source": "IN_SALON_ACKNOWLEDGEMENT"
+      }
+    },
+    {
+      "schema": "evidence",
+      "instance": {
+        "evidence_id": "evidence-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "attribute_key": "daily_styling_minutes",
+        "value": "5",
+        "evidence_class": "USER_REPORTED",
+        "source_type": "CLIENT_ANSWER",
+        "captured_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "question",
+      "instance": {
+        "question_id": "q-1",
+        "profile_version": "hair-v1",
+        "service_id": "HAIRCUT",
+        "text": "How long do you style daily?",
+        "reason": "DECISION_IMPACT",
+        "evidence_gap_keys": [
+          "daily_styling_minutes"
+        ],
+        "state": "ANSWERED",
+        "asked_by": "ABC",
+        "answer": "5 min",
+        "answer_source": "CLIENT",
+        "answered_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "media",
+      "instance": {
+        "asset_id": "asset-1",
+        "session_id": "session-1",
+        "consent_id": "consent-1",
+        "asset_role": "CLIENT_ORIGINAL",
+        "storage_key": "tenants/tenant-1/assets/asset-1",
+        "mime_type": "image/png",
+        "checksum_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "created_at": "2026-10-29T12:00:00Z",
+        "access_policy": "SHARED_CURRENT_SESSION"
+      }
+    },
+    {
+      "schema": "analysis",
+      "instance": {
+        "analysis_id": "analysis-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "engine_version": "0.0.1",
+        "evidence_ids": [
+          "evidence-1"
+        ],
+        "attributes": [
+          {
+            "key": "style_goal",
+            "value": "classic",
+            "evidence_class": "USER_REPORTED",
+            "source_evidence_id": "evidence-1"
+          }
+        ],
+        "unknowns": [
+          "growth_pattern"
+        ],
+        "created_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "recommendation",
+      "instance": {
+        "recommendation_set_id": "recset-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "candidates": [
+          {
+            "candidate_id": "cand-1",
+            "look_spec_id": "spec-1",
+            "reason": "Low maintenance",
+            "feasibility_label": "CONDITIONAL"
+          }
+        ],
+        "created_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "look",
+      "instance": {
+        "look_spec_id": "look-1",
+        "look_version_id": "look-v1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "version": 1,
+        "desired_attributes": [
+          {
+            "key": "fringe_length",
+            "value": "short",
+            "evidence_class": "USER_REPORTED"
+          }
+        ],
+        "editable_regions": [
+          "HAIR"
+        ],
+        "created_at": "2026-10-29T12:00:00Z",
+        "created_by": "specialist-1",
+        "status": "CANDIDATE"
+      }
+    },
+    {
+      "schema": "visual-job",
+      "instance": {
+        "job_id": "job-1",
+        "session_id": "session-1",
+        "look_version_id": "look-v1",
+        "source_asset_id": "asset-1",
+        "mode": "TRANSFORM",
+        "state": "QA_PASSED",
+        "idempotency_key": "key-1",
+        "attempt": 1,
+        "created_at": "2026-10-29T12:00:00Z",
+        "requested_by": "specialist-1",
+        "output_asset_id": "preview-1",
+        "qa_report_id": "qa-1"
+      }
+    },
+    {
+      "schema": "visual-qa",
+      "instance": {
+        "qa_report_id": "qa-1",
+        "job_id": "job-1",
+        "look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "qa_status": "PASS",
+        "region_fidelity": "LOCKED_REGIONS_PRESERVED",
+        "identity_assessment": "PASS",
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "evaluator_version": "qa-v1"
+      }
+    },
+    {
+      "schema": "sop",
+      "instance": {
+        "sop_id": "sop-1",
+        "service_id": "HAIRCUT",
+        "version": "1.0",
+        "status": "APPROVED",
+        "approved_by": "qualified-specialist-1",
+        "approved_at": "2026-10-29T12:00:00Z",
+        "evidence_requirements": [
+          "hair_state"
+        ],
+        "allowed_tools": [
+          "scissors"
+        ],
+        "source_revision": "manufacturer-or-salon-1",
+        "qualification_role": "BARBER"
+      }
+    },
+    {
+      "schema": "feasibility",
+      "instance": {
+        "assessment_id": "f-1",
+        "session_id": "session-1",
+        "selected_look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "status": "PROFESSIONALLY_CONFIRMED",
+        "evidence_ids": [
+          "evidence-1"
+        ],
+        "blocking_unknowns": [],
+        "specialist_id": "specialist-1",
+        "sop_version_id": "sop-1",
+        "evaluated_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "service-pack",
+      "instance": {
+        "service_id": "HAIRCUT",
+        "ontology_version": "v1",
+        "release_state": "SPECIFIED",
+        "question_profile_version": "q-v1",
+        "required_evidence_keys": [
+          "hair_state"
+        ],
+        "safety_tier": "S1",
+        "visual_qa_profile_version": "vis-v1",
+        "professional_validation_role": "BARBER"
+      }
+    },
+    {
+      "schema": "technical-plan",
+      "instance": {
+        "plan_id": "plan-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "selected_look_version_id": "look-v1",
+        "plan_version": 1,
+        "status": "DRAFT",
+        "feasibility_assessment_id": "f-1",
+        "evidence_ids": [
+          "evidence-1"
+        ],
+        "blocking_unknowns": [
+          "back_view_required"
+        ],
+        "steps": [],
+        "created_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "specialist-validation",
+      "instance": {
+        "validation_id": "val-1",
+        "session_id": "session-1",
+        "plan_id": "plan-1",
+        "plan_version": 1,
+        "selected_look_version_id": "look-v1",
+        "sop_version_id": "sop-1",
+        "evidence_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "specialist_id": "specialist-1",
+        "specialist_qualification_id": "qualification-1",
+        "decision": "VALIDATED",
+        "reviewed_at": "2026-10-29T12:00:00Z",
+        "approval_proof_id": "approval-1"
+      }
+    },
+    {
+      "schema": "event",
+      "instance": {
+        "event_id": "event-1",
+        "event_type": "LOOK_SELECTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "session-1",
+        "aggregate_version": 4,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "payload": {
+          "session_id": "session-1",
+          "look_version_id": "look-v1"
+        }
+      }
+    },
+    {
+      "schema": "handoff",
+      "instance": {
+        "handoff_id": "handoff-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "selected_look_version_id": "look-v1",
+        "status": "DRAFT",
+        "created_at": "2026-10-29T12:00:00Z",
+        "target_domain": "APPOINTMENTS"
+      }
+    },
+    {
+      "schema": "business-action",
+      "instance": {
+        "action_id": "business-1",
+        "tenant_id": "tenant-1",
+        "requested_by": "manager-1",
+        "domain": "CALENDAR",
+        "action_type": "RESCHEDULE",
+        "state": "PROPOSED",
+        "created_at": "2026-10-29T12:00:00Z",
+        "idempotency_key": "key-b1",
+        "requires_confirmation": true
+      }
+    },
+    {
+      "schema": "knowledge",
+      "instance": {
+        "knowledge_package_id": "kb-1",
+        "ontology_version": "v1",
+        "service_id": "HAIRCUT",
+        "retrieval_sources": [
+          {
+            "source_id": "kb-s1",
+            "source_version": "v1"
+          }
+        ],
+        "grounded_facts": [
+          {
+            "key": "styling",
+            "value": "low",
+            "source_id": "kb-s1"
+          }
+        ],
+        "created_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "consultation-profile",
+      "instance": {
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "question_profile_version": "q-v1",
+        "answer_ids": [
+          "ans-1"
+        ],
+        "evidence_ids": [
+          "evidence-1"
+        ],
+        "readiness": "READY_FOR_RECOMMENDATION",
+        "updated_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "visual-mask",
+      "instance": {
+        "mask_set_id": "mask-1",
+        "session_id": "session-1",
+        "look_version_id": "look-v1",
+        "source_asset_id": "asset-1",
+        "regions": [
+          {
+            "region_id": "hair",
+            "purpose": "EDITABLE",
+            "asset_id": "mask-asset-1"
+          }
+        ],
+        "coordinate_space": "CANONICAL_ORIGINAL_PIXELS",
+        "mask_policy_version": "mask-v1",
+        "created_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "policy-decision",
+      "instance": {
+        "policy_decision_id": "policy-1",
+        "scope": "PLAN",
+        "decision": "BLOCK",
+        "safety_tier": "S3",
+        "reason_codes": [
+          "MISSING_CHEMISTRY_HISTORY"
+        ],
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "policy_version": "v1"
+      }
+    },
+    {
+      "schema": "business-insight",
+      "instance": {
+        "insight_id": "insight-1",
+        "tenant_id": "tenant-1",
+        "as_of": "2026-10-29T12:00:00Z",
+        "metric_key": "settled_revenue",
+        "metric_value": 1250,
+        "source_event_ids": [
+          "event-1"
+        ],
+        "currency_or_unit": "EUR",
+        "data_freshness_state": "CURRENT",
+        "engine_version": "v1"
+      }
+    },
+    {
+      "schema": "engine-command",
+      "instance": {
+        "command_id": "command-1",
+        "engine_id": "ENG-15",
+        "contract_version": "1.0.0",
+        "correlation_id": "trace-1",
+        "tenant_id": "tenant-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "input_schema_id": "feasibility-v1",
+        "input_ref": "f-1",
+        "idempotency_key": "key-1",
+        "requested_at": "2026-10-29T12:00:00Z"
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "schema": "session",
+      "instance": {
+        "session_id": "session-1",
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "specialist_id": "specialist-1",
+        "state": "LOOK_SELECTED",
+        "state_version": 0,
+        "created_at": "2026-10-29T12:00:00Z",
+        "updated_at": "2026-10-29T12:00:00Z",
+        "scope": "IN_SALON_SHARED_SCREEN"
+      },
+      "reason": "look selection requires specific immutable look"
+    },
+    {
+      "schema": "consent",
+      "instance": {
+        "consent_id": "consent-1",
+        "session_id": "session-1",
+        "client_id": "client-1",
+        "purpose": [],
+        "status": "ACTIVE",
+        "policy_version": "consent-1.0",
+        "recorded_at": "2026-10-29T12:00:00Z",
+        "recorded_by": "specialist-1",
+        "source": "IN_SALON_ACKNOWLEDGEMENT"
+      },
+      "reason": "empty consent purpose prohibited"
+    },
+    {
+      "schema": "consent",
+      "instance": {
+        "consent_id": "consent-1",
+        "session_id": "session-1",
+        "client_id": "client-1",
+        "purpose": [
+          "CAPTURE",
+          "AI_PROCESSING"
+        ],
+        "status": "WITHDRAWN",
+        "policy_version": "consent-1.0",
+        "recorded_at": "2026-10-29T12:00:00Z",
+        "recorded_by": "specialist-1",
+        "source": "IN_SALON_ACKNOWLEDGEMENT"
+      },
+      "reason": "withdrawn requires timestamp"
+    },
+    {
+      "schema": "evidence",
+      "instance": {
+        "evidence_id": "evidence-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "attribute_key": "daily_styling_minutes",
+        "value": "5",
+        "evidence_class": "OBSERVED",
+        "source_type": "CLIENT_ANSWER",
+        "captured_at": "2026-10-29T12:00:00Z"
+      },
+      "reason": "user report cannot be transformed into observation"
+    },
+    {
+      "schema": "question",
+      "instance": {
+        "question_id": "q-1",
+        "profile_version": "hair-v1",
+        "service_id": "HAIRCUT",
+        "text": "How long do you style daily?",
+        "reason": "DECISION_IMPACT",
+        "evidence_gap_keys": [
+          "daily_styling_minutes"
+        ],
+        "state": "ANSWERED",
+        "asked_by": "ABC",
+        "answer": "5 min",
+        "answered_at": "2026-10-29T12:00:00Z"
+      },
+      "reason": "answered requires source"
+    },
+    {
+      "schema": "media",
+      "instance": {
+        "asset_id": "asset-1",
+        "session_id": "session-1",
+        "consent_id": "consent-1",
+        "asset_role": "CLIENT_ORIGINAL",
+        "storage_key": "tenants/tenant-1/assets/asset-1",
+        "mime_type": "image/png",
+        "checksum_sha256": "broken",
+        "created_at": "2026-10-29T12:00:00Z",
+        "access_policy": "SHARED_CURRENT_SESSION"
+      },
+      "reason": "invalid media checksum"
+    },
+    {
+      "schema": "look",
+      "instance": {
+        "look_spec_id": "look-1",
+        "look_version_id": "look-v1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "version": 1,
+        "desired_attributes": [
+          {
+            "key": "fringe_length",
+            "value": "short",
+            "evidence_class": "USER_REPORTED"
+          }
+        ],
+        "editable_regions": [],
+        "created_at": "2026-10-29T12:00:00Z",
+        "created_by": "specialist-1",
+        "status": "CANDIDATE"
+      },
+      "reason": "look cannot have no editable targets"
+    },
+    {
+      "schema": "visual-job",
+      "instance": {
+        "job_id": "job-1",
+        "session_id": "session-1",
+        "look_version_id": "look-v1",
+        "source_asset_id": "asset-1",
+        "mode": "TRANSFORM",
+        "state": "QA_PASSED",
+        "idempotency_key": "key-1",
+        "attempt": 1,
+        "created_at": "2026-10-29T12:00:00Z",
+        "requested_by": "specialist-1",
+        "output_asset_id": "preview-1"
+      },
+      "reason": "passed visual job needs QA report"
+    },
+    {
+      "schema": "visual-qa",
+      "instance": {
+        "qa_report_id": "qa-1",
+        "job_id": "job-1",
+        "look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "qa_status": "PASS",
+        "region_fidelity": "LOCKED_REGIONS_PRESERVED",
+        "identity_assessment": "FAIL",
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "evaluator_version": "qa-v1"
+      },
+      "reason": "passed visual QA cannot have failed identity"
+    },
+    {
+      "schema": "sop",
+      "instance": {
+        "sop_id": "sop-1",
+        "service_id": "HAIRCUT",
+        "version": "1.0",
+        "status": "APPROVED",
+        "approved_at": "2026-10-29T12:00:00Z",
+        "evidence_requirements": [
+          "hair_state"
+        ],
+        "allowed_tools": [
+          "scissors"
+        ],
+        "source_revision": "manufacturer-or-salon-1",
+        "qualification_role": "BARBER"
+      },
+      "reason": "approved SOP needs qualified source of approval"
+    },
+    {
+      "schema": "feasibility",
+      "instance": {
+        "assessment_id": "f-1",
+        "session_id": "session-1",
+        "selected_look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "status": "PROFESSIONALLY_CONFIRMED",
+        "evidence_ids": [
+          "evidence-1"
+        ],
+        "blocking_unknowns": [],
+        "sop_version_id": "sop-1",
+        "evaluated_at": "2026-10-29T12:00:00Z"
+      },
+      "reason": "professionally confirmed requires specialist"
+    },
+    {
+      "schema": "technical-plan",
+      "instance": {
+        "plan_id": "plan-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "selected_look_version_id": "look-v1",
+        "plan_version": 1,
+        "status": "VALIDATED",
+        "feasibility_assessment_id": "f-1",
+        "evidence_ids": [
+          "evidence-1"
+        ],
+        "blocking_unknowns": [
+          "back_view_required"
+        ],
+        "steps": [],
+        "created_at": "2026-10-29T12:00:00Z"
+      },
+      "reason": "validated plan requires plan evidence, qualified validator, and steps"
+    },
+    {
+      "schema": "specialist-validation",
+      "instance": {
+        "validation_id": "val-1",
+        "session_id": "session-1",
+        "plan_id": "plan-1",
+        "plan_version": 1,
+        "selected_look_version_id": "look-v1",
+        "sop_version_id": "sop-1",
+        "evidence_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "specialist_id": "specialist-1",
+        "decision": "VALIDATED",
+        "reviewed_at": "2026-10-29T12:00:00Z",
+        "approval_proof_id": "approval-1"
+      },
+      "reason": "approval without qualification is rejected"
+    },
+    {
+      "schema": "service-pack",
+      "instance": {
+        "service_id": "HAIRCUT",
+        "ontology_version": "v1",
+        "release_state": "RELEASED",
+        "question_profile_version": "q-v1",
+        "required_evidence_keys": [
+          "hair_state"
+        ],
+        "safety_tier": "S1",
+        "visual_qa_profile_version": "vis-v1",
+        "professional_validation_role": "BARBER"
+      },
+      "reason": "service released requires SOP and proof"
+    },
+    {
+      "schema": "policy-decision",
+      "instance": {
+        "policy_decision_id": "policy-1",
+        "scope": "PLAN",
+        "decision": "ALLOW",
+        "safety_tier": "S3",
+        "reason_codes": [
+          "MISSING_CHEMISTRY_HISTORY"
+        ],
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "policy_version": "v1"
+      },
+      "reason": "S3 policy cannot permit action"
+    },
+    {
+      "schema": "business-action",
+      "instance": {
+        "action_id": "business-1",
+        "tenant_id": "tenant-1",
+        "requested_by": "manager-1",
+        "domain": "CALENDAR",
+        "action_type": "RESCHEDULE",
+        "state": "CONFIRMED",
+        "created_at": "2026-10-29T12:00:00Z",
+        "idempotency_key": "key-b1",
+        "requires_confirmation": true
+      },
+      "reason": "business success requires real operation receipt"
+    },
+    {
+      "schema": "handoff",
+      "instance": {
+        "handoff_id": "handoff-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "selected_look_version_id": "look-v1",
+        "status": "AUTHORIZED",
+        "created_at": "2026-10-29T12:00:00Z",
+        "target_domain": "APPOINTMENTS"
+      },
+      "reason": "handoff needs human authorization"
+    },
+    {
+      "schema": "event",
+      "instance": {
+        "event_id": "event-1",
+        "event_type": "LOOK_SELECTED",
+        "event_schema_version": "1.0.0",
+        "tenant_id": "tenant-1",
+        "aggregate_id": "session-1",
+        "aggregate_version": 4,
+        "occurred_at": "2026-10-29T12:00:00Z",
+        "correlation_id": "trace-1",
+        "payload": {
+          "session_id": "session-1",
+          "look_version_id": "look-v1"
+        }
+      },
+      "reason": "event audit requires actor"
+    },
+    {
+      "schema": "business-insight",
+      "instance": {
+        "insight_id": "insight-1",
+        "tenant_id": "tenant-1",
+        "as_of": "2026-10-29T12:00:00Z",
+        "metric_key": "settled_revenue",
+        "metric_value": 1250,
+        "source_event_ids": [],
+        "currency_or_unit": "EUR",
+        "data_freshness_state": "CURRENT",
+        "engine_version": "v1"
+      },
+      "reason": "no source provenance means not a real KPI"
+    },
+    {
+      "schema": "engine-command",
+      "instance": {
+        "command_id": "command-1",
+        "engine_id": "ENG-20",
+        "contract_version": "1.0.0",
+        "correlation_id": "trace-1",
+        "tenant_id": "tenant-1",
+        "actor": {
+          "user_id": "specialist-1",
+          "role": "SPECIALIST"
+        },
+        "input_schema_id": "feasibility-v1",
+        "input_ref": "f-1",
+        "idempotency_key": "key-1",
+        "requested_at": "2026-10-29T12:00:00Z"
+      },
+      "reason": "unknown non-registered engine id"
+    }
+  ]
+}

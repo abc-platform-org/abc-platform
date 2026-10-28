@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/policy-decision.schema.json",
+  "title": "policy-decision",
+  "type": "object",
+  "required": [
+    "policy_decision_id",
+    "scope",
+    "decision",
+    "safety_tier",
+    "reason_codes",
+    "evaluated_at",
+    "policy_version"
+  ],
+  "properties": {
+    "policy_decision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "INTAKE",
+        "QUESTION",
+        "RECOMMENDATION",
+        "VISUAL_RELEASE",
+        "FEASIBILITY",
+        "PLAN",
+        "VALIDATION",
+        "BUSINESS_ACTION"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "ALLOW",
+        "ALLOW_CONDITIONAL",
+        "BLOCK",
+        "REQUIRES_PROFESSIONAL_CHECK"
+      ]
+    },
+    "safety_tier": {
+      "type": "string",
+      "enum": [
+        "S0",
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_checks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "safety_tier": {
+            "const": "S3"
+          }
+        },
+        "required": [
+          "safety_tier"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "BLOCK",
+              "REQUIRES_PROFESSIONAL_CHECK"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

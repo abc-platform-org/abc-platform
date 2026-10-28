@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/feasibility.schema.json",
+  "title": "feasibility",
+  "type": "object",
+  "required": [
+    "assessment_id",
+    "session_id",
+    "selected_look_version_id",
+    "service_id",
+    "status",
+    "evidence_ids",
+    "blocking_unknowns",
+    "evaluated_at"
+  ],
+  "properties": {
+    "assessment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "selected_look_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "service_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "VISUALLY_PLAUSIBLE",
+        "CONDITIONALLY_FEASIBLE",
+        "PROFESSIONALLY_CONFIRMED",
+        "BLOCKED",
+        "NOT_ENOUGH_EVIDENCE"
+      ]
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "blocking_unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "specialist_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sop_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "PROFESSIONALLY_CONFIRMED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "specialist_id",
+          "sop_version_id"
+        ]
+      }
+    }
+  ]
+}

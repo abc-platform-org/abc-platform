@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-19",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Opportunity and Automation",
+  "purpose": "Propose, request approval and execute only authorized domain actions with receipt.",
+  "non_goals": "No direct payments/inventory/campaign from model text.",
+  "typed_input_ref": "../schemas/business-insight.schema.json",
+  "typed_output_ref": "../schemas/business-action.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Explicit READ/RECOMMEND/EXECUTE privileges, idempotency, confirmation",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Failure/partial receipt logged with compensation state.",
+  "tests": [
+    "BUS-03",
+    "SEC-ACTION"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

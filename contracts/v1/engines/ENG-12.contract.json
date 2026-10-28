@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-12",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Visual State and Version",
+  "purpose": "Append-only version DAG, Undo/Redo, compare, stable accepted Look and stale job rejection.",
+  "non_goals": "Cannot mutate original or silently overwrite accepted modifications.",
+  "typed_input_ref": "../schemas/look.schema.json",
+  "typed_output_ref": "../schemas/look.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Parent/version identity and selected immutable LookVersion",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "CAS conflict protects prior accepted result.",
+  "tests": [
+    "VIS-05",
+    "SES-REC-01"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

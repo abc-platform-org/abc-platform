@@ -1,0 +1,25 @@
+name: Phase 02 contract integrity
+on:
+  pull_request:
+    paths:
+      - 'contracts/v1/**'
+      - 'scripts/validate_phase02.py'
+      - '.github/workflows/phase02-contract-integrity.yml'
+      - 'docs/01-product/phase-01/FEATURE_RELEASE_MATRIX.csv'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned JSON Schema validators
+        run: python -m pip install 'jsonschema==4.23.0' 'referencing==0.35.1'
+      - name: Run Phase-02 typed-contract validation and negative fixtures
+        run: python scripts/validate_phase02.py

@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-05",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Knowledge and Ontology",
+  "purpose": "Retrieve source versioned beauty/service knowledge and ontology mappings.",
+  "non_goals": "Cannot treat missing legacy parent/source file as verified evidence.",
+  "typed_input_ref": "../schemas/service-pack.schema.json",
+  "typed_output_ref": "../schemas/knowledge.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Knowledge source lineage, applicability and version required",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Unverified source triggers SOURCE_UNVERIFIED.",
+  "tests": [
+    "KNW-01",
+    "CT-SCHEMA-01"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

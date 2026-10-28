@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-13",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Service Feasibility",
+  "purpose": "Separate visually plausible from conditionally executable and professionally confirmed.",
+  "non_goals": "Cannot assert hair chemistry from picture or self-approve execution.",
+  "typed_input_ref": "../schemas/look.schema.json",
+  "typed_output_ref": "../schemas/feasibility.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Actual specialist observations, salon capability, safety and SOP",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Missing facts -> professional check / blocked.",
+  "tests": [
+    "TEC-01",
+    "TEC-02"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "REQUIRES_QUALIFIED_HUMAN_WHEN_APPLICABLE"
+}

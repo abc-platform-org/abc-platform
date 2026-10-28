@@ -1,0 +1,30 @@
+{
+  "engine_id": "ENG-09",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Controlled Visual Generation",
+  "purpose": "Queue provider adapter controlled transform/try-on with provenance and immutable inputs.",
+  "non_goals": "Does not decide identity preservation or publish QA_PASS on its own.",
+  "typed_input_ref": "../schemas/visual-mask.schema.json",
+  "typed_output_ref": "../schemas/visual-job.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Consent active, reference isolation, job idempotency and policy",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Provider timeout yields retryable failure, not fake preview.",
+  "tests": [
+    "VIS-03",
+    "VIS-REF-01"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

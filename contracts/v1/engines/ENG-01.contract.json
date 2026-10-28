@@ -1,0 +1,31 @@
+{
+  "engine_id": "ENG-01",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Orchestration",
+  "purpose": "Controls durable state, workflow replay, idempotency, outbox and recovery; never derives tenant from prompt or browser.",
+  "non_goals": "Must not issue specialist validation or financial receipts.",
+  "typed_input_ref": "../schemas/engine-command.schema.json",
+  "typed_output_ref": "../schemas/session.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Session version CAS; auth context; orchestration policy gate",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Retryable step resumes checkpoint; duplicated request returns same result.",
+  "tests": [
+    "SES-01",
+    "SES-REC-01",
+    "SEC-EVENT"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "GATED_BY_REVIEWED_CONTRACT"
+}

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/visual-mask.schema.json",
+  "title": "visual-mask",
+  "type": "object",
+  "required": [
+    "mask_set_id",
+    "session_id",
+    "look_version_id",
+    "source_asset_id",
+    "regions",
+    "coordinate_space",
+    "mask_policy_version",
+    "created_at"
+  ],
+  "properties": {
+    "mask_set_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "look_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_asset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "region_id",
+          "purpose",
+          "asset_id"
+        ],
+        "properties": {
+          "region_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "EDITABLE",
+              "HARD_LOCKED",
+              "SOFT_EDGE"
+            ]
+          },
+          "asset_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "coordinate_space": {
+      "type": "string",
+      "enum": [
+        "CANONICAL_ORIGINAL_PIXELS",
+        "NORMALIZED_0_1"
+      ]
+    },
+    "mask_policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "segmentation_model_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "qa_gate_status": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "PASS",
+        "FAIL"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

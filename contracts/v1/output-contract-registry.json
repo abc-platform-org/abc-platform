@@ -1,0 +1,175 @@
+{
+  "version": "1.0.0-draft",
+  "historical_contracts_preserved": 17,
+  "not_renumbered": true,
+  "legacy_outputs": [
+    {
+      "output_id": "OUT-01",
+      "label": "Clarification",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/question.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-02",
+      "label": "Recommendation Set",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/recommendation.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-03",
+      "label": "Comparison",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/recommendation.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-04",
+      "label": "Fixed-Choice Assessment",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/recommendation.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-05",
+      "label": "Visual Preview Result",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/visual-qa.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-06",
+      "label": "Service Explanation",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/knowledge.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-07",
+      "label": "Maintenance and Aftercare",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/technical-plan.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-08",
+      "label": "Feasibility / Limitation",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/feasibility.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-09",
+      "label": "Safety Notice",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/policy-decision.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-10",
+      "label": "Client Decision Summary",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/look.schema.json",
+      "delivery_view": "SPECIALIST_PRIVILEGED_OR_INTERNAL",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-11",
+      "label": "Salon Handoff Package",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/handoff.schema.json",
+      "delivery_view": "SPECIALIST_PRIVILEGED_OR_INTERNAL",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-12",
+      "label": "Specialist Analysis / Review",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/analysis.schema.json",
+      "delivery_view": "SPECIALIST_PRIVILEGED_OR_INTERNAL",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-13",
+      "label": "Specialist Visual Request Result",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/visual-qa.schema.json",
+      "delivery_view": "SPECIALIST_PRIVILEGED_OR_INTERNAL",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-14",
+      "label": "Client-Ready In-Session Package",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/recommendation.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-15",
+      "label": "Complete Look",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/look.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-16",
+      "label": "Service Bundle / Complementary Services",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/service-pack.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    },
+    {
+      "output_id": "OUT-17",
+      "label": "Capability Limitation / Failure / Recovery",
+      "origin": "LEGACY_ABC_DOC_014_ROLE",
+      "contract_status": "MAPPED_FOR_PHASE02_REVIEW",
+      "typed_payload_ref": "schemas/policy-decision.schema.json",
+      "delivery_view": "SHARED_PER_AUTHORIZED_PROJECTION",
+      "client_remote_delivery": false
+    }
+  ],
+  "productization_new_outputs": [
+    {
+      "output_contract_id": "TECHNICAL_PLAN_DRAFT",
+      "payload_ref": "schemas/technical-plan.schema.json",
+      "privileged": true,
+      "human_approval_separate": true
+    },
+    {
+      "output_contract_id": "SPECIALIST_VALIDATION",
+      "payload_ref": "schemas/specialist-validation.schema.json",
+      "privileged": true,
+      "human_approval_separate": false
+    }
+  ],
+  "source_disposition": "Pending Phase-00 authority and parent-version exceptions"
+}

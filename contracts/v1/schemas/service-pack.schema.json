@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/service-pack.schema.json",
+  "title": "service-pack",
+  "type": "object",
+  "required": [
+    "service_id",
+    "ontology_version",
+    "release_state",
+    "question_profile_version",
+    "required_evidence_keys",
+    "safety_tier",
+    "visual_qa_profile_version",
+    "professional_validation_role"
+  ],
+  "properties": {
+    "service_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ontology_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "release_state": {
+      "type": "string",
+      "enum": [
+        "SPECIFIED",
+        "CONTRACTED",
+        "IMPLEMENTED",
+        "TESTED",
+        "PROFESSIONALLY_REVIEWED",
+        "RELEASED",
+        "BLOCKED",
+        "RETIRED"
+      ]
+    },
+    "question_profile_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_evidence_keys": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "safety_tier": {
+      "type": "string",
+      "enum": [
+        "S0",
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    "visual_qa_profile_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "professional_validation_role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sop_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "salon_capability_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "service_categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "release_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "service_pack_version": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "release_state": {
+            "const": "RELEASED"
+          }
+        },
+        "required": [
+          "release_state"
+        ]
+      },
+      "then": {
+        "required": [
+          "sop_version_id",
+          "release_evidence_ids"
+        ],
+        "properties": {
+          "release_evidence_ids": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

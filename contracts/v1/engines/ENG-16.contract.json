@@ -1,0 +1,31 @@
+{
+  "engine_id": "ENG-16",
+  "contract_version": "1.0.0-draft",
+  "owner": "saleheebrahimi2029-hub",
+  "state": "DESIGN_ONLY",
+  "name": "Specialist Validation",
+  "purpose": "Capture authenticated qualified human review bound to LookVersion, SOP, evidence and plan version.",
+  "non_goals": "Engine cannot self-issue a human signature or infer qualification.",
+  "typed_input_ref": "../schemas/technical-plan.schema.json",
+  "typed_output_ref": "../schemas/specialist-validation.schema.json",
+  "invocation": "ORCHESTRATED_TYPED_COMMAND",
+  "preconditions": "Specialist auth/qualification and explicit typed decision",
+  "backend_authority": "AUTHENTICATED_TENANT_ROLE_CONTEXT",
+  "failure_recovery": "Material change invalidates prior validation.",
+  "tests": [
+    "TEC-04",
+    "TEC-05",
+    "SEC-ROLE"
+  ],
+  "audit_fields": [
+    "trace_id",
+    "correlation_id",
+    "engine_id",
+    "engine_version",
+    "input_asset_or_fact_version",
+    "outcome",
+    "error_code"
+  ],
+  "release_state": "NOT_IMPLEMENTED",
+  "approval_policy": "REQUIRES_QUALIFIED_HUMAN_WHEN_APPLICABLE"
+}

@@ -1,0 +1,120 @@
+{
+  "program": "ABC-MEP-01.1",
+  "package": "GATES-00-02-RECONCILIATION",
+  "as_of": "2026-10-29",
+  "scope": "CONDITIONALLY_ACCEPTED_DESIGN_ONLY_BY_DELEGATED_TECHNICAL_AUTHORITY_NOT_PRODUCTION",
+  "accountable_owner": "saleheebrahimi2029-hub",
+  "owner_assignment_evidence": "EXPLICIT_USER_DIRECTIVE",
+  "reviewed_prs": [
+    {
+      "number": 1,
+      "head_sha": "9d7a8ed1d079059ce99d6165664cf49b64579fa6",
+      "draft": true,
+      "merged": false,
+      "submitted_reviews": 0,
+      "document_ci_success": 3
+    },
+    {
+      "number": 10,
+      "head_sha": "7f940efdfeebd373825179abe3f94a11299e2749",
+      "draft": true,
+      "merged": false,
+      "submitted_reviews": 0,
+      "document_ci_success": 2
+    },
+    {
+      "number": 12,
+      "head_sha": "164c512a944faf186144fdbb0d88dcabee871ade",
+      "draft": true,
+      "merged": false,
+      "submitted_reviews": 0,
+      "contract_ci_success": 3
+    }
+  ],
+  "source_audit": {
+    "confirmed_versions": {
+      "ABC-DOC-001": "v1.1.0",
+      "ABC-DOC-005": "v1.0.2",
+      "ABC-DOC-900": "v1.1.0"
+    },
+    "unrecovered_parent_versions": [
+      "ABC-DOC-001 v1.2.0",
+      "ABC-DOC-005 v1.1.0",
+      "ABC-CCR-001 v1.1.0"
+    ],
+    "exceptions_proposed": 3,
+    "exceptions_signed": 0,
+    "search_limit": "Historical Notion snapshots and targeted accessible Library search; not proof other exports do not exist",
+    "exceptions_design_accepted_by_delegation": 3
+  },
+  "design": {
+    "adrs_proposed": 10,
+    "adrs_formally_approved": 0,
+    "phase01_requirements": 64,
+    "phase02_engines": 19,
+    "phase02_schemas": 34,
+    "phase02_api_paths": 39,
+    "phase02_api_operations": 41,
+    "phase02_events": 25,
+    "phase02_state_machines": 5,
+    "adrs_design_accepted_by_delegation": 10
+  },
+  "proposed_release_deferrals": 9,
+  "adopted_release_deferrals": 9,
+  "qualified_specialist_attestations": 0,
+  "independent_privacy_legal_reviews": 0,
+  "independent_visual_qa_reviews": 0,
+  "golden_authored": 120,
+  "golden_runtime_executed_verified": 0,
+  "gate_status": {
+    "G-00": "DESIGN_BASELINE_ACCEPTED_BY_DELEGATION",
+    "G-01": "PRODUCT_DESIGN_ACCEPTED_BY_DELEGATION",
+    "G-02": "CONTRACT_DESIGN_ACCEPTED_BY_DELEGATION"
+  },
+  "changes_authorized": {
+    "notion": false,
+    "main": false,
+    "merge_any_pr": false,
+    "mark_service_released": false,
+    "mark_gate_pass": false
+  },
+  "next_action": "Validate all delegated decision matrices and exact-head CI; merge staged design-only PRs only where GitHub branch protection allows; preserve hard release issue #18.",
+  "phase02_contract_audit": {
+    "head_sha": "164c512a944faf186144fdbb0d88dcabee871ade",
+    "found_design_defects": 12,
+    "remediated_at_contract_layer": 12,
+    "core_positive_fixtures": 33,
+    "core_negative_fixtures": 39,
+    "event_positive_fixtures": 25,
+    "event_negative_fixtures": 77,
+    "verified_ci_run_id": 40778026510,
+    "engine_implementations": "NONE_VERIFIED",
+    "total_synthetic_fixtures": 174
+  },
+  "owner_governance_direction": {
+    "status": "USER_DIRECTIVE_ADOPTED",
+    "date": "2026-10-29",
+    "scope": "DESIGN_AND_CONTRACT_APPROVAL_SEPARATED_FROM_REAL_PRODUCT_RELEASE",
+    "source": "ABC project user message on 2026-10-29",
+    "does_not_infer_signed_git_review": true,
+    "does_not_infer_individual_adr_approval": true
+  },
+  "policy_change_approved_in_pr": false,
+  "owner_formal_gate_approval_recorded": false,
+  "amendment_note": "The single-owner design/release split was explicitly requested by user, while 3 source exceptions / 10 ADR itemized approvals and 9 hard release conditions remain pending recorded review.",
+  "governance_direction_implementation_note": "Owner directly adopted design-vs-release separation and delegated technical decisions to assistant; each item is recorded as DESIGN_ONLY. No human GitHub review, qualified SOP/privacy/QA signoff or runtime engine is implied.",
+  "delegated_decision": {
+    "decision_id": "ABC-DDR-20261029-001",
+    "decision_document": "docs/00-governance/gate-reconciliation/DELEGATED_DESIGN_DECISION_2026-10-29.md",
+    "delegator": "PROJECT_OWNER_DIRECT_USER_INSTRUCTION",
+    "actor": "AI_ENGINEERING_CONSULTANT_NOT_HUMAN_REVIEWER",
+    "qualifier": "DESIGN_ONLY_CONDITIONAL",
+    "signed_human_github_review": false,
+    "formal_reviewer_attestation": false,
+    "source_parent_bytes_recovered": false,
+    "accepts_all_ten_adr_design_choices": true,
+    "accepts_three_bounded_source_exceptions": true,
+    "accepts_nine_hard_release_blocks": true,
+    "conditional_pr_merging_authorized_after_exact_head_ci_and_branch_checks": true
+  }
+}

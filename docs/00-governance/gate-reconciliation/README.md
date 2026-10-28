@@ -1,0 +1,39 @@
+# ABC-MEP-01.1 — Gate 00/01/02 reconciliation (2026-10-29)
+
+**Governance direction update (2026-10-29):** The user explicitly adopted design-versus-release separation. See [decision record](OWNER_GOVERNANCE_DIRECTIVE.md). This does not approve individual historical exceptions, ADR revisions, expert safety tests, or any merge.
+
+**Status:** REVIEW_DOSSIER_PREPARED; **G00 BLOCKED**, **G01 PENDING**, **G02 PENDING**. This document is NOT a human signature or expert audit.
+**Accountable internal owner:** `saleheebrahimi2029-hub` per user directive; no other fictional staff assigned.
+**Scope:** design and contract freeze only. No live-client data, executable chemical procedures, payment release or production claim is authorized by this package.
+**Base:** PR #1 head `9d7a8ed1d079059ce99d6165664cf49b64579fa6`. Downstream PR #10 head `7f940efdfeebd373825179abe3f94a11299e2749`; PR #12 hardened head `164c512a944faf186144fdbb0d88dcabee871ade` (12 draft contract defects corrected; 174 synthetic validations, CI SUCCESS).
+
+## Delivered
+
+- [SOURCE_AUDIT.md](SOURCE_AUDIT.md): independently searched Notion and Library versions; three parents not retrieved.
+- [SOURCE_EXCEPTION_PROPOSALS.csv](SOURCE_EXCEPTION_PROPOSALS.csv): bounded exceptions still **UNSIGNED**.
+- [ADR_DECISION_MATRIX.csv](ADR_DECISION_MATRIX.csv): 10 ADRs with actual reviewed Git blob SHAs; all **PENDING_OWNER_DECISION**.
+- [SINGLE_OWNER_GATE_POLICY.md](SINGLE_OWNER_GATE_POLICY.md): accountable owner and design-vs-release separation.
+- [RELEASE_SAFETY_DEFERRALS.csv](RELEASE_SAFETY_DEFERRALS.csv): proposed test/expert proof placement; no release bypass.
+- [GATE_DECISIONS.csv](GATE_DECISIONS.csv): precise status and exit requirement for G00/G01/G02.
+- [OWNER_REVIEW_AND_ATTESTATION.md](OWNER_REVIEW_AND_ATTESTATION.md): exact evidence-linked review path.
+- [MERGE_READINESS_AND_RUNBOOK.md](MERGE_READINESS_AND_RUNBOOK.md): safe stacked-PR merge order.
+- [ISSUE_RECONCILIATION.md](ISSUE_RECONCILIATION.md): real GitHub blockers, next steps.
+- [GATE_RECONCILIATION_SNAPSHOT.json](GATE_RECONCILIATION_SNAPSHOT.json): machine-readable evidence summary.
+- [Automated integrity validator](../../../scripts/validate_gate_reconciliation.py) and CI workflow, to be verified on the PR.
+
+## Verified facts and proposed ruling
+
+- PR #1/#10/#12 were all Draft/unmerged with **zero submitted GitHub reviews** at the time checked. main remained `62951aa6ac85e1d8a331cc7c5e14e1ac843b6e11`.
+- Notion registry explicitly lists `ABC-DOC-001 v1.1.0` and `ABC-DOC-005 v1.0.2`, not newer claimed parents. Productization cites versions not found as separate original artifacts. That is a bounded search finding, not proof of nonexistence elsewhere.
+- The owner's **target product direction** is already user-established: in-salon shared screen, specialist-operated, AI Studio center, independently contract-driven platform, conditional technical plans and Salon OS.
+- Architecture/software design may be *proposed for owner freeze* without claiming professional/clinical, legal or runtime verification, IF a reviewed policy formally defers those proof obligations to the corresponding service/pilot gates. This **changes gate classification**, so it requires explicit owner approval and does not automatically supersede earlier G-00 rules.
+
+**Do not merge** PRs or change old signed records, Notion, or main solely because docs/contract CI succeeds.
+
+## Decision superseding the original unsigned proposal (2026-10-29)
+
+The owner has **delegated technical/architecture choices** to the assistant. The resulting [bounded technical decision ABC-DDR-20261029-001](DELEGATED_DESIGN_DECISION_2026-10-29.md) conditionally accepts **3 source exceptions, 10 ADR design directions, the 64-feature Phase-01 baseline, the current 19-engine Phase-02 contract baseline and all 9 hard release-gate blockers**.
+
+**Effective statuses:** G-00 = `DESIGN_BASELINE_ACCEPTED_BY_DELEGATION`; G-01 = `PRODUCT_DESIGN_ACCEPTED_BY_DELEGATION`; G-02 = `CONTRACT_DESIGN_ACCEPTED_BY_DELEGATION`. This is **design-only**, not a real GitHub human review, expert certification, 19 running engines or product release.
+
+Statements below describing "still pending owner choice" reflect the earlier historical checkpoint and are superseded **only for delegated technical design choices**. Human signature absence, original source nonrecovery, exact-head checks, and release blocking conditions remain true.

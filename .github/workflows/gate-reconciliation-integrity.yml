@@ -1,0 +1,23 @@
+name: Gate 00-02 reconciliation integrity
+on:
+  pull_request:
+    paths:
+      - 'docs/00-governance/gate-reconciliation/**'
+      - 'docs/00-governance/adrs/**'
+      - 'scripts/validate_gate_reconciliation.py'
+      - '.github/workflows/gate-reconciliation-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-review-dossier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify source/ADR SHA traceability and honest Gate statuses
+        run: python scripts/validate_gate_reconciliation.py

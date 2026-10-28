@@ -100,12 +100,15 @@ must(set(typed_evt["required_payload_keys"]) <= set(valid_event_fixture["payload
 # Every registered event is now a discriminated typed envelope. Positive/negative
 # fixtures must cover every event, including rejection of unknown payload fields.
 event_fixtures = load(CONTRACTS / "examples" / "event-payload-fixtures.json")
-must(len(event_fixtures["positive"]) == 25 and len(event_fixtures["negative"]) == 51,
+must(len(event_fixtures["positive"]) == 25 and len(event_fixtures["negative"]) == 77,
      "full event fixture coverage expected")
 registered_events = {ev["event_type"] for ev in evtypes}
 must({x["event_type"] for x in event_fixtures["positive"]} == registered_events,
      "a registered event has no positive typed fixture")
 for item in event_fixtures["positive"]:
+    expected_producer = next(e["producer_engine_id"] for e in evtypes if e["event_type"] == item["event_type"])
+    must(item["instance"]["producer_engine_id"] == expected_producer, "producer fixture mismatch")
+    must(item["instance"].get("trace_id"), "event trace id missing")
     err = valid_instance("event", item["instance"])
     must(not err, f"valid event payload {item['event_type']} rejected: {err[0] if err else ''}")
 for item in event_fixtures["negative"]:
@@ -113,6 +116,8 @@ for item in event_fixtures["negative"]:
     must(bool(err), f"invalid event payload accepted: {item['event_type']} {item['reason']}")
 event_schema = schemas["event"]
 must(len(event_schema.get("allOf", [])) == len(evtypes), "each event needs exactly one schema branch")
+must("producer_engine_id" in event_schema["required"] and "trace_id" in event_schema["required"],
+     "event producer and trace binding must be mandatory")
 must(set(event_schema["properties"]["event_type"]["enum"]) == registered_events,
      "event type enum differs from registry")
 
@@ -290,4 +295,4 @@ for row in coverage:
         must(row["schema_contracts"] and row["engine_ids"],row["requirement_id"])
 gate = (CONTRACTS / "gate-02-decision.md").read_text(encoding="utf-8")
 must("G02_FORMAL_PASS_PENDING" in gate, "contract gate must remain pending")
-print("PHASE-02 CONTRACT TESTS PASS (draft docs): 34 schemas, 33 valid + 39 invalid fixtures plus 25 positive / 51 negative event payload fixtures, 19 engines, 25 events, 5 state machines, 39 API paths / 41 operations, 64 requirement crosswalks, 17 historic outputs, 64 upstream requirements. NO RUNNING ENGINES/FORMAL GATE PASS CLAIMED.")
+print("PHASE-02 CONTRACT TESTS PASS (draft docs): 34 schemas, 33 valid + 39 invalid fixtures plus 25 positive / 77 negative event payload fixtures, 19 engines, 25 events, 5 state machines, 39 API paths / 41 operations, 64 requirement crosswalks, 17 historic outputs, 64 upstream requirements. NO RUNNING ENGINES/FORMAL GATE PASS CLAIMED.")

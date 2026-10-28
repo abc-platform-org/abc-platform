@@ -287,7 +287,9 @@
         "payload": {
           "session_id": "session-1",
           "look_version_id": "look-v1"
-        }
+        },
+        "producer_engine_id": "ENG-12",
+        "trace_id": "trace-1"
       }
     },
     {
@@ -842,7 +844,9 @@
         "payload": {
           "session_id": "session-1",
           "look_version_id": "look-v1"
-        }
+        },
+        "producer_engine_id": "ENG-12",
+        "trace_id": "trace-1"
       },
       "reason": "event audit requires actor"
     },

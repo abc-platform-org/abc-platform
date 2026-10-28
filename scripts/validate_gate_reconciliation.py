@@ -17,7 +17,7 @@ P = ROOT / "docs/00-governance/gate-reconciliation"
 docs = [
     "README.md", "SOURCE_AUDIT.md", "SINGLE_OWNER_GATE_POLICY.md",
     "MERGE_READINESS_AND_RUNBOOK.md", "OWNER_REVIEW_AND_ATTESTATION.md",
-    "ISSUE_RECONCILIATION.md", "SOURCE_EXCEPTION_PROPOSALS.csv",
+    "ISSUE_RECONCILIATION.md", "OWNER_GOVERNANCE_DIRECTIVE.md", "SOURCE_EXCEPTION_PROPOSALS.csv",
     "ADR_DECISION_MATRIX.csv", "RELEASE_SAFETY_DEFERRALS.csv",
     "GATE_DECISIONS.csv", "GATE_RECONCILIATION_SNAPSHOT.json",
 ]
@@ -76,6 +76,11 @@ assert snapshot["source_audit"]["exceptions_proposed"] == 3
 assert snapshot["source_audit"]["exceptions_signed"] == 0
 assert snapshot["design"]["adrs_proposed"] == 10
 assert snapshot["design"]["adrs_formally_approved"] == 0
+assert snapshot["owner_governance_direction"]["status"] == "USER_DIRECTIVE_ADOPTED"
+assert snapshot["owner_governance_direction"]["does_not_infer_signed_git_review"] is True
+assert snapshot["policy_change_approved_in_pr"] is False
+assert snapshot["owner_formal_gate_approval_recorded"] is False
+assert "USER_DIRECTIVE_ADOPTED_AS_PRODUCT_GOVERNANCE_POLICY" in (P/"OWNER_GOVERNANCE_DIRECTIVE.md").read_text(encoding="utf-8")
 assert snapshot["proposed_release_deferrals"] == 9
 assert snapshot["adopted_release_deferrals"] == 0
 assert all(not value for value in snapshot["changes_authorized"].values())
@@ -93,4 +98,4 @@ assert "NOT SIGNED" in attestation
 for code in ["SRC-EXC-001","SRC-EXC-002","SRC-EXC-003","ADR-001","ADR-010"]:
     assert code in (attestation + "\n" + (P/"ADR_DECISION_MATRIX.csv").read_text())
 assert "G-00" in (P/"README.md").read_text()
-print("GATE_RECONCILIATION_DOC_PASS: 3 unsigned source exceptions, 10 ADR blob-SHA verified / unsigned, 9 unaccepted release deferrals, G00/G01/G02 not approved; 11 dossier artifacts. NO MERGE / NO RUNTIME / NO EXPERT CERTIFICATION.")
+print("GATE_RECONCILIATION_DOC_PASS: 3 unsigned source exceptions, 10 ADR blob-SHA verified / unsigned, 9 unaccepted release deferrals, G00/G01/G02 not approved; 12 dossier artifacts. NO MERGE / NO RUNTIME / NO EXPERT CERTIFICATION.")

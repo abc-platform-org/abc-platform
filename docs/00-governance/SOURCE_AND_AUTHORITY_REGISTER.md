@@ -36,3 +36,8 @@ Document `ABC-SRC-001` | status: `PROPOSED` / audit incomplete
 ## Migration policy
 
 Preserve existing IDs, knowledge service mapping, and 120 golden test IDs. Introduce new `ABC-F`, `AIS`, `ENG`, `PRD` identities as **proposal**, not silent substitutions for canonical legacy IDs. Every migrated contract requires source, new owner, implementation test, and review.
+
+
+## Phase 00 audit overlay (2026-10-29; PR #1 — proposed)
+
+[WP-000-01 audit index](phase-00/README.md) provides source-by-source evidence and distinguishes legacy Notion document authority from target platform authority. Gate-00 is **BLOCKED_FOR_APPROVAL**; missing parent sources and human ADR approvals remain open. The archive itself was not retroactively rewritten.

@@ -45,8 +45,30 @@ def git_blob_sha(content):
 manifest = json_file(ROOT / "PACKAGE_MANIFEST.json")
 require(manifest["file_count"] == 69 and len(manifest["files"]) == 69, "original ZIP manifest differs")
 require(manifest["target_repo"] == OWNER + "/abc-platform", "original archive targeted other repo")
-remap = {"README.md": "docs/00-governance/original-package/README.2026-10-28.md"}
-require(len(remap) == 1, "source-preservation exception must be exactly one file")
+remap = {
+    "README.md": "docs/00-governance/original-package/README.2026-10-28.md",
+}
+# Original ZIP files updated by the Phase-00 decision/WP scripts are NOT
+# silently overwritten. Their original Git blobs remain byte-exact in an
+# archival mirror while the active docs retain the subsequent valid revisions.
+superseded = [
+    "CHANGELOG.md",
+    "docs/00-governance/ADR_INDEX.md",
+    "docs/00-governance/SOURCE_AND_AUTHORITY_REGISTER.md",
+    "docs/00-governance/adrs/ADR-001.md",
+    "docs/00-governance/adrs/ADR-002.md",
+    "docs/00-governance/adrs/ADR-008.md",
+    "docs/00-governance/adrs/ADR-009.md",
+    "docs/00-governance/adrs/ADR-010.md",
+    "scripts/validate_baseline.py",
+]
+remap.update({path: "docs/00-governance/original-package/source-snapshot/" + path for path in superseded})
+require(len(remap) == 10 and set(remap) <= set(manifest["files"]), "source exception mapping not exact")
+for original in remap:
+    current = ROOT/original
+    require(current.is_file(), f"original path removed during source preservation: {original}")
+    require(hashlib.sha256(current.read_bytes()).hexdigest() != manifest["files"][original],
+            f"unexpected source snapshot remap not needed or conflict: {original}")
 sha_mismatches = []
 for original, expected_sha256 in manifest["files"].items():
     path = ROOT / remap.get(original, original)
@@ -177,4 +199,4 @@ for p in [ROOT/"docs/00-governance/phase-00/wp-000-03/GATE00_DECISION.md",
     require("PENDING" in content or "BLOCKED" in content, "historic gate doc must remain immutable with original status")
 require("G02_FORMAL_PASS_PENDING" in (P2/"gate-02-decision.md").read_text(), "G02 formal independent review still pending")
 
-print("INTEGRATED_ABC_DESIGN_AUDIT_PASS: 70 ZIP source bytes preserved (README remapped, existing root README untouched), 3 delegated bounded source exceptions, 10 ADR blob matches, 9 hard release blockers, 64 P01 requirements, 11 NOT_RELEASED packs, 19 engines, 34 schemas, 41 API operations, 25 event types, 5 state machines, 174 synthetic fixtures. NO RUNTIME OR EXPERT/PRODUCTION CLAIM.")
+print("INTEGRATED_ABC_DESIGN_AUDIT_PASS: 70 ZIP source bytes preserved (10 explicitly archived original paths, 59 unchanged; active revisions intact), 3 delegated bounded source exceptions, 10 ADR blob matches, 9 hard release blockers, 64 P01 requirements, 11 NOT_RELEASED packs, 19 engines, 34 schemas, 41 API operations, 25 event types, 5 state machines, 174 synthetic fixtures. NO RUNTIME OR EXPERT/PRODUCTION CLAIM.")

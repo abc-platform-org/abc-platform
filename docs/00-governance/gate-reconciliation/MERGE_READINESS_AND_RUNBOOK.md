@@ -7,6 +7,14 @@
 | 2 | #10 | docs/phase-01-product-definition-20261029 | main after retarget | 7f940efdfeebd373825179abe3f94a11299e2749 |
 | 3 | #12 | contracts/phase-02-interface-baseline-20261029 | main after retarget | 164c512a944faf186144fdbb0d88dcabee871ade |
 
+## Preflight warning: stacked branches and asynchronous verification
+
+- Always re-read all 4 PR head SHAs and target branches immediately before any merge; prior SHA records are **historical evidence**, not a branch lease.
+- Do not treat successful CI from an older commit as current; require successful checks on the exact last SHA being merged.
+- If the governance PR and Phase-02 head change during review, reset the owner approval packet with the *new* HEAD and require review again.
+- Formal design-only Gate PASS requires explicit owner authorization on exact source exceptions and ADR decisions, not merely assignment or a CI pass.
+- Hard service/pilot gates remain blocked independently of design-only merge.
+
 ## Preconditions
 
 1. **Owner explicitly reviews** source exception details (3), ADR directions (10), product MVP stages (64) and contract draft (19 engines / 34 schemas / 41 API ops) with exact SHA and recorded decision.
@@ -21,7 +29,7 @@
 A. After Gate dossier review, merge the small governance PR **into PR #1 branch**, not directly main, only with authorization; keep evidence of new branch head.  
 B. Resolve Gate-00, then merge #1 to main after all required checks.  
 C. Retarget #10 to main, re-check its **18 intended file** diff; avoid duplicating inherited base files; review and merge after G-01 authorization.  
-D. Retarget #12 to main, re-check its **72 intended file** diff and contract CI; review and merge after G-02 authorization.  
+D. Retarget #12 to main, re-check its **75 intended file** diff (72 original files plus three additional audit/event-fixture artifacts; 12 contract-level findings corrected) and contract CI; review and merge after G-02 authorization.  
 E. Read back final main tree, file hashes/count and results; retain source branches if needed; never force-push or claim runtime build.
 
 Any failed condition → STOP at safe point. No PR must auto-merge merely because docs CI passed or user earlier asked to build the project.

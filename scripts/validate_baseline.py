@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Stdlib-only validation for this documentation baseline; NOT a runtime or AI test."""
 from pathlib import Path
-import re, sys
+import re, sys, hashlib, json
 root = Path(__file__).resolve().parents[1]
 required = [
     'README.md', 'docs/00-governance/PROJECT_CHARTER.md', 'docs/01-product/PRD.md',
@@ -29,7 +29,20 @@ for i in range(1,21):
 roadmap=(root/'docs/05-delivery/MASTER_ROADMAP_16_PHASES.md').read_text(encoding='utf-8')
 for i in range(16):
     if f'Phase {i:02}' not in roadmap: problems.append('Phase missing %02d'%i)
+# Original 70-file ZIP README cannot replace pre-existing repository root README.
+# Treat the byte-exact copy as an immutable ARCHIVAL source, not as an active
+# Markdown page: its original root-relative links are not valid at archival path.
+archive_rel = 'docs/00-governance/original-package/README.2026-10-28.md'
+archive = root / archive_rel
+if archive.exists():
+    manifest = json.loads((root/'PACKAGE_MANIFEST.json').read_text(encoding='utf-8'))
+    expected = manifest['files']['README.md']
+    actual = hashlib.sha256(archive.read_bytes()).hexdigest()
+    if expected != actual: problems.append('Original ZIP README archival SHA256 mismatch')
 for md in root.rglob('*.md'):
+    if md == archive:
+        continue  # verified byte-identical archival original; see integration audit
+
     text=md.read_text(encoding='utf-8')
     for target in re.findall(r'(?<!\!)\[[^]]+\]\(([^)]+)\)',text):
         if target.startswith(('https://','http://','#','mailto:')):continue

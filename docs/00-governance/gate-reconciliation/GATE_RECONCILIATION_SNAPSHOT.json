@@ -24,11 +24,11 @@
     },
     {
       "number": 12,
-      "head_sha": "396289f55c9dde74164386b56c64281059f7dd43",
+      "head_sha": "164c512a944faf186144fdbb0d88dcabee871ade",
       "draft": true,
       "merged": false,
       "submitted_reviews": 0,
-      "contract_ci_success": 2
+      "contract_ci_success": 3
     }
   ],
   "source_audit": {
@@ -78,14 +78,15 @@
   },
   "next_action": "Owner explicitly reviews exact artifacts and accepts/rejects individually bounded source, ADR, governance deferrals, product, contracts and merge authority; expert checks before relevant release gates",
   "phase02_contract_audit": {
-    "head_sha": "396289f55c9dde74164386b56c64281059f7dd43",
-    "found_design_defects": 11,
-    "remediated_at_contract_layer": 11,
+    "head_sha": "164c512a944faf186144fdbb0d88dcabee871ade",
+    "found_design_defects": 12,
+    "remediated_at_contract_layer": 12,
     "core_positive_fixtures": 33,
     "core_negative_fixtures": 39,
     "event_positive_fixtures": 25,
-    "event_negative_fixtures": 51,
-    "verified_ci_run_id": 40777547843,
-    "engine_implementations": "NONE_VERIFIED"
+    "event_negative_fixtures": 77,
+    "verified_ci_run_id": 40778026510,
+    "engine_implementations": "NONE_VERIFIED",
+    "total_synthetic_fixtures": 174
   }
 }

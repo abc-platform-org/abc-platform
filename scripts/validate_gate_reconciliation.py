@@ -67,7 +67,7 @@ assert all(re.fullmatch(r"[a-f0-9]{40}", r["reviewed_original_head_sha"]) for r 
 assert {r["gate_id"]:r["reviewed_original_head_sha"] for r in gates} == {
     "G-00":"9d7a8ed1d079059ce99d6165664cf49b64579fa6",
     "G-01":"7f940efdfeebd373825179abe3f94a11299e2749",
-    "G-02":"396289f55c9dde74164386b56c64281059f7dd43",
+    "G-02":"164c512a944faf186144fdbb0d88dcabee871ade",
 }
 
 snapshot=json.loads((P/"GATE_RECONCILIATION_SNAPSHOT.json").read_text(encoding="utf-8"))
@@ -82,9 +82,9 @@ assert all(not value for value in snapshot["changes_authorized"].values())
 assert snapshot["gate_status"]["G-00"] == "BLOCKED_FOR_FORMAL_APPROVAL"
 assert all(g != "PASS" for g in snapshot["gate_status"].values())
 assert snapshot["golden_runtime_executed_verified"] == 0
-assert snapshot["phase02_contract_audit"]["found_design_defects"] == 11
-assert snapshot["phase02_contract_audit"]["verified_ci_run_id"] == 40777547843
-assert snapshot["reviewed_prs"][2]["head_sha"] == "396289f55c9dde74164386b56c64281059f7dd43"
+assert snapshot["phase02_contract_audit"]["found_design_defects"] == 12
+assert snapshot["phase02_contract_audit"]["verified_ci_run_id"] == 40778026510
+assert snapshot["reviewed_prs"][2]["head_sha"] == "164c512a944faf186144fdbb0d88dcabee871ade"
 assert len(snapshot["reviewed_prs"])==3
 assert all(p["submitted_reviews"]==0 and p["draft"] and not p["merged"] for p in snapshot["reviewed_prs"])
 

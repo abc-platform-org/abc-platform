@@ -36,3 +36,7 @@ Continue WP-000-02 **on a reviewed branch**, resolve source conflicts and obtain
 ## WP-000-02 — Decision Preparation (2026-10-29)
 
 [WP-000-02 package](wp-000-02/README.md) records evidence-led recovery limits, conflict-by-conflict architecture disposition, legacy AG→ENG mapping, source-exception proposals, ADR review requirements, blocker actions and G-00 reassessment. **G-00 remains BLOCKED_FOR_FORMAL_APPROVAL**. No signoffs have been fabricated and no Notion or `main` changes are authorized.
+
+## WP-000-03 — Governance & Formal Approval Dossier
+
+[WP-000-03 review dossier](wp-000-03/README.md) establishes the six-role accountable RACI proposal, 19 ENG workstream ownership, 14 blocker closure tasks, 20 unsigned approval ledger entries, eight real GitHub issues (#2–#9), source exception routing, independent privacy/safety/QA review protocols and a Gate-00 re-assessment. **Document preparation and tracking are complete; named people/qualifications/approvals remain UNASSIGNED/PENDING. Gate-00 is BLOCKED_FOR_FORMAL_APPROVAL.** No automatic PR merge or Notion/main mutation is authorized.

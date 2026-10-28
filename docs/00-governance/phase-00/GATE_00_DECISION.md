@@ -39,3 +39,7 @@ Status: **BLOCKED_FOR_APPROVAL** (evidence matrix prepared; no implementation co
 ## WP-000-02 — Decision Preparation (2026-10-29)
 
 [Gate-00 reassessment](wp-000-02/GATE_00_REASSESSMENT.md): 20/20 MIGs dispositioned at the review/contract level; ADR-001/002/008/009/010 expanded but retain proposed status; three Productization parents still unverified with explicit [source exception proposals](wp-000-02/SOURCE_EXCEPTIONS.md); named technical, SOP, privacy and QA approvers still unassigned. **Final Gate-00 verdict unchanged: BLOCKED_FOR_FORMAL_APPROVAL.** Authoring/CI success must not be represented as runtime test or signoff.
+
+## WP-000-03 — Formal Governance Readiness (2026-10-29)
+
+[Gate-00 final review](wp-000-03/GATE00_DECISION.md) and [blocker-to-issue matrix](wp-000-03/GATE00_CLOSURE_MATRIX.csv) document 14 open issues, six proposed reviewer authorities, 19 engine accountability roles and 20 unsigned approval records. Eight GitHub issues #2–#9 now track actual closure actions. **Current Gate-00 verdict remains BLOCKED_FOR_FORMAL_APPROVAL** because real reviewer identities, accepted parent-source exceptions/verified sources, qualified SOP/safety/privacy/QA reviews and final ADR/Gate signatures are not available. Docs CI must not be treated as production evidence.

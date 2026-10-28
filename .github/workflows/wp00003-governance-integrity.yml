@@ -1,0 +1,25 @@
+name: WP00003 governance integrity
+
+on:
+  pull_request:
+    paths:
+      - 'docs/00-governance/phase-00/**'
+      - 'docs/00-governance/ADR_INDEX.md'
+      - 'docs/05-delivery/PHASE_00_TRACEABILITY.csv'
+      - 'scripts/validate_wp00003.py'
+      - '.github/workflows/wp00003-governance-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wp00003-documents:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate WP00003 governance artifacts (document structure only)
+        run: python scripts/validate_wp00003.py

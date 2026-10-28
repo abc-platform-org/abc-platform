@@ -22,3 +22,11 @@
 - Added legacy AG-01..10 to target ENG-01..19 mapping and mandatory interface/security/technical-plan conditions.
 - Expanded ADR-001/002/008/009/010 with alternatives, controls, tests and reviewer requirements; **status remains proposed**.
 - Updated Phase-00 index, authority register and Gate-00 decision overlay. Main and Notion are unchanged; no application runtime or Golden tests claimed.
+
+## 2026-10-29 — WP-000-03 formal governance package (PR #1, draft)
+
+- Defined proposed A/R/C responsibilities for 19 engines, 18 product modules and six independent governance review authorities; real people remain unassigned.
+- Added 14-blocker closure matrix, 20-entry unsigned approval ledger, source/SOP/privacy/QA policies, risk treatment and exact G-00 decision criteria.
+- Created GitHub issues #2–#9 for source exceptions, ADR review, owner assignment, privacy, domain/safety SOP, QA, knowledge verification and final Gate-00 decision.
+- Added WP00003 document validator and GitHub workflow; these verify *documentation structure only*.
+- Gate-00 remains BLOCKED_FOR_FORMAL_APPROVAL; `main` and Notion unchanged; no runtime implementation, 120-case execution or reviewer signoff claimed.

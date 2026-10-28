@@ -1,0 +1,54 @@
+{
+  "program": "ABC-MEP-01.1",
+  "work_package": "WP-000-03",
+  "state": "REVIEW_DOSSIER_COMPLETE_HUMAN_APPROVAL_PENDING",
+  "as_of": "2026-10-29",
+  "target_repository": "saleheebrahimi2029-hub/abc-platform",
+  "branch": "docs/engineering-baseline-20261028",
+  "pull_request_number": 1,
+  "gate_00": "BLOCKED_FOR_FORMAL_APPROVAL",
+  "status_authority": {
+    "roles_proposed": 6,
+    "real_people_verified": 0,
+    "adr_decisions_proposed": 10,
+    "adr_decisions_signed": 0,
+    "source_exceptions_pending": 3,
+    "source_exceptions_accepted": 0
+  },
+  "engines": {
+    "design_roles": 19,
+    "implemented_verified": 0
+  },
+  "traceability": {
+    "modules": 18,
+    "studio_features": 26,
+    "prd_requirements": 20
+  },
+  "blocker_tracking": {
+    "total": 14,
+    "tracked_issues": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "hard_review_required": true
+  },
+  "qa": {
+    "documentation_only": true,
+    "golden_authored": 120,
+    "golden_execution_verified": 0,
+    "release_gate_passed": false
+  },
+  "policy": {
+    "may_auto_merge": false,
+    "may_relabel_adr_accepted": false,
+    "may_invent_human_signoffs": false,
+    "notion_write_allowed": false,
+    "main_write_allowed": false
+  }
+}

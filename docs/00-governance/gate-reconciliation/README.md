@@ -29,3 +29,11 @@
 - Architecture/software design may be *proposed for owner freeze* without claiming professional/clinical, legal or runtime verification, IF a reviewed policy formally defers those proof obligations to the corresponding service/pilot gates. This **changes gate classification**, so it requires explicit owner approval and does not automatically supersede earlier G-00 rules.
 
 **Do not merge** PRs or change old signed records, Notion, or main solely because docs/contract CI succeeds.
+
+## Decision superseding the original unsigned proposal (2026-10-29)
+
+The owner has **delegated technical/architecture choices** to the assistant. The resulting [bounded technical decision ABC-DDR-20261029-001](DELEGATED_DESIGN_DECISION_2026-10-29.md) conditionally accepts **3 source exceptions, 10 ADR design directions, the 64-feature Phase-01 baseline, the current 19-engine Phase-02 contract baseline and all 9 hard release-gate blockers**.
+
+**Effective statuses:** G-00 = `DESIGN_BASELINE_ACCEPTED_BY_DELEGATION`; G-01 = `PRODUCT_DESIGN_ACCEPTED_BY_DELEGATION`; G-02 = `CONTRACT_DESIGN_ACCEPTED_BY_DELEGATION`. This is **design-only**, not a real GitHub human review, expert certification, 19 running engines or product release.
+
+Statements below describing "still pending owner choice" reflect the earlier historical checkpoint and are superseded **only for delegated technical design choices**. Human signature absence, original source nonrecovery, exact-head checks, and release blocking conditions remain true.

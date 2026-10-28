@@ -92,11 +92,13 @@
   "owner_governance_direction": {
     "status": "USER_DIRECTIVE_ADOPTED",
     "date": "2026-10-29",
-    "scope": "SEPARATE_DESIGN_APPROVAL_FROM_RELEASE_PROOF",
-    "source": "User's explicit instruction in this ABC project conversation",
-    "does_not_infer_signed_git_review": true
+    "scope": "DESIGN_AND_CONTRACT_APPROVAL_SEPARATED_FROM_REAL_PRODUCT_RELEASE",
+    "source": "ABC project user message on 2026-10-29",
+    "does_not_infer_signed_git_review": true,
+    "does_not_infer_individual_adr_approval": true
   },
   "policy_change_approved_in_pr": false,
   "owner_formal_gate_approval_recorded": false,
-  "amendment_note": "The single-owner design/release split was explicitly requested by user, while 3 source exceptions / 10 ADR itemized approvals and 9 hard release conditions remain pending recorded review."
+  "amendment_note": "The single-owner design/release split was explicitly requested by user, while 3 source exceptions / 10 ADR itemized approvals and 9 hard release conditions remain pending recorded review.",
+  "governance_direction_implementation_note": "Principle adopted by user; exact source exceptions, 10 ADRs, service risk obligations and exact-SHA review still pending; no live service is authorized."
 }

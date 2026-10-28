@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/service-catalog.schema.json",
+  "title": "service-catalog",
+  "type": "object",
+  "required": [
+    "service_id",
+    "tenant_id",
+    "branch_id",
+    "display_name",
+    "availability",
+    "service_pack_release_state",
+    "duration_minutes_source"
+  ],
+  "properties": {
+    "service_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "availability": {
+      "type": "string",
+      "enum": [
+        "AVAILABLE",
+        "NOT_AVAILABLE",
+        "PRO_REVIEW_REQUIRED"
+      ]
+    },
+    "service_pack_release_state": {
+      "type": "string",
+      "enum": [
+        "SPECIFIED",
+        "CONTRACTED",
+        "IMPLEMENTED",
+        "TESTED",
+        "PROFESSIONALLY_REVIEWED",
+        "RELEASED",
+        "BLOCKED",
+        "RETIRED"
+      ]
+    },
+    "duration_minutes_source": {
+      "type": "string",
+      "enum": [
+        "SALON_CONFIG",
+        "HISTORICAL_DATA",
+        "UNKNOWN"
+      ]
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sop_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "price_amount": {
+      "type": "number",
+      "minimum": 0
+    },
+    "price_currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "catalog_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "qualified_staff_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "availability": {
+            "const": "AVAILABLE"
+          }
+        },
+        "required": [
+          "availability"
+        ]
+      },
+      "then": {
+        "properties": {
+          "service_pack_release_state": {
+            "const": "RELEASED"
+          }
+        }
+      }
+    }
+  ]
+}

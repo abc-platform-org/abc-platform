@@ -20,3 +20,7 @@
 
 ## Gate-02 formal acceptance
 Requires full schema/API/state/event/owner coverage **and** human review of unresolved Gate-00 source/ADR issues, qualified safety/privacy consultation where applicable, and signed decision on exact artifact commit. A passing docs/JSON-Schema CI is `CONTRACTS_DRAFT_STRUCTURALLY_VALIDATED`, **not** `G02_FORMAL_PASS`.
+
+## Contract coverage matrix and extended test enforcement
+
+Validator `scripts/validate_phase02.py` now cross-checks all 64 Phase-01 requirements against schema, API operation, engine, event and owner; rejects unknown links or missing API coverage for `MAPPED_API` rows. Eight additional Salon OS schemas, a LookPreference schema, and new negative fixtures are included. `DEFERRED_RELEASE` rows must be completed before their service/business features can be deployed. Event producer declarations and a typed event fixture are cross-checked; runtime consumer and full event payload validation remain later work.

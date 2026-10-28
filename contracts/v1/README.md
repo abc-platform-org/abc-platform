@@ -33,3 +33,7 @@
 - Numeric SLOs/visual thresholds, model/provider choice, real SOP library, jurisdictional privacy details and qualified external reviews are not fabricated.
 - Contract CI tests schema/fixture compatibility; no deployed service, running engine, human safety or Visual QA success inferred.
 - Breaking contract changes require major version and migration plan; no silent mutation of historic output contracts OUT-01..17.
+
+## Phase-02 MVP Salon OS and Studio coverage amendment
+
+The refined draft contract package adds Clients, Appointment/Calendar, Staff, Service Catalog, Search, Branch, Notification and Salon Configuration schemas and routes, plus a separate `LookPreference` contract (shortlisting is never specialist approval). **Final draft inventory:** 34 JSON Schemas, 39 API paths / 41 operations, 25 events, 5 guarded state machines, 19 engine descriptors, 64 requirement crosswalks, 33 positive and 29 negative schema fixtures. See [coverage report](CONTRACT_COVERAGE_REPORT.md), [mapping](requirements-contract-map.csv) and [12-risk register](contract-risk-register.csv). These are contracts for future implementation, not deployed APIs.

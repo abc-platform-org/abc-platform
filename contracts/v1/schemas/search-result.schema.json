@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/search-result.schema.json",
+  "title": "search-result",
+  "type": "object",
+  "required": [
+    "query",
+    "tenant_id",
+    "results",
+    "visibility_scope",
+    "generated_at"
+  ],
+  "properties": {
+    "query": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "visibility_scope": {
+      "type": "string",
+      "enum": [
+        "SPECIALIST_SCOPED",
+        "RECEPTION_SCOPED",
+        "MANAGER_SCOPED"
+      ]
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "entity_id",
+          "entity_type",
+          "display_label"
+        ],
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "entity_type": {
+            "type": "string",
+            "enum": [
+              "CLIENT",
+              "APPOINTMENT",
+              "SERVICE",
+              "LOOK",
+              "SESSION",
+              "SPECIALIST"
+            ]
+          },
+          "display_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "branch_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "visible_fields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "next_page_cursor": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

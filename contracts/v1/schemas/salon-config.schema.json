@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/salon-config.schema.json",
+  "title": "salon-config",
+  "type": "object",
+  "required": [
+    "tenant_id",
+    "branch_id",
+    "config_version",
+    "enabled_service_ids",
+    "language",
+    "privacy_policy_version",
+    "updated_at",
+    "updated_by"
+  ],
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "config_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "enabled_service_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "fa",
+        "en"
+      ]
+    },
+    "privacy_policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "studio_modes_enabled": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "TRANSFORM",
+          "TRY_ON",
+          "COMPARE",
+          "INSPIRATION",
+          "TECHNICAL_PLAN"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "feature_flags": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "salon_brand_name": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

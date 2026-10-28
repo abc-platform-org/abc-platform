@@ -412,6 +412,124 @@
         "idempotency_key": "key-1",
         "requested_at": "2026-10-29T12:00:00Z"
       }
+    },
+    {
+      "schema": "client",
+      "instance": {
+        "client_id": "client-1",
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "display_name": "Sample Client",
+        "created_at": "2026-10-29T12:00:00Z",
+        "record_version": 1
+      }
+    },
+    {
+      "schema": "appointment",
+      "instance": {
+        "appointment_id": "appointment-1",
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "client_id": "client-1",
+        "specialist_id": "specialist-1",
+        "service_id": "HAIRCUT",
+        "start_at": "2026-10-29T12:00:00Z",
+        "end_at": "2026-10-29T13:00:00Z",
+        "state": "CONFIRMED",
+        "record_version": 1
+      }
+    },
+    {
+      "schema": "staff",
+      "instance": {
+        "staff_id": "specialist-1",
+        "tenant_id": "tenant-1",
+        "branch_ids": [
+          "branch-1"
+        ],
+        "roles": [
+          "SPECIALIST"
+        ],
+        "qualification_service_ids": [
+          "HAIRCUT"
+        ],
+        "active": true
+      }
+    },
+    {
+      "schema": "service-catalog",
+      "instance": {
+        "service_id": "HAIRCUT",
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "display_name": "Haircut",
+        "availability": "NOT_AVAILABLE",
+        "service_pack_release_state": "SPECIFIED",
+        "duration_minutes_source": "UNKNOWN"
+      }
+    },
+    {
+      "schema": "search-result",
+      "instance": {
+        "query": "Sample",
+        "tenant_id": "tenant-1",
+        "results": [
+          {
+            "entity_id": "client-1",
+            "entity_type": "CLIENT",
+            "display_label": "Sample Client"
+          }
+        ],
+        "visibility_scope": "SPECIALIST_SCOPED",
+        "generated_at": "2026-10-29T12:00:00Z"
+      }
+    },
+    {
+      "schema": "branch",
+      "instance": {
+        "branch_id": "branch-1",
+        "tenant_id": "tenant-1",
+        "name": "Main Branch",
+        "active": true,
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "schema": "notification",
+      "instance": {
+        "notification_id": "note-1",
+        "tenant_id": "tenant-1",
+        "recipient_role": "SPECIALIST",
+        "kind": "VISUAL_JOB",
+        "state": "UNREAD",
+        "created_at": "2026-10-29T12:00:00Z",
+        "message_code": "JOB_QUEUED"
+      }
+    },
+    {
+      "schema": "salon-config",
+      "instance": {
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "config_version": 1,
+        "enabled_service_ids": [],
+        "language": "fa",
+        "privacy_policy_version": "v1",
+        "updated_at": "2026-10-29T12:00:00Z",
+        "updated_by": "owner-1"
+      }
+    },
+    {
+      "schema": "look-preference",
+      "instance": {
+        "preference_id": "pref-1",
+        "session_id": "session-1",
+        "look_version_id": "look-v1",
+        "kind": "SHORTLIST",
+        "recorded_by_specialist_id": "specialist-1",
+        "client_participated": true,
+        "created_at": "2026-10-29T12:00:00Z"
+      }
     }
   ],
   "invalid": [
@@ -748,6 +866,128 @@
         "requested_at": "2026-10-29T12:00:00Z"
       },
       "reason": "unknown non-registered engine id"
+    },
+    {
+      "schema": "client",
+      "instance": {
+        "client_id": "client-1",
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "created_at": "2026-10-29T12:00:00Z",
+        "record_version": 1
+      },
+      "reason": "missing client display name"
+    },
+    {
+      "schema": "appointment",
+      "instance": {
+        "appointment_id": "appointment-1",
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "client_id": "client-1",
+        "specialist_id": "specialist-1",
+        "service_id": "HAIRCUT",
+        "start_at": "2026-10-29T12:00:00Z",
+        "end_at": "2026-10-29T13:00:00Z",
+        "state": "READY_FOR_ANYTHING",
+        "record_version": 1
+      },
+      "reason": "unknown appointment state"
+    },
+    {
+      "schema": "staff",
+      "instance": {
+        "staff_id": "specialist-1",
+        "tenant_id": "tenant-1",
+        "branch_ids": [
+          "branch-1"
+        ],
+        "roles": [],
+        "qualification_service_ids": [
+          "HAIRCUT"
+        ],
+        "active": true
+      },
+      "reason": "staff must have at least one authorized role"
+    },
+    {
+      "schema": "service-catalog",
+      "instance": {
+        "service_id": "HAIRCUT",
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "display_name": "Haircut",
+        "availability": "AVAILABLE",
+        "service_pack_release_state": "SPECIFIED",
+        "duration_minutes_source": "UNKNOWN"
+      },
+      "reason": "unreleased service cannot advertise AVAILABLE"
+    },
+    {
+      "schema": "search-result",
+      "instance": {
+        "query": "Sample",
+        "tenant_id": "tenant-1",
+        "results": [
+          {
+            "entity_id": "client-1",
+            "entity_type": "MEDICAL_RECORD",
+            "display_label": "Sample Client"
+          }
+        ],
+        "visibility_scope": "SPECIALIST_SCOPED",
+        "generated_at": "2026-10-29T12:00:00Z"
+      },
+      "reason": "no undeclared search entity type"
+    },
+    {
+      "schema": "branch",
+      "instance": {
+        "branch_id": "branch-1",
+        "tenant_id": "tenant-1",
+        "name": "Main Branch",
+        "active": true
+      },
+      "reason": "branch must declare timezone"
+    },
+    {
+      "schema": "notification",
+      "instance": {
+        "notification_id": "note-1",
+        "tenant_id": "tenant-1",
+        "recipient_role": "SPECIALIST",
+        "kind": "VISUAL_JOB",
+        "state": "READ",
+        "created_at": "2026-10-29T12:00:00Z",
+        "message_code": "JOB_QUEUED"
+      },
+      "reason": "READ notification requires timestamp"
+    },
+    {
+      "schema": "salon-config",
+      "instance": {
+        "tenant_id": "tenant-1",
+        "branch_id": "branch-1",
+        "config_version": 0,
+        "enabled_service_ids": [],
+        "language": "fa",
+        "privacy_policy_version": "v1",
+        "updated_at": "2026-10-29T12:00:00Z",
+        "updated_by": "owner-1"
+      },
+      "reason": "config version starts at 1"
+    },
+    {
+      "schema": "look-preference",
+      "instance": {
+        "preference_id": "pref-1",
+        "session_id": "session-1",
+        "look_version_id": "look-v1",
+        "kind": "SHORTLIST",
+        "client_participated": true,
+        "created_at": "2026-10-29T12:00:00Z"
+      },
+      "reason": "shared client preference never bypasses accountable specialist/session attribution"
     }
   ]
 }

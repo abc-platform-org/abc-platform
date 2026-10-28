@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/client.schema.json",
+  "title": "client",
+  "type": "object",
+  "required": [
+    "client_id",
+    "tenant_id",
+    "branch_id",
+    "display_name",
+    "created_at",
+    "record_version"
+  ],
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "preferred_language": {
+      "type": "string",
+      "enum": [
+        "fa",
+        "en",
+        "other"
+      ]
+    },
+    "active_consent_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "last_visit_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "internal_note_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pii_access_tier": {
+      "type": "string",
+      "enum": [
+        "SHARED_SESSION_MINIMUM",
+        "SPECIALIST_RESTRICTED",
+        "MANAGEMENT_RESTRICTED"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

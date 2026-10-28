@@ -16,3 +16,7 @@
 
 ## Important boundaries
 A contract can be machine-validated without being a deployed engine; real operations, API runtime and human specialist qualification are later phases. No fake unit test or visual QA claim. The 120 historic Golden tests remain authored but not run.
+
+## Final draft readiness clarification
+
+The document package defines 34 schemas, 19 engine contracts, 39 API paths / 41 operations, 25 events and 5 state machines; requirement coverage is 52 API mapped, 6 internal-only and 6 explicitly deferred future-release items. This may become `DRAFT_CONTRACTS_STRUCTURALLY_VALIDATED` only after the exact GitHub Actions run passes. **G02_FORMAL_PASS_PENDING** until explicit review and Gate-00/01 source/ADR/user product acceptance prerequisites are discharged. Runtime Visual QA, qualified SOP safety and operating system integrations are not completed.

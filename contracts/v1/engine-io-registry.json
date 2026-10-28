@@ -26,7 +26,8 @@
       ],
       "emits": [
         "SESSION_CREATED",
-        "SESSION_CLOSED"
+        "SESSION_CLOSED",
+        "CONSENT_RECORDED"
       ],
       "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
       "observability": [
@@ -65,7 +66,8 @@
       ],
       "emits": [
         "QUESTION_ASKED",
-        "ANSWER_RECORDED"
+        "ANSWER_RECORDED",
+        "INTENT_SET"
       ],
       "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
       "observability": [
@@ -444,8 +446,7 @@
         "CONFLICT"
       ],
       "emits": [
-        "LOOK_SELECTED",
-        "VALIDATION_INVALIDATED"
+        "LOOK_SELECTED"
       ],
       "retry": "EXPLICIT_IDEMPOTENCY_OR_NO_RETRY",
       "observability": [

@@ -26,7 +26,7 @@ def must(value, error):
         raise AssertionError(error)
 
 schema_files = sorted(SCHEMAS.glob("*.schema.json"))
-must(len(schema_files) == 25, f"expected 25 schema files; got {len(schema_files)}")
+must(len(schema_files) == 34, f"expected 25 schema files; got {len(schema_files)}")
 schemas = {}
 resources = []
 for path in schema_files:
@@ -46,8 +46,8 @@ def valid_instance(name: str, instance: dict):
     return list(validator[name].iter_errors(instance))
 
 fixtures = load(CONTRACTS / "examples" / "contract-fixtures.json")
-must(len(fixtures["valid"]) == 24, "24 synthetic positive fixtures expected")
-must(len(fixtures["invalid"]) == 20, "20 synthetic negative fixtures expected")
+must(len(fixtures["valid"]) == 33, "24 synthetic positive fixtures expected")
+must(len(fixtures["invalid"]) == 29, "20 synthetic negative fixtures expected")
 for item in fixtures["valid"]:
     name, instance = item["schema"], item["instance"]
     must(name in validator and name != "common", f"invalid fixture schema {name}")
@@ -87,6 +87,15 @@ for ev in evtypes:
     must(ev["producer_engine_id"] in engine_ids, ev["event_type"])
     must((CONTRACTS / ev["payload_reference_schema"]).exists(), ev["event_type"])
     must(ev["required_payload_keys"], ev["event_type"])
+
+for ev in evtypes:
+    producer = next(e for e in engines if e["engine_id"] == ev["producer_engine_id"])
+    must(ev["event_type"] in producer["emits"],
+         f"producer {producer['engine_id']} does not declare event {ev['event_type']}")
+valid_event_fixture = next(x["instance"] for x in fixtures["valid"] if x["schema"] == "event")
+typed_evt = next(x for x in evtypes if x["event_type"] == valid_event_fixture["event_type"])
+must(set(typed_evt["required_payload_keys"]) <= set(valid_event_fixture["payload"]),
+     "event payload lacks registry required keys")
 must(events["delivery"] == "TRANSACTIONAL_OUTBOX_AT_LEAST_ONCE", "invalid message delivery claim")
 must(events["deduplication"] == "consumer_id:event_id", "missing event dedupe")
 
@@ -117,7 +126,7 @@ must(any(t["to"] == "QA_PASSED" and "visual_qa_report_passed" in t["guards"] for
 
 api = load(CONTRACTS / "openapi.json")
 must(api["openapi"] == "3.1.0", "OpenAPI major not 3.1")
-must(len(api["paths"]) == 21, f"expected 21 API paths, found {len(api['paths'])}")
+must(len(api["paths"]) == 39, f"expected 21 API paths, found {len(api['paths'])}")
 operation_ids = []
 for path, methods in api["paths"].items():
     must(path.startswith("/v1/"), path)
@@ -138,7 +147,7 @@ for path, methods in api["paths"].items():
             must("tenant_id" not in shape.get("properties", {}), f"body accepts spoofed tenant {path}")
             if "{" in path and not path.endswith("}"):
                 pass
-            if op["operationId"] not in ("createConsultation","proposeBusinessAction"):
+            if op["operationId"] not in ("createConsultation","proposeBusinessAction","createClient","createAppointment"):
                 must(any(p.get("name") == "X-Expected-State-Version" for p in params),
                     f"missing CAS version guard {path}")
         for response in op["responses"].values():
@@ -156,7 +165,7 @@ for path, methods in api["paths"].items():
                     must((CONTRACTS / ref[2:]).exists(), f"unresolved API response ref {ref}")
                 else:
                     must(ref == "#/components/schemas/Error", f"unexpected API response ref {ref}")
-must(len(operation_ids) == len(set(operation_ids)) == 21, "duplicate API operation IDs")
+must(len(operation_ids) == len(set(operation_ids)) == 41, "duplicate API operation IDs")
 must(api["servers"][0]["url"].endswith(".invalid"), "no real deployment URL intended")
 
 outputs = load(CONTRACTS / "output-contract-registry.json")
@@ -174,6 +183,37 @@ with source.open(encoding="utf-8", newline="") as f:
 must(len(rows) == 64, "Phase-01 64 feature traceability rows required")
 must(all(x["accountable_owner"] == "saleheebrahimi2029-hub" for x in rows), "single-owner mismatch")
 
+
+coverage_path=CONTRACTS / "requirements-contract-map.csv"
+with coverage_path.open(encoding="utf-8", newline="") as f:
+    coverage=list(csv.DictReader(f))
+must(len(coverage) == 64 and len({r["requirement_id"] for r in coverage}) == 64,
+     "Phase-02 requires 64 mapped product requirements")
+must({r["requirement_id"] for r in coverage} == {r["id"] for r in rows},
+     "Crosswalk does not match all Phase-01 IDs")
+must({r["status"] for r in coverage} <= {"MAPPED_API", "MAPPED_INTERNAL", "DEFERRED_RELEASE"},
+     "Invalid contract coverage state")
+must(sum(x["status"] == "DEFERRED_RELEASE" for x in coverage)==6,
+     "Deferred Salon OS contracts must be explicitly identified")
+for row in coverage:
+    must(row["accountable_owner"] == "saleheebrahimi2029-hub",row["requirement_id"])
+    must(row["implementation_proof_status"] == "NO_RUNTIME_IMPLEMENTATION",row["requirement_id"])
+    for name in row["schema_contracts"].split(";"):
+        must(name in schemas, f"unknown schema {name} for {row['requirement_id']}")
+    for eid in row["engine_ids"].split(";"):
+        must(eid in engine_ids, f"unknown engine {eid} for {row['requirement_id']}")
+    for event_type in row["event_types"].split(";"):
+        if event_type != "NONE":
+            must(event_type in {e["event_type"] for e in evtypes},
+                 f"unknown event {event_type} for {row['requirement_id']}")
+    for op_name in row["api_operations"].split(";"):
+        if op_name != "NONE":
+            must(op_name in operation_ids,
+                 f"unknown API operation {op_name} for {row['requirement_id']}")
+    if row["status"] == "MAPPED_API":
+        must(row["api_operations"] != "NONE",row["requirement_id"])
+    if row["status"] == "MAPPED_INTERNAL":
+        must(row["schema_contracts"] and row["engine_ids"],row["requirement_id"])
 gate = (CONTRACTS / "gate-02-decision.md").read_text(encoding="utf-8")
 must("G02_FORMAL_PASS_PENDING" in gate, "contract gate must remain pending")
-print("PHASE-02 CONTRACT TESTS PASS (draft docs): 25 schemas, 24 valid + 20 invalid fixtures, 19 engines, 25 events, 5 state machines, 21 API paths, 17 historic outputs, 64 upstream requirements. NO RUNNING ENGINES/FORMAL GATE PASS CLAIMED.")
+print("PHASE-02 CONTRACT TESTS PASS (draft docs): 34 schemas, 33 valid + 29 invalid fixtures, 19 engines, 25 events, 5 state machines, 39 API paths / 41 operations, 64 requirement crosswalks, 17 historic outputs, 64 upstream requirements. NO RUNNING ENGINES/FORMAL GATE PASS CLAIMED.")

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.abc.internal/v1/look-preference.schema.json",
+  "title": "look-preference",
+  "type": "object",
+  "required": [
+    "preference_id",
+    "session_id",
+    "look_version_id",
+    "kind",
+    "recorded_by_specialist_id",
+    "client_participated",
+    "created_at"
+  ],
+  "properties": {
+    "preference_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "look_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "FAVORITE",
+        "SHORTLIST",
+        "REJECTED"
+      ]
+    },
+    "recorded_by_specialist_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "client_participated": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

@@ -29,3 +29,9 @@ Earlier WP-000-03 classed specialist, privacy and QA reviewers as mandatory *hum
 Owner can approve **product and design decisions** after exact version review; cannot claim independent regulatory, clinical, qualified salon SOP, security penetration or third-party QA attestations. Required reviewers/records remain assigned as **future release obligations**, not fictitious team members.
 
 **Status: PRODUCT_GOVERNANCE_DIRECTION_ADOPTED_FROM_USER / FORMAL_GATES_UNAPPROVED.** The nine individual release-deferral rows, three source exceptions and 10 ADRs still need independently auditable decisions on exact revised artifacts; no runtime, legal, security or SOP evidence has been signed.
+
+## Adopted implementation of the delegated design-governance direction
+
+The product owner directly adopted separating design approval from operational/service release, then delegated architecture and engineering decisions to the assistant. This policy is now the architecture workstream's **adopted design-only governance principle** (decision `ABC-DDR-20261029-001`). The nine hard release controls in [RELEASE_SAFETY_DEFERRALS.csv](RELEASE_SAFETY_DEFERRALS.csv) are **mandatory and fail-closed**.
+
+This **does not** upgrade an AI engineering decision to a qualified salon SOP approval, independent security review, human GitHub approval, client consent, Golden runtime execution, or real customer/product-release authorization. All ServicePacks retain `NOT_RELEASED` until independently evidenced release checks.

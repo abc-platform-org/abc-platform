@@ -1,0 +1,80 @@
+{
+  "program": "ABC-MEP-01.1",
+  "package": "GATES-00-02-RECONCILIATION",
+  "as_of": "2026-10-29",
+  "scope": "DESIGN_ONLY_PROPOSAL_NOT_RELEASE",
+  "accountable_owner": "saleheebrahimi2029-hub",
+  "owner_assignment_evidence": "EXPLICIT_USER_DIRECTIVE",
+  "reviewed_prs": [
+    {
+      "number": 1,
+      "head_sha": "9d7a8ed1d079059ce99d6165664cf49b64579fa6",
+      "draft": true,
+      "merged": false,
+      "submitted_reviews": 0,
+      "document_ci_success": 3
+    },
+    {
+      "number": 10,
+      "head_sha": "7f940efdfeebd373825179abe3f94a11299e2749",
+      "draft": true,
+      "merged": false,
+      "submitted_reviews": 0,
+      "document_ci_success": 2
+    },
+    {
+      "number": 12,
+      "head_sha": "d8fa9feed609970836a958fe804ea3a65e105ac1",
+      "draft": true,
+      "merged": false,
+      "submitted_reviews": 0,
+      "contract_ci_success": 1
+    }
+  ],
+  "source_audit": {
+    "confirmed_versions": {
+      "ABC-DOC-001": "v1.1.0",
+      "ABC-DOC-005": "v1.0.2",
+      "ABC-DOC-900": "v1.1.0"
+    },
+    "unrecovered_parent_versions": [
+      "ABC-DOC-001 v1.2.0",
+      "ABC-DOC-005 v1.1.0",
+      "ABC-CCR-001 v1.1.0"
+    ],
+    "exceptions_proposed": 3,
+    "exceptions_signed": 0,
+    "search_limit": "Historical Notion snapshots and targeted accessible Library search; not proof other exports do not exist"
+  },
+  "design": {
+    "adrs_proposed": 10,
+    "adrs_formally_approved": 0,
+    "phase01_requirements": 64,
+    "phase02_engines": 19,
+    "phase02_schemas": 34,
+    "phase02_api_paths": 39,
+    "phase02_api_operations": 41,
+    "phase02_events": 25,
+    "phase02_state_machines": 5
+  },
+  "proposed_release_deferrals": 9,
+  "adopted_release_deferrals": 0,
+  "qualified_specialist_attestations": 0,
+  "independent_privacy_legal_reviews": 0,
+  "independent_visual_qa_reviews": 0,
+  "golden_authored": 120,
+  "golden_runtime_executed_verified": 0,
+  "gate_status": {
+    "G-00": "BLOCKED_FOR_FORMAL_APPROVAL",
+    "G-01": "PENDING_G00_AND_OWNER_PRODUCT_SIGNOFF",
+    "G-02": "PENDING_G00_G01_AND_OWNER_CONTRACT_REVIEW"
+  },
+  "changes_authorized": {
+    "notion": false,
+    "main": false,
+    "merge_any_pr": false,
+    "mark_service_released": false,
+    "mark_gate_pass": false
+  },
+  "next_action": "Owner explicitly reviews exact artifacts and accepts/rejects individually bounded source, ADR, governance deferrals, product, contracts and merge authority; expert checks before relevant release gates"
+}

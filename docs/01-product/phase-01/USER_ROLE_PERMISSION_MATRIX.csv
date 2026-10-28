@@ -1,0 +1,33 @@
+actor,action,view,policy,server_side_condition
+Specialist,start_session,SPECIALIST_PRIVILEGED,ALLOW,"Authentication, tenant/branch, authorized service scope"
+Specialist,present_shared_view,SHARED,ALLOW,Only approved client-facing fields
+Specialist,inspect_private_professional_notes,SPECIALIST_PRIVILEGED,ALLOW_CONDITIONAL,Step-up auth and assigned case
+Specialist,propose_look_or_generate,SHARED,ALLOW_CONDITIONAL,"Consent, image QA, service capability"
+Specialist,validate_technical_plan,SPECIALIST_PRIVILEGED,ALLOW_CONDITIONAL,Verified qualification; exact SOP/LookVersion/plan
+Specialist,read_payments,MANAGEMENT,DENY_BY_DEFAULT,Separate explicit finance role required
+Specialist,change_branch,MANAGEMENT,ALLOW_CONDITIONAL,"Authorized target branch, re-auth, session state"
+Client,answer_consultation_questions,SHARED,ALLOW_IN_SESSION,Participates on same salon display; no independent login
+Client,view_previews_and_compare,SHARED,ALLOW_IN_SESSION,Only current consented client's assets
+Client,express_preference_and_select,SHARED,ALLOW_IN_SESSION,Preference != service validation
+Client,access_private_notes,SPECIALIST_PRIVILEGED,DENY,Never exposed on shared screen
+Client,approve_execution_plan,SPECIALIST_PRIVILEGED,DENY,Only qualified authenticated specialist
+Client,manage_payment_or_campaign,MANAGEMENT,DENY,No external client portal
+Reception,read_appointment,MANAGEMENT,ALLOW_CONDITIONAL,Branch-scoped and permitted fields
+Reception,create_or_move_appointment,MANAGEMENT,ALLOW_CONDITIONAL,Conflict checked and audited
+Reception,read_private_analysis,SPECIALIST_PRIVILEGED,DENY_BY_DEFAULT,Separate qualification/access required
+Reception,process_payment,MANAGEMENT,ALLOW_CONDITIONAL,Finance role and genuine provider response
+Reception,send_customer_visuals,EXTERNAL,DENY_BY_DEFAULT,Not part of ABC core workflow
+SalonManager,view_business_kpi,MANAGEMENT,ALLOW_CONDITIONAL,Tenant-scoped real financial data
+SalonManager,manage_team,MANAGEMENT,ALLOW_CONDITIONAL,Authorized staff domain only
+SalonManager,configure_service_catalog,MANAGEMENT,ALLOW_CONDITIONAL,Service release Gate cannot be bypassed
+SalonManager,approve_campaign_execution,MANAGEMENT,ALLOW_CONDITIONAL,"Audience consent, explicit preview/approval"
+SalonManager,validate_technical_plan,SPECIALIST_PRIVILEGED,DENY_BY_DEFAULT,Manager title alone is not specialist qualification
+OrganizationOwner,manage_branches,MANAGEMENT,ALLOW_CONDITIONAL,Org tenant only; privilege escalation audit
+OrganizationOwner,manage_role_permissions,MANAGEMENT,ALLOW_CONDITIONAL,Backend policy and dual safeguards where needed
+OrganizationOwner,read_all_customer_images,MANAGEMENT,DENY_BY_DEFAULT,Data minimization and purpose limitation
+PlatformOperator,maintain_infrastructure,PLATFORM,ALLOW_CONDITIONAL,Least privilege/time-bound audit; avoid raw image access
+PlatformOperator,view_client_images,PLATFORM,DENY_BY_DEFAULT,Exceptional access must be justified/authorized
+PlatformOperator,approve_salon_service_plan,SPECIALIST_PRIVILEGED,DENY,Infrastructure administration != professional qualification
+AskABC,read_business_analytics,MANAGEMENT,ALLOW_CONDITIONAL,Read scope and data provenance
+AskABC,recommend_campaign_or_rebooking,MANAGEMENT,ALLOW_CONDITIONAL,Not an execution receipt
+AskABC,execute_payment_or_inventory_mutation,MANAGEMENT,DENY_UNLESS_AUTHORIZED,"Domain action permission, confirmation, idempotency and audit"

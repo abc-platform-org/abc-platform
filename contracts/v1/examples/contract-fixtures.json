@@ -156,7 +156,10 @@
         "created_at": "2026-10-29T12:00:00Z",
         "requested_by": "specialist-1",
         "output_asset_id": "preview-1",
-        "qa_report_id": "qa-1"
+        "qa_report_id": "qa-1",
+        "expected_session_version": 4,
+        "original_image_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "mask_policy_version": "mask-v1"
       }
     },
     {
@@ -170,7 +173,12 @@
         "region_fidelity": "LOCKED_REGIONS_PRESERVED",
         "identity_assessment": "PASS",
         "evaluated_at": "2026-10-29T12:00:00Z",
-        "evaluator_version": "qa-v1"
+        "evaluator_version": "qa-v1",
+        "reference_isolation": "PASS",
+        "boundary_naturalness": "PASS",
+        "evidence_asset_ids": [
+          "qa-evidence-1"
+        ]
       }
     },
     {
@@ -678,7 +686,12 @@
         "region_fidelity": "LOCKED_REGIONS_PRESERVED",
         "identity_assessment": "FAIL",
         "evaluated_at": "2026-10-29T12:00:00Z",
-        "evaluator_version": "qa-v1"
+        "evaluator_version": "qa-v1",
+        "reference_isolation": "PASS",
+        "boundary_naturalness": "PASS",
+        "evidence_asset_ids": [
+          "qa-evidence-1"
+        ]
       },
       "reason": "passed visual QA cannot have failed identity"
     },
@@ -988,6 +1001,216 @@
         "created_at": "2026-10-29T12:00:00Z"
       },
       "reason": "shared client preference never bypasses accountable specialist/session attribution"
+    },
+    {
+      "schema": "visual-qa",
+      "instance": {
+        "qa_report_id": "qa-1",
+        "job_id": "job-1",
+        "look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "qa_status": "PASS",
+        "region_fidelity": "LOCKED_REGIONS_PRESERVED",
+        "identity_assessment": "PASS",
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "evaluator_version": "qa-v1",
+        "reference_isolation": "FAIL",
+        "boundary_naturalness": "PASS",
+        "evidence_asset_ids": [
+          "qa-evidence-1"
+        ]
+      },
+      "reason": "QA_PASS cannot contain reference isolation failure"
+    },
+    {
+      "schema": "visual-qa",
+      "instance": {
+        "qa_report_id": "qa-1",
+        "job_id": "job-1",
+        "look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "qa_status": "PASS",
+        "region_fidelity": "LOCKED_REGIONS_PRESERVED",
+        "identity_assessment": "PASS",
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "evaluator_version": "qa-v1",
+        "reference_isolation": "PASS",
+        "boundary_naturalness": "FAIL",
+        "evidence_asset_ids": [
+          "qa-evidence-1"
+        ]
+      },
+      "reason": "QA_PASS cannot contain boundary fidelity failure"
+    },
+    {
+      "schema": "visual-qa",
+      "instance": {
+        "qa_report_id": "qa-1",
+        "job_id": "job-1",
+        "look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "qa_status": "PASS",
+        "region_fidelity": "NOT_APPLICABLE",
+        "identity_assessment": "PASS",
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "evaluator_version": "qa-v1",
+        "reference_isolation": "PASS",
+        "boundary_naturalness": "PASS",
+        "evidence_asset_ids": [
+          "qa-evidence-1"
+        ]
+      },
+      "reason": "No region lock evidence cannot be QA_PASS"
+    },
+    {
+      "schema": "visual-qa",
+      "instance": {
+        "qa_report_id": "qa-1",
+        "job_id": "job-1",
+        "look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "qa_status": "PASS",
+        "region_fidelity": "LOCKED_REGIONS_PRESERVED",
+        "identity_assessment": "PASS",
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "evaluator_version": "qa-v1",
+        "reference_isolation": "PASS",
+        "boundary_naturalness": "PASS",
+        "evidence_asset_ids": [
+          "qa-evidence-1"
+        ],
+        "human_review_required": true,
+        "human_review_completed": false
+      },
+      "reason": "No human QA completion when required"
+    },
+    {
+      "schema": "visual-qa",
+      "instance": {
+        "qa_report_id": "qa-1",
+        "job_id": "job-1",
+        "look_version_id": "look-v1",
+        "service_id": "HAIRCUT",
+        "qa_status": "PASS",
+        "region_fidelity": "LOCKED_REGIONS_PRESERVED",
+        "identity_assessment": "PASS",
+        "evaluated_at": "2026-10-29T12:00:00Z",
+        "evaluator_version": "qa-v1",
+        "reference_isolation": "PASS",
+        "boundary_naturalness": "PASS",
+        "evidence_asset_ids": [
+          "qa-evidence-1"
+        ],
+        "failed_reasons": [
+          "IDENTITY_DRIFT"
+        ]
+      },
+      "reason": "QA_PASS with failures rejected"
+    },
+    {
+      "schema": "visual-job",
+      "instance": {
+        "job_id": "job-1",
+        "session_id": "session-1",
+        "look_version_id": "look-v1",
+        "source_asset_id": "asset-1",
+        "mode": "TRANSFORM",
+        "state": "QA_PASSED",
+        "idempotency_key": "key-1",
+        "attempt": 1,
+        "created_at": "2026-10-29T12:00:00Z",
+        "requested_by": "specialist-1",
+        "output_asset_id": "preview-1",
+        "qa_report_id": "qa-1",
+        "original_image_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "mask_policy_version": "mask-v1"
+      },
+      "reason": "Stale job cannot mark QA_PASSED without version"
+    },
+    {
+      "schema": "visual-job",
+      "instance": {
+        "job_id": "job-1",
+        "session_id": "session-1",
+        "look_version_id": "look-v1",
+        "source_asset_id": "asset-1",
+        "mode": "TRANSFORM",
+        "state": "QA_PASSED",
+        "idempotency_key": "key-1",
+        "attempt": 1,
+        "created_at": "2026-10-29T12:00:00Z",
+        "requested_by": "specialist-1",
+        "output_asset_id": "preview-1",
+        "qa_report_id": "qa-1",
+        "expected_session_version": 4,
+        "mask_policy_version": "mask-v1"
+      },
+      "reason": "Unbound source asset cannot be treated as QA_PASSED"
+    },
+    {
+      "schema": "handoff",
+      "instance": {
+        "handoff_id": "handoff-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "selected_look_version_id": "look-v1",
+        "status": "CONFIRMED",
+        "created_at": "2026-10-29T12:00:00Z",
+        "target_domain": "APPOINTMENTS",
+        "authorized_by": "specialist-1",
+        "authorized_at": "2026-10-29T12:00:00Z",
+        "validation_id": "validation-1",
+        "business_action_id": "biz-1"
+      },
+      "reason": "Handoff confirmed but no real operation receipt"
+    },
+    {
+      "schema": "technical-plan",
+      "instance": {
+        "plan_id": "plan-1",
+        "session_id": "session-1",
+        "service_id": "HAIRCUT",
+        "selected_look_version_id": "look-v1",
+        "plan_version": 1,
+        "status": "VALIDATED",
+        "feasibility_assessment_id": "f-1",
+        "evidence_ids": [
+          "evidence-1"
+        ],
+        "blocking_unknowns": [],
+        "steps": [
+          {
+            "step_id": "step-1",
+            "phase": "EXECUTE",
+            "objective": "Test",
+            "requires_evidence_keys": [],
+            "state": "PROHIBITED_UNTIL_VALIDATED"
+          }
+        ],
+        "created_at": "2026-10-29T12:00:00Z",
+        "sop_version_id": "sop-1",
+        "validation_id": "val-1",
+        "validated_by_specialist_id": "specialist-1",
+        "validated_at": "2026-10-29T12:00:00Z"
+      },
+      "reason": "Validated plan cannot retain prohibited execution step"
+    },
+    {
+      "schema": "business-action",
+      "instance": {
+        "action_id": "business-1",
+        "tenant_id": "tenant-1",
+        "requested_by": "manager-1",
+        "domain": "CALENDAR",
+        "action_type": "RESCHEDULE",
+        "state": "CONFIRMED",
+        "created_at": "2026-10-29T12:00:00Z",
+        "idempotency_key": "key-b1",
+        "requires_confirmation": true,
+        "operation_receipt_id": "receipt-1",
+        "confirmed_by": "owner-1"
+      },
+      "reason": "Confirmed action requires actual confirmation timestamp"
     }
   ]
 }

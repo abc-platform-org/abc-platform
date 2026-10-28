@@ -119,17 +119,58 @@
         ]
       },
       "then": {
+        "required": [
+          "reference_isolation",
+          "boundary_naturalness",
+          "evidence_asset_ids"
+        ],
         "properties": {
           "region_fidelity": {
-            "enum": [
-              "LOCKED_REGIONS_PRESERVED",
-              "NOT_APPLICABLE"
-            ]
+            "const": "LOCKED_REGIONS_PRESERVED"
           },
           "identity_assessment": {
             "const": "PASS"
+          },
+          "reference_isolation": {
+            "enum": [
+              "PASS",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "boundary_naturalness": {
+            "const": "PASS"
+          },
+          "failed_reasons": {
+            "maxItems": 0
+          },
+          "evidence_asset_ids": {
+            "minItems": 1
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "human_review_required": {
+                  "const": true
+                }
+              },
+              "required": [
+                "human_review_required"
+              ]
+            },
+            "then": {
+              "properties": {
+                "human_review_completed": {
+                  "const": true
+                }
+              },
+              "required": [
+                "human_review_completed"
+              ]
+            }
+          }
+        ]
       }
     }
   ]

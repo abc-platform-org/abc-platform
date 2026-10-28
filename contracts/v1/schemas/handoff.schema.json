@@ -111,6 +111,24 @@
           "validation_id"
         ]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "CONFIRMED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "operation_receipt_id",
+          "business_action_id"
+        ]
+      }
     }
   ]
 }

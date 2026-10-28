@@ -129,7 +129,10 @@
       "then": {
         "required": [
           "output_asset_id",
-          "qa_report_id"
+          "qa_report_id",
+          "expected_session_version",
+          "original_image_hash",
+          "mask_policy_version"
         ]
       }
     }

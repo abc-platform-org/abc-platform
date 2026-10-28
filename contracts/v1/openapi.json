@@ -130,6 +130,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -203,6 +213,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -213,7 +233,12 @@
               }
             }
           }
-        }
+        },
+        "x-abc-policy-guards": [
+          "EXACT_TENANT_BRANCH_SCOPE",
+          "SESSION_FIELD_LEVEL_PROJECTION",
+          "SHARED_VIEW_NO_PRIVATE_DATA"
+        ]
       }
     },
     "/v1/consultations/{session_id}/consents": {
@@ -267,7 +292,9 @@
         "x-abc-idempotent": true,
         "x-abc-policy-guards": [
           "CLIENT_PRESENT",
-          "CONSENT_DISCLOSURE"
+          "CONSENT_DISCLOSURE",
+          "CONSENT_EVIDENCE_VERIFIED_NOT_SPECIALIST_SELF_ASSERTED",
+          "CLIENT_PRESENT_OR_LEGALLY_VALID_AUTHORIZED_PROXY"
         ],
         "requestBody": {
           "required": true,
@@ -308,13 +335,19 @@
                   "retention_policy_id": {
                     "type": "string",
                     "minLength": 1
+                  },
+                  "consent_evidence_ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Tamper-evident proof of specific client acknowledgement; validated server-side"
                   }
                 },
                 "required": [
                   "client_id",
                   "purpose",
                   "source",
-                  "disclosure_version"
+                  "disclosure_version",
+                  "consent_evidence_ref"
                 ]
               }
             }
@@ -333,6 +366,16 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
             "content": {
               "application/json": {
                 "schema": {
@@ -488,6 +531,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -629,6 +682,16 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
             "content": {
               "application/json": {
                 "schema": {
@@ -806,6 +869,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -934,6 +1007,16 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
             "content": {
               "application/json": {
                 "schema": {
@@ -1078,6 +1161,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -1162,7 +1255,9 @@
         "x-abc-idempotent": true,
         "x-abc-policy-guards": [
           "SPEC_VALID",
-          "IMMUTABLE_PARENT"
+          "IMMUTABLE_PARENT",
+          "REFERENCE_ASSETS_TENANT_SCOPED",
+          "REFERENCE_NOT_CLIENT_IDENTITY"
         ],
         "requestBody": {
           "required": true,
@@ -1251,6 +1346,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -1322,6 +1427,16 @@
                   "items": {
                     "$ref": "./schemas/look.schema.json"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -1456,6 +1571,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -1527,6 +1652,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -1537,7 +1672,12 @@
               }
             }
           }
-        }
+        },
+        "x-abc-policy-guards": [
+          "JOB_SESSION_TENANT_SCOPE",
+          "NO_UNRELEASED_MEDIA_URL",
+          "MODEL_RUNTIME_NOT_CLAIMED"
+        ]
       }
     },
     "/v1/consultations/{session_id}/selected-looks": {
@@ -1592,7 +1732,8 @@
         "x-abc-policy-guards": [
           "QA_PASS",
           "CLIENT_PREFERENCE",
-          "SELECT_NOT_VALIDATION"
+          "SELECT_NOT_VALIDATION",
+          "QA_REPORT_LOOK_VERSION_MATCH_SERVER_VERIFIED"
         ],
         "requestBody": {
           "required": true,
@@ -1636,6 +1777,16 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
             "content": {
               "application/json": {
                 "schema": {
@@ -1776,6 +1927,16 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
             "content": {
               "application/json": {
                 "schema": {
@@ -1928,6 +2089,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -2013,7 +2184,10 @@
         "x-abc-policy-guards": [
           "HUMAN_SPECIALIST_AUTHENTICATED",
           "QUALIFIED_SERVICE",
-          "EXACT_DEPENDENCY_FINGERPRINT"
+          "EXACT_DEPENDENCY_FINGERPRINT",
+          "QUALIFICATION_DERIVED_FROM_SERVER_PRINCIPAL",
+          "NEVER_TRUST_CLIENT_QUALIFICATION_ID",
+          "SERVER_RECOMPUTES_EVIDENCE_FINGERPRINT"
         ],
         "requestBody": {
           "required": true,
@@ -2048,10 +2222,6 @@
                     "type": "string",
                     "pattern": "^[a-f0-9]{64}$"
                   },
-                  "qualification_id": {
-                    "type": "string",
-                    "minLength": 1
-                  },
                   "conditions": {
                     "type": "array",
                     "items": {
@@ -2065,8 +2235,7 @@
                   "plan_version",
                   "look_version_id",
                   "sop_version_id",
-                  "evidence_fingerprint",
-                  "qualification_id"
+                  "evidence_fingerprint"
                 ]
               }
             }
@@ -2085,6 +2254,16 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
             "content": {
               "application/json": {
                 "schema": {
@@ -2240,6 +2419,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -2312,6 +2501,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -2322,7 +2521,12 @@
               }
             }
           }
-        }
+        },
+        "x-abc-policy-guards": [
+          "TENANT_SERVICE_CATALOG_SCOPE",
+          "RELEASE_STATE_VISIBLE",
+          "SERVICE_DISABLED_UNTIL_RELEASED"
+        ]
       }
     },
     "/v1/business-insights": {
@@ -2357,6 +2561,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -2367,7 +2581,12 @@
               }
             }
           }
-        }
+        },
+        "x-abc-policy-guards": [
+          "TENANT_SCOPED_FINANCIAL_DATA",
+          "SOURCE_EVENT_LINEAGE",
+          "NO_MOCK_KPI_AS_LIVE"
+        ]
       }
     },
     "/v1/business-actions": {
@@ -2403,7 +2622,9 @@
         "x-abc-idempotent": true,
         "x-abc-policy-guards": [
           "ACTION_POLICY",
-          "NO_DIRECT_AI_MUTATION"
+          "NO_DIRECT_AI_MUTATION",
+          "SERVER_COMPUTES_REQUIRES_CONFIRMATION",
+          "SERVER_DOMAIN_POLICY_CONTROLS_APPROVAL"
         ],
         "requestBody": {
           "required": true,
@@ -2428,9 +2649,6 @@
                     "type": "string",
                     "minLength": 1
                   },
-                  "requires_confirmation": {
-                    "type": "boolean"
-                  },
                   "branch_id": {
                     "type": "string",
                     "minLength": 1
@@ -2438,8 +2656,7 @@
                 },
                 "required": [
                   "domain",
-                  "action_type",
-                  "requires_confirmation"
+                  "action_type"
                 ]
               }
             }
@@ -2458,6 +2675,16 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
             "content": {
               "application/json": {
                 "schema": {
@@ -2551,7 +2778,9 @@
         "x-abc-idempotent": true,
         "x-abc-policy-guards": [
           "MANAGEMENT_ROLE",
-          "CONFIRMATION_REQUIRED_IF_SENSITIVE"
+          "CONFIRMATION_REQUIRED_IF_SENSITIVE",
+          "SERVER_DERIVED_POLICY_REQUIREMENT",
+          "HUMAN_DECISION_AUDITED"
         ],
         "requestBody": {
           "required": true,
@@ -2589,6 +2818,16 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
             "content": {
               "application/json": {
                 "schema": {
@@ -2726,6 +2965,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized / privacy / consent",
             "content": {
@@ -2846,6 +3095,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -2909,6 +3168,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "./schemas/client.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -3028,6 +3297,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -3090,6 +3369,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "./schemas/appointment.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -3209,6 +3498,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -3269,6 +3568,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Denied",
             "content": {
@@ -3314,6 +3623,16 @@
                   "items": {
                     "$ref": "./schemas/service-catalog.schema.json"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -3376,6 +3695,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Denied",
             "content": {
@@ -3433,6 +3762,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Denied",
             "content": {
@@ -3479,6 +3818,16 @@
                   "items": {
                     "$ref": "./schemas/notification.schema.json"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -3588,6 +3937,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -3639,6 +3998,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "./schemas/salon-config.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -3759,6 +4128,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Not authorized",
             "content": {
@@ -3823,6 +4202,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Forbidden",
             "content": {
@@ -3878,6 +4267,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Forbidden",
             "content": {
@@ -3929,6 +4328,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "./schemas/technical-plan.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -4009,6 +4418,16 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Forbidden",
             "content": {
@@ -4062,6 +4481,16 @@
                   "items": {
                     "$ref": "./schemas/question.schema.json"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -4169,6 +4598,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "./schemas/look-preference.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }

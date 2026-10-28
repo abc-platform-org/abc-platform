@@ -242,7 +242,18 @@
             "maxItems": 0
           },
           "steps": {
-            "minItems": 1
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "enum": [
+                    "PROPOSED",
+                    "CONDITIONAL"
+                  ]
+                }
+              }
+            }
           }
         }
       }

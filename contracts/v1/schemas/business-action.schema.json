@@ -142,6 +142,25 @@
           "confirmation_at"
         ]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "CONFIRMED"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "operation_receipt_id",
+          "confirmed_by",
+          "confirmation_at"
+        ]
+      }
     }
   ]
 }

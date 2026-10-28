@@ -26,7 +26,7 @@ def must(value, error):
         raise AssertionError(error)
 
 schema_files = sorted(SCHEMAS.glob("*.schema.json"))
-must(len(schema_files) == 34, f"expected 25 schema files; got {len(schema_files)}")
+must(len(schema_files) == 34, f"expected 34 schema files; got {len(schema_files)}")
 schemas = {}
 resources = []
 for path in schema_files:
@@ -46,8 +46,8 @@ def valid_instance(name: str, instance: dict):
     return list(validator[name].iter_errors(instance))
 
 fixtures = load(CONTRACTS / "examples" / "contract-fixtures.json")
-must(len(fixtures["valid"]) == 33, "24 synthetic positive fixtures expected")
-must(len(fixtures["invalid"]) == 29, "20 synthetic negative fixtures expected")
+must(len(fixtures["valid"]) == 33, "33 synthetic positive fixtures expected")
+must(len(fixtures["invalid"]) == 39, "39 synthetic negative fixtures expected")
 for item in fixtures["valid"]:
     name, instance = item["schema"], item["instance"]
     must(name in validator and name != "common", f"invalid fixture schema {name}")
@@ -96,6 +96,26 @@ valid_event_fixture = next(x["instance"] for x in fixtures["valid"] if x["schema
 typed_evt = next(x for x in evtypes if x["event_type"] == valid_event_fixture["event_type"])
 must(set(typed_evt["required_payload_keys"]) <= set(valid_event_fixture["payload"]),
      "event payload lacks registry required keys")
+
+# Every registered event is now a discriminated typed envelope. Positive/negative
+# fixtures must cover every event, including rejection of unknown payload fields.
+event_fixtures = load(CONTRACTS / "examples" / "event-payload-fixtures.json")
+must(len(event_fixtures["positive"]) == 25 and len(event_fixtures["negative"]) == 51,
+     "full event fixture coverage expected")
+registered_events = {ev["event_type"] for ev in evtypes}
+must({x["event_type"] for x in event_fixtures["positive"]} == registered_events,
+     "a registered event has no positive typed fixture")
+for item in event_fixtures["positive"]:
+    err = valid_instance("event", item["instance"])
+    must(not err, f"valid event payload {item['event_type']} rejected: {err[0] if err else ''}")
+for item in event_fixtures["negative"]:
+    err = valid_instance("event", item["instance"])
+    must(bool(err), f"invalid event payload accepted: {item['event_type']} {item['reason']}")
+event_schema = schemas["event"]
+must(len(event_schema.get("allOf", [])) == len(evtypes), "each event needs exactly one schema branch")
+must(set(event_schema["properties"]["event_type"]["enum"]) == registered_events,
+     "event type enum differs from registry")
+
 must(events["delivery"] == "TRANSACTIONAL_OUTBOX_AT_LEAST_ONCE", "invalid message delivery claim")
 must(events["deduplication"] == "consumer_id:event_id", "missing event dedupe")
 
@@ -111,6 +131,41 @@ for machine in machines["machines"]:
         edge=(t["from"],t["to"],t["actor"])
         must(edge not in seen, f"duplicate edge: {edge}")
         seen.add(edge)
+
+# Actual reachability and recoverability, not merely valid state names.
+for machine in machines["machines"]:
+    states_reachable = {machine["initial"]}
+    for _ in range(len(machine["states"]) + 1):
+        before = len(states_reachable)
+        for edge in machine["transitions"]:
+            if edge["from"] in states_reachable:
+                states_reachable.add(edge["to"])
+        if len(states_reachable) == before:
+            break
+    must(states_reachable == set(machine["states"]),
+         f"{machine['id']} has unreachable states: {set(machine['states']) - states_reachable}")
+session_machine = next(m for m in machines["machines"] if m["id"] == "CONSULTATION_SESSION")
+def session_edges(origin):
+    return [t for t in session_machine["transitions"] if t["from"] == origin]
+for origin in ("PAUSED", "FAILED_RECOVERABLE"):
+    outgoing = session_edges(origin)
+    must(outgoing and any(t["to"] not in ("CANCELLED", "CLOSED") for t in outgoing),
+         f"{origin} cannot resume safely")
+    for edge in outgoing:
+        if edge["to"] != "CANCELLED":
+            must("checkpoint_state_equals_target" in edge["guards"],
+                 f"{origin} can jump to arbitrary saved state")
+            must(any("policy" in guard for guard in edge["guards"]),
+                 f"{origin} bypasses current policy")
+for edge in session_edges("SAFETY_BLOCKED"):
+    must(edge["to"] in ("INTENT_DEFINED", "CANCELLED"), "safety-block escape")
+    if edge["to"] != "CANCELLED":
+        must("qualified_specialist_review" in edge["guards"] and
+             "non_bypassable_policy_recheck_passed" in edge["guards"],
+             "safety-block bypass without qualified review")
+must(any(t["to"] == "SAFETY_BLOCKED" for t in session_machine["transitions"]),
+     "safety-blocked state is unreachable")
+
 for machine_id, source, target in machines["forbidden_transitions"]:
     machine = next(m for m in machines["machines"] if m["id"] == machine_id)
     must(not any(t["from"] == source and t["to"] == target for t in machine["transitions"]),
@@ -126,7 +181,7 @@ must(any(t["to"] == "QA_PASSED" and "visual_qa_report_passed" in t["guards"] for
 
 api = load(CONTRACTS / "openapi.json")
 must(api["openapi"] == "3.1.0", "OpenAPI major not 3.1")
-must(len(api["paths"]) == 39, f"expected 21 API paths, found {len(api['paths'])}")
+must(len(api["paths"]) == 39, f"expected 39 API paths, found {len(api['paths'])}")
 operation_ids = []
 for path, methods in api["paths"].items():
     must(path.startswith("/v1/"), path)
@@ -136,6 +191,9 @@ for path, methods in api["paths"].items():
         must(op.get("security") == [{"bearerAuth": []}], f"missing auth {path}")
         must(op.get("x-abc-tenant-source") == "VERIFIED_AUTH_CONTEXT", f"untrusted tenant {path}")
         must(op.get("x-abc-roles"), f"missing RBAC {path}")
+        must(op.get("x-abc-policy-guards"), f"missing mandatory policy guard {op['operationId']}")
+        must("401" in op["responses"], f"missing authentication failure contract {op['operationId']}")
+        must("403" in op["responses"], f"missing role/scope denial contract {op['operationId']}")
         params = op.get("parameters", [])
         for par in params:
             must(par.get("required"), f"optional critical API parameter {path}: {par}")
@@ -166,6 +224,22 @@ for path, methods in api["paths"].items():
                 else:
                     must(ref == "#/components/schemas/Error", f"unexpected API response ref {ref}")
 must(len(operation_ids) == len(set(operation_ids)) == 41, "duplicate API operation IDs")
+# No untrusted browser/API declaration can waive approval or claim specialist qualifications.
+forbidden_body_fields = {
+    "proposeBusinessAction": {"requires_confirmation"},
+    "validateTechnicalPlan": {"qualification_id", "specialist_qualification_id"}
+}
+for path, methods in api["paths"].items():
+    for method, op in methods.items():
+        if op["operationId"] in forbidden_body_fields:
+            body = op["requestBody"]["content"]["application/json"]["schema"]
+            for field in forbidden_body_fields[op["operationId"]]:
+                must(field not in body.get("properties", {}) and field not in body.get("required", []),
+                     f"untrusted client can assert {field} for {op['operationId']}")
+consent_api = api["paths"]["/v1/consultations/{session_id}/consents"]["post"]
+consent_shape = consent_api["requestBody"]["content"]["application/json"]["schema"]
+must("consent_evidence_ref" in consent_shape["required"], "no evidence for recording consent")
+
 must(api["servers"][0]["url"].endswith(".invalid"), "no real deployment URL intended")
 
 outputs = load(CONTRACTS / "output-contract-registry.json")
@@ -216,4 +290,4 @@ for row in coverage:
         must(row["schema_contracts"] and row["engine_ids"],row["requirement_id"])
 gate = (CONTRACTS / "gate-02-decision.md").read_text(encoding="utf-8")
 must("G02_FORMAL_PASS_PENDING" in gate, "contract gate must remain pending")
-print("PHASE-02 CONTRACT TESTS PASS (draft docs): 34 schemas, 33 valid + 29 invalid fixtures, 19 engines, 25 events, 5 state machines, 39 API paths / 41 operations, 64 requirement crosswalks, 17 historic outputs, 64 upstream requirements. NO RUNNING ENGINES/FORMAL GATE PASS CLAIMED.")
+print("PHASE-02 CONTRACT TESTS PASS (draft docs): 34 schemas, 33 valid + 39 invalid fixtures plus 25 positive / 51 negative event payload fixtures, 19 engines, 25 events, 5 state machines, 39 API paths / 41 operations, 64 requirement crosswalks, 17 historic outputs, 64 upstream requirements. NO RUNNING ENGINES/FORMAL GATE PASS CLAIMED.")

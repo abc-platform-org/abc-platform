@@ -41,3 +41,7 @@ Preserve existing IDs, knowledge service mapping, and 120 golden test IDs. Intro
 ## Phase 00 audit overlay (2026-10-29; PR #1 — proposed)
 
 [WP-000-01 audit index](phase-00/README.md) provides source-by-source evidence and distinguishes legacy Notion document authority from target platform authority. Gate-00 is **BLOCKED_FOR_APPROVAL**; missing parent sources and human ADR approvals remain open. The archive itself was not retroactively rewritten.
+
+## WP-000-02 — Decision Preparation (2026-10-29)
+
+The [recovery log](phase-00/wp-000-02/SOURCE_RECOVERY_LOG.md) confirms the accessible DOC-001 is v1.1.0 and DOC-005 is v1.0.2, while DOC-001 v1.2.0 / DOC-005 v1.1.0 / CCR-001 v1.1.0 remain referenced only; [unsigned source exception proposals](phase-00/wp-000-02/SOURCE_EXCEPTIONS.md) prevent silent lineage approval. [Authority resolution](phase-00/wp-000-02/AUTHORITY_RESOLUTION.md) supersedes none of the historical Notion pages and does not imply implementation. Gate-00 remains BLOCKED.

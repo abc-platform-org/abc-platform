@@ -16,3 +16,7 @@
 ## ADR template
 
 Each ADR MUST include status, context, options, decision, consequences, threat model, alternatives rejected, change implications, affected requirement IDs, migration plan, verification, date and approver. Decisions are not automatically approved merely by inclusion in this package.
+
+## WP-000-02 — Decision Preparation (2026-10-29)
+
+Detailed review material: [ADR review dossier](phase-00/wp-000-02/ADR_REVIEW_PACKAGE.md), [decision register](phase-00/wp-000-02/DECISION_REGISTER.csv), [signoff form](phase-00/wp-000-02/REVIEW_AND_SIGNOFF.md). ADR-001/002/008/009/010 have added review analyses but **remain proposed**, not accepted. User-confirmed product intent is respected; technical deployment and release policy require named reviewers. Do not merge PR#1 or close G-00 as PASS solely because these amendments exist.

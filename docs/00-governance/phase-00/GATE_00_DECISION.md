@@ -35,3 +35,7 @@ Status: **BLOCKED_FOR_APPROVAL** (evidence matrix prepared; no implementation co
 - Do not claim 120 tests passed.
 - Do not claim image identity fidelity guaranteed by a generative model.
 - Do not infer a missing upstream document exists from a downstream reference.
+
+## WP-000-02 — Decision Preparation (2026-10-29)
+
+[Gate-00 reassessment](wp-000-02/GATE_00_REASSESSMENT.md): 20/20 MIGs dispositioned at the review/contract level; ADR-001/002/008/009/010 expanded but retain proposed status; three Productization parents still unverified with explicit [source exception proposals](wp-000-02/SOURCE_EXCEPTIONS.md); named technical, SOP, privacy and QA approvers still unassigned. **Final Gate-00 verdict unchanged: BLOCKED_FOR_FORMAL_APPROVAL.** Authoring/CI success must not be represented as runtime test or signoff.

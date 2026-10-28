@@ -1,0 +1,19 @@
+name: WP00002 documentation integrity
+on:
+  pull_request:
+    paths:
+      - 'docs/00-governance/phase-00/wp-000-02/**'
+      - 'docs/00-governance/adrs/**'
+      - 'docs/00-governance/phase-00/GATE_00_DECISION.md'
+      - 'scripts/validate_wp00002.py'
+      - '.github/workflows/wp00002-audit-integrity.yml'
+  workflow_dispatch:
+jobs:
+  documentation-only:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate WP-000-02 (document structure only)
+        run: python3 scripts/validate_wp00002.py

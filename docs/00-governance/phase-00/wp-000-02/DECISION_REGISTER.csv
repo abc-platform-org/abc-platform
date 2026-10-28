@@ -1,0 +1,14 @@
+decision_id,subject,basis,status,record,required_authority,next_evidence
+D-001,Current independent-platform product intent,User-directed scope,PRODUCT_DIRECTION_RECORDED,ADR-001,Product Authority,Approve reviewed runtime ADR; no retroactive Notion edit
+D-002,"Shared screen in-salon, specialist-controlled",User-directed scope,PRODUCT_DIRECTION_RECORDED,ADR-002,Product/Security Authority,Approve privacy/access design and role tests
+D-003,Look specification independent of preview,Architecture proposal,PROPOSED_FOR_REVIEW,ADR-003,Architecture/Data Authority,Approve canonical schema and version policy
+D-004,Service-aware image transform pipeline,Architecture proposal,PROPOSED_FOR_POC,ADR-004,Vision/QA Authority,"Approve POC scope, do not promise pixel-level identity"
+D-005,Independent visual QA before selection,Architecture proposal,PROPOSED_FOR_REVIEW,ADR-005,Vision/QA Authority,Approve blocked/accepted preview policy
+D-006,Immutable edit/version lineage,Architecture proposal,PROPOSED_FOR_REVIEW,ADR-006,Runtime/Data Authority,Approve stale-job and rollback semantics
+D-007,Feasibility distinct from preview aesthetics,User-directed safety,PRODUCT_DIRECTION_RECORDED,ADR-007,Specialist/Safety Authority,Approve FZ-1/2/3 boundaries
+D-008,SOP-grounded draft plan and specialist sign-off,User-directed safety,PRODUCT_DIRECTION_RECORDED,ADR-008,Specialist/Safety Authority,Approve evidence and source protocols
+D-009,Durable event-driven session state,Architecture proposal,PROPOSED_FOR_REVIEW,ADR-009,Runtime/Architecture Authority,Approve outbox/idempotency/rollback constraints
+D-010,Tenant/RBAC/consent/evaluation from foundation,Architecture proposal,PROPOSED_FOR_REVIEW,ADR-010,Security/QA Authority,Approve threat model and test scope
+D-011,Recover or explicitly except DOC-001 v1.2,Missing source,UNRECOVERED_EXCEPTION_PENDING,SRC-EXC-001,Product Authority,Attach versioned source or sign bounded exception
+D-012,Recover or explicitly except DOC-005 v1.1,Missing source,UNRECOVERED_EXCEPTION_PENDING,SRC-EXC-002,Architecture Authority,Attach source or sign bounded exception
+D-013,Recover or explicitly except CCR-001 v1.1,Missing source,UNRECOVERED_EXCEPTION_PENDING,SRC-EXC-003,Product/QA Authority,Attach source or sign bounded exception

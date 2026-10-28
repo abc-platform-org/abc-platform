@@ -32,3 +32,7 @@
 ## Next authorized step
 
 Continue WP-000-02 **on a reviewed branch**, resolve source conflicts and obtain explicit decisions before claiming G-00 PASS. Merge PR#1 only after approval.
+
+## WP-000-02 — Decision Preparation (2026-10-29)
+
+[WP-000-02 package](wp-000-02/README.md) records evidence-led recovery limits, conflict-by-conflict architecture disposition, legacy AG→ENG mapping, source-exception proposals, ADR review requirements, blocker actions and G-00 reassessment. **G-00 remains BLOCKED_FOR_FORMAL_APPROVAL**. No signoffs have been fabricated and no Notion or `main` changes are authorized.

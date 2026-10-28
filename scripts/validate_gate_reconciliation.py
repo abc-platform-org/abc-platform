@@ -17,7 +17,7 @@ P = ROOT / "docs/00-governance/gate-reconciliation"
 docs = [
     "README.md", "SOURCE_AUDIT.md", "SINGLE_OWNER_GATE_POLICY.md",
     "MERGE_READINESS_AND_RUNBOOK.md", "OWNER_REVIEW_AND_ATTESTATION.md",
-    "ISSUE_RECONCILIATION.md", "OWNER_GOVERNANCE_DIRECTIVE.md", "SOURCE_EXCEPTION_PROPOSALS.csv",
+    "ISSUE_RECONCILIATION.md", "OWNER_GOVERNANCE_DIRECTIVE.md", "ADR_TECHNICAL_REVIEW.md", "SOURCE_EXCEPTION_PROPOSALS.csv",
     "ADR_DECISION_MATRIX.csv", "RELEASE_SAFETY_DEFERRALS.csv",
     "GATE_DECISIONS.csv", "GATE_RECONCILIATION_SNAPSHOT.json",
 ]
@@ -38,6 +38,12 @@ assert all(r["forbidden_inference"] and r["review_trigger"] for r in source)
 assert all(r["issue"] == "2" for r in source)
 
 adrs = read_csv("ADR_DECISION_MATRIX.csv")
+review_path=P/"ADR_TECHNICAL_REVIEW.md"
+review_text=review_path.read_text(encoding="utf-8")
+assert "ENGINEERING_RECOMMENDATION_ONLY" in review_text
+for adr_num in range(1,11):
+    assert f"ADR-{adr_num:03d}" in review_text, f"missing review ADR-{adr_num:03d}"
+assert "not** an actual owner GitHub review" in review_text
 assert len(adrs) == 10
 assert {r["adr_id"] for r in adrs} == {f"ADR-{i:03d}" for i in range(1,11)}
 for row in adrs:
@@ -98,4 +104,4 @@ assert "NOT SIGNED" in attestation
 for code in ["SRC-EXC-001","SRC-EXC-002","SRC-EXC-003","ADR-001","ADR-010"]:
     assert code in (attestation + "\n" + (P/"ADR_DECISION_MATRIX.csv").read_text())
 assert "G-00" in (P/"README.md").read_text()
-print("GATE_RECONCILIATION_DOC_PASS: 3 unsigned source exceptions, 10 ADR blob-SHA verified / unsigned, 9 unaccepted release deferrals, G00/G01/G02 not approved; 12 dossier artifacts. NO MERGE / NO RUNTIME / NO EXPERT CERTIFICATION.")
+print("GATE_RECONCILIATION_DOC_PASS: 3 unsigned source exceptions, 10 ADR blob-SHA verified / unsigned, 9 unaccepted release deferrals, G00/G01/G02 not approved; 13 dossier artifacts. NO MERGE / NO RUNTIME / NO EXPERT CERTIFICATION.")

@@ -25,17 +25,19 @@ class ManagedDBAdmissionTests(unittest.TestCase):
     def test_db_peer_checked_from_immutable_login_and_tls_view(self):
         approved={"login":LOGIN,"active_role":LOGIN,"ssl":True,
                   "version":"TLSv1.3","client_dn":"CN=ABC workload",
-                  "issuer_dn":"CN=Approved CA"}
+                  "issuer_dn":"CN=Approved CA","client_serial":43707}
         con=Mock()
         con.execute.return_value.fetchone.return_value=approved
         proof=assert_managed_db_peer(con,expected_login=LOGIN,
-                      client_dn="CN=ABC workload",issuer_dn="CN=Approved CA")
+                      client_dn="CN=ABC workload",issuer_dn="CN=Approved CA",
+                      certificate_serial="43707")
         self.assertEqual(proof["authorization"],"NOT_YET_PROVISIONED")
         self.assertIn("pg_stat_ssl",con.execute.call_args.args[0])
         for patch in ({"login":"abc_app"},{"version":"TLSv1.2"},
                       {"ssl":False},{"client_dn":"CN=Other"},
-                      {"issuer_dn":"CN=Untrusted"},{"active_role":"abc_app"}):
+                      {"issuer_dn":"CN=Untrusted"},{"client_serial":44},{"active_role":"abc_app"}):
             with self.subTest(patch=patch),self.assertRaises(ValueError):
                 con.execute.return_value.fetchone.return_value={**approved,**patch}
                 assert_managed_db_peer(con,expected_login=LOGIN,
-                      client_dn="CN=ABC workload",issuer_dn="CN=Approved CA")
+                      client_dn="CN=ABC workload",issuer_dn="CN=Approved CA",
+                      certificate_serial="43707")

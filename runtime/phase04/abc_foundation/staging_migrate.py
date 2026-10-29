@@ -24,6 +24,7 @@ FILENAMES = (
     "0009_answer_consumer_eng14_policy_gate.sql",
     "0010_eng03_durable_handoff_queue.sql",
     "0011_eng14_privileged_policy_broker.sql",
+    "0012_eng03_executor_pipeline.sql",
 )
 
 

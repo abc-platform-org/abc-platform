@@ -63,11 +63,11 @@ class ENG01PostgresCommandStore(PostgresStore):
             if row["state_version"]!=version:
                 raise DomainError(409,"state_version_conflict")
             now=datetime.now(timezone.utc)
-            new=con.execute("""UPDATE abc.sessions
-                 SET state='PAUSED',checkpoint='CREATED',
-                     state_version=state_version+1,updated_at=%s
-                 WHERE session_id=%s AND state_version=%s AND state='CREATED'
-                 RETURNING *""",(now,sid,version)).fetchone()
+            # The app role no longer has SQL UPDATE permission on state.
+            # Both the typed command and legacy checkpoint must converge
+            # on the DB-owned transactional ENG14 broker and row trigger.
+            new=con.execute("""SELECT * FROM abc.eng14_apply_pause(%s,%s)""",
+                            (sid,version)).fetchone()
             if new is None:
                 raise DomainError(409,"state_version_conflict")
             con.execute("""INSERT INTO abc.state_audit

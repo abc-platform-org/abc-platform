@@ -13,6 +13,11 @@ GATES=("G01_ARCHITECTURE","G02_DOMAIN_CAPABILITY","G03_CONTRACTS",
 "G09_OBSERVABILITY_OPERATIONS","G10_INDEPENDENT_SIGNOFF")
 
 
+def digest_manifest(evidence):
+    return hashlib.sha256(json.dumps(evidence,sort_keys=True,
+               separators=(",",":"),allow_nan=False).encode()).hexdigest()
+
+
 def evaluate(engine,evidence=None,reviewer=None,commit_sha=None):
     result={"engine_id":engine["id"],"status":"IN_PROGRESS",
             "complete":False,"product_release_approved":False}
@@ -31,9 +36,7 @@ def evaluate(engine,evidence=None,reviewer=None,commit_sha=None):
            not re.fullmatch(r"[a-f0-9]{64}",evidence[k]["artifact_sha256"])
            for k in GATES):
         return result
-    payload=json.dumps(evidence,sort_keys=True,
-                       separators=(",",":"),allow_nan=False).encode()
-    manifest_digest=hashlib.sha256(payload).hexdigest()
+    manifest_digest=digest_manifest(evidence)
     # External reviewer must verify signed claims, issuer trust, scope,
     # independent professional and security identities and exact artifacts.
     outcome=reviewer.verify(engine_id=engine["id"],

@@ -73,3 +73,28 @@ class ServiceIdentityTests(unittest.TestCase):
         data=self.token()
         with self.assertRaises(IdentityError): self.issuer.verify(data[7:])
         with self.assertRaises(IdentityError): self.issuer.verify("Bearer abc")
+
+    def test_signature_forgery_and_algorithm_downgrade_denied(self):
+        n=int(time.time())
+        data={"iss":SISS,"aud":AUD,"sub":"svc:abc-eng02","iat":n-2,
+              "nbf":n-2,"exp":n+60,"jti":str(uuid.uuid4()),
+              "token_use":"service","engine_id":"ENG-02"}
+        invalid=jwt.encode(data,self.other,algorithm="RS256",
+                           headers={"kid":"test-rsa-1"})
+        with self.assertRaises(IdentityError):
+            self.issuer.verify("Bearer "+invalid)
+        weak=jwt.encode(data,"malicious-key",algorithm="HS256",
+                        headers={"kid":"test-rsa-1"})
+        with self.assertRaises(IdentityError):
+            self.issuer.verify("Bearer "+weak)
+
+    def test_issuer_and_jwks_pin_are_not_token_selected(self):
+        with self.assertRaises(ValueError):
+            WorkloadVerifier(issuer=SISS,audience=AUD,
+                             jwks_uri="https://attacker.example/jwks")
+        with self.assertRaises(ValueError):
+            WorkloadVerifier(issuer=SISS,audience="abc-public-api",
+                             jwks_uri=SISS+"/jwks")
+        with self.assertRaises(ValueError):
+            WorkloadVerifier(issuer="http://workload.identity.example.test",
+                             audience=AUD,jwks_uri=SISS+"/jwks")

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ABC · محیط مدیریت سالن — نمونهٔ فاز ۳</title><style>:root{--ink:#20362f;--muted:#566b63;--surface:#fffef9;--paper:#f4f3ed;--line:#d8ded4;--accent:#275d47}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.7 Tahoma,Arial,sans-serif}button,select,input{font:inherit;min-height:44px;border:1px solid #aebbb3;background:white;border-radius:10px;padding:8px;color:var(--ink)}button{cursor:pointer}button:hover{background:#e4eee4}button:disabled{opacity:.65;cursor:not-allowed}a{color:#245c46}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #95620d;outline-offset:3px}.sandbox{background:var(--ink);color:white;padding:9px 22px;font-size:12px;text-align:center}header{padding:18px 30px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;border-bottom:1px solid var(--line)}.identity{display:flex;align-items:center;gap:16px}.brand{font:38px Georgia,serif;letter-spacing:3px}.controls{display:flex;gap:14px;align-items:end;flex-wrap:wrap}.controls label{font-size:12px;display:grid;gap:3px}.layout{display:grid;grid-template-columns:265px minmax(0,1fr);min-height:calc(100vh - 124px)}nav{background:#ebeee8;border-inline-end:1px solid var(--line);padding:22px}nav h2{font-size:17px}nav button{display:block;text-align:start;width:100%;margin:6px 0}nav button[aria-current=page]{background:var(--accent);color:white;border-color:var(--accent)}nav small{display:block;font-size:10px;opacity:.78}nav p{font-size:12px;color:var(--muted)}main{padding:35px;min-width:0}.pagehead{display:flex;justify-content:space-between;gap:20px;align-items:center}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--muted)}h1{font-size:28px;margin:5px 0;font-weight:500}h2{font-size:19px}.status{font-size:11px;padding:7px 12px;border:1px solid var(--line);border-radius:20px;white-space:nowrap}p{color:var(--muted)}#notice:not(:empty){padding:12px;border:1px solid #c6a577;background:#fbf2dd;border-radius:10px;margin:12px 0}#content{display:grid;gap:18px;max-width:1120px}.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px}.fields{display:flex;gap:16px;flex-wrap:wrap}.fields label{display:grid;gap:5px}.empty,.record{background:#e9efea;border-radius:10px;padding:16px}.results{margin-top:16px}.muted{font-size:13px}.skip{position:absolute;top:-200px;background:white;padding:12px;z-index:2}.skip:focus{top:0}.link{display:inline-block;margin-top:12px}@media(max-width:900px){.layout{display:block}nav{padding:12px}#navigation{display:flex;overflow:auto;gap:9px}nav button{min-width:165px}main{padding:20px}h1{font-size:24px}.pagehead{flex-wrap:wrap}}@media(max-width:430px){header{padding:14px}.identity{flex-wrap:wrap}.controls{align-items:start}.controls label{width:100%}.controls select{width:100%}.card{padding:16px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}</style></head>
+<body>
+<a class="skip" href="#main">رفتن به محتوای اصلی</a>
+<div class="sandbox">نمونهٔ تعاملی طراحی فاز ۳ · فقط داده‌های ساختگی · بدون اتصال به نوبت، مشتری، پرداخت یا هوش مصنوعی واقعی</div>
+<header>
+  <div class="identity"><b class="brand">ABC</b><span>فضای مدیریت سالن · نمونهٔ قابل بررسی</span></div>
+  <div class="controls">
+    <label>نقش آزمایشی <select id="role"><option value="Client">مشتری</option><option value="Specialist">متخصص</option><option value="Reception">پذیرش</option><option value="SalonManager">مدیر سالن</option><option value="OrganizationOwner">مالک سازمان</option><option value="PlatformOperator">اپراتور زیرساخت</option></select></label>
+    <label>شعبه <select id="branch"><option value="DEMO-BRANCH-01">شعبهٔ نمونهٔ ۱</option><option value="DEMO-BRANCH-02">شعبهٔ نمونهٔ ۲</option></select></label>
+    <a href="./review.html">استودیوی نمونه</a>
+  </div>
+</header>
+<div class="layout">
+  <nav aria-label="ماژول‌های قابل نمایش"><h2>بخش‌های کاری</h2><div id="navigation"></div>
+    <p>تغییر نقش در این نمونه فقط برای آزمون نمایش است؛ مجوزهای واقعی باید در سرور اعمال شوند.</p>
+  </nav>
+  <main id="main" tabindex="-1">
+    <div class="pagehead"><div><div class="eyebrow" id="section-id"></div><h1 id="heading"></h1></div><span class="status">SYNTHETIC · NOT RELEASED</span></div>
+    <p id="explanation"></p><div id="notice" role="status" aria-live="polite"></div><div id="content"></div>
+  </main>
+</div>
+<script type="module">// ABC Phase 03: synthetic management-only UX state, NOT real backend authorization.
+const ROLES=['Client','Specialist','Reception','SalonManager','OrganizationOwner','PlatformOperator'];
+const MODULES=Object.freeze([
+ ['ABC-F01','نمای کلی','MVP',['Reception','SalonManager','OrganizationOwner']],
+ ['ABC-F02','جست‌وجو','MVP',['Reception','SalonManager','OrganizationOwner']],
+ ['ABC-F03','تقویم','MVP',['Reception','SalonManager','OrganizationOwner']],
+ ['ABC-F04','مشتریان','MVP',['Reception','SalonManager','OrganizationOwner']],
+ ['ABC-F05','استودیوی هوش مصنوعی','MVP',['Specialist','SalonManager','OrganizationOwner']],
+ ['ABC-F06','برنامهٔ فنی','MVP',['Specialist']],
+ ['ABC-F07','تیم و صلاحیت‌ها','MVP',['SalonManager','OrganizationOwner']],
+ ['ABC-F08','خدمات','MVP',['Reception','SalonManager','OrganizationOwner']],
+ ['ABC-F09','فروش و صندوق','V2',['Reception','SalonManager','OrganizationOwner']],
+ ['ABC-F10','موجودی','V2',['SalonManager','OrganizationOwner']],
+ ['ABC-F11','بازاریابی','V2',['SalonManager','OrganizationOwner']],
+ ['ABC-F12','تحلیل کسب‌وکار','V2',['SalonManager','OrganizationOwner']],
+ ['ABC-F13','اتوماسیون','V2',['SalonManager','OrganizationOwner']],
+ ['ABC-F14','بازخورد','V2',['SalonManager','OrganizationOwner']],
+ ['ABC-F15','Ask ABC','V2',['SalonManager','OrganizationOwner']],
+ ['ABC-F16','اعلان‌ها','MVP',['Reception','SalonManager','OrganizationOwner']],
+ ['ABC-F17','چندشعبه‌ای','V3',['OrganizationOwner']],
+ ['ABC-F18','تنظیمات و حاکمیت','MVP',['SalonManager','OrganizationOwner']]
+].map(([id,name,phase,roles])=>({id,name,phase,roles})));
+const appts=Object.freeze([{id:'DEMO-A01',slot:'10:00',staff:'DEMO-STAFF-01'},{id:'DEMO-A02',slot:'11:30',staff:'DEMO-STAFF-02'}]);
+const services=Object.freeze([{id:'hair',title:'کوتاهی مو'},{id:'men',title:'موی مردانه'},{id:'beard',title:'ریش'}]);
+const freshManagement=(role='Reception')=>({role:ROLES.includes(role)?role:'Client',module:'ABC-F01',branch:'DEMO-BRANCH-01',epoch:1,search:'',draft:null,notice:''});
+const allowed=(role,module)=>ROLES.includes(role)&&MODULES.some(m=>m.id===module&&m.roles.includes(role));
+const issue=(s,notice)=>({...s,notice});
+function managementReduce(s,a){
+ const n={...s,notice:''};
+ if(a.type==='simulateRole'){if(!ROLES.includes(a.role))return issue(s,'نقش آزمایشی نامعتبر است.');return {...freshManagement(a.role),branch:s.branch,epoch:s.epoch+1,notice:'نقش نمایشی تغییر کرد؛ این احراز هویت نیست.'};}
+ if(a.type==='navigate'){if(!allowed(s.role,a.module))return issue(s,'دسترسی این نقش به این صفحه مجاز نیست.');return {...n,module:a.module,draft:null};}
+ if(a.type==='switchBranch'){if(s.role!=='OrganizationOwner'||!['DEMO-BRANCH-01','DEMO-BRANCH-02'].includes(a.branch))return issue(s,'تغییر شعبه نیازمند مجوز مالک سازمان است.');return {...n,branch:a.branch,epoch:s.epoch+1,draft:null,search:'',notice:'شعبهٔ نمایشی تغییر کرد و پیش‌نویس پیشین باطل شد.'};}
+ if(a.type==='search'){if(!allowed(s.role,'ABC-F02')||s.module!=='ABC-F02')return issue(s,'جست‌وجو برای این نقش مجاز نیست.');return {...n,search:String(a.query??'').slice(0,80)};}
+ if(a.type==='draftBooking'){
+  if(!allowed(s.role,'ABC-F03')||s.module!=='ABC-F03')return issue(s,'ایجاد نوبت مجاز نیست.');
+  if(!['10:00','11:30','14:00','16:00'].includes(a.slot)||!['DEMO-STAFF-01','DEMO-STAFF-02'].includes(a.staff))return issue(s,'بازه یا نیروی نمونه نامعتبر است.');
+  if(appts.some(x=>x.slot===a.slot&&x.staff===a.staff))return issue(s,'تداخل نوبت در Fixture؛ هیچ نوبتی ایجاد نشد.');
+  return {...n,draft:{type:'BOOKING_PROPOSAL',slot:a.slot,staff:a.staff,branch:s.branch,epoch:s.epoch,status:'AWAITING_REAL_RECEIPT'},notice:'فقط پیش‌نویس نمایشی؛ نوبت واقعی ثبت نشده است.'};
+ }
+ if(a.type==='requestConfirmation'){
+  if(!allowed(s.role,'ABC-F03')||s.module!=='ABC-F03'||s.draft?.type!=='BOOKING_PROPOSAL'||s.draft.branch!==s.branch||s.draft.epoch!==s.epoch)return issue(s,'پیش‌نویس معتبر همین شعبه وجود ندارد.');
+  return issue(s,'فقط API واقعی می‌تواند رسید معتبر بدهد؛ این نمونه هیچ نوبتی تأیید نمی‌کند.');
+ }
+ if(a.type==='proposeCampaign'){if(!allowed(s.role,'ABC-F11')||s.module!=='ABC-F11')return issue(s,'مجوز پیشنهاد کمپین وجود ندارد.');return {...n,draft:{type:'CAMPAIGN_PROPOSAL',branch:s.branch,status:'NEEDS_CONSENT_AND_APPROVAL'},notice:'پیشنهاد نمایشی؛ هیچ پیام تبلیغاتی ارسال نشد.'};}
+ if(a.type==='executeSensitive')return issue(s,'پرداخت، تغییر موجودی، ارسال کمپین و تغییر نقش در نمونه مسدود است.');
+ return issue(s,'عملیات نامعتبر است.');
+}
+function managementProjection(s){
+ const modules=MODULES.filter(m=>allowed(s.role,m.id));
+ const module=allowed(s.role,s.module)?s.module:null;
+ const common={role:s.role,module,branch:s.branch,modules,synthetic:true,notice:s.notice};
+ if(!module)return {...common,denied:true};
+ if(module==='ABC-F01')return {...common,kpis:null,schedule:appts.map(x=>({id:x.id,slot:x.slot,status:'SYNTHETIC'}))};
+ if(module==='ABC-F02')return {...common,search:s.search,results:s.search.trim()?[{id:'DEMO-CLIENT-01',label:'پروندهٔ غیرواقعی بدون اطلاعات هویتی'}]:[]};
+ if(module==='ABC-F03')return {...common,appointments:appts.map(x=>({...x,status:'SYNTHETIC'})),draft:s.draft?.type==='BOOKING_PROPOSAL'?{...s.draft}:null};
+ if(module==='ABC-F04')return {...common,clients:[{id:'DEMO-CLIENT-01',consent:'NOT_GRANTED',history:'NOT_LOADED'}]};
+ if(module==='ABC-F07')return {...common,team:[{id:'DEMO-STAFF-01',qualification:'NOT_VERIFIED'},{id:'DEMO-STAFF-02',qualification:'NOT_VERIFIED'}]};
+ if(module==='ABC-F08')return {...common,services:services.map(x=>({...x,release:'NOT_RELEASED'}))};
+ if(module==='ABC-F11')return {...common,draft:s.draft?.type==='CAMPAIGN_PROPOSAL'?{...s.draft}:null};
+ if(module==='ABC-F16')return {...common,notifications:[{id:'DEMO-N01',text:'اعلان نمونه؛ رویداد واقعی دریافت نشده است.'}]};
+ return {...common,empty:'این ماژول در نقشهٔ محصول تعریف شده اما اتصال اجرایی و دادهٔ واقعی در فاز بعدی توسعه می‌یابد.'};
+}
+
+let state=freshManagement();
+const $=id=>document.getElementById(id);
+const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const card=(title,body)=>'<section class="card"><h2>'+esc(title)+'</h2>'+body+'</section>';
+const noData='<p class="muted">هیچ دادهٔ کسب‌وکار واقعی به این نمونه متصل نیست.</p>';
+function dispatch(action){const prev=state.module;state=managementReduce(state,action);render();if(state.module!==prev)$('main').focus();}
+function render(){
+ const v=managementProjection(state);
+ $('role').value=state.role;$('branch').value=state.branch;$('branch').disabled=state.role!=='OrganizationOwner';
+ $('navigation').innerHTML=v.modules.map(m=>'<button type="button" data-module="'+m.id+'" aria-current="'+(v.module===m.id?'page':'false')+'">'+esc(m.name)+'<small>'+m.id+' · '+m.phase+'</small></button>').join('')||'<p>ماژول مدیریتی برای این نقش وجود ندارد.</p>';
+ document.querySelectorAll('[data-module]').forEach(b=>{b.onclick=()=>dispatch({type:'navigate',module:b.dataset.module});});
+ const selected=MODULES.find(x=>x.id===v.module);
+ $('section-id').textContent=selected?.id||'ACCESS DENIED';
+ $('heading').textContent=selected?.name||'نمایش محدود';
+ $('explanation').textContent=selected?'فاز هدف: '+selected.phase+' · دسترسی نمایشی با نقش و شعبهٔ مشخص':'این نقش مجوز مشاهدهٔ محیط مدیریت را ندارد.';
+ $('notice').textContent=v.notice||'';
+ let html='';
+ if(v.denied)html=card('دسترسی رد شد','<p>هیچ رکورد یا فرم مدیریتی در این نما نمایش داده نمی‌شود.</p>');
+ else if(v.module==='ABC-F01')html=card('شاخص‌های عملکرد',noData+'<div class="empty">درآمد، ظرفیت، نرخ تبدیل: دادهٔ قابل تأیید وجود ندارد.</div>')+card('جلسه‌های نمایشی',v.schedule.map(x=>'<p>'+esc(x.id)+' · '+esc(x.slot)+' · صرفاً نمونه</p>').join(''));
+ else if(v.module==='ABC-F02')html=card('جست‌وجوی کنترل‌شده','<label>جست‌وجو در دادهٔ آزمایشی <input id="search" maxlength="80" value="'+esc(v.search)+'" placeholder="عبارت آزمایشی"></label><button id="searchSubmit">جست‌وجو</button><div class="results">'+(v.results.length?v.results.map(x=>'<p>'+esc(x.id)+' · '+esc(x.label)+'</p>').join(''):'<p>نتیجه‌ای موجود نیست.</p>')+'</div>');
+ else if(v.module==='ABC-F03')html=card('تقویم و تداخل نوبت', '<p>بازه‌های Fixture: ۱۰:۰۰ برای نیروی ۱ و ۱۱:۳۰ برای نیروی ۲ اشغال‌اند.</p><div class="fields"><label>ساعت<select id="slot"><option>10:00</option><option>11:30</option><option>14:00</option><option>16:00</option></select></label><label>نیرو<select id="staff"><option>DEMO-STAFF-01</option><option>DEMO-STAFF-02</option></select></label></div><button id="draft">ساخت پیش‌نویس نوبت</button><p>'+(v.draft?'پیش‌نویس: '+esc(v.draft.slot)+' · '+esc(v.draft.staff)+' · منتظر رسید':'پیش‌نویسی ثبت نشده است.')+'</p><button id="confirm" '+(v.draft?'':'disabled')+'>درخواست تأیید (بدون API)</button>')+card('نوبت‌های ساختگی',v.appointments.map(x=>'<p>'+esc(x.id)+' · '+esc(x.slot)+' · '+esc(x.staff)+' · DEMO</p>').join(''));
+ else if(v.module==='ABC-F04')html=card('پرونده و رضایت مشتری',v.clients.map(x=>'<div class="record"><b>'+esc(x.id)+'</b><p>رضایت عکس: ثبت نشده · تاریخچه: بارگذاری نشده</p><p>فاقد تصویر یا اطلاعات شناسایی فردی</p></div>').join(''));
+ else if(v.module==='ABC-F07')html=card('تیم و صلاحیت‌ها',v.team.map(x=>'<p>'+esc(x.id)+' · صلاحیت حرفه‌ای احراز نشده؛ تأیید برنامهٔ فنی مجاز نیست.</p>').join(''));
+ else if(v.module==='ABC-F08')html=card('وضعیت خدمات',v.services.map(x=>'<p>'+esc(x.title)+' ('+esc(x.id)+') · <strong>NOT_RELEASED</strong></p>').join(''));
+ else if(v.module==='ABC-F11')html=card('پیشنهاد کمپین',noData+'<p>برای ارسال واقعی به رضایت بازاریابی، تأیید انسانی، مجوز دامنه و رسید معتبر نیاز است.</p><button id="campaign">ایجاد پیشنهاد نمایشی</button><p>'+(v.draft?'در انتظار رضایت و مجوز؛ ارسال نشده است.':'هنوز پیشنهادی ساخته نشده است.')+'</p><button id="execute">آزمون ممنوعیت ارسال</button>');
+ else if(v.module==='ABC-F16')html=card('اعلان‌ها',v.notifications.map(n=>'<p>'+esc(n.text)+'</p>').join(''));
+ else if(v.module==='ABC-F05'||v.module==='ABC-F06')html=card('مسیر کاری استودیو','<p>این لینک نمونهٔ مشاوره است؛ اختیار متخصص یا مدیریت را به کاربر منتقل نمی‌کند.</p><p>تأیید برنامهٔ فنی فقط پس از احراز صلاحیت و تأیید نسخهٔ دقیق مجاز است.</p><a class="link" href="./review.html">ورود به نمونهٔ استودیو</a>');
+ else html=card('وضعیت طراحی ماژول','<p>'+esc(v.empty)+'</p>'+noData+'<button id="execute">آزمون جلوگیری از اقدام عملیاتی</button>');
+ $('content').innerHTML=html;
+ if($('searchSubmit'))$('searchSubmit').onclick=()=>dispatch({type:'search',query:$('search').value});
+ if($('search'))$('search').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();dispatch({type:'search',query:e.target.value});}};
+ if($('draft'))$('draft').onclick=()=>dispatch({type:'draftBooking',slot:$('slot').value,staff:$('staff').value});
+ if($('confirm'))$('confirm').onclick=()=>dispatch({type:'requestConfirmation'});
+ if($('campaign'))$('campaign').onclick=()=>dispatch({type:'proposeCampaign'});
+ if($('execute'))$('execute').onclick=()=>dispatch({type:'executeSensitive'});
+}
+$('role').onchange=e=>dispatch({type:'simulateRole',role:e.target.value});
+$('branch').onchange=e=>dispatch({type:'switchBranch',branch:e.target.value});
+render();
+</script>
+</body></html>

@@ -45,4 +45,29 @@ CREATE TRIGGER eng14_session_creation_gate_before_insert
 -- ENG02's distinct abc_orchestrator authorization remains unchanged.
 REVOKE UPDATE(state_version,updated_at,last_event_id)
   ON abc.sessions FROM abc_app;
+
+-- PostgreSQL SELECT ... FOR UPDATE requires UPDATE privilege on at least
+-- one column. Both ENG01 adapters use row locks before receipt/CAS checks.
+-- Preserve a single harmless privilege but reject all direct metadata-only
+-- writes through a separate SQL trigger. The ENG14 broker changes state and
+-- updated_at atomically, so its legitimate pause remains allowed.
+GRANT UPDATE(updated_at) ON abc.sessions TO abc_app;
+CREATE FUNCTION abc.eng14_app_metadata_write_gate() RETURNS trigger
+LANGUAGE plpgsql SECURITY INVOKER
+SET search_path=pg_catalog,abc
+AS $metadata$
+BEGIN
+  IF session_user='abc_app'
+     AND NEW.state IS NOT DISTINCT FROM OLD.state
+  THEN
+    RAISE EXCEPTION 'ENG14 app metadata-only session UPDATE denied'
+      USING ERRCODE='23514';
+  END IF;
+  RETURN NEW;
+END;
+$metadata$;
+REVOKE ALL ON FUNCTION abc.eng14_app_metadata_write_gate() FROM PUBLIC;
+CREATE TRIGGER eng14_app_metadata_write_gate_before_update
+  BEFORE UPDATE OF updated_at ON abc.sessions
+  FOR EACH ROW EXECUTE FUNCTION abc.eng14_app_metadata_write_gate();
 COMMIT;

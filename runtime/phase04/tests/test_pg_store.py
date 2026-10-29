@@ -411,7 +411,7 @@ class PostgresRuntimeTests(unittest.TestCase):
               (login_name,tenant_id,consumer_id,engine_id,active,approved_at,
                certificate_client_dn,certificate_issuer_dn,certificate_serial)
               VALUES(%s,%s,'ci-managed-identity','ENG-01',true,clock_timestamp(),
-                     'CN=ci-managed','CN=ci-ca','AABB')""",
+                     'CN=ci-managed','CN=ci-ca','43707')""",
               (login,self.tenant))
             admin.execute("""INSERT INTO abc.eng14_tenant_workload_mode
               (tenant_id,managed_required,activated_at,activated_by)

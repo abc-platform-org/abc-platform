@@ -1,0 +1,51 @@
+# NON-ACTIVE PRIVATE API BLUEPRINT. NOT A DEPLOYMENT REQUEST.
+# Requires separately owned and funded private connectivity to PostgreSQL with
+# server-side verified client certs. Render-managed Postgres is NOT equivalent.
+# External operator must issue separate API server and upstream client certs,
+# configure a trusted OIDC issuer, and verify private-only reachability.
+services:
+  - type: pserv
+    name: abc-p04-private-api-synthetic
+    runtime: docker
+    numInstances: 1
+    dockerfilePath: ./runtime/phase04/Dockerfile
+    dockerContext: ./runtime/phase04
+    dockerCommand: python -m abc_foundation.staging_api
+    autoDeployTrigger: "off"
+    envVars:
+      - key: ABC_ENV
+        value: STAGING_PRIVATE
+      - key: ABC_STAGING_PURPOSE
+        value: SYNTHETIC_NO_CLIENT_DATA
+      - key: ABC_NETWORK_BOUNDARY
+        value: RENDER_PRIVATE_SERVICE
+      - key: ABC_DB_AUTH_MODE
+        value: MANAGED_MTLS
+      - key: ABC_API_TRANSPORT
+        value: MTLS_TLS13
+      - key: PORT
+        value: "10000"
+      - key: ABC_PG_DSN
+        sync: false
+      - key: ABC_DB_WORKLOAD_LOGIN
+        sync: false
+      - key: ABC_DB_CLIENT_DN
+        sync: false
+      - key: ABC_DB_ISSUER_DN
+        sync: false
+      - key: ABC_DB_CERT_SERIAL
+        sync: false
+      - key: ABC_API_TLS_CERT_FILE
+        sync: false
+      - key: ABC_API_TLS_KEY_FILE
+        sync: false
+      - key: ABC_API_TLS_CA_FILE
+        sync: false
+      - key: ABC_API_ALLOWED_CLIENT_URIS
+        sync: false
+      - key: ABC_OIDC_ISSUER
+        sync: false
+      - key: ABC_OIDC_AUDIENCE
+        sync: false
+      - key: ABC_OIDC_JWKS_URI
+        sync: false

@@ -77,3 +77,14 @@ The point-in-time "managed OIDC and PostgreSQL still pending" statements above r
 **Current authoritative audit:** [IDENTITY_POSTGRES_CONSENT_AUDIT_2026-10-29.md](IDENTITY_POSTGRES_CONSENT_AUDIT_2026-10-29.md). Read this together with the historical baseline, not as a replacement for P02 contracts.
 
 **Gate decision:** \`WP-004-01 = STAGING_ADAPTERS_IMPLEMENTED_PENDING_FINAL_HEAD_CHECK\` until exact-commit CI passes; \`P04 = IN_PROGRESS\`; external IdP/managed DB, independent consent verifier/DSR, distributed jobs, full 19 engines, observability, product deployment, human security and privacy approval remain OPEN. No merge to main or live usage authorized.
+
+
+## WP-004-02 — Independent worker, tenant-safe outbox and consent lifecycle (2026-10-29)
+
+- **A genuine defect was caught and remediated:** the initial worker delivery reconciliation could receive other tenants' events. Each consumer now requires an **administrator-provisioned active tenant subscription**; PostgreSQL foreign key + RLS bind consumer and tenant, and revocation prevents new claims and ACK. Details and test provenance: [DURABLE_EVENTS_AND_SERVICE_BOUNDARIES.md](DURABLE_EVENTS_AND_SERVICE_BOUNDARIES.md).
+- \`0003_event_delivery.sql\`, \`0004_tenant_subscriptions.sql\`, \`0006_session_index_projection.sql\`: distinct least-privilege \`abc_worker\` role, persistent per-consumer delivery ledger, lease token fencing, retry/DLQ, and idempotent non-PII session-index read model.
+- \`abc_foundation/service_session_index.py\`: independent process entry point, no public port, only in staging/integration mode; no real visual model or business effect.
+- \`0005_consent_lifecycle.sql\`: expiring, non-resurrectable consent with immutable purpose/client/proof fields and status audit. App role cannot approve/write; public consent/media remain disabled.
+- After this continuation, **88 Python integration/unit tests passed at an intermediate SHA**; inspect the latest GitHub Actions SHA for current evidence. 41 frozen API operations remain **2 integration-only / 39 not implemented**; all \`NOT_RELEASED\`.
+
+**Gate:** P04 IN_PROGRESS, full engineered platform deployment NOT ACCEPTED. No change to P00–P02 contracts or Phase03 PR #21. No public cloud or real Identity Provider has been configured.

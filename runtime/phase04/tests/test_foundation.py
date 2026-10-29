@@ -278,5 +278,70 @@ class CanonicalAlignmentTests(unittest.TestCase):
         self.assertEqual(methods["/v1/consultations"]["post"]["x-abc-roles"],["SPECIALIST"])
         self.assertIn("bearerAuth",methods["/v1/consultations"]["post"]["security"][0])
 
+
+
+class FixtureJobTests(unittest.TestCase):
+    """No-media synthetic durable job queue acceptance, not a production CV worker."""
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory()
+        self.dbpath=pathlib.Path(self.tmp.name)/"jobs.db"
+        self.db=Store(self.dbpath)
+        self.sid=self.db.create(ACTOR,BODY,key("fixture-session"))["session_id"]
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_enqueue_key_replay_is_idempotent(self):
+        a=self.db.enqueue_fixture_job(ACTOR,self.sid,key("job"))
+        b=self.db.enqueue_fixture_job(ACTOR,self.sid,key("job"))
+        self.assertEqual(a,b)
+        self.assertEqual(a["status"],"QUEUED")
+
+    def test_crash_lease_recovery_and_stale_worker_denial(self):
+        job=self.db.enqueue_fixture_job(ACTOR,self.sid,key("job"))
+        first=self.db.lease_fixture_job("worker-a",1000,seconds=10)
+        self.assertEqual(first["job_id"],job["job_id"])
+        self.assertIsNone(self.db.lease_fixture_job("worker-b",1005,seconds=10))
+        restarted=Store(self.dbpath)
+        second=restarted.lease_fixture_job("worker-b",1011,seconds=10)
+        self.assertEqual(second["attempt"],2)
+        with self.assertRaises(DomainError) as cm:
+            restarted.finish_fixture_job(first["lease_token"],job["job_id"],1012,True)
+        self.assertEqual(cm.exception.status,409)
+        self.assertEqual(restarted.finish_fixture_job(second["lease_token"],job["job_id"],1012,True),"SUCCEEDED")
+        self.assertIsNone(restarted.lease_fixture_job("worker-c",1012))
+
+    def test_three_failures_dead_letter_fixture(self):
+        self.db.enqueue_fixture_job(ACTOR,self.sid,key("job"))
+        for n in range(3):
+            leased=self.db.lease_fixture_job("worker",1000+n*40,seconds=20)
+            expected="DEAD_LETTER" if n==2 else "QUEUED"
+            self.assertEqual(self.db.finish_fixture_job(leased["lease_token"],leased["job_id"],1001+n*40,False),expected)
+        self.assertIsNone(self.db.lease_fixture_job("worker",1300))
+
+    def test_cancellation_fences_inflight_success(self):
+        self.db.enqueue_fixture_job(ACTOR,self.sid,key("job"))
+        lease=self.db.lease_fixture_job("worker",1000)
+        self.db.cancel_fixture_jobs(ACTOR,self.sid)
+        with self.assertRaises(DomainError) as cm:
+            self.db.finish_fixture_job(lease["lease_token"],lease["job_id"],1001,True)
+        self.assertEqual(cm.exception.status,409)
+        self.assertIsNone(self.db.lease_fixture_job("worker",1035))
+
+    def test_other_tenant_cannot_cancel_or_enqueue(self):
+        other={**ACTOR,"tenant_id":"tenant-other"}
+        with self.assertRaises(DomainError) as cm:
+            self.db.enqueue_fixture_job(other,self.sid,key("job-other"))
+        self.assertEqual(cm.exception.status,404)
+        with self.assertRaises(DomainError) as cm:
+            self.db.cancel_fixture_jobs(other,self.sid)
+        self.assertEqual(cm.exception.status,404)
+
+    def test_worker_lease_is_unique_under_contention(self):
+        self.db.enqueue_fixture_job(ACTOR,self.sid,key("job"))
+        with ThreadPoolExecutor(max_workers=6) as pool:
+            leased=list(pool.map(lambda x:self.db.lease_fixture_job("worker-"+str(x),1000,seconds=10), range(6)))
+        self.assertEqual(sum(x is not None for x in leased),1)
+
 if __name__ == "__main__":
     unittest.main()

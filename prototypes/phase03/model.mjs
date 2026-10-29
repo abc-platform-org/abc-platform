@@ -10,7 +10,7 @@ export function reduce(s,a){
  if(a.type==='role'){if(!a.privateScreen)return error(s,'ابتدا نمایشگر را از دید مشتری خارج کنید.');n.role=a.role;n.privateScreen=true;return n;}
  if(a.type==='offline'){n.online=!s.online;return n;}
  if(terminal)return error(s,'جلسه پایان یافته است؛ جلسهٔ تازه بسازید.');
- if(a.type==='revoke'){n.consent=false;n.pending=null;n.job++;n.selected=null;n.validated=null;n.looks=[];n.state='SAFETY_BLOCKED';n.checkpoint=null;n.notice='رضایت پس گرفته شد؛ تصاویر و پردازش نمونه متوقف شدند.';return n;}
+ if(a.type==='revoke'){n.consent=false;n.pending=null;n.job++;n.selected=null;n.validated=null;n.looks=[];n.active=null;n.redo=[];n.favorite=[];n.role='shared';n.privateScreen=false;n.sop=false;n.feasible=false;n.qualified=false;n.state='SAFETY_BLOCKED';n.checkpoint=null;n.notice='رضایت پس گرفته شد؛ تصاویر و پردازش نمونه متوقف شدند.';return n;}
  if(!s.online)return error(s,'اتصال قطع است؛ تغییر ثبت نمی‌شود.');
  if(a.type==='pause'){if(['PAUSED','SAFETY_BLOCKED','FAILED_RECOVERABLE','HANDOFF'].includes(s.state))return error(s,'توقف در این وضعیت مجاز نیست.');n.checkpoint=s.state;n.state='PAUSED';n.pending=null;n.job++;return n;}
  if(a.type==='resume'){if(!['PAUSED','FAILED_RECOVERABLE'].includes(s.state)||!s.checkpoint)return error(s,'نقطهٔ بازیابی معتبر وجود ندارد.');n.state=s.checkpoint;n.checkpoint=null;return n;}
@@ -29,7 +29,7 @@ export function reduce(s,a){
  if(a.type==='undo'){const current=s.looks.find(l=>l.id===s.active);if(s.state!=='PREVIEW_REVIEW'||!current?.parent)return error(s,'نسخهٔ قبلی وجود ندارد.');n.redo.push(s.active);n.active=current.parent;return n;}
  if(a.type==='redo'){if(s.state!=='PREVIEW_REVIEW'||!s.redo.length)return error(s,'نسخه‌ای برای بازگردانی نیست.');n.active=n.redo.pop();return n;}
  if(a.type==='reviseSelected'){
- if(!['LOOK_SELECTED','FEASIBILITY_REVIEW','PLAN_DRAFTED','SPECIALIST_REVIEW'].includes(s.state)||s.role!=='specialist')return error(s,'اصلاح انتخاب نیازمند متخصص و مرحلهٔ مجاز است.');
+ if(!['LOOK_SELECTED','FEASIBILITY_REVIEW','PLAN_DRAFTED','SPECIALIST_REVIEW'].includes(s.state)||s.role!=='specialist'||!s.privateScreen||!s.consent||!s.selected||!s.looks.some(l=>l.id===s.selected&&l.qa==='PASS')||s.receipt)return error(s,'اصلاح انتخاب نیازمند متخصص، وضعیت خصوصی، رضایت معتبر و نسخهٔ انتخاب‌شده است.');
  n.active=s.selected;n.selected=null;n.validated=null;n.sop=false;n.feasible=false;n.qualified=false;n.receipt=false;n.pending=null;n.job++;n.state='REVISION_REQUESTED';n.notice='انتخاب و تأییدهای وابسته نامعتبر شدند؛ نسخهٔ پیشین محفوظ است.';return n;
  }
  if(a.type==='generate'){
@@ -37,7 +37,7 @@ export function reduce(s,a){
  n.job++;n.pending=n.job;n.notice='در حال آماده‌سازی تصویر نمایشی…';return n;
  }
  if(a.type==='result'){
- if(a.job!==s.pending||!s.consent)return error(s,'نتیجهٔ قدیمی یا لغوشده کنار گذاشته شد.');
+ if(!Number.isInteger(s.pending)||a.job!==s.pending||!s.consent||!['OPTIONS_READY','PREVIEW_REVIEW','REVISION_REQUESTED'].includes(s.state))return error(s,'نتیجهٔ بدون درخواست معتبر، قدیمی یا لغوشده کنار گذاشته شد.');
  n.pending=null;
  if(a.qa!=='PASS'){n.notice='کنترل کیفیت ناموفق؛ این نتیجه قابل انتخاب نیست.';return n;}
  n.looks.push({id:'LOOK-'+(s.looks.length+1),parent:s.active??s.looks.at(-1)?.id??null,qa:'PASS',length:a.length??50,locked:s.locked});n.active=n.looks.at(-1).id;n.redo=[];n.state='PREVIEW_REVIEW';return n;

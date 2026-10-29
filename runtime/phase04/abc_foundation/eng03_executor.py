@@ -14,6 +14,7 @@ from psycopg.rows import dict_row
 
 from .eng02_consultation import FIXTURE_PATH
 from .store import DomainError
+from .pg_outbox import CONSUMER
 
 REGISTRY=json.loads(FIXTURE_PATH.read_text())["profiles"][0]
 QUESTION={q["question_id"]:q for q in REGISTRY["questions"]}
@@ -38,10 +39,13 @@ def _uuid(value):
 
 class ENG03Executor:
     ENGINE_ID="ENG-03"
-    def __init__(self,dsn):
+    def __init__(self,dsn,consumer_id):
         if not isinstance(dsn,str) or not dsn:
             raise ValueError("independent_eng03_dsn_required")
+        if not isinstance(consumer_id,str) or not CONSUMER.fullmatch(consumer_id):
+            raise ValueError("bound_eng03_consumer_required")
         self.dsn=dsn
+        self.consumer_id=consumer_id
 
     def _connect(self):
         con=psycopg.connect(self.dsn,row_factory=dict_row,connect_timeout=4)
@@ -57,8 +61,9 @@ class ENG03Executor:
         with self._connect() as con:
             row=con.execute("""WITH next AS (
                 SELECT job_id FROM abc.eng03_input_jobs
-                WHERE (status='QUEUED_PENDING_ENGINE' AND next_attempt_at<=clock_timestamp())
-                   OR (status='LEASED' AND lease_until<=clock_timestamp())
+                WHERE consumer_id=%s AND (
+                    (status='QUEUED_PENDING_ENGINE' AND next_attempt_at<=clock_timestamp())
+                   OR (status='LEASED' AND lease_until<=clock_timestamp()))
                 ORDER BY updated_at,job_id
                 FOR UPDATE SKIP LOCKED LIMIT 1
             )
@@ -69,12 +74,13 @@ class ENG03Executor:
             FROM next WHERE job.job_id=next.job_id
             RETURNING job.job_id,job.consumer_id,job.tenant_id,job.session_id,
                       job.source_event_id,job.lease_token,job.attempts""",
-                (token,seconds)).fetchone()
+                (self.consumer_id,token,seconds)).fetchone()
             return {k:str(v) if isinstance(v,uuid.UUID) else v for k,v in row.items()} if row else None
 
     def _leased(self,con,job_id,token):
         row=con.execute("""SELECT * FROM abc.eng03_input_jobs
-            WHERE job_id=%s FOR UPDATE""",(job_id,)).fetchone()
+            WHERE job_id=%s AND consumer_id=%s FOR UPDATE""",
+            (job_id,self.consumer_id)).fetchone()
         if row is None:
             raise DomainError(404,"job_not_found")
         now=con.execute("SELECT clock_timestamp() AS now").fetchone()["now"]

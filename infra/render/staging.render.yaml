@@ -17,7 +17,7 @@ services:
     plan: starter
     region: frankfurt
     branch: foundation/phase-04-runtime-20261029
-    autoDeployTrigger: off
+    autoDeployTrigger: 'off'
     dockerContext: runtime/phase04
     dockerfilePath: runtime/phase04/Dockerfile
     dockerCommand: python -m abc_foundation.staging_api
@@ -45,7 +45,7 @@ services:
     plan: starter
     region: frankfurt
     branch: foundation/phase-04-runtime-20261029
-    autoDeployTrigger: off
+    autoDeployTrigger: 'off'
     dockerContext: runtime/phase04
     dockerfilePath: runtime/phase04/Dockerfile
     dockerCommand: python -m abc_foundation.staging_worker

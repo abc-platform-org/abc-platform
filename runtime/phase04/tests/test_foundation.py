@@ -343,5 +343,25 @@ class FixtureJobTests(unittest.TestCase):
             leased=list(pool.map(lambda x:self.db.lease_fixture_job("worker-"+str(x),1000,seconds=10), range(6)))
         self.assertEqual(sum(x is not None for x in leased),1)
 
+
+class PauseRaceTests(unittest.TestCase):
+    def test_pause_atomically_invalidates_pending_fixture_and_late_worker(self):
+        with tempfile.TemporaryDirectory() as folder:
+            db=Store(pathlib.Path(folder)/"state.db")
+            sid=db.create(ACTOR,BODY,key("session-pause"))["session_id"]
+            job=db.enqueue_fixture_job(ACTOR,sid,key("job-before-pause"))
+            lease=db.lease_fixture_job("worker",1000,seconds=100)
+            self.assertEqual(lease["job_id"],job["job_id"])
+            state=db.checkpoint_command(ACTOR,sid,"pause",0,key("pause-session"))
+            self.assertEqual(state["state"],"PAUSED")
+            with self.assertRaises(DomainError) as cm:
+                db.finish_fixture_job(lease["lease_token"],lease["job_id"],1001,True)
+            self.assertEqual(cm.exception.status,409)
+            self.assertIsNone(db.lease_fixture_job("worker",1010))
+            resumed=db.checkpoint_command(ACTOR,sid,"resume",1,key("resume-session"))
+            self.assertEqual(resumed["state"],"CREATED")
+            fresh=db.enqueue_fixture_job(ACTOR,sid,key("new-intent-after-resume"))
+            self.assertNotEqual(fresh["job_id"],job["job_id"])
+
 if __name__ == "__main__":
     unittest.main()

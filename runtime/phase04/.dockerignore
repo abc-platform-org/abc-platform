@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+tests
+*.db
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.env
+.env.*
+.git

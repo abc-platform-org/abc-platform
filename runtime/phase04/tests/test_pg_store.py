@@ -318,3 +318,55 @@ class PostgresRuntimeTests(unittest.TestCase):
         with psycopg.connect(ADMIN) as con:
             self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng01_create_audit
                    WHERE session_id=%s""",(sid,)).fetchone()[0],1)
+
+    def test_service_login_binding_is_admin_only_and_physically_authenticated(self):
+        # Disposable test login: real staging additionally requires mutual TLS
+        # and externally managed certificate-to-login enrollment.
+        from psycopg import sql
+        from psycopg.conninfo import make_conninfo
+        suffix=uuid.uuid4().hex[:16]
+        login="abc_api_"+suffix
+        password="ci-disposable-"+suffix
+        with psycopg.connect(ADMIN) as admin:
+            admin.execute(sql.SQL("""CREATE ROLE {} LOGIN NOINHERIT
+                NOSUPERUSER NOCREATEROLE NOBYPASSRLS PASSWORD {}""").format(
+                sql.Identifier(login),sql.Literal(password)))
+            admin.execute(sql.SQL("GRANT abc_app TO {} WITH SET TRUE").format(
+                sql.Identifier(login)))
+        login_dsn=make_conninfo(DSN,user=login,password=password)
+        body=json.dumps(self.body())
+        # No binding => physical session_user cannot invent authorization.
+        with self.assertRaises(psycopg.errors.CheckViolation):
+            with psycopg.connect(login_dsn) as con:
+                con.execute("SET ROLE abc_app")
+                self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+                con.execute("SELECT abc.eng01_create_session(%s::jsonb,%s)",
+                            (body,"unbound-managed-1"))
+        with psycopg.connect(DSN) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""INSERT INTO abc.eng01_api_login_bindings
+                    (login_name,tenant_id,consumer_id,engine_id,active,approved_at)
+                    VALUES(%s,%s,'forged','ENG-01',true,now())""",
+                    (login,self.tenant))
+        with psycopg.connect(ADMIN) as admin:
+            admin.execute("""INSERT INTO abc.eng01_api_login_bindings
+                (login_name,tenant_id,consumer_id,engine_id,active,approved_at)
+                VALUES(%s,%s,'ci-managed-consumer','ENG-01',true,now())""",
+                (login,self.tenant))
+        with psycopg.connect(login_dsn) as con:
+            con.execute("SET ROLE abc_app")
+            self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+            row=con.execute("SELECT abc.eng01_create_session(%s::jsonb,%s)",
+                            (body,"approved-managed-1")).fetchone()[0]
+        self.assertEqual(row["state"],"CREATED")
+        self.assertEqual(row["tenant_id"],self.tenant)
+        with psycopg.connect(ADMIN) as admin:
+            admin.execute("""UPDATE abc.eng01_api_login_bindings SET active=false
+                        WHERE login_name=%s AND tenant_id=%s""",
+                        (login,self.tenant))
+        with self.assertRaises(psycopg.errors.CheckViolation):
+            with psycopg.connect(login_dsn) as con:
+                con.execute("SET ROLE abc_app")
+                self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+                con.execute("SELECT abc.eng01_create_session(%s::jsonb,%s)",
+                            (body,"revoked-managed-1"))

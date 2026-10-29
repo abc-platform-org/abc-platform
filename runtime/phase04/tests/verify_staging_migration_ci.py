@@ -22,12 +22,14 @@ app_pass="disposable-test-app-"+("a"*40)
 worker_pass="disposable-test-worker-"+("b"*40)
 orchestrator_pass="disposable-test-orchestrator-"+("d"*40)
 answer_worker_pass="disposable-test-answer-worker-"+("e"*40)
+eng03_pass="disposable-test-eng03-"+("f"*40)
+pipeline_pass="disposable-test-pipeline-"+("g"*40)
 migration_pass="disposable-test-migrator-"+("c"*40)
 
 with psycopg.connect(ADMIN,autocommit=True) as con:
     con.execute(sql.SQL("""CREATE ROLE abc_staging_migrator LOGIN CREATEROLE
                  NOSUPERUSER NOCREATEDB NOBYPASSRLS PASSWORD {}""").format(sql.Literal(migration_pass)))
-    con.execute("GRANT abc_app,abc_worker,abc_orchestrator,abc_answer_worker TO abc_staging_migrator WITH ADMIN OPTION")
+    con.execute("GRANT abc_app,abc_worker,abc_orchestrator,abc_answer_worker,abc_eng03_worker,abc_pipeline_worker TO abc_staging_migrator WITH ADMIN OPTION")
     con.execute("CREATE DATABASE abc_staging OWNER abc_staging_migrator")
 
 local=ADMIN.replace("postgres:abc-integration-only-password",
@@ -41,7 +43,9 @@ env={"ABC_ENV":"STAGING_MIGRATION_PRIVATE",
      "ABC_STAGING_APP_PASSWORD":app_pass,
      "ABC_STAGING_WORKER_PASSWORD":worker_pass,
      "ABC_STAGING_ORCHESTRATOR_PASSWORD":orchestrator_pass,
-     "ABC_STAGING_ANSWER_WORKER_PASSWORD":answer_worker_pass}
+     "ABC_STAGING_ANSWER_WORKER_PASSWORD":answer_worker_pass,
+     "ABC_STAGING_ENG03_PASSWORD":eng03_pass,
+     "ABC_STAGING_PIPELINE_PASSWORD":pipeline_pass}
 with patch.object(staging_migrate,"validate_migrator_config",return_value=local):
     staging_migrate.apply_migrations(env)
     staging_migrate.apply_migrations(env)

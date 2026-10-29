@@ -7,6 +7,7 @@ from unittest.mock import Mock
 from abc_foundation.staging_api import validate_staging_dsn, make_private_server, assert_staging_database
 from abc_foundation.staging_worker import configure_worker
 from abc_foundation.staging_migrate import validate_migrator_config, planned_migrations, FILENAMES
+from abc_foundation.staging_smoke import check_private_url, smoke
 
 STAGING_ENV={
     "ABC_ENV":"STAGING_PRIVATE",
@@ -49,6 +50,55 @@ class StagingGuardTests(unittest.TestCase):
     def test_worker_rejects_http_service_boundary(self):
         with self.assertRaises(ValueError):
             configure_worker({**STAGING_ENV,"ABC_WORKER_DSN":"none","ABC_CONSUMER_ID":"test-consumer"})
+
+
+    def test_private_smoke_rejects_public_and_unexpected_urls(self):
+        bad=[
+            "https://abc-p04-private-api-abc.onrender.com",
+            "https://abc-p04-private-api-abc",
+            "http://example.com",
+            "http://localhost:10000",
+            "http://abc-p04-private-api-abc.example.org:10000",
+            "http://abc-p04-private-api-abc:10001",
+            "http://abc-p04-private-api-abc:10000/anything",
+            "http://abc-p04-private-api-abc:10000/?token=secret",
+            "http://user:password@abc-p04-private-api-abc:10000",
+        ]
+        for url in bad:
+            with self.subTest(url=url),self.assertRaises(ValueError):
+                check_private_url(url)
+        self.assertEqual(check_private_url("http://abc-p04-private-api-abc:10000"),
+                         "http://abc-p04-private-api-abc:10000")
+
+    def test_staging_smoke_health_and_negative_auth_without_token(self):
+        import io
+        from urllib.error import HTTPError
+        calls=[]
+        class Good:
+            def __init__(self,body):
+                self.status=200
+                self.stream=io.BytesIO(body)
+            def __enter__(self): return self
+            def __exit__(self,*args): pass
+            def read(self,n): return self.stream.read(n)
+        def transport(req,timeout):
+            calls.append((req.full_url,req.get_method(),req.headers.get("Authorization")))
+            if req.get_method()=="POST":
+                raise HTTPError(req.full_url,401,"blocked",{},io.BytesIO(b'{"error":"unauthenticated"}'))
+            return Good(b'{"status":"ok","capability":"OIDC_PG_LOOPBACK"}')
+        output=smoke("http://abc-p04-private-api-test:10000",transport)
+        self.assertEqual(output,{"/healthz":200,"/v1/consultations":401})
+        self.assertTrue(all(authorization is None for _,_,authorization in calls))
+
+    def test_staging_smoke_refuses_false_health(self):
+        import io
+        class Bad:
+            status=200
+            def __enter__(self): return self
+            def __exit__(self,*args): pass
+            def read(self,n): return b'{"status":"ok","capability":"PRODUCTION"}'
+        with self.assertRaises(RuntimeError):
+            smoke("http://abc-p04-private-api-test:10000",lambda *_args,**_kwargs:Bad())
 
     def test_migrator_rejects_prod_admin_and_weak_secrets(self):
         base={

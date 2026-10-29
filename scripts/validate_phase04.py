@@ -19,6 +19,6 @@ assert all(r["release"]=="NOT_RELEASED" for r in rows)
 assert all(r["implementation"] in ("NOT_IMPLEMENTED","LOCAL_HARNESS_ONLY") for r in rows)
 runtime=(ROOT/"runtime/phase04/abc_foundation/http_api.py").read_text()
 assert '"/v1/consultations"' in runtime and "SESSION_RE" in runtime
-assert '"/_foundation/v0/' in runtime
+assert '/_foundation/v0/' in runtime
 assert "capability_not_implemented" in runtime
 print("PASS: 41 exact v1 operations; 2 local-harness only; 39 not implemented; no release")

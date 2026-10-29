@@ -23,7 +23,10 @@ export function reduce(s,a){
  if(!allowed[a.key]?.includes(s.state))return error(s,'این ورودی در مرحلهٔ فعلی قابل تغییر نیست.');
  if(['sop','feasible','qualified'].includes(a.key)&&(s.role!=='specialist'||!s.privateScreen))return error(s,'این تصمیم به محیط محافظت‌شدهٔ متخصص نیاز دارد.');
  if(a.key==='locked'&&a.value!==true)return error(s,'حفظ ناحیه‌های محافظت‌شده در این خدمت اجباری است.');
- n[a.key]=a.value;return n;
+ n[a.key]=a.value;
+ if(a.key==='textOnly'&&a.value===true)n.consent=false;
+ if(a.key==='consent'&&a.value===true)n.textOnly=false;
+ return n;
  }
  if(a.type==='answer'){if(s.state!=='INTENT_DEFINED')return error(s,'مرحلهٔ پرسش فعال نیست.');n.answers[a.key]=a.value;return n;}
  if(a.type==='favorite'){if(!s.looks.some(l=>l.id===a.id))return error(s,'نسخه یافت نشد.');n.favorite=s.favorite.includes(a.id)?s.favorite.filter(id=>id!==a.id):[...s.favorite,a.id];return n;}

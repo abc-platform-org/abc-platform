@@ -209,3 +209,10 @@ class StagingGuardTests(unittest.TestCase):
                 "ABC_DB_AUTH_MODE":"MANAGED_MTLS",
                 "ABC_PG_DSN":"postgresql://abc_api_ci@db.private/abc_staging?sslmode=verify-full"},
                 verifier=Mock())
+
+    def test_private_staging_refuses_plaintext_http_even_with_injected_store(self):
+        with self.assertRaisesRegex(ValueError,"api_mutual_tls13_required"):
+            make_private_server(environ=STAGING_ENV,store=Mock(),verifier=Mock())
+        with self.assertRaisesRegex(ValueError,"api_externally_managed_tls_material_required"):
+            make_private_server(environ={**STAGING_ENV,
+                "ABC_API_TRANSPORT":"MTLS_TLS13"},store=Mock(),verifier=Mock())

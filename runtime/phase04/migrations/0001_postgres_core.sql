@@ -124,12 +124,28 @@ ALTER TABLE abc.consent_evidence FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS abc_consent_scope ON abc.consent_evidence;
 CREATE POLICY abc_consent_scope ON abc.consent_evidence FOR SELECT TO abc_app
   USING (tenant_id = current_setting('abc.tenant',true)
-    AND branch_id = current_setting('abc.branch',true));
+    AND branch_id = current_setting('abc.branch',true)
+    AND EXISTS (SELECT 1 FROM abc.sessions s
+                WHERE s.session_id = abc.consent_evidence.session_id));
 -- No runtime write policy: evidence must be verified by a future segregated service.
 
+-- Tenant and branch directory names are also tenant-scoped, not public metadata.
+ALTER TABLE abc.tenants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE abc.tenants FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS abc_tenant_directory ON abc.tenants;
+CREATE POLICY abc_tenant_directory ON abc.tenants FOR SELECT TO abc_app
+  USING (tenant_id = current_setting('abc.tenant',true));
+ALTER TABLE abc.branches ENABLE ROW LEVEL SECURITY;
+ALTER TABLE abc.branches FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS abc_branch_directory ON abc.branches;
+CREATE POLICY abc_branch_directory ON abc.branches FOR SELECT TO abc_app
+  USING (tenant_id = current_setting('abc.tenant',true)
+    AND branch_id = current_setting('abc.branch',true));
 REVOKE ALL ON ALL TABLES IN SCHEMA abc FROM PUBLIC;
 GRANT SELECT ON abc.memberships TO abc_app;
 GRANT SELECT ON abc.tenants,abc.branches TO abc_app;
-GRANT SELECT,INSERT,UPDATE ON abc.sessions,abc.idempotency,abc.outbox TO abc_app;
+GRANT SELECT,INSERT,UPDATE ON abc.sessions,abc.idempotency TO abc_app;
+-- Outbox events can be appended by the session transaction; no raw event read.
+GRANT INSERT ON abc.outbox TO abc_app;
 GRANT SELECT ON abc.consent_evidence TO abc_app;
 COMMIT;

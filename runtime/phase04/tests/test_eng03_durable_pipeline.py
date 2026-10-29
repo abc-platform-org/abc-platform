@@ -367,6 +367,11 @@ class ENG03PipelineTests(unittest.TestCase):
         self.assertEqual(self.pipeline.run_once(),"ACKED")
         self.assertEqual(self.count("abc.eng04_06_results"),2)
 
+    def test_pipeline_role_cannot_read_eng03_fencing_secrets(self):
+        with psycopg.connect(PIPELINE) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SELECT source_lease_token FROM abc.eng03_evidence_ledger")
+
     def test_unknown_critical_answer_still_bounded_by_eng14(self):
         self.arrive(value="UNKNOWN")
         self.assertEqual(self.worker.run_once(),"ACKED")

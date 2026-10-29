@@ -88,3 +88,15 @@ The point-in-time "managed OIDC and PostgreSQL still pending" statements above r
 - After this continuation, **88 Python integration/unit tests passed at an intermediate SHA**; inspect the latest GitHub Actions SHA for current evidence. 41 frozen API operations remain **2 integration-only / 39 not implemented**; all \`NOT_RELEASED\`.
 
 **Gate:** P04 IN_PROGRESS, full engineered platform deployment NOT ACCEPTED. No change to P00–P02 contracts or Phase03 PR #21. No public cloud or real Identity Provider has been configured.
+
+
+## WP-004-03 — Private staging infrastructure packaging and operator gate (2026-10-29)
+
+- The connected Render workspace \`My Workspace\` was inspected. At that time, there were **no Render services and no Render PostgreSQL instances**. The available connected create action supports public web services and databases, but **not** creation of private services or background workers; a public substitute is forbidden.
+- New reviewed staging specification: \`infra/render/staging.render.yaml\` (Frankfurt, PostgreSQL 16, \`ipAllowList: []\`, private \`pserv\` API, background \`worker\`, manual deploy only, no client data). Docker image is run with UID 10001 and a bounded dependency set.
+- New \`staging_api.py\` and \`staging_worker.py\` fail closed on missing DB role/TLS/RLS, network-mode and synthetic-only environment; JWT/JWKS provider secrets and DB DSNs are injected out of band. The provider's private networking, not an environment value, must enforce reachability.
+- New \`staging_migrate.py\` uses separate privileged operator workflow, six migration checksums, advisory-lock serialization and atomic migration+receipt commits. The isolated ephemeral PostgreSQL integration test applies the schema, reruns without duplicates and rejects tampered checksums; no real Render DB was migrated.
+- New \`staging_smoke.py\` permits only internal private service addresses and checks health/no-token 401 without real data.
+- Authoritative playbook and risk gate: [PRIVATE_STAGING_DEPLOYMENT_RUNBOOK.md](PRIVATE_STAGING_DEPLOYMENT_RUNBOOK.md). Blueprint static policy: \`scripts/validate_phase04_staging.py\`. Tests are mandatory at exact PR HEAD.
+
+**Explicit gate:** \`STAGING_CONFIGURATION = CODE_TESTED\`; \`RENDER_RESOURCES = NOT_PROVISIONED\`; \`MANAGED_IDP = NOT_CONNECTED\`; \`CLOUD_DATA_MIGRATION = NOT_EXECUTED\`; \`P04_EXIT = IN_PROGRESS\`. Costs and a private Render Blueprint import require account-holder authorization and actual service creation, which the current connected actions do not support directly. No real client data or public interface is authorized.

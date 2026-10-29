@@ -383,7 +383,18 @@ class PostgresRuntimeTests(unittest.TestCase):
         with self.assertRaises(DomainError) as pause_error:
             self.store.checkpoint_command(self.principal,existing,"pause",0,
                                           "pause-after-managed-mode")
-        self.assertEqual(pause_error.exception.status,403)
+        self.assertIn(pause_error.exception.status,(403,404))
+        # The restrictive tenant RLS policy must hide the session even when
+        # a stolen shared DB credential supplies forged OIDC GUC values.
+        with psycopg.connect(DSN) as forged:
+            self.store._scope(forged,ISS,self.subject,self.tenant,self.branch)
+            visible=forged.execute("SELECT count(*) FROM abc.sessions WHERE session_id=%s",
+                                   (existing,)).fetchone()[0]
+            self.assertEqual(visible,0)
+            receipts=forged.execute(
+                "SELECT count(*) FROM abc.idempotency WHERE tenant_id=%s",
+                (self.tenant,)).fetchone()[0]
+            self.assertEqual(receipts,0)
         with psycopg.connect(ADMIN) as admin:
             session=admin.execute("""SELECT state,state_version FROM abc.sessions
                 WHERE session_id=%s""",(existing,)).fetchone()

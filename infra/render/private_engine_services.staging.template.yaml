@@ -10,7 +10,7 @@ services:
     rootDir: runtime/phase04
     dockerfilePath: ./Dockerfile
     dockerCommand: python -m abc_foundation.private_engine_service_server
-    autoDeployTrigger: off
+    autoDeployTrigger: "off"
     envVars:
       - key: ABC_ENV
         value: STAGING_PRIVATE
@@ -46,7 +46,7 @@ services:
     rootDir: runtime/phase04
     dockerfilePath: ./Dockerfile
     dockerCommand: python -m abc_foundation.private_engine_service_server
-    autoDeployTrigger: off
+    autoDeployTrigger: "off"
     envVars:
       - key: ABC_ENV
         value: STAGING_PRIVATE
@@ -82,7 +82,7 @@ services:
     rootDir: runtime/phase04
     dockerfilePath: ./Dockerfile
     dockerCommand: python -m abc_foundation.private_engine_service_server
-    autoDeployTrigger: off
+    autoDeployTrigger: "off"
     envVars:
       - key: ABC_ENV
         value: STAGING_PRIVATE

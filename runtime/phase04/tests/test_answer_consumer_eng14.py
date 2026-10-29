@@ -186,6 +186,37 @@ class AnswerConsumerIntegration(unittest.TestCase):
                           (self.sid,)).fetchone()[0]
             self.assertEqual(n,0)
 
+    def test_orchestrator_role_cannot_issue_policy_by_direct_table_insert(self):
+        with psycopg.connect(ORCH) as con:
+            con.execute("SELECT set_config('abc.issuer',%s,true)",(ISS,))
+            con.execute("SELECT set_config('abc.subject',%s,true)",(self.subject,))
+            con.execute("SELECT set_config('abc.tenant',%s,true)",(self.tenant,))
+            con.execute("SELECT set_config('abc.branch',%s,true)",(self.branch,))
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""INSERT INTO abc.eng14_policy_audit
+                    (decision_id,command_id,tenant_id,branch_id,session_id,actor_id,
+                     aggregate_version,policy_version,scope,decision,input_digest,evaluated_at)
+                    VALUES(%s,%s,%s,%s,%s,%s,1,'eng14.synthetic.1',
+                           'QUESTION','ALLOW',%s,clock_timestamp())""",
+                    (uuid.uuid4(),uuid.uuid4(),self.tenant,self.branch,self.sid,
+                     self.subject,"0"*64))
+        self.assertEqual(self.answer()["aggregate_version"],1)
+
+    def test_privileged_policy_broker_blocks_wrong_profile(self):
+        with psycopg.connect(ORCH) as con:
+            for k,v in (("abc.issuer",ISS),("abc.subject",self.subject),
+                        ("abc.tenant",self.tenant),("abc.branch",self.branch)):
+                con.execute("SELECT set_config(%s,%s,true)",(k,v))
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("""SELECT abc.issue_eng14_answer_proof(
+                    %s,%s,%s,%s,%s,%s,1,%s,%s,%s,%s,%s)""",
+                    (uuid.uuid4(),uuid.uuid4(),self.tenant,self.branch,self.sid,
+                     self.subject,"0"*64,SERVICE_ISS,"svc:abc-eng02",
+                     "synthetic:prior-treatment","fake-profile"))
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("SELECT count(*) FROM abc.eng14_policy_audit WHERE session_id=%s",
+                            (self.sid,)).fetchone()[0],0)
+
     def test_eng14_critical_unknown_stops_next_command(self):
         self.answer(value="UNKNOWN")
         with self.assertRaises(DomainError):

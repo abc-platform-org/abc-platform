@@ -6,6 +6,7 @@ from unittest.mock import Mock
 
 from abc_foundation.staging_api import validate_staging_dsn, make_private_server, assert_staging_database
 from abc_foundation.staging_worker import configure_worker
+from abc_foundation.staging_answer_worker import configure_answer_worker
 from abc_foundation.staging_migrate import validate_migrator_config, planned_migrations, FILENAMES
 from abc_foundation.staging_smoke import check_private_url, smoke
 
@@ -51,6 +52,23 @@ class StagingGuardTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             configure_worker({**STAGING_ENV,"ABC_WORKER_DSN":"none","ABC_CONSUMER_ID":"test-consumer"})
 
+
+    def test_answer_worker_refuses_local_public_or_wrong_role(self):
+        base={"ABC_ENV":"STAGING_PRIVATE",
+              "ABC_STAGING_PURPOSE":"SYNTHETIC_NO_CLIENT_DATA",
+              "ABC_NETWORK_BOUNDARY":"RENDER_BACKGROUND_WORKER",
+              "ABC_ANSWER_CONSUMER_ID":"answer-consumer-test",
+              "ABC_ANSWER_WORKER_DSN":"postgresql://abc_answer_worker:abc@db.private/abc_staging?sslmode=require"}
+        with self.assertRaises(ValueError):
+            configure_answer_worker({**base,"ABC_ENV":"PRODUCTION"})
+        with self.assertRaises(ValueError):
+            configure_answer_worker({**base,"ABC_NETWORK_BOUNDARY":"PUBLIC_HTTP"})
+        with self.assertRaises(ValueError):
+            configure_answer_worker({**base,"ABC_ANSWER_WORKER_DSN":
+                         "postgresql://abc_worker@db.private/abc_staging?sslmode=require"})
+        with self.assertRaises(ValueError):
+            configure_answer_worker({**base,"ABC_ANSWER_WORKER_DSN":
+                         "postgresql://abc_answer_worker@localhost/abc_staging?sslmode=require"})
 
     def test_private_smoke_rejects_public_and_unexpected_urls(self):
         bad=[

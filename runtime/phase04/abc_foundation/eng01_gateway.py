@@ -73,6 +73,8 @@ class TypedCheckpointGateway:
         if command["idempotency_key"] != command["command_id"]:
             raise DomainError(400,"command_idempotency_binding_required")
         self.orchestrator.store._key(command["idempotency_key"])
+        if "policy_decision_id" in command:
+            raise DomainError(501,"policy_gate_not_connected")
         if type(command["expected_state_version"]) is not int or command["expected_state_version"]<0:
             raise DomainError(400,"invalid_expected_state_version")
         requested=_iso(command["requested_at"])
@@ -92,10 +94,10 @@ class TypedCheckpointGateway:
         if (scoped["tenant_id"]!=command["tenant_id"] or
                 scoped["branch_id"]!=command["branch_id"]):
             raise DomainError(404,"not_found")
-        # Only CREATED -> PAUSED and exact idempotent replay are executable.
-        result=self.orchestrator.perform_checkpoint(
-            principal,command["session_id"],target_state="PAUSED",
-            expected_state_version=command["expected_state_version"],
-            idempotency_key=command["idempotency_key"])
-        return {**result,"command_id":command["command_id"],
-                "correlation_id":command["correlation_id"]}
+        # In a single DB transaction persist the FULL command digest,
+        # session CAS, audit, and replay receipt; never mint a new correlation
+        # ID for an existing command receipt or replay a modified command.
+        writer=getattr(self.orchestrator.store,"execute_eng01_pause",None)
+        if not callable(writer):
+            raise DomainError(501,"atomic_command_receipt_store_required")
+        return writer(principal,command)

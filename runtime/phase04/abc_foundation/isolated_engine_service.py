@@ -4,6 +4,8 @@ This is a synthetic process boundary and CONTRACT prototype, NOT a cloud service
 or a substitute for authenticated mTLS deployment. No network or DB credentials.
 """
 import json
+from pathlib import Path
+from jsonschema import Draft202012Validator,FormatChecker
 import sys
 import uuid
 
@@ -14,6 +16,11 @@ from .eng06_decision import SyntheticDecisionEngine
 from .store import DomainError
 
 VERSION="abc.internal.engine.synthetic.v1"
+_CONTRACTS=json.loads(Path(__file__).with_name("internal_engine_ports.v1.json").read_text())
+_INPUT=Draft202012Validator(_CONTRACTS["request"],format_checker=FormatChecker())
+_OUTPUT=Draft202012Validator(_CONTRACTS["response"],format_checker=FormatChecker())
+Draft202012Validator.check_schema(_CONTRACTS["request"])
+Draft202012Validator.check_schema(_CONTRACTS["response"])
 ENGINES=("ENG-04","ENG-05","ENG-06")
 _ALLOWED={"request_id","engine_id","contract_version","consumer_id","session_id","payload"}
 
@@ -33,6 +40,8 @@ def validate(message,engine_id):
             raise DomainError(400,"invalid_engine_service_identifier") from None
     if not isinstance(message.get("payload"),dict):
         raise DomainError(400,"invalid_engine_payload")
+    if not _INPUT.is_valid(message):
+        raise DomainError(400,"engine_port_json_schema_rejected")
 
 
 def dispatch(message,engine_id):
@@ -59,10 +68,13 @@ def dispatch(message,engine_id):
              analysis=payload["analysis"],knowledge=payload["knowledge"])
     if not isinstance(result,dict):
         raise DomainError(500,"engine_result_invalid")
-    return {"request_id":message["request_id"],"engine_id":engine_id,
-            "contract_version":VERSION,"consumer_id":message["consumer_id"],
-            "session_id":message["session_id"],"result":result,
-            "release_approved":False}
+    response={"request_id":message["request_id"],"engine_id":engine_id,
+              "contract_version":VERSION,"consumer_id":message["consumer_id"],
+              "session_id":message["session_id"],"result":result,
+              "release_approved":False}
+    if not _OUTPUT.is_valid(response):
+        raise DomainError(500,"engine_output_schema_rejected")
+    return response
 
 
 def main():

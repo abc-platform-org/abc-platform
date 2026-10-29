@@ -1,25 +1,45 @@
-# ABC Phase 03 — UI/UX design candidate
+# ABC Phase 03 — Complete synthetic UI/UX engineering review candidate
 
-Owner: saleheebrahimi2029-hub. Base: `1b479453c155b5744ec95e136733cce16a34ae88`.
-Work packages: WP-003-01 shared AI Studio; WP-003-02 specialist Technical Plan.
-Issue: [#20](https://github.com/saleheebrahimi2029-hub/abc-platform/issues/20).
+**Program:** ABC-MEP-01.1  
+**Owner/accountability:** \`saleheebrahimi2029-hub\`  
+**Base:** \`main@1b479453c155b5744ec95e136733cce16a34ae88\` (P00–P02 DESIGN_ONLY).  
+**Branch:** \`design/phase-03-studio-20261029\`, [PR #21](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/21), [Issue #20](https://github.com/saleheebrahimi2029-hub/abc-platform/issues/20).
 
-## Deliverables
+## Artifacts
 
-- [Design system](DESIGN_SYSTEM.md): layout, tokens, components and interaction rules.
-- [Screen/role/contract map](SCREEN_CONTRACT_MAP.json): exact accepted API operation IDs and session states.
-- [Requirement coverage](REQUIREMENT_COVERAGE.csv): all 64 baseline requirements, with explicit prototype vs specification-only scope.
-- [UX test protocol](UX_TEST_PROTOCOL.md): scenarios, pass evidence and remaining human/device checks.
-- [Architecture findings](CONTRACT_FINDINGS.md): downstream inconsistencies surfaced by UI design.
-- [Gate disposition](GATE_03.md): evidence-based status; not a product release.
-- Executable prototype: `prototypes/phase03/index.html`, `app.mjs`, `model.mjs`, `style.css`.
-- Automated tests: `node --test tests/phase03/model.test.mjs`; traceability check: `python scripts/validate_phase03.py`.
+- \`DESIGN_SYSTEM.md\` — design tokens, responsive composition, roles, accessibility and UI behavior.
+- \`MANAGEMENT_UX_CONTRACT.md\` — permission-safe Salon OS design and exact dispositions of 18 module IDs.
+- \`DESIGN_AUTHORITY_DECISIONS.md\` — six missing historical visual references, provisional design choice, selected-look revision amendment.
+- \`SCREEN_CONTRACT_MAP.json\` — 15 state/role/API screen mappings against P02 v1 contracts.
+- \`REQUIREMENT_COVERAGE.csv\` — 64/64 traced scope with explicit \`runtime_status=NOT_IMPLEMENTED\` (correct for Phase 03).
+- \`UX_TEST_PROTOCOL.md\` and \`BROWSER_QA.md\` — automated vs pending human/device acceptance.
+- \`CONTRACT_FINDINGS.md\`, \`GATE_03.md\`, \`CONTINUATION_AUDIT_2026-10-29.md\` — defects and truthful gate review.
+- \`contracts/phase03/revision-transition-addendum.json\` — approved **for synthetic design only**, not a v1 production state machine modification.
 
-## Run
-Serve `prototypes/phase03` over HTTP using your normal local development environment. The ES modules require HTTP; opening index.html with file:// is not supported. No installation, API keys, external fonts, network images, live AI, storage of customer data, camera access, upload, payment, booking or messaging are involved. Reload starts a new synthetic session; pause/resume is memory-only and is not durable backend recovery.
+## Prototypes
 
-## Authority
-The authoritative state-machine source is `contracts/v1/state-machines.json`, not older prose aliases. Shared-screen is a display projection, not a separate customer account or trusted API actor. The production backend must authorize the specialist and return a safe projection. The prototype simulates decisions using explicit fixture controls; it cannot establish real authentication, qualification, safety or image quality.
+| Entry | Purpose | Runtime |
+|---|---|---|
+| \`prototypes/phase03/index.html\` | Shared specialist-led Studio (ES modules) | HTTP local server |
+| \`prototypes/phase03/management.html\` | Role-scoped Salon Business OS review | HTTP local server |
+| \`prototypes/phase03/review.html\` | Self-contained Studio design review | Standalone HTML |
+| \`prototypes/phase03/review-management.html\` | Self-contained management design review | Standalone HTML |
 
-## Visual references
-The accepted roadmap refers to six historical reference images but does not provide resolvable image IDs. A targeted Library search returned textual references, not the six images. This candidate uses the specified three-zone layout and a new restrained ivory/forest design; it does not claim pixel fidelity to unseen images. Reference comparison remains an explicit design-review item, not an invented completed check.
+The standalone files are rebuildable via \`python scripts/build_phase03_review.py\` and CI-checked for staleness. They use only synthetic data: no customer image, camera, upload, billing, booking, messaging, live model, user record or external API.
+
+## Repeatable checks
+
+\`\`\`bash
+python scripts/validate_phase03.py
+python scripts/build_phase03_review.py --check
+node --check prototypes/phase03/app.mjs
+node --check prototypes/phase03/management.mjs
+node --test tests/phase03/model.test.mjs tests/phase03/management.test.mjs tests/phase03/contrast.test.mjs
+# GitHub Actions also provisions Chromium for tests/phase03/browser.spec.mjs
+\`\`\`
+
+The GitHub CI workflow \`.github/workflows/phase03-design-integrity.yml\` stores screenshot artifacts on a passing browser run.
+
+## Truthful exit
+
+**Engineering candidate:** Synthetic design implementation complete for review; **formal UX phase exit:** pending physical/device, screen reader, paired salon UX and independent visual reference review. **Release G-03:** NOT_RUN. No PR-to-main merge or real-client processing is authorized by this status. All engine runtime capabilities are for later phases.

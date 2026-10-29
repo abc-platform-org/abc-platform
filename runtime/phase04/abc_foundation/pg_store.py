@@ -189,6 +189,11 @@ class PostgresStore:
         self._key(key)
         if action not in ("pause", "resume") or type(expected_version) is not int or expected_version < 0:
             raise DomainError(400, "invalid_checkpoint_command")
+        # The older local checkpoint adapter previously resumed without
+        # rechecking version-bound consent and ENG14 policy. Disallow that
+        # legacy execution path until a transactional verified resume exists.
+        if action=="resume":
+            raise DomainError(501,"resume_requires_eng14_and_verified_consent")
         try:
             sid=uuid.UUID(session_id)
         except (ValueError,TypeError):

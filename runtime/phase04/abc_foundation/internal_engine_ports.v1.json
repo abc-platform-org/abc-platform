@@ -1,0 +1,185 @@
+{
+  "status": "DRAFT_INTERNAL_SYNTHETIC_ONLY",
+  "frozen_phase02_contracts_changed": false,
+  "request": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "ABC synthetic-only independent-engine internal request envelope",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "request_id",
+      "engine_id",
+      "contract_version",
+      "consumer_id",
+      "session_id",
+      "payload"
+    ],
+    "properties": {
+      "request_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "engine_id": {
+        "enum": [
+          "ENG-04",
+          "ENG-05",
+          "ENG-06"
+        ]
+      },
+      "contract_version": {
+        "const": "abc.internal.engine.synthetic.v1"
+      },
+      "consumer_id": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9_-]+$"
+      },
+      "session_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "payload": {
+        "type": "object"
+      }
+    },
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "engine_id": {
+              "const": "ENG-04"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "payload": {
+              "type": "object",
+              "required": [
+                "evidence"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "evidence": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "engine_id": {
+              "const": "ENG-05"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "payload": {
+              "type": "object",
+              "required": [
+                "service_id",
+                "fixture"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "service_id": {
+                  "const": "synthetic:hair-color"
+                },
+                "fixture": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "engine_id": {
+              "const": "ENG-06"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "payload": {
+              "type": "object",
+              "required": [
+                "analysis",
+                "knowledge"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "analysis": {
+                  "type": "object"
+                },
+                "knowledge": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "response": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "ABC synthetic independent-engine result envelope",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "request_id",
+      "engine_id",
+      "contract_version",
+      "consumer_id",
+      "session_id",
+      "result",
+      "release_approved"
+    ],
+    "properties": {
+      "request_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "engine_id": {
+        "enum": [
+          "ENG-04",
+          "ENG-05",
+          "ENG-06"
+        ]
+      },
+      "contract_version": {
+        "const": "abc.internal.engine.synthetic.v1"
+      },
+      "consumer_id": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 96
+      },
+      "session_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "result": {
+        "type": "object"
+      },
+      "release_approved": {
+        "const": false
+      }
+    }
+  }
+}

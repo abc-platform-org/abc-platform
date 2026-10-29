@@ -6,13 +6,12 @@ web API or background worker. Never commit secrets or a full DB connection URL.
 import hashlib
 import os
 from pathlib import Path
-import re
 
 import psycopg
 from psycopg import sql
 from psycopg.conninfo import conninfo_to_dict
 
-MIGRATIONS = Path(__file__).resolve().parents[2] / "migrations"
+MIGRATIONS = Path(__file__).resolve().parents[1] / "migrations"
 FILENAMES = (
     "0001_postgres_core.sql",
     "0002_checkpoint_audit.sql",

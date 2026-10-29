@@ -16,6 +16,25 @@ ALTER TABLE abc.eng01_create_audit FORCE ROW LEVEL SECURITY;
 REVOKE ALL ON abc.eng01_create_audit FROM PUBLIC,abc_app,abc_worker,abc_orchestrator,
   abc_answer_worker,abc_eng03_worker,abc_pipeline_worker;
 
+-- Operator-controlled physical PostgreSQL-login binding. Custom GUCs do not
+-- identify an authenticated workload; session_user cannot be spoofed by SET.
+-- Each managed API service must authenticate under a dedicated LOGIN/NOINHERIT
+-- role and then SET ROLE abc_app before using the restricted broker.
+CREATE TABLE abc.eng01_api_login_bindings(
+  login_name name NOT NULL,
+  tenant_id text NOT NULL REFERENCES abc.tenants(tenant_id),
+  consumer_id text NOT NULL CHECK(length(consumer_id) BETWEEN 3 AND 96),
+  engine_id text NOT NULL CHECK(engine_id='ENG-01'),
+  active boolean NOT NULL DEFAULT false,
+  approved_at timestamptz,
+  PRIMARY KEY(login_name,tenant_id),
+  CHECK(active=false OR approved_at IS NOT NULL)
+);
+ALTER TABLE abc.eng01_api_login_bindings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE abc.eng01_api_login_bindings FORCE ROW LEVEL SECURITY;
+REVOKE ALL ON abc.eng01_api_login_bindings FROM PUBLIC,abc_app,abc_worker,
+  abc_orchestrator,abc_answer_worker,abc_eng03_worker,abc_pipeline_worker;
+
 CREATE FUNCTION abc.eng01_create_session(p_body jsonb,p_key text)
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER
@@ -37,7 +56,12 @@ DECLARE
   v_event jsonb;
   v_field text;
 BEGIN
-  IF session_user <> 'abc_app'
+  IF (session_user <> 'abc_app' AND NOT EXISTS (
+        SELECT 1 FROM abc.eng01_api_login_bindings binding
+         WHERE binding.login_name=session_user
+           AND binding.tenant_id=v_tenant
+           AND binding.engine_id='ENG-01'
+           AND binding.active AND binding.approved_at IS NOT NULL))
      OR v_issuer NOT LIKE 'https://%'
      OR nullif(v_actor,'') IS NULL OR nullif(v_tenant,'') IS NULL
      OR nullif(v_branch,'') IS NULL
@@ -161,6 +185,8 @@ DO $policy$ BEGIN
     CREATE POLICY abc_migrator_owner_idempotency ON abc.idempotency
        FOR ALL TO abc_staging_migrator USING(true) WITH CHECK(true);
     CREATE POLICY abc_migrator_owner_create_audit ON abc.eng01_create_audit
+       FOR ALL TO abc_staging_migrator USING(true) WITH CHECK(true);
+    CREATE POLICY abc_migrator_owner_api_bindings ON abc.eng01_api_login_bindings
        FOR ALL TO abc_staging_migrator USING(true) WITH CHECK(true);
   END IF;
 END $policy$;

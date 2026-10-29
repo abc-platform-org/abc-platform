@@ -72,14 +72,13 @@ class ENG14DatabaseGate(unittest.TestCase):
              "guard-"+suffix)["session_id"]
 
     def test_untrusted_direct_state_update_rejected(self):
-        # FORCE RLS hides the row completely when there is no trusted
-        # session scope, so the update affects ZERO rows without running a
-        # row trigger. This is secure denial, not an expected SQL exception.
+        # Direct state writes are now unconditionally forbidden at SQL GRANT
+        # level, even before RLS and state trigger are reached.
         with psycopg.connect(APP) as con:
-            affected=con.execute("""UPDATE abc.sessions SET state='PAUSED',
-                state_version=1,checkpoint='CREATED' WHERE session_id=%s""",
-                (self.sid,)).rowcount
-            self.assertEqual(affected,0)
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""UPDATE abc.sessions SET state='PAUSED',
+                    state_version=1,checkpoint='CREATED'
+                    WHERE session_id=%s""",(self.sid,))
         self.assertEqual(self.store.get(self.p,self.sid)["state"],"CREATED")
 
     def test_state_pause_approved_only_after_verified_membership_and_audited(self):
@@ -103,11 +102,24 @@ class ENG14DatabaseGate(unittest.TestCase):
             for k,v in (("abc.issuer",ISS),("abc.subject",self.s),
                         ("abc.tenant",self.t),("abc.branch",self.b)):
                 con.execute("SELECT set_config(%s,%s,true)",(k,v))
-            with self.assertRaises(psycopg.errors.CheckViolation):
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("""UPDATE abc.sessions SET state='CREATED',
                        checkpoint=NULL,state_version=state_version+1
                        WHERE session_id=%s""",(self.sid,))
         self.assertEqual(self.store.get(self.p,self.sid)["state"],"PAUSED")
+
+    def test_forged_custom_guc_cannot_grant_direct_state_update(self):
+        # Simulate stolen abc_app DB credentials with spoofed valid GUC values.
+        # SQL privilege boundary must still block state UPDATE.
+        with psycopg.connect(APP) as con:
+            for key,val in (("abc.issuer",ISS),("abc.subject",self.s),
+                            ("abc.tenant",self.t),("abc.branch",self.b)):
+                con.execute("SELECT set_config(%s,%s,true)",(key,val))
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""UPDATE abc.sessions SET state='PAUSED',
+                    checkpoint='CREATED',state_version=1
+                    WHERE session_id=%s""",(self.sid,))
+        self.assertEqual(self.store.get(self.p,self.sid)["state"],"CREATED")
 
     def test_revoked_specialist_cannot_mutate(self):
         with psycopg.connect(ADMIN) as con:

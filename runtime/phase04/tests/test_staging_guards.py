@@ -108,6 +108,7 @@ class StagingGuardTests(unittest.TestCase):
             "ABC_STAGING_APP_PASSWORD":"A"*32,
             "ABC_STAGING_WORKER_PASSWORD":"B"*32,
             "ABC_STAGING_ORCHESTRATOR_PASSWORD":"C"*32,
+            "ABC_STAGING_ANSWER_WORKER_PASSWORD":"D"*32,
         }
         self.assertIsInstance(validate_migrator_config(base),str)
         for bad in (
@@ -117,6 +118,8 @@ class StagingGuardTests(unittest.TestCase):
             {"ABC_STAGING_WORKER_PASSWORD":"A"*32},
             {"ABC_STAGING_ORCHESTRATOR_PASSWORD":"A"*32},
             {"ABC_STAGING_ORCHESTRATOR_PASSWORD":"short"},
+            {"ABC_STAGING_ANSWER_WORKER_PASSWORD":"A"*32},
+            {"ABC_STAGING_ANSWER_WORKER_PASSWORD":"short"},
             {"ABC_STAGING_MIGRATOR_DSN":"postgresql://postgres@db.private/abc_staging?sslmode=require"},
             {"ABC_STAGING_MIGRATOR_DSN":"postgresql://abc_staging_migrator@db.private/abc_staging"},
         ):

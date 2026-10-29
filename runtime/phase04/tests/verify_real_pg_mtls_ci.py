@@ -120,7 +120,7 @@ CMD ["postgres","-c","ssl=on","-c","ssl_min_protocol_version=TLSv1.3","-c","ssl_
                 "-e","POSTGRES_DB=abc_mtls_ci",
                 "-p","127.0.0.1::5432",tag)
             port_text=cmd("docker","port",container,"5432/tcp").stdout.strip()
-            match=re.search(r"127\\.0\\.0\\.1:(\\d+)",port_text)
+            match=re.search(r"127\.0\.0\.1:(\d+)",port_text)
             if not match: raise AssertionError("unexpected_docker_private_mapping")
             port=match.group(1)
             for attempt in range(50):

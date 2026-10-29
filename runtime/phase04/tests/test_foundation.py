@@ -241,5 +241,42 @@ class HttpTests(unittest.TestCase):
             self.assertEqual(json.loads(resp.read())["capability"],"LOCAL_INTEGRATION_ONLY")
 
 
+
+
+class CanonicalAlignmentTests(unittest.TestCase):
+    """Assert actual emitted DTO/event subsets against the frozen Phase-02 JSON definitions."""
+    @classmethod
+    def setUpClass(cls):
+        cls.root = pathlib.Path(__file__).resolve().parents[3]
+        cls.session = json.loads((cls.root/"contracts/v1/schemas/session.schema.json").read_text())
+        cls.event = json.loads((cls.root/"contracts/v1/schemas/event.schema.json").read_text())
+        cls.openapi = json.loads((cls.root/"contracts/v1/openapi.json").read_text())
+
+    def test_live_projection_conforms_to_canonical_session_fields(self):
+        with tempfile.TemporaryDirectory() as folder:
+            result=Store(pathlib.Path(folder)/"s.db").create(ACTOR,BODY,key("schema"))
+        self.assertTrue(set(self.session["required"]).issubset(result))
+        self.assertFalse(set(result)-set(self.session["properties"]))
+        self.assertIn(result["state"],self.session["properties"]["state"]["enum"])
+        self.assertEqual(result["scope"],self.session["properties"]["scope"]["const"])
+
+    def test_emitted_session_event_conforms_to_canonical_envelope(self):
+        with tempfile.TemporaryDirectory() as folder:
+            db=Store(pathlib.Path(folder)/"s.db")
+            db.create(ACTOR,BODY,key("event"))
+            e=db.pending_outbox("validator")[0]
+        self.assertTrue(set(self.event["required"]).issubset(e))
+        self.assertFalse(set(e)-set(self.event["properties"]))
+        self.assertIn(e["event_type"],self.event["properties"]["event_type"]["enum"])
+        self.assertIn(e["producer_engine_id"],self.event["properties"]["producer_engine_id"]["enum"])
+        self.assertEqual(e["actor"]["role"],"SPECIALIST")
+
+    def test_only_actual_v1_implemented_operations_are_advertised(self):
+        methods=self.openapi["paths"]
+        self.assertEqual(methods["/v1/consultations"]["post"]["operationId"],"createConsultation")
+        self.assertEqual(methods["/v1/consultations/{session_id}"]["get"]["operationId"],"getConsultation")
+        self.assertEqual(methods["/v1/consultations"]["post"]["x-abc-roles"],["SPECIALIST"])
+        self.assertIn("bearerAuth",methods["/v1/consultations"]["post"]["security"][0])
+
 if __name__ == "__main__":
     unittest.main()

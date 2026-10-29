@@ -158,6 +158,43 @@ class PostgresRuntimeTests(unittest.TestCase):
                      "client-B",["AI_PROCESSING"],"synthetic-hash","v1","policy-1"))
         self.assertFalse(self.store.has_verified_consent(self.principal,s["session_id"],"AI_PROCESSING"))
 
+
+    def test_pg_checkpoint_is_durable_across_adapter_restart_and_replay(self):
+        sid=self.create("create-for-checkpoint")["session_id"]
+        first=self.store.checkpoint_command(self.principal,sid,"pause",0,"pause-intent-0001")
+        self.assertEqual((first["state"],first["state_version"]),("PAUSED",1))
+        restarted=PostgresStore(DSN)
+        replay=restarted.checkpoint_command(self.principal,sid,"pause",0,"pause-intent-0001")
+        self.assertEqual(replay,first)
+        resume=restarted.checkpoint_command(self.principal,sid,"resume",1,"resume-intent-0001")
+        self.assertEqual((resume["state"],resume["state_version"]),("CREATED",2))
+        self.assertEqual(self.store.get(self.principal,sid)["state_version"],2)
+        with psycopg.connect(ADMIN) as con:
+            audit=con.execute("SELECT count(*) FROM abc.state_audit WHERE session_id=%s",(sid,)).fetchone()[0]
+        self.assertEqual(audit,2)
+
+    def test_pg_checkpoint_stale_concurrent_change_is_rejected(self):
+        sid=self.create("create-for-race")["session_id"]
+        def go(i):
+            try:
+                self.store.checkpoint_command(self.principal,sid,"pause",0,"distinct-race-"+str(i))
+                return 200
+            except DomainError as e:
+                return e.status
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            results=list(executor.map(go,range(5)))
+        self.assertEqual(results.count(200),1)
+        self.assertEqual(results.count(409),4)
+
+    def test_pg_checkpoint_replay_denied_after_membership_revocation(self):
+        sid=self.create("create-for-revoke")["session_id"]
+        self.store.checkpoint_command(self.principal,sid,"pause",0,"pause-revoke-0001")
+        with psycopg.connect(ADMIN) as con:
+            con.execute("UPDATE abc.memberships SET active=false WHERE subject=%s",(self.subject,))
+        with self.assertRaises(DomainError) as e:
+            self.store.checkpoint_command(self.principal,sid,"pause",0,"pause-revoke-0001")
+        self.assertEqual(e.exception.status,404)
+
     def test_pg_event_conforms_to_canonical_base_envelope(self):
         sid=self.create()["session_id"]
         with psycopg.connect(ADMIN) as con:

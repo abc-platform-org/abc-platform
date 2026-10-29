@@ -38,6 +38,10 @@ jobs:
         run: python -m pip install -r runtime/phase04/requirements.txt
       - name: Apply PostgreSQL migration with least-privilege runtime role
         run: python runtime/phase04/tests/bootstrap_postgres.py
+      - name: Install audited Blueprint YAML parser
+        run: python -m pip install PyYAML==6.0.2
+      - name: Enforce private Render staging topology
+        run: python scripts/validate_phase04_staging.py
       - name: Validate 41-operation Phase-02/04 traceability
         run: python scripts/validate_phase04.py
       - name: Compile local-only runtime
@@ -45,6 +49,15 @@ jobs:
       - name: Execute integration, isolation, replay and persistence tests
         working-directory: runtime/phase04
         run: python -m unittest discover -s tests -v
+      - name: Build nonroot staging container from exact PR code
+        run: docker build -f runtime/phase04/Dockerfile -t abc-phase04-staging:ci runtime/phase04
+      - name: Verify container refuses unconfigured staging startup
+        run: |
+          if docker run --rm abc-phase04-staging:ci python -m abc_foundation.staging_api; then
+            echo "FAIL: staging container started without credentials and private environment" >&2
+            exit 1
+          fi
+          echo "PASS: no implicit staging credentials or public start"
       - name: Check strict source constraints
         run: |
           python - <<'PY'

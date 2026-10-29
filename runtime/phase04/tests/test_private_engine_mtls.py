@@ -231,3 +231,27 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
                     server_name=host,certfile="unused",keyfile="unused",
                     ca_file="unused",token="unused",message={},
                     managed_private=True)
+
+    def test_real_render_private_dns_pins_exact_target_engine_and_tls_boundary(self):
+        from unittest.mock import patch
+        from abc_foundation.private_engine_transport import send_private_engine_message
+        good={"engine_id":"ENG-05","request_id":"synthetic"}
+        with patch("abc_foundation.private_engine_transport.require_mtls_context",
+                   side_effect=RuntimeError("managed_tls_boundary_reached")):
+            with self.assertRaisesRegex(RuntimeError,"managed_tls_boundary_reached"):
+                send_private_engine_message(
+                    host="abc-eng05-private-synthetic-a1b2c3",
+                    port=11005,server_name="abc-eng05-private-synthetic-a1b2c3",
+                    certfile="external",keyfile="external",ca_file="external",
+                    token="external",message=good,managed_private=True)
+            for host, msg in (
+                ("abc-eng06-private-synthetic-a1b2c3",good),
+                ("abc-eng05-private-synthetic-a1b2c3.example.com",good),
+                ("abc-eng05-private-synthetic-a1b2c3",{"engine_id":"ENG-04"}),
+                ("abc-eng05-private-synthetic-a1b2c3.onrender.com",good),
+            ):
+                with self.subTest(host=host,msg=msg),self.assertRaises(ValueError):
+                    send_private_engine_message(host=host,port=11005,
+                        server_name=host,certfile="external",keyfile="external",
+                        ca_file="external",token="external",message=msg,
+                        managed_private=True)

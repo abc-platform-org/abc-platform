@@ -77,3 +77,14 @@ python -m abc_foundation.service_session_index
 **No public port, no real customers, no automatic subscription provisioning.** Real per-workload service identities, protected secrets, monitoring, distributed scheduling, legal retention and live cloud infrastructure are not deployed. Purpose-scoped consent remains a verified-read-only gate; \`0005_consent_lifecycle.sql\` adds bounded validity and auditable immutable status transitions, not actual in-salon capture or attestation.
 
 See \`docs/04-platform/DURABLE_EVENTS_AND_SERVICE_BOUNDARIES.md\` for isolation decisions, test matrix and release blockers.
+
+
+## Render private staging packaging (not yet provisioned)
+
+- \`Dockerfile\`: non-root Python image with fixed direct package versions; API and Worker share only the build artifact, not database roles or launch command.
+- \`infra/render/staging.render.yaml\`: **custom-path** private service and background worker with managed PostgreSQL in Frankfurt, no public DB ingress and no automatic deploy. The repository does not create a public Render web service.
+- \`abc_foundation.staging_api\` and \`abc_foundation.staging_worker\`: independent, environment-gated entrypoints. Public OIDC and client/media workflows remain disabled. Separate DB credentials \`abc_app\` and \`abc_worker\`.
+- \`abc_foundation.staging_migrate\`: explicitly approved one-off database owner workflow; atomic SQL/checksum receipts. Never add migrator DB credentials to API/Worker env.
+- \`abc_foundation.staging_smoke\`: post-deploy private-network smoke using synthetic requests only.
+- Validation: \`python scripts/validate_phase04_staging.py\` from repo root, plus the Phase04 GitHub Actions integration job (real disposable PostgreSQL 16, six migrations, non-root Docker build, no-secret boot refusal).
+- **Current: code complete for staging operator review, infrastructure NOT DEPLOYED.** A Render dashboard Blueprint sync (private-only), budget signoff, managed IdP and DB administrative controls are still required. Read \`docs/04-platform/PRIVATE_STAGING_DEPLOYMENT_RUNBOOK.md\` before any environment creation.

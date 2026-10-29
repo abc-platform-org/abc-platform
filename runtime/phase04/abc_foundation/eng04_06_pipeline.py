@@ -17,6 +17,7 @@ from .eng04_analysis import SyntheticBeautyAnalysis,FIELDS
 from .eng05_knowledge import SyntheticKnowledgeEngine
 from .eng06_decision import SyntheticDecisionEngine
 from .store import DomainError
+from .pg_outbox import CONSUMER
 
 QUESTION_REGISTRY=json.loads(FIXTURE_PATH.read_text())["profiles"][0]
 _BY_FIELD={q["field"]:q for q in QUESTION_REGISTRY["questions"]}
@@ -24,10 +25,13 @@ _BY_FIELD={q["field"]:q for q in QUESTION_REGISTRY["questions"]}
 
 class SyntheticAnalysisPipeline:
     ENGINE_IDS=("ENG-04","ENG-05","ENG-06")
-    def __init__(self,dsn,*,knowledge_fixture=None):
+    def __init__(self,dsn,consumer_id,*,knowledge_fixture=None):
         if not isinstance(dsn,str) or not dsn:
             raise ValueError("independent_analysis_database_dsn_required")
+        if not isinstance(consumer_id,str) or not CONSUMER.fullmatch(consumer_id):
+            raise ValueError("bound_analysis_consumer_required")
         self.dsn=dsn
+        self.consumer_id=consumer_id
         self.fixture=knowledge_fixture
         # The knowledge engine independently rejects any unreviewed source.
         if knowledge_fixture is not None:
@@ -48,8 +52,9 @@ class SyntheticAnalysisPipeline:
         with self._connect() as con:
             item=con.execute("""WITH chosen AS (
                 SELECT job_id FROM abc.eng04_06_jobs
-                WHERE (status='QUEUED' AND next_attempt_at<=clock_timestamp())
-                   OR (status='LEASED' AND lease_until<=clock_timestamp())
+                WHERE consumer_id=%s AND (
+                      (status='QUEUED' AND next_attempt_at<=clock_timestamp())
+                   OR (status='LEASED' AND lease_until<=clock_timestamp()))
                 ORDER BY updated_at,job_id FOR UPDATE SKIP LOCKED LIMIT 1
             )
             UPDATE abc.eng04_06_jobs job
@@ -59,12 +64,13 @@ class SyntheticAnalysisPipeline:
             FROM chosen WHERE chosen.job_id=job.job_id
             RETURNING job.job_id,job.lease_token,job.consumer_id,job.tenant_id,
                       job.session_id,job.aggregate_version,job.source_evidence_id""",
-                (token,seconds)).fetchone()
+                (self.consumer_id,token,seconds)).fetchone()
             return {k:str(v) if isinstance(v,uuid.UUID) else v for k,v in item.items()} if item else None
 
     def _leased(self,con,job_id,token):
         row=con.execute("""SELECT * FROM abc.eng04_06_jobs
-                      WHERE job_id=%s FOR UPDATE""",(job_id,)).fetchone()
+                      WHERE job_id=%s AND consumer_id=%s FOR UPDATE""",
+                    (job_id,self.consumer_id)).fetchone()
         if row is None:
             raise DomainError(404,"analysis_job_not_found")
         now=con.execute("SELECT clock_timestamp() AS now").fetchone()["now"]

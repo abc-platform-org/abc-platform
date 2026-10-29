@@ -58,3 +58,22 @@ The PostgreSQL test path uses \`migrations/0001_postgres_core.sql\` and \`0002_c
 **Full technical and security review:** \`docs/04-platform/IDENTITY_POSTGRES_CONSENT_AUDIT_2026-10-29.md\`.
 
 The \`requirements.txt\` library versions are currently major-bounded, **not a production lockfile**. Dependency locking, security scanning, cloud secrets and ingress controls must be added before deploying.
+
+
+## Independent event projection process (staging proof)
+
+Separate outbox reconciliation and session-index processing now reside in \`abc_foundation/pg_outbox.py\`, \`abc_foundation/session_index_consumer.py\` and executable \`abc_foundation/service_session_index.py\`. They run with an **independent restricted PostgreSQL worker credential** — never the HTTP \`abc_app\` role — and require an **active admin-provisioned tenant subscription**. Job leasing, replay and a non-PII read-model projection are persisted; duplicate replay is idempotent after a crash between effect and ACK.
+
+For a disposable PostgreSQL staging environment only, following administrative migration and subscription setup:
+
+\`\`\`bash
+cd runtime/phase04
+export ABC_ENV=OIDC_PG_LOOPBACK_INTEGRATION
+export ABC_WORKER_DSN='<test-only worker connection secret>'
+export ABC_CONSUMER_ID='<admin-provisioned consumer ID>'
+python -m abc_foundation.service_session_index
+\`\`\`
+
+**No public port, no real customers, no automatic subscription provisioning.** Real per-workload service identities, protected secrets, monitoring, distributed scheduling, legal retention and live cloud infrastructure are not deployed. Purpose-scoped consent remains a verified-read-only gate; \`0005_consent_lifecycle.sql\` adds bounded validity and auditable immutable status transitions, not actual in-salon capture or attestation.
+
+See \`docs/04-platform/DURABLE_EVENTS_AND_SERVICE_BOUNDARIES.md\` for isolation decisions, test matrix and release blockers.

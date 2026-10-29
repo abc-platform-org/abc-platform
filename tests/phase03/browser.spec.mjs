@@ -29,6 +29,9 @@ test('complete synthetic salon journey never claims production execution',async(
  await page.locator('#feasible').check();await page.locator('#sop').check();await page.locator('#next').click();
  await page.locator('#qualified').check();await page.locator('#next').click();
  await page.locator('#next').click();await expect(page.locator('#title')).toHaveText('تحویل داخلی');
+ await page.locator('#shared').click();await expect(page.locator('#receipt')).toHaveCount(0);
+ await expect(page.locator('#workspace')).toContainText('جزئیات تحویل و رسید فقط در محیط اختصاصی');
+ await page.locator('#privacy').click();await page.locator('#privateConfirm').check();await page.locator('#enterPrivate').click();
  await page.locator('#next').click();await expect(page.locator('#notice')).toContainText('رسید');
  await page.locator('#receipt').click();await page.locator('#next').click();
  await expect(page.locator('#title')).toHaveText('پایان جلسه');

@@ -386,10 +386,10 @@ BEGIN
        OR candidate->>'hard_filter_status' IS DISTINCT FROM 'CONDITIONALLY_PASSED'
        OR candidate->>'reason' IS DISTINCT FROM 'SYNTHETIC_TEST_ONLY_REQUIRES_PROFESSIONAL_REVIEW'
        OR NOT EXISTS (
-          SELECT 1 FROM jsonb_array_elements(NEW.knowledge_json->'grounded_facts') AS item(fact)
-          WHERE item.fact->>'key'=candidate->>'candidate_id'
-             AND item.fact->>'source_id'='synthetic:offline-catalog'
-             AND item.fact->'value'='true'::jsonb)
+          SELECT 1 FROM jsonb_array_elements(NEW.knowledge_json->'grounded_facts') AS source_fact(fact_json)
+          WHERE source_fact.fact_json->>'key'=candidate->>'candidate_id'
+             AND source_fact.fact_json->>'source_id'='synthetic:offline-catalog'
+             AND source_fact.fact_json->'value'='true'::jsonb)
     THEN
        RAISE EXCEPTION 'synthetic candidate was upgraded or invented' USING ERRCODE='23514';
     END IF;

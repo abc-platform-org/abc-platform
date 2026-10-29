@@ -6,6 +6,7 @@ from psycopg.conninfo import conninfo_to_dict
 from .http_api import handler_factory
 from .oidc import OIDCVerifier
 from .pg_store import PostgresStore
+from .managed_pg_store import ManagedMTLSPostgresStore
 
 
 def validate_staging_dsn(dsn, expected_role):
@@ -50,10 +51,24 @@ def make_private_server(environ=None, store=None, verifier=None):
     if port < 1024 or port > 65535:
         raise ValueError("invalid_staging_port")
     if store is None:
-        dsn = env.get("ABC_PG_DSN")
-        validate_staging_dsn(dsn, "abc_app")
-        store = PostgresStore(dsn)
-        assert_staging_database(store, "abc_app", ["abc.sessions", "abc.memberships", "abc.consent_evidence"])
+        dsn=env.get("ABC_PG_DSN")
+        auth_mode=env.get("ABC_DB_AUTH_MODE","LEGACY_SYNTHETIC")
+        if auth_mode=="MANAGED_MTLS":
+            required=("ABC_DB_WORKLOAD_LOGIN","ABC_DB_CLIENT_DN",
+                      "ABC_DB_ISSUER_DN","ABC_DB_CERT_SERIAL")
+            if any(not env.get(item) for item in required):
+                raise ValueError("managed_mtls_database_identity_pins_required")
+            store=ManagedMTLSPostgresStore(
+                dsn,expected_login=env["ABC_DB_WORKLOAD_LOGIN"],
+                client_dn=env["ABC_DB_CLIENT_DN"],issuer_dn=env["ABC_DB_ISSUER_DN"],
+                certificate_serial=env["ABC_DB_CERT_SERIAL"])
+        elif auth_mode=="LEGACY_SYNTHETIC":
+            validate_staging_dsn(dsn,"abc_app")
+            store=PostgresStore(dsn)
+        else:
+            raise ValueError("unapproved_database_auth_mode")
+        assert_staging_database(store,"abc_app",
+            ["abc.sessions","abc.memberships","abc.consent_evidence"])
     if verifier is None:
         for key in ("ABC_OIDC_ISSUER", "ABC_OIDC_AUDIENCE", "ABC_OIDC_JWKS_URI"):
             if not env.get(key):

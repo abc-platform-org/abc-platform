@@ -233,6 +233,45 @@ class ENG02PostgresIntegration(unittest.TestCase):
             state=con.execute("SELECT state_version FROM abc.sessions WHERE session_id=%s",(self.sid,)).fetchone()[0]
         self.assertEqual(state,0)
 
+    def test_four_answer_sequence_is_versioned_and_outboxed_once_each(self):
+        ids=("synthetic:prior-treatment","synthetic:sensitivity",
+             "synthetic:desired-goal","synthetic:maintenance")
+        values=("NO","NO","SUBTLE","LOW")
+        for index,(qid,val) in enumerate(zip(ids,values),start=1):
+            command={**self.cmd,"command_id":str(uuid.uuid4()),
+                 "question_id":qid,"value":val,"expected_state_version":index-1}
+            outcome=self.execute(cmd=command)
+            self.assertEqual(outcome["aggregate_version"],index)
+            self.assertEqual(outcome,self.execute(cmd=command))
+        self.assertEqual(self.count("abc.eng02_answers"),4)
+        self.assertEqual(self.count("abc.outbox"),5)
+        self.assertEqual(self.count("abc.eng02_command_receipts"),4)
+        with psycopg.connect(ADMIN) as con:
+            rows=con.execute("""SELECT aggregate_version,event_json
+                FROM abc.outbox WHERE aggregate_id=%s ORDER BY aggregate_version""",
+                (self.sid,)).fetchall()
+            self.assertEqual([x[0] for x in rows],[0,1,2,3,4])
+            self.assertEqual([x[1]["payload"]["question_id"] for x in rows[1:]],list(ids))
+            self.assertEqual(con.execute("""SELECT state,state_version FROM abc.sessions
+                WHERE session_id=%s""",(self.sid,)).fetchone(),("CREATED",4))
+
+    def test_out_of_order_question_and_malicious_answer_type_denied(self):
+        wrong={**self.cmd,"question_id":"synthetic:maintenance","value":"LOW"}
+        with self.assertRaises(DomainError) as e:
+            self.execute(cmd=wrong)
+        self.assertEqual(e.exception.code,"question_order_or_duplicate_denied")
+        wrong={**self.cmd,"value":"NOT_AN_APPROVED_VALUE"}
+        with self.assertRaises(DomainError) as e:
+            self.execute(cmd=wrong)
+        self.assertEqual(e.exception.status,400)
+        self.assertEqual(self.count("abc.outbox"),1)
+
+    def test_gateway_identity_cannot_provision_its_own_workload_grant(self):
+        with psycopg.connect(ORCH) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""UPDATE abc.engine_workload_grants SET active=true
+                         WHERE tenant_id=%s""",(self.tenant,))
+
     def test_role_cannot_read_other_engine_records(self):
         with psycopg.connect(ORCH) as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):

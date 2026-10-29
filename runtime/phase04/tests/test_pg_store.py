@@ -199,6 +199,65 @@ class PostgresRuntimeTests(unittest.TestCase):
             self.store.checkpoint_command(self.principal,sid,"pause",0,"pause-revoke-0001")
         self.assertEqual(e.exception.status,404)
 
+
+    def test_pg_consent_immutable_proof_and_non_resurrection(self):
+        client="synthetic-"+uuid.uuid4().hex[:10]
+        sid=self.store.create(self.principal,{**self.body(),"client_id":client},"consent-lifecycle-1")["session_id"]
+        cid=uuid.uuid4()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.consent_evidence
+                (consent_id,tenant_id,branch_id,session_id,client_id,status,purpose,
+                 evidence_digest,disclosure_version,retention_policy_id)
+                VALUES(%s,%s,%s,%s,%s,'PENDING_VERIFICATION',%s,%s,%s,%s)""",
+                (cid,self.tenant,self.branch,sid,client,["AI_PROCESSING"],
+                 "proof-hash-synthetic-123","disclosure-1","retention-1"))
+            con.execute("""UPDATE abc.consent_evidence SET status='ACTIVE',
+                verified_at=now(),valid_until=now()+interval '1 day' WHERE consent_id=%s""",(cid,))
+        self.assertTrue(self.store.has_verified_consent(self.principal,sid,"AI_PROCESSING"))
+        with psycopg.connect(ADMIN) as con:
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("UPDATE abc.consent_evidence SET purpose=ARRAY['CAPTURE'] WHERE consent_id=%s",(cid,))
+        with psycopg.connect(ADMIN) as con:
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("""UPDATE abc.consent_evidence
+                    SET valid_until=now()+interval '2 days' WHERE consent_id=%s""",(cid,))
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.consent_evidence SET status='WITHDRAWN',revoked_at=now()
+                         WHERE consent_id=%s""",(cid,))
+        self.assertFalse(self.store.has_verified_consent(self.principal,sid,"AI_PROCESSING"))
+        with psycopg.connect(ADMIN) as con:
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("""UPDATE abc.consent_evidence SET status='ACTIVE',revoked_at=NULL
+                    WHERE consent_id=%s""",(cid,))
+        with psycopg.connect(ADMIN) as con:
+            audits=con.execute("""SELECT before_status,after_status FROM abc.consent_status_audit
+                    WHERE consent_id=%s ORDER BY recorded_at""",(cid,)).fetchall()
+        self.assertEqual([a[1] for a in audits],["PENDING_VERIFICATION","ACTIVE","WITHDRAWN"])
+
+    def test_pg_consent_activation_cannot_skip_verification(self):
+        client="synthetic-"+uuid.uuid4().hex[:10]
+        sid=self.store.create(self.principal,{**self.body(),"client_id":client},"consent-lifecycle-2")["session_id"]
+        with psycopg.connect(ADMIN) as con:
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("""INSERT INTO abc.consent_evidence
+                    (consent_id,tenant_id,branch_id,session_id,client_id,status,purpose,
+                     evidence_digest,disclosure_version,retention_policy_id,verified_at,valid_until)
+                    VALUES(%s,%s,%s,%s,%s,'ACTIVE',%s,%s,%s,%s,now(),now()+interval '1 day')""",
+                    (uuid.uuid4(),self.tenant,self.branch,sid,client,["AI_PROCESSING"],
+                     "synthetic-proof-123","v1","retention-1"))
+        cid=uuid.uuid4()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.consent_evidence
+                    (consent_id,tenant_id,branch_id,session_id,client_id,status,purpose,
+                     evidence_digest,disclosure_version,retention_policy_id)
+                    VALUES(%s,%s,%s,%s,%s,'PENDING_VERIFICATION',%s,%s,%s,%s)""",
+                    (cid,self.tenant,self.branch,sid,client,["AI_PROCESSING"],
+                     "synthetic-proof-123","v1","retention-1"))
+        with psycopg.connect(ADMIN) as con:
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("UPDATE abc.consent_evidence SET status='ACTIVE' WHERE consent_id=%s",(cid,))
+        self.assertFalse(self.store.has_verified_consent(self.principal,sid,"AI_PROCESSING"))
+
     def test_pg_event_conforms_to_canonical_base_envelope(self):
         sid=self.create()["session_id"]
         with psycopg.connect(ADMIN) as con:

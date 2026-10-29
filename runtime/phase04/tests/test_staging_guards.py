@@ -92,6 +92,28 @@ class StagingGuardTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             configure_engine_worker("UNKNOWN",base)
 
+    def test_engine_staging_requires_exact_scoped_login_not_group_secret(self):
+        prefix={"ABC_ENV":"STAGING_PRIVATE",
+              "ABC_STAGING_PURPOSE":"SYNTHETIC_NO_CLIENT_DATA",
+              "ABC_NETWORK_BOUNDARY":"RENDER_BACKGROUND_WORKER",
+              "ABC_ENGINE_CONSUMER_ID":"approved-consumer-test",
+              "ABC_ENGINE_TENANT_ID":"synthetic-test-tenant",
+              "ABC_ENGINE_DSN":"postgresql://abc_eng03_worker:old@db.private/abc_staging?sslmode=require"}
+        with self.assertRaisesRegex(ValueError,"per_consumer_database_login_required"):
+            configure_engine_worker("ENG03",prefix)
+        with self.assertRaisesRegex(ValueError,"staging_database_role_mismatch"):
+            configure_engine_worker("ENG03",{
+                **prefix,"ABC_ENGINE_WORKLOAD_LOGIN":"abc_e3_0123456789abcd"
+            })
+        with self.assertRaisesRegex(ValueError,"per_consumer_database_login_required"):
+            configure_engine_worker("ENG03",{
+                **prefix,"ABC_ENGINE_WORKLOAD_LOGIN":"abc_p6_0123456789abcd"
+            })
+        with self.assertRaisesRegex(ValueError,"per_consumer_database_login_required"):
+            configure_engine_worker("PIPELINE",{
+                **prefix,"ABC_ENGINE_WORKLOAD_LOGIN":"abc_e3_0123456789abcd"
+            })
+
     def test_private_smoke_rejects_public_and_unexpected_urls(self):
         bad=[
             "https://abc-p04-private-api-abc.onrender.com",

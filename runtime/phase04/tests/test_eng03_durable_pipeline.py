@@ -64,8 +64,8 @@ class ENG03PipelineTests(unittest.TestCase):
         },"eng03-create-"+marker)["session_id"]
         self.writer=PGENG02CommandWriter(ORCH)
         self.answer_worker=AnswerIndexConsumer(ANSWER,self.consumer)
-        self.worker=ENG03Executor(ENG03)
-        self.pipeline=SyntheticAnalysisPipeline(PIPELINE)
+        self.worker=ENG03Executor(ENG03,self.consumer)
+        self.pipeline=SyntheticAnalysisPipeline(PIPELINE,self.consumer)
 
     def answer(self,qid="synthetic:prior-treatment",value="NO",version=0):
         command={
@@ -124,7 +124,7 @@ class ENG03PipelineTests(unittest.TestCase):
             con.execute("""UPDATE abc.eng03_input_jobs
                 SET lease_until=clock_timestamp()-interval '1 second'
                 WHERE job_id=%s""",(leased["job_id"],))
-        fresh=ENG03Executor(ENG03).claim()
+        fresh=ENG03Executor(ENG03,self.consumer).claim()
         self.assertEqual(fresh["job_id"],leased["job_id"])
         self.assertNotEqual(fresh["lease_token"],leased["lease_token"])
         with self.assertRaises(DomainError) as ex:
@@ -214,7 +214,7 @@ class ENG03PipelineTests(unittest.TestCase):
         with psycopg.connect(ADMIN) as con:
             self.assertEqual(con.execute("SELECT count(*) FROM abc.eng03_evidence_ledger WHERE session_id=%s",
                                        (self.sid,)).fetchone()[0],4)
-        fixture_pipeline=SyntheticAnalysisPipeline(PIPELINE,knowledge_fixture=FIXTURE)
+        fixture_pipeline=SyntheticAnalysisPipeline(PIPELINE,self.consumer,knowledge_fixture=FIXTURE)
         for _ in range(4):
             item=fixture_pipeline.claim()
             self.assertIsNotNone(item)

@@ -195,3 +195,39 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
                        {"ABC_ENGINE_PORT":"80"}):
             with self.subTest(change=change),self.assertRaises(ValueError):
                 configure_private_engine_service({**config,**change})
+
+    def test_private_staging_service_must_be_distinct_and_externally_provisioned(self):
+        from unittest.mock import patch,Mock
+        env={"ABC_ENV":"STAGING_PRIVATE",
+             "ABC_NETWORK_BOUNDARY":"RENDER_PRIVATE_SERVICE",
+             "ABC_RENDER_SERVICE_KIND":"PRIVATE",
+             "ABC_STAGING_PURPOSE":"SYNTHETIC_NO_CLIENT_DATA",
+             "ABC_ENGINE_SYNTHETIC_ONLY":"true",
+             "ABC_ENGINE_ID":"ENG-05","ABC_CALLER_ENGINE_ID":"ENG-03",
+             "ABC_ENGINE_CONSUMER_ID":"ci-consumer-01",
+             "ABC_ENGINE_PORT":"11005",
+             "ABC_TLS_CERT_FILE":"/run/secrets/engine.crt",
+             "ABC_TLS_KEY_FILE":"/run/secrets/engine.key",
+             "ABC_TLS_CA_FILE":"/run/secrets/trust.crt",
+             "ABC_WORKLOAD_ISSUER":"https://issuer.abc-ci.example",
+             "ABC_WORKLOAD_JWKS_URL":"https://issuer.abc-ci.example/jwks"}
+        with patch("abc_foundation.private_engine_service_server.private_engine_server",
+                   return_value=Mock()) as builder:
+            configure_private_engine_service(env)
+            self.assertEqual(builder.call_args.kwargs["host"],"0.0.0.0")
+            self.assertTrue(builder.call_args.kwargs["managed_private"])
+        for tamper in ({"ABC_RENDER_SERVICE_KIND":"WEB"},
+                       {"ABC_NETWORK_BOUNDARY":"PUBLIC_HTTP"},
+                       {"ABC_TLS_KEY_FILE":""},
+                       {"ABC_ENV":"PRODUCTION"}):
+            with self.subTest(tamper=tamper),self.assertRaises(ValueError):
+                configure_private_engine_service({**env,**tamper})
+
+    def test_managed_private_client_rejects_public_and_unpinned_dns(self):
+        for host in ("public.example.com","abc-engine.onrender.com",
+                     "abc-engine.internal.evil.com","http://abc-engine.internal"):
+            with self.subTest(host=host),self.assertRaises(ValueError):
+                send_private_engine_message(host=host,port=10000,
+                    server_name=host,certfile="unused",keyfile="unused",
+                    ca_file="unused",token="unused",message={},
+                    managed_private=True)

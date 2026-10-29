@@ -270,3 +270,103 @@ class PostgresRuntimeTests(unittest.TestCase):
         self.assertEqual(doc["tenant_id"],self.tenant)
         self.assertEqual(doc["aggregate_version"],0)
         self.assertEqual(doc["payload"]["branch_id"],self.branch)
+
+    def test_broker_is_only_session_and_outbox_write_authority(self):
+        session_id, event_id = uuid.uuid4(), uuid.uuid4()
+        with psycopg.connect(DSN) as con:
+            self.store._scope(con, ISS, self.subject,self.tenant,self.branch)
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""INSERT INTO abc.sessions
+                   (session_id,tenant_id,branch_id,specialist_id,state,
+                    state_version,created_at,updated_at,last_event_id)
+                   VALUES(%s,%s,%s,%s,'CREATED',0,now(),now(),%s)""",
+                   (session_id,self.tenant,self.branch,self.subject,event_id))
+        with psycopg.connect(DSN) as con:
+            self.store._scope(con, ISS, self.subject,self.tenant,self.branch)
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""INSERT INTO abc.outbox
+                     (event_id,tenant_id,aggregate_id,aggregate_version,event_json,created_at)
+                     VALUES(%s,%s,%s,0,'{}'::jsonb,now())""",
+                    (event_id,self.tenant,session_id))
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("SELECT count(*) FROM abc.sessions WHERE session_id=%s",
+                                         (session_id,)).fetchone()[0],0)
+
+    def test_direct_create_receipt_forgery_denied(self):
+        with psycopg.connect(DSN) as con:
+            self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("""INSERT INTO abc.idempotency
+                    (tenant_id,actor_id,operation,request_key,fingerprint,response_json)
+                    VALUES(%s,%s,'create','forged-receipt-1','fake','{}'::jsonb)""",
+                    (self.tenant,self.subject))
+
+    def test_broker_writes_exactly_one_version_zero_audit_and_event(self):
+        result=self.create("create-broker-audit-1")
+        sid=result["session_id"]
+        with psycopg.connect(ADMIN) as con:
+            rows=con.execute("""SELECT a.tenant_id,a.actor_id,
+                a.event_id,o.aggregate_version,o.event_json->>'event_type',
+                s.state,s.state_version
+                FROM abc.eng01_create_audit a
+                JOIN abc.sessions s ON s.session_id=a.session_id
+                JOIN abc.outbox o ON o.event_id=a.event_id
+                WHERE a.session_id=%s""",(sid,)).fetchall()
+        self.assertEqual(rows,[(self.tenant,self.subject,
+                     uuid.UUID(result["last_event_id"]),0,"SESSION_CREATED","CREATED",0)])
+        self.assertEqual(self.create("create-broker-audit-1"),result)
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng01_create_audit
+                   WHERE session_id=%s""",(sid,)).fetchone()[0],1)
+
+    def test_service_login_binding_is_admin_only_and_physically_authenticated(self):
+        # Disposable test login: real staging additionally requires mutual TLS
+        # and externally managed certificate-to-login enrollment.
+        from psycopg import sql
+        from psycopg.conninfo import make_conninfo
+        suffix=uuid.uuid4().hex[:16]
+        login="abc_api_"+suffix
+        password="ci-disposable-"+suffix
+        with psycopg.connect(ADMIN) as admin:
+            admin.execute(sql.SQL("""CREATE ROLE {} LOGIN NOINHERIT
+                NOSUPERUSER NOCREATEROLE NOBYPASSRLS PASSWORD {}""").format(
+                sql.Identifier(login),sql.Literal(password)))
+            admin.execute(sql.SQL("GRANT abc_app TO {} WITH SET TRUE").format(
+                sql.Identifier(login)))
+        login_dsn=make_conninfo(DSN,user=login,password=password)
+        body=json.dumps(self.body())
+        # No binding => physical session_user cannot invent authorization.
+        with self.assertRaises(psycopg.errors.CheckViolation):
+            with psycopg.connect(login_dsn) as con:
+                con.execute("SET ROLE abc_app")
+                self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+                con.execute("SELECT abc.eng01_create_session(%s::jsonb,%s)",
+                            (body,"unbound-managed-1"))
+        with psycopg.connect(DSN) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""INSERT INTO abc.eng01_api_login_bindings
+                    (login_name,tenant_id,consumer_id,engine_id,active,approved_at)
+                    VALUES(%s,%s,'forged','ENG-01',true,now())""",
+                    (login,self.tenant))
+        with psycopg.connect(ADMIN) as admin:
+            admin.execute("""INSERT INTO abc.eng01_api_login_bindings
+                (login_name,tenant_id,consumer_id,engine_id,active,approved_at)
+                VALUES(%s,%s,'ci-managed-consumer','ENG-01',true,now())""",
+                (login,self.tenant))
+        with psycopg.connect(login_dsn) as con:
+            con.execute("SET ROLE abc_app")
+            self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+            row=con.execute("SELECT abc.eng01_create_session(%s::jsonb,%s)",
+                            (body,"approved-managed-1")).fetchone()[0]
+        self.assertEqual(row["state"],"CREATED")
+        self.assertEqual(row["tenant_id"],self.tenant)
+        with psycopg.connect(ADMIN) as admin:
+            admin.execute("""UPDATE abc.eng01_api_login_bindings SET active=false
+                        WHERE login_name=%s AND tenant_id=%s""",
+                        (login,self.tenant))
+        with self.assertRaises(psycopg.errors.CheckViolation):
+            with psycopg.connect(login_dsn) as con:
+                con.execute("SET ROLE abc_app")
+                self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+                con.execute("SELECT abc.eng01_create_session(%s::jsonb,%s)",
+                            (body,"revoked-managed-1"))

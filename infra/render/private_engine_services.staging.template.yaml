@@ -1,0 +1,114 @@
+# NON-ACTIVE BLUEPRINT CANDIDATE. DO NOT APPLY WITHOUT SECURITY AND COST APPROVAL.
+# Render private service topology only; never replace with public web services.
+# External operator must provision certificate/key/CA secret mounts and
+# managed workload issuer, approve billing and prove private-only routing.
+# RootDir/Dockerfile and Render Blueprint syntax require provider preflight.
+services:
+  - type: pserv
+    name: abc-eng04-private-synthetic
+    runtime: docker
+    rootDir: runtime/phase04
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m abc_foundation.private_engine_service_server
+    autoDeployTrigger: "off"
+    envVars:
+      - key: ABC_ENV
+        value: STAGING_PRIVATE
+      - key: ABC_NETWORK_BOUNDARY
+        value: RENDER_PRIVATE_SERVICE
+      - key: ABC_RENDER_SERVICE_KIND
+        value: PRIVATE
+      - key: ABC_STAGING_PURPOSE
+        value: SYNTHETIC_NO_CLIENT_DATA
+      - key: ABC_ENGINE_SYNTHETIC_ONLY
+        value: "true"
+      - key: ABC_ENGINE_ID
+        value: ENG-04
+      - key: ABC_CALLER_ENGINE_ID
+        value: ENG-03
+      - key: ABC_ENGINE_PORT
+        value: "11004"
+      - key: ABC_ENGINE_CONSUMER_ID
+        sync: false
+      - key: ABC_WORKLOAD_ISSUER
+        sync: false
+      - key: ABC_WORKLOAD_JWKS_URL
+        sync: false
+      - key: ABC_TLS_CERT_FILE
+        sync: false
+      - key: ABC_TLS_KEY_FILE
+        sync: false
+      - key: ABC_TLS_CA_FILE
+        sync: false
+  - type: pserv
+    name: abc-eng05-private-synthetic
+    runtime: docker
+    rootDir: runtime/phase04
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m abc_foundation.private_engine_service_server
+    autoDeployTrigger: "off"
+    envVars:
+      - key: ABC_ENV
+        value: STAGING_PRIVATE
+      - key: ABC_NETWORK_BOUNDARY
+        value: RENDER_PRIVATE_SERVICE
+      - key: ABC_RENDER_SERVICE_KIND
+        value: PRIVATE
+      - key: ABC_STAGING_PURPOSE
+        value: SYNTHETIC_NO_CLIENT_DATA
+      - key: ABC_ENGINE_SYNTHETIC_ONLY
+        value: "true"
+      - key: ABC_ENGINE_ID
+        value: ENG-05
+      - key: ABC_CALLER_ENGINE_ID
+        value: ENG-03
+      - key: ABC_ENGINE_PORT
+        value: "11005"
+      - key: ABC_ENGINE_CONSUMER_ID
+        sync: false
+      - key: ABC_WORKLOAD_ISSUER
+        sync: false
+      - key: ABC_WORKLOAD_JWKS_URL
+        sync: false
+      - key: ABC_TLS_CERT_FILE
+        sync: false
+      - key: ABC_TLS_KEY_FILE
+        sync: false
+      - key: ABC_TLS_CA_FILE
+        sync: false
+  - type: pserv
+    name: abc-eng06-private-synthetic
+    runtime: docker
+    rootDir: runtime/phase04
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m abc_foundation.private_engine_service_server
+    autoDeployTrigger: "off"
+    envVars:
+      - key: ABC_ENV
+        value: STAGING_PRIVATE
+      - key: ABC_NETWORK_BOUNDARY
+        value: RENDER_PRIVATE_SERVICE
+      - key: ABC_RENDER_SERVICE_KIND
+        value: PRIVATE
+      - key: ABC_STAGING_PURPOSE
+        value: SYNTHETIC_NO_CLIENT_DATA
+      - key: ABC_ENGINE_SYNTHETIC_ONLY
+        value: "true"
+      - key: ABC_ENGINE_ID
+        value: ENG-06
+      - key: ABC_CALLER_ENGINE_ID
+        value: ENG-03
+      - key: ABC_ENGINE_PORT
+        value: "11006"
+      - key: ABC_ENGINE_CONSUMER_ID
+        sync: false
+      - key: ABC_WORKLOAD_ISSUER
+        sync: false
+      - key: ABC_WORKLOAD_JWKS_URL
+        sync: false
+      - key: ABC_TLS_CERT_FILE
+        sync: false
+      - key: ABC_TLS_KEY_FILE
+        sync: false
+      - key: ABC_TLS_CA_FILE
+        sync: false

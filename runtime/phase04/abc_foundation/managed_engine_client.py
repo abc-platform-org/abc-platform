@@ -38,7 +38,8 @@ class ManagedMTLSEngineClient:
              host=target["host"],port=target["port"],
              server_name=target["server_name"],
              certfile=self.client_cert,keyfile=self.client_key,
-             ca_file=self.trust_ca,token=token,message=msg)
+             ca_file=self.trust_ca,token=token,message=msg,
+             managed_private=target["host"]!="127.0.0.1")
         if (not isinstance(result,dict) or result.get("engine_id")!=engine_id
             or result.get("request_id")!=msg["request_id"]
             or result.get("consumer_id")!=consumer_id

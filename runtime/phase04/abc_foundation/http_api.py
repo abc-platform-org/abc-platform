@@ -91,8 +91,6 @@ def handler_factory(store, signing_secret, identity_verifier=None):
                     body = self._body()
                     if body:
                         raise DomainError(400, "unexpected_command_body")
-                    if identity_verifier is not None:
-                        raise DomainError(501, "checkpoint_migration_not_implemented")
                     result = store.checkpoint_command(
                         actor, match.group(1), match.group(2),
                         self._expected(), self.headers.get("Idempotency-Key"))

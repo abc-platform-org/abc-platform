@@ -66,4 +66,48 @@ REVOKE ALL ON FUNCTION abc.eng14_state_transition_gate() FROM PUBLIC;
 CREATE TRIGGER eng14_state_transition_gate_before_update
   BEFORE UPDATE OF state ON abc.sessions
   FOR EACH ROW EXECUTE FUNCTION abc.eng14_state_transition_gate();
+-- Direct application SQL may update answer metadata, not state/checkout.
+-- Remove the legacy table-level UPDATE grant, then allow non-state fields only.
+REVOKE UPDATE ON abc.sessions FROM abc_app;
+GRANT UPDATE(state_version,updated_at,last_event_id) ON abc.sessions TO abc_app;
+CREATE FUNCTION abc.eng14_apply_pause(p_session uuid,p_expected_version integer)
+RETURNS SETOF abc.sessions
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,abc
+AS $apply$
+BEGIN
+  IF session_user<>'abc_app' OR p_expected_version<0
+    OR current_setting('abc.issuer',true) NOT LIKE 'https://%'
+    OR current_setting('abc.subject',true) IS NULL
+    OR current_setting('abc.tenant',true) IS NULL
+    OR current_setting('abc.branch',true) IS NULL
+    OR NOT EXISTS(
+        SELECT 1 FROM abc.sessions s
+          JOIN abc.memberships m
+            ON m.issuer=current_setting('abc.issuer',true)
+           AND m.subject=s.specialist_id AND m.role='SPECIALIST'
+           AND m.tenant_id=s.tenant_id AND m.branch_id=s.branch_id
+           AND m.active
+        WHERE s.session_id=p_session AND s.state='CREATED'
+          AND s.state_version=p_expected_version
+          AND s.specialist_id=current_setting('abc.subject',true)
+          AND s.tenant_id=current_setting('abc.tenant',true)
+          AND s.branch_id=current_setting('abc.branch',true)
+        FOR SHARE OF m)
+  THEN
+    RAISE EXCEPTION 'ENG14 state transition broker denied'
+      USING ERRCODE='23514';
+  END IF;
+  RETURN QUERY UPDATE abc.sessions s
+    SET state='PAUSED',checkpoint='CREATED',
+        state_version=s.state_version+1,updated_at=clock_timestamp()
+    WHERE s.session_id=p_session AND s.state='CREATED'
+      AND s.state_version=p_expected_version
+      AND s.tenant_id=current_setting('abc.tenant',true)
+      AND s.branch_id=current_setting('abc.branch',true)
+      AND s.specialist_id=current_setting('abc.subject',true)
+    RETURNING s.*;
+END;
+$apply$;
+REVOKE ALL ON FUNCTION abc.eng14_apply_pause(uuid,integer) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION abc.eng14_apply_pause(uuid,integer) TO abc_app;
 COMMIT;

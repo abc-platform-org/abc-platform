@@ -7,8 +7,8 @@ services:
   - type: pserv
     name: abc-eng04-private-synthetic
     runtime: docker
-    rootDir: runtime/phase04
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./runtime/phase04/Dockerfile
+    dockerContext: ./runtime/phase04
     dockerCommand: python -m abc_foundation.private_engine_service_server
     autoDeployTrigger: "off"
     envVars:
@@ -43,8 +43,8 @@ services:
   - type: pserv
     name: abc-eng05-private-synthetic
     runtime: docker
-    rootDir: runtime/phase04
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./runtime/phase04/Dockerfile
+    dockerContext: ./runtime/phase04
     dockerCommand: python -m abc_foundation.private_engine_service_server
     autoDeployTrigger: "off"
     envVars:
@@ -79,8 +79,8 @@ services:
   - type: pserv
     name: abc-eng06-private-synthetic
     runtime: docker
-    rootDir: runtime/phase04
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./runtime/phase04/Dockerfile
+    dockerContext: ./runtime/phase04
     dockerCommand: python -m abc_foundation.private_engine_service_server
     autoDeployTrigger: "off"
     envVars:

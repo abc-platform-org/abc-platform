@@ -47,3 +47,14 @@ python -m unittest discover -s tests -v
 The local store additionally exercises \`NO_MEDIA_TEST_FIXTURE\` jobs with durable queue state, atomic leases, bounded retry, dead-letter and stale-worker rejection. These methods have **no HTTP exposure**, no actual model calls and never accept image bytes. Pausing a session fences outstanding fixture jobs atomically. Tests prove crash/restart and old-lease denial. This is a prerequisite for future ENG-01 worker orchestration, not an implementation of ENG-08..11 visual engines.
 
 The frozen Phase-02 API inventory is explicitly tracked: 2 operations have a local harness; 39 remain unimplemented, all 41 \`NOT_RELEASED\`. Run \`python scripts/validate_phase04.py\` from repository root.
+
+
+## OIDC + PostgreSQL integration branch (newer than local-only section above)
+
+The **separate** \`abc_foundation.server_oidc\` entry connects a pinned RSA-signed OIDC access-token verifier with PostgreSQL membership/RLS session persistence. It remains loopback-only and refuses to start without \`ABC_ENV=OIDC_PG_LOOPBACK_INTEGRATION\`, \`ABC_OIDC_ISSUER\`, \`ABC_OIDC_AUDIENCE\`, \`ABC_OIDC_JWKS_URI\`, \`ABC_PG_DSN\`. This is a staging harness, **not production ingress or a public IdP connection**.
+
+The PostgreSQL test path uses \`migrations/0001_postgres_core.sql\` and \`0002_checkpoint_audit.sql\` in an ephemeral Postgres 16 service. OIDC tests sign JWTs with fresh in-memory test RSA keys and never issue public auth tokens. The specialist's tenant, role and branch must come from active DB memberships, never untrusted JWT attributes. Consent \`ACTIVE\` is not actionable without externally verified proof; \`has_verified_consent\` is read-only, and public consent/media endpoints still fail closed.
+
+**Full technical and security review:** \`docs/04-platform/IDENTITY_POSTGRES_CONSENT_AUDIT_2026-10-29.md\`.
+
+The \`requirements.txt\` library versions are currently major-bounded, **not a production lockfile**. Dependency locking, security scanning, cloud secrets and ingress controls must be added before deploying.

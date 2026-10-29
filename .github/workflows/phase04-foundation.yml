@@ -54,6 +54,10 @@ jobs:
         run: python tests/verify_staging_migration_ci.py
       - name: Build nonroot staging container from exact PR code
         run: docker build -f runtime/phase04/Dockerfile -t abc-phase04-staging:ci runtime/phase04
+      - name: Verify image runs as dedicated unprivileged UID
+        run: |
+          test "$(docker image inspect abc-phase04-staging:ci --format '{{.Config.User}}')" = "10001:10001"
+          echo "PASS: nonroot runtime user"
       - name: Verify container refuses unconfigured staging startup
         run: |
           if docker run --rm abc-phase04-staging:ci python -m abc_foundation.staging_api; then

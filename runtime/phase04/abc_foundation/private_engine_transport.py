@@ -94,7 +94,7 @@ def private_engine_server(*,host,port,target_engine,caller_engine,consumer_id,
 def send_private_engine_message(*,host,port,server_name,certfile,keyfile,ca_file,
                                 token,message,managed_private=False):
     private_host=(isinstance(host,str) and host.endswith(".internal")
-        and bool(re.fullmatch(r"[a-z][a-z0-9-]{2,62}\\.internal",host))
+        and bool(re.fullmatch(r"[a-z][a-z0-9-]{2,62}\.internal",host))
         and server_name==host)
     if (not 1<=port<=65535 or
         not ((host=="127.0.0.1" and server_name=="localhost")

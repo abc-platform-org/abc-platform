@@ -59,6 +59,15 @@ class ENG03Executor:
             raise DomainError(400,"invalid_lease_seconds")
         token=uuid.uuid4()
         with self._connect() as con:
+            # Repeated process crashes must not lease forever. Expired third
+            # lease is permanently DLQed before attempting a new claim.
+            con.execute("""UPDATE abc.eng03_input_jobs SET
+                 status='DLQ',lease_until=NULL,lease_token=NULL,
+                 error_code='LEASE_RETRY_EXHAUSTED',
+                 updated_at=clock_timestamp()
+                 WHERE consumer_id=%s AND status='LEASED'
+                   AND lease_until<=clock_timestamp() AND attempts>=3""",
+                   (self.consumer_id,))
             row=con.execute("""WITH next AS (
                 SELECT job_id FROM abc.eng03_input_jobs
                 WHERE consumer_id=%s AND (

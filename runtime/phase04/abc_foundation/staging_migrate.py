@@ -20,6 +20,7 @@ FILENAMES = (
     "0005_consent_lifecycle.sql",
     "0006_session_index_projection.sql",
     "0007_eng01_command_receipts.sql",
+    "0008_engine_workload_eng02_answer_outbox.sql",
 )
 
 
@@ -45,11 +46,12 @@ def validate_migrator_config(env):
             or c.get("host") in (None, "", "localhost", "127.0.0.1", "::1")
             or c.get("dbname") != "abc_staging"):
         raise ValueError("unexpected_managed_staging_database")
-    for key in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD"):
+    for key in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD","ABC_STAGING_ORCHESTRATOR_PASSWORD"):
         v=env.get(key)
         if not isinstance(v,str) or len(v) < 32 or len(v) > 512:
             raise ValueError("missing_secure_role_credential_"+key)
-    if env["ABC_STAGING_APP_PASSWORD"] == env["ABC_STAGING_WORKER_PASSWORD"]:
+    values=[env[k] for k in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD","ABC_STAGING_ORCHESTRATOR_PASSWORD")]
+    if len(set(values))!=3:
         raise ValueError("distinct_role_credentials_required")
     return dsn
 
@@ -82,6 +84,7 @@ def apply_migrations(env=None):
         try:
             _role(con,"abc_app",env["ABC_STAGING_APP_PASSWORD"])
             _role(con,"abc_worker",env["ABC_STAGING_WORKER_PASSWORD"])
+            _role(con,"abc_orchestrator",env["ABC_STAGING_ORCHESTRATOR_PASSWORD"])
             with con.transaction():
                 con.execute("""
                     CREATE TABLE IF NOT EXISTS public.abc_schema_migrations(
@@ -90,7 +93,7 @@ def apply_migrations(env=None):
                     )
                 """)
                 con.execute("""REVOKE ALL ON public.abc_schema_migrations
-                             FROM PUBLIC, abc_app, abc_worker""")
+                             FROM PUBLIC, abc_app, abc_worker, abc_orchestrator""")
             for filename,digest in plan:
                 source=(MIGRATIONS / filename).read_text().strip()
                 if not source.startswith("--") or "BEGIN;" not in source or not source.endswith("COMMIT;"):

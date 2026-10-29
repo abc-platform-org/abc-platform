@@ -242,6 +242,51 @@ class ENG03PipelineTests(unittest.TestCase):
         self.pipeline.complete(fresh["job_id"],fresh["lease_token"])
         self.assertEqual(self.count("abc.eng04_06_results"),1)
 
+    def test_database_rejects_forged_eng03_source_and_policy(self):
+        receipt=self.arrive()
+        leased=self.worker.claim()
+        with psycopg.connect(ENG03) as con:
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("""INSERT INTO abc.eng03_evidence_ledger(
+                    evidence_id,consumer_id,source_job_id,source_event_id,
+                    source_answer_id,policy_decision_id,source_lease_token,
+                    tenant_id,branch_id,session_id,aggregate_version,
+                    question_id,source_kind,evidence_json,evidence_digest)
+                    VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,
+                    'synthetic:prior-treatment','CLIENT',%s,%s)""",
+                    (uuid.uuid4(),self.consumer,leased["job_id"],receipt["event_id"],
+                     uuid.uuid4(),uuid.uuid4(),leased["lease_token"],
+                     self.tenant,self.branch,self.sid,
+                     json.dumps({"evidence_class":"OBSERVED","value":"NO",
+                       "session_id":self.sid,"service_id":"synthetic:hair-color",
+                       "attribute_key":"prior_treatment"}),"0"*64))
+        self.worker.complete(leased["job_id"],leased["lease_token"])
+        self.assertEqual(self.count("abc.eng03_evidence_ledger"),1)
+
+    def test_pipeline_db_blocks_invented_or_approved_candidate(self):
+        self.arrive()
+        self.worker.run_once()
+        job=self.pipeline.claim()
+        analysis={"session_id":self.sid,"service_id":"synthetic:hair-color"}
+        knowledge={"service_id":"synthetic:hair-color","retrieval_sources":[]}
+        decision={"session_id":self.sid,"service_id":"synthetic:hair-color",
+                  "candidates":[{"candidate_id":"real:unsafe","reason":"FAKE",
+                       "feasibility_label":"VISUALLY_PLAUSIBLE",
+                       "hard_filter_status":"PASSED"}]}
+        with psycopg.connect(PIPELINE) as con:
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("""INSERT INTO abc.eng04_06_results(
+                    result_id,consumer_id,source_pipeline_job_id,
+                    tenant_id,branch_id,session_id,aggregate_version,
+                    source_evidence_digest,analysis_json,knowledge_json,
+                    decision_json,policy_version)
+                    VALUES(%s,%s,%s,%s,%s,%s,1,%s,%s,%s,%s,'eng14.synthetic.1')""",
+                    (uuid.uuid4(),self.consumer,job["job_id"],self.tenant,
+                     self.branch,self.sid,"0"*64,json.dumps(analysis),
+                     json.dumps(knowledge),json.dumps(decision)))
+        self.pipeline.complete(job["job_id"],job["lease_token"])
+        self.assertEqual(self.count("abc.eng04_06_results"),1)
+
     def test_cross_tenant_bindings_not_available_to_unbound_runtime(self):
         self.arrive()
         with psycopg.connect(ADMIN) as con:

@@ -44,6 +44,8 @@ jobs:
         run: python scripts/validate_phase04_staging.py
       - name: Validate 41-operation Phase-02/04 traceability
         run: python scripts/validate_phase04.py
+      - name: ENG-01 canonical workflow state graph integrity
+        run: python scripts/validate_eng01.py
       - name: Compile local-only runtime
         run: python -m compileall -q runtime/phase04/abc_foundation
       - name: Execute integration, isolation, replay and persistence tests

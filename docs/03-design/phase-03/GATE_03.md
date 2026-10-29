@@ -1,4 +1,6 @@
-# G-03 disposition — IN_PROGRESS / NOT PASSED
+# P03-UX-EXIT disposition — IN_PROGRESS / NOT PASSED
+
+**Terminology control:** This is the Phase-03 *design/UX exit*, not release Gate **G-03**, which is reserved for real visual QA by `docs/05-delivery/RELEASE_GATES.md`. Product release G-03 remains **NOT_RUN / NOT_PASSED**. Passing synthetic UI tests never authorizes actual visual results.
 
 Date: 2026-10-29. Authority: assistant under delegated engineering/design authority. No human expert signoff claimed.
 

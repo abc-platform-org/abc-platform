@@ -1,0 +1,66 @@
+# ABC Phase 04 PRIVATE STAGING candidate. Requires Render connected account,
+# administrative DB migrations and real OIDC issuer before either service can start.
+# NO public web service, no media storage, no client data, no production deployment.
+databases:
+  - name: abc-p04-staging-pg
+    databaseName: abc_staging
+    user: abc_staging_migrator
+    plan: basic-256mb
+    region: frankfurt
+    postgresMajorVersion: "16"
+    ipAllowList: []
+
+services:
+  - type: pserv
+    name: abc-p04-private-api
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    branch: foundation/phase-04-runtime-20261029
+    autoDeployTrigger: off
+    dockerContext: runtime/phase04
+    dockerfilePath: runtime/phase04/Dockerfile
+    dockerCommand: python -m abc_foundation.staging_api
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: ABC_ENV
+        value: STAGING_PRIVATE
+      - key: ABC_STAGING_PURPOSE
+        value: SYNTHETIC_NO_CLIENT_DATA
+      - key: ABC_NETWORK_BOUNDARY
+        value: RENDER_PRIVATE_SERVICE
+      - key: ABC_PG_DSN
+        sync: false
+      - key: ABC_OIDC_ISSUER
+        sync: false
+      - key: ABC_OIDC_AUDIENCE
+        sync: false
+      - key: ABC_OIDC_JWKS_URI
+        sync: false
+
+  - type: worker
+    name: abc-p04-session-index-worker
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    branch: foundation/phase-04-runtime-20261029
+    autoDeployTrigger: off
+    dockerContext: runtime/phase04
+    dockerfilePath: runtime/phase04/Dockerfile
+    dockerCommand: python -m abc_foundation.staging_worker
+    numInstances: 1
+    maxShutdownDelaySeconds: 60
+    envVars:
+      - key: ABC_ENV
+        value: STAGING_PRIVATE
+      - key: ABC_STAGING_PURPOSE
+        value: SYNTHETIC_NO_CLIENT_DATA
+      - key: ABC_NETWORK_BOUNDARY
+        value: RENDER_BACKGROUND_WORKER
+      - key: ABC_WORKER_DSN
+        sync: false
+      - key: ABC_CONSUMER_ID
+        sync: false
+      - key: ABC_WORKER_POLL_SECONDS
+        value: "2"

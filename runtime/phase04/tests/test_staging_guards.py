@@ -7,6 +7,7 @@ from unittest.mock import Mock
 from abc_foundation.staging_api import validate_staging_dsn, make_private_server, assert_staging_database
 from abc_foundation.staging_worker import configure_worker
 from abc_foundation.staging_answer_worker import configure_answer_worker
+from abc_foundation.staging_engine_workers import configure_engine_worker
 from abc_foundation.staging_migrate import validate_migrator_config, planned_migrations, FILENAMES
 from abc_foundation.staging_smoke import check_private_url, smoke
 
@@ -21,7 +22,7 @@ class StagingGuardTests(unittest.TestCase):
     def test_migration_manifest_complete_and_sha256(self):
         plan=planned_migrations()
         self.assertEqual(tuple(x[0] for x in plan),FILENAMES)
-        self.assertEqual(len(plan),11)
+        self.assertEqual(len(plan),12)
         self.assertTrue(all(len(digest)==64 for _,digest in plan))
 
     def test_staging_dsn_rejects_admin_or_missing_tls(self):
@@ -69,6 +70,27 @@ class StagingGuardTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             configure_answer_worker({**base,"ABC_ANSWER_WORKER_DSN":
                          "postgresql://abc_answer_worker@localhost/abc_staging?sslmode=require"})
+
+    def test_segregated_engine_workers_fail_closed_without_private_identity(self):
+        base={"ABC_ENV":"STAGING_PRIVATE",
+              "ABC_STAGING_PURPOSE":"SYNTHETIC_NO_CLIENT_DATA",
+              "ABC_NETWORK_BOUNDARY":"RENDER_BACKGROUND_WORKER",
+              "ABC_ENGINE_CONSUMER_ID":"eng03-binding-test",
+              "ABC_ENGINE_TENANT_ID":"synthetic-test-tenant",
+              "ABC_ENGINE_DSN":"postgresql://abc_eng03_worker:secret@db.private/abc_staging?sslmode=require"}
+        with self.assertRaises(ValueError):
+            configure_engine_worker("ENG03",{**base,"ABC_ENV":"PRODUCTION"})
+        with self.assertRaises(ValueError):
+            configure_engine_worker("ENG03",{**base,"ABC_NETWORK_BOUNDARY":"PUBLIC_HTTP"})
+        with self.assertRaises(ValueError):
+            configure_engine_worker("ENG03",{**base,"ABC_ENGINE_CONSUMER_ID":"!bad"})
+        with self.assertRaises(ValueError):
+            configure_engine_worker("ENG03",{**base,"ABC_ENGINE_DSN":
+                          "postgresql://abc_app:secret@db.private/abc_staging?sslmode=require"})
+        with self.assertRaises(ValueError):
+            configure_engine_worker("PIPELINE",base)
+        with self.assertRaises(ValueError):
+            configure_engine_worker("UNKNOWN",base)
 
     def test_private_smoke_rejects_public_and_unexpected_urls(self):
         bad=[
@@ -127,6 +149,8 @@ class StagingGuardTests(unittest.TestCase):
             "ABC_STAGING_WORKER_PASSWORD":"B"*32,
             "ABC_STAGING_ORCHESTRATOR_PASSWORD":"C"*32,
             "ABC_STAGING_ANSWER_WORKER_PASSWORD":"D"*32,
+            "ABC_STAGING_ENG03_PASSWORD":"E"*32,
+            "ABC_STAGING_PIPELINE_PASSWORD":"F"*32,
         }
         self.assertIsInstance(validate_migrator_config(base),str)
         for bad in (
@@ -138,6 +162,10 @@ class StagingGuardTests(unittest.TestCase):
             {"ABC_STAGING_ORCHESTRATOR_PASSWORD":"short"},
             {"ABC_STAGING_ANSWER_WORKER_PASSWORD":"A"*32},
             {"ABC_STAGING_ANSWER_WORKER_PASSWORD":"short"},
+            {"ABC_STAGING_ENG03_PASSWORD":"A"*32},
+            {"ABC_STAGING_ENG03_PASSWORD":"short"},
+            {"ABC_STAGING_PIPELINE_PASSWORD":"A"*32},
+            {"ABC_STAGING_PIPELINE_PASSWORD":"short"},
             {"ABC_STAGING_MIGRATOR_DSN":"postgresql://postgres@db.private/abc_staging?sslmode=require"},
             {"ABC_STAGING_MIGRATOR_DSN":"postgresql://abc_staging_migrator@db.private/abc_staging"},
         ):

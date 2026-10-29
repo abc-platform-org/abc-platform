@@ -66,7 +66,13 @@ class SyntheticDecisionEngine:
         critical_missing=any(observations[key]["value"] in (None,"UNKNOWN")
                              for key in ("prior_treatment","sensitivity_flag"))
         flagged=observations["sensitivity_flag"]["value"]=="YES"
-        unsafe=(critical_missing or flagged or observations["goal"]["value"] is None)
+        # A recommendation is not permitted until every variable in the
+        # synthetic consultation profile has an explicit known value.
+        # Previously an unanswered maintenance variable could still yield a
+        # candidate after the third answer despite incomplete readiness.
+        incomplete=any(item.get("value") is None or item.get("value") in
+                       ("UNKNOWN","UNSURE") for item in observations.values())
+        unsafe=(critical_missing or flagged or incomplete)
         candidates=[]
         exclusions=[]
         for name in self.OPTIONS:

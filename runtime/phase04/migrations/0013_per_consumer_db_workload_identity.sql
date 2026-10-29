@@ -65,6 +65,11 @@ BEGIN
   JOIN abc.eng03_worker_bindings b
     ON b.consumer_id=j.consumer_id AND b.tenant_id=j.tenant_id
        AND b.worker_role='abc_eng03_worker' AND b.active
+  JOIN abc.worker_login_bindings identity_binding
+    ON identity_binding.login_name=session_user
+       AND identity_binding.worker_role='abc_eng03_worker'
+       AND identity_binding.consumer_id=j.consumer_id
+       AND identity_binding.tenant_id=j.tenant_id AND identity_binding.active
   JOIN abc.answer_index_projection proj
     ON proj.consumer_id=j.consumer_id AND proj.event_id=j.source_event_id
        AND proj.tenant_id=j.tenant_id AND proj.branch_id=j.branch_id
@@ -120,6 +125,11 @@ BEGIN
     JOIN abc.eng03_worker_bindings b
       ON b.worker_role='abc_eng03_worker' AND b.consumer_id=j.consumer_id
          AND b.tenant_id=j.tenant_id AND b.active
+    JOIN abc.worker_login_bindings identity_binding
+      ON identity_binding.login_name=session_user
+         AND identity_binding.worker_role='abc_eng03_worker'
+         AND identity_binding.consumer_id=j.consumer_id
+         AND identity_binding.tenant_id=j.tenant_id AND identity_binding.active
     WHERE j.job_id=NEW.source_job_id AND j.consumer_id=NEW.consumer_id
       AND j.source_event_id=NEW.source_event_id
       AND j.tenant_id=NEW.tenant_id AND j.branch_id=NEW.branch_id
@@ -188,8 +198,13 @@ BEGIN
   SELECT j.job_id,j.source_evidence_id INTO item
     FROM abc.eng04_06_jobs j
     JOIN abc.eng03_worker_bindings b
-      ON b.worker_role='abc_eng03_worker' AND b.consumer_id=j.consumer_id
+      ON b.worker_role='abc_pipeline_worker' AND b.consumer_id=j.consumer_id
        AND b.tenant_id=j.tenant_id AND b.active
+    JOIN abc.worker_login_bindings identity_binding
+      ON identity_binding.login_name=session_user
+         AND identity_binding.worker_role='abc_pipeline_worker'
+         AND identity_binding.consumer_id=j.consumer_id
+         AND identity_binding.tenant_id=j.tenant_id AND identity_binding.active
     JOIN abc.eng03_evidence_ledger e
       ON e.evidence_id=j.source_evidence_id
        AND e.consumer_id=j.consumer_id AND e.tenant_id=j.tenant_id

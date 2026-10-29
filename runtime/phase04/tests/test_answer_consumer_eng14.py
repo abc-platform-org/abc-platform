@@ -87,6 +87,12 @@ class AnswerConsumerIntegration(unittest.TestCase):
                 WHERE consumer_id=%s AND event_id=%s""",
                 (self.cid,receipt["event_id"])).fetchone()[0]
             self.assertEqual(status,"ACKED")
+            jobs=con.execute("""SELECT source_event_id,status,aggregate_version
+                 FROM abc.eng03_input_jobs WHERE consumer_id=%s""",(self.cid,)).fetchall()
+            self.assertEqual(len(jobs),1)
+            self.assertEqual(str(jobs[0][0]),receipt["event_id"])
+            self.assertEqual(jobs[0][1],"QUEUED_PENDING_ENGINE")
+            self.assertEqual(jobs[0][2],1)
 
     def test_effect_commits_before_ack_restart_dedup(self):
         self.answer()
@@ -104,6 +110,9 @@ class AnswerConsumerIntegration(unittest.TestCase):
             n=con.execute("""SELECT count(*) FROM abc.answer_index_projection
                               WHERE consumer_id=%s""",(self.cid,)).fetchone()[0]
             self.assertEqual(n,1)
+            pending=con.execute("SELECT count(*) FROM abc.eng03_input_jobs WHERE consumer_id=%s",
+                            (self.cid,)).fetchone()[0]
+            self.assertEqual(pending,1)
 
     def test_dedicated_role_cannot_read_answers_sessions_or_consent(self):
         for table in ("abc.eng02_answers","abc.sessions","abc.consent_evidence",
@@ -208,6 +217,27 @@ class AnswerConsumerIntegration(unittest.TestCase):
             state=con.execute("SELECT state FROM abc.event_delivery WHERE consumer_id=%s AND event_id=%s",
                           (self.cid,eid)).fetchone()[0]
             self.assertEqual(state,"PENDING")
+
+    def test_worker_cannot_run_or_modify_eng03_handoff(self):
+        self.answer()
+        self.assertEqual(self.service_worker.run_once(),"PROJECTED")
+        with psycopg.connect(ANSWER) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("UPDATE abc.eng03_input_jobs SET status='QUEUED_PENDING_ENGINE'")
+        with psycopg.connect(APP) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SELECT * FROM abc.eng03_input_jobs")
+
+    def test_malicious_event_cannot_create_eng03_handoff(self):
+        self.answer()
+        self.service_worker.dispatcher.register(self.cid)
+        delivery=self.service_worker.dispatcher.lease(self.cid)
+        bad={**delivery,"event":{**delivery["event"],"event_type":"ANALYSIS_READY"}}
+        with self.assertRaises(DomainError):
+            self.service_worker.project(bad)
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("SELECT count(*) FROM abc.eng03_input_jobs WHERE consumer_id=%s",
+                            (self.cid,)).fetchone()[0],0)
 
     def test_parallel_dispatch_lease_single_item(self):
         self.answer()

@@ -5,6 +5,7 @@ preflight refuses real-client input and nonprivate staging. Each worker has a
 distinct constrained database principal and an admin-active binding.
 """
 import os
+import re
 import signal
 import time
 
@@ -29,10 +30,14 @@ def configure_engine_worker(kind,env=None):
         raise ValueError("explicit_admin_bound_consumer_tenant_required")
     role="abc_eng03_worker" if kind=="ENG03" else "abc_pipeline_worker"
     dsn=env.get("ABC_ENGINE_DSN")
-    validate_staging_dsn(dsn,role)
+    expected_login=env.get("ABC_ENGINE_WORKLOAD_LOGIN")
+    login_pattern=r"abc_e3_[0-9a-f]{14,24}" if kind=="ENG03" else r"abc_p6_[0-9a-f]{14,24}"
+    if not isinstance(expected_login,str) or not re.fullmatch(login_pattern,expected_login):
+        raise ValueError("per_consumer_database_login_required")
+    validate_staging_dsn(dsn,expected_login)
     worker=ENG03Executor(dsn,consumer) if kind=="ENG03" else SyntheticAnalysisPipeline(dsn,consumer)
     tables=["abc.eng03_worker_bindings","abc.eng03_input_jobs","abc.eng03_evidence_ledger",
-            "abc.eng04_06_jobs","abc.eng04_06_results"]
+            "abc.eng04_06_jobs","abc.eng04_06_results","abc.worker_login_bindings"]
     assert_staging_database(worker,role,tables)
     with worker._connect() as con:
         allowed=con.execute("""SELECT 1 FROM abc.eng03_worker_bindings

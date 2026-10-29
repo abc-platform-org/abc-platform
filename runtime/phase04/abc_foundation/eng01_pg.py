@@ -8,6 +8,8 @@ import json
 import uuid
 from datetime import datetime, timezone
 
+import psycopg
+
 from .pg_store import PostgresStore
 from .store import DomainError
 
@@ -80,9 +82,15 @@ class ENG01PostgresCommandStore(PostgresStore):
                 "publication_status":"INTERNAL_SYNTHETIC_ONLY",
                 "command_id":str(cmd_id),"correlation_id":str(correlation)
             }
-            con.execute("""INSERT INTO abc.eng01_command_receipts
-                (command_id,tenant_id,branch_id,actor_id,session_id,
-                 request_digest,correlation_id,result_json)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s)""",
-                (cmd_id,tenant,branch,subject,sid,digest,correlation,json.dumps(result)))
+            try:
+                con.execute("""INSERT INTO abc.eng01_command_receipts
+                    (command_id,tenant_id,branch_id,actor_id,session_id,
+                     request_digest,correlation_id,result_json)
+                     VALUES(%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    (cmd_id,tenant,branch,subject,sid,digest,correlation,json.dumps(result)))
+            except psycopg.errors.UniqueViolation:
+                # A different specialist sharing the tenant cannot read the
+                # other scoped receipt under RLS. Do not surface a DB 500 or
+                # leak its owner; the entire earlier state/audit is rolled back.
+                raise DomainError(409,"command_id_conflict") from None
             return result

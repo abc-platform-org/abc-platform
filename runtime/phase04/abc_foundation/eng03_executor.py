@@ -134,13 +134,13 @@ class ENG03Executor:
                    "abc:eng04-06:input:"+str(jid))
             con.execute("""INSERT INTO abc.eng03_evidence_ledger (
                evidence_id,consumer_id,source_job_id,source_event_id,
-               source_answer_id,policy_decision_id,tenant_id,branch_id,session_id,
+               source_answer_id,policy_decision_id,source_lease_token,tenant_id,branch_id,session_id,
                aggregate_version,question_id,source_kind,evidence_json,evidence_digest)
-               VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+               VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                ON CONFLICT DO NOTHING""",
                (uuid.UUID(evidence["evidence_id"]),job["consumer_id"],jid,
                 job["source_event_id"],uuid.UUID(source["answer_id"]),
-                uuid.UUID(source["policy_decision_id"]),job["tenant_id"],
+                uuid.UUID(source["policy_decision_id"]),token,job["tenant_id"],
                 job["branch_id"],job["session_id"],job["aggregate_version"],
                 source["question_id"],source["answer_source"],json.dumps(evidence),digest))
             con.execute("""INSERT INTO abc.eng04_06_jobs (

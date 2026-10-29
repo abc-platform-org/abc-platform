@@ -286,7 +286,7 @@ BEGIN
     END IF;
   END IF;
   RETURN NEW;
-END
+END;
 $source$;
 REVOKE ALL ON FUNCTION abc.verify_eng03_evidence_source() FROM PUBLIC;
 CREATE TRIGGER eng03_evidence_lineage_gate

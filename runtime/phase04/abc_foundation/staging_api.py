@@ -1,12 +1,12 @@
 """Private-only staging API process. Hosting provider MUST enforce private network."""
 import os
-from http.server import ThreadingHTTPServer
 
 from psycopg.conninfo import conninfo_to_dict
 from .http_api import handler_factory
 from .oidc import OIDCVerifier
 from .pg_store import PostgresStore
 from .managed_pg_store import ManagedMTLSPostgresStore
+from .private_api_mtls import create_private_api_server
 
 
 def validate_staging_dsn(dsn, expected_role):
@@ -78,9 +78,11 @@ def make_private_server(environ=None, store=None, verifier=None):
         verifier = OIDCVerifier(
             issuer=env["ABC_OIDC_ISSUER"], audience=env["ABC_OIDC_AUDIENCE"],
             jwks_uri=env["ABC_OIDC_JWKS_URI"])
-    # Binding to all interfaces is permitted ONLY because hosting is private-service.
-    # An environment variable by itself does not enforce network isolation.
-    return ThreadingHTTPServer(("0.0.0.0", port), handler_factory(store, None, verifier))
+    # Private hosting is necessary but insufficient: the listener itself
+    # must validate a managed client certificate before parsing HTTP/OIDC.
+    # No plaintext fallback, even if the database is synthetic-only.
+    return create_private_api_server(
+        ("0.0.0.0",port), handler_factory(store,None,verifier),env)
 
 
 def main():

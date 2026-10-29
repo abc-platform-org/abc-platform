@@ -47,7 +47,7 @@ with patch.object(staging_migrate,"validate_migrator_config",return_value=local)
     staging_migrate.apply_migrations(env)
 with psycopg.connect(local) as con:
     migration_rows=con.execute("SELECT filename,sha256 FROM public.abc_schema_migrations ORDER BY filename").fetchall()
-    assert len(migration_rows)==9
+    assert len(migration_rows)==10
     assert [name for name,digest in migration_rows]==list(staging_migrate.FILENAMES)
     for name,digest in migration_rows:
         assert digest==dict(staging_migrate.planned_migrations())[name]

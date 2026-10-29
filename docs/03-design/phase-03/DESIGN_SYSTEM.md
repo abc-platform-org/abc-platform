@@ -63,3 +63,13 @@ Text contrast target 4.5:1 normal / 3:1 large, meaningful controls 3:1; calculat
 ## Content and error policy
 
 Use Persian explanatory text and short actionable labels. No “approved” without an explicit approval type. QA failure: retry or keep last accepted version. Unavailable capability: explain scope, no fabricated alternatives. Offline: deny mutations, preserve visible session. Consent withdrawal: cancel pending jobs, remove images and prevent new processing. Unauthorized view: safe screen plus reauth request; private data never sent to shared API projection. Empty-state close is a valid outcome.
+
+## Phase-03 v0.2 implementation reconciliation
+
+The Phase-03 branch now contains two distinct synthetic, responsive review experiences: shared in-salon Studio and role-projected Salon OS management. The management model references all 18 ABC-F IDs; sensitive transactions are not performed. Privileged data is removed from shared-mode DOM rather than only hidden with CSS. Selected appearance, specialist feasibility, human validation, and backend receipt remain separate transitions.
+
+Studio LookSpec fixture controls now record service, mode, palette, target region, front-view provenance and locked-region policy. Side/back requests without evidence do not produce an accepted preview. This is semantic interface behavior only, not actual model inference or image generation.
+
+Measured token contrast pairs: body text 11.59:1, supporting text 5.84:1, primary white-on-forest 7.66:1, warning 5.62:1, danger 6.94:1. Automated checks cover defined token pairs, not every rendered UI state. Device/assistive-technology audits remain unexecuted.
+
+Build and compare the exact self-contained Studio and Salon OS files with `python scripts/build_phase03_review.py --check`; browser E2E checks and screenshots are in GitHub CI. These review artifacts are not production applications.

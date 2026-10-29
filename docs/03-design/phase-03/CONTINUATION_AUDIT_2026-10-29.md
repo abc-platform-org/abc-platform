@@ -67,3 +67,10 @@ Status:
 - [ ] Formal UX phase exit decision is tied to exact Git SHA, reviewer and audit artifacts. Until then: **IN_PROGRESS / NO MERGE AS COMPLETED**.
 
 No action here signs a human review, merges a PR, changes Notion, or grants real-client processing.
+
+
+## Later continuation and supersession
+
+Initial observations that Salon OS was specification-only and semantic preview controls were absent have been superseded for the **synthetic UI branch only**: it now includes 18 management navigation/projection modules, role-scoped draft booking, no-send marketing, LookSpec modes/palette/limited-view guards, two standalone source-generated review files and browser/contrast regressions. No production Salon OS or AI engine is implemented.
+
+Updated `GATE_03.md` is the authoritative Phase-03 exit disposition. Historical image sources, independent device/assistive-tech testing, paired salon review and real data security remain unverified. The original audit findings above remain useful as point-in-time evidence but should not be read as the current code inventory.

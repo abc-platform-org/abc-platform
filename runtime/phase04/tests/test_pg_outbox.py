@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 import psycopg
 
 from abc_foundation.pg_outbox import OutboxDispatcher
+from abc_foundation.session_index_consumer import SessionIndexConsumer
 from abc_foundation.pg_store import PostgresStore
 from abc_foundation.oidc import Principal
 from abc_foundation.store import DomainError
@@ -39,6 +40,55 @@ class OutboxIntegrationTests(unittest.TestCase):
 
     def create(self,key):
         return self.pg.create(self.principal,{"branch_id":self.branch,"scope":"IN_SALON_SHARED_SCREEN"},key)
+
+
+    def test_independent_session_index_consumer_projects_once(self):
+        session=self.create("create-"+uuid.uuid4().hex)
+        service=SessionIndexConsumer(WORKER,self.consumer)
+        self.assertEqual(service.run_once(),"PROJECTED")
+        self.assertIsNone(service.run_once())
+        with psycopg.connect(ADMIN) as con:
+            rows=con.execute("""SELECT session_id,tenant_id,branch_id FROM abc.session_index_projection
+                        WHERE consumer_id=%s""",(self.consumer,)).fetchall()
+        self.assertEqual(len(rows),1)
+        self.assertEqual(str(rows[0][0]),session["session_id"])
+        self.assertEqual(rows[0][1:],(self.tenant,self.branch))
+
+    def test_consumer_crash_after_effect_before_ack_remains_idempotent(self):
+        session=self.create("create-"+uuid.uuid4().hex)
+        service=SessionIndexConsumer(WORKER,self.consumer)
+        service.dispatcher.register(self.consumer)
+        first=service.dispatcher.lease(self.consumer)
+        self.assertEqual(service.project(first),session["session_id"])
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.event_delivery SET lease_until=clock_timestamp()-interval '1 second'
+                       WHERE consumer_id=%s AND event_id=%s""",
+                        (self.consumer,first["event_id"]))
+        # Restarted independent service replays effect but unique event_id makes a no-op.
+        fresh=SessionIndexConsumer(WORKER,self.consumer)
+        self.assertEqual(fresh.run_once(),"PROJECTED")
+        with psycopg.connect(ADMIN) as con:
+            count=con.execute("""SELECT count(*) FROM abc.session_index_projection
+                       WHERE consumer_id=%s""",(self.consumer,)).fetchone()[0]
+        self.assertEqual(count,1)
+
+    def test_session_index_rejects_untrusted_event_scope(self):
+        self.create("create-"+uuid.uuid4().hex)
+        self.worker.register(self.consumer)
+        delivery=self.worker.lease(self.consumer)
+        fake={**delivery,"event":{**delivery["event"],"tenant_id":"wrong-tenant"}}
+        with self.assertRaises(DomainError) as e:
+            SessionIndexConsumer(WORKER,self.consumer).project(fake)
+        self.assertEqual(e.exception.status,422)
+
+    def test_session_index_disallows_write_after_consumer_revocation(self):
+        self.create("create-"+uuid.uuid4().hex)
+        self.worker.register(self.consumer)
+        delivery=self.worker.lease(self.consumer)
+        with psycopg.connect(ADMIN) as con:
+            con.execute("UPDATE abc.worker_subscriptions SET active=false WHERE consumer_id=%s",(self.consumer,))
+        with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+            SessionIndexConsumer(WORKER,self.consumer).project(delivery)
 
     def test_worker_registers_once_and_replays_only_one_event(self):
         session=self.create("create-"+uuid.uuid4().hex)

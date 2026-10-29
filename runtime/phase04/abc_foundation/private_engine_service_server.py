@@ -24,7 +24,7 @@ def configure_private_engine_service(env=None):
     engine=env.get("ABC_ENGINE_ID")
     caller=env.get("ABC_CALLER_ENGINE_ID")
     consumer=env.get("ABC_ENGINE_CONSUMER_ID")
-    if engine not in ENGINES or caller not in ENGINES | {"ENG-03"} or caller==engine:
+    if engine not in ENGINES or caller not in (*ENGINES,"ENG-03") or caller==engine:
         raise ValueError("distinct_engine_mtls_roles_required")
     if not isinstance(consumer,str) or not 3<=len(consumer)<=96:
         raise ValueError("consumer_binding_required")

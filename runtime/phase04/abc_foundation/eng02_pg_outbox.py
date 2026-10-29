@@ -179,13 +179,11 @@ class PGENG02CommandWriter:
                         (newversion,now,eid,session_id,row["state_version"])).fetchone()
             if updated is None:
                 raise DomainError(409,"state_version_conflict")
-            con.execute("""INSERT INTO abc.eng14_policy_audit
-                (decision_id,command_id,tenant_id,branch_id,session_id,
-                 actor_id,aggregate_version,policy_version,scope,decision,
-                 input_digest,evaluated_at)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,'QUESTION','ALLOW',%s,%s)""",
+            con.execute("""SELECT abc.issue_eng14_answer_proof(
+                %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (uuid.UUID(decision["policy_decision_id"]),command_id,tenant,branch,
-                 session_id,subject,newversion,decision["policy_version"],digest,now))
+                 session_id,subject,newversion,digest,service_issuer,service_subject,
+                 command["question_id"],command["profile_version"]))
             con.execute("""INSERT INTO abc.eng02_answers
                  (tenant_id,branch_id,session_id,question_profile_version,
                   question_id,value,answer_source,actor_id,answer_id,

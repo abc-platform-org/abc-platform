@@ -206,6 +206,10 @@ class Store:
                         (state, checkpoint, expected_version + 1, now, sid, expected_version))
             if con.execute("SELECT changes()").fetchone()[0] != 1:
                 raise DomainError(409, "state_version_conflict")
+            if action == "pause":
+                # Atomically fence outstanding synthetic workers against late completion.
+                con.execute("""UPDATE fixture_jobs SET status='CANCELLED',leased_by=NULL,lease_until=NULL,
+                             updated_at=? WHERE session_id=? AND status IN ('QUEUED','LEASED')""", (now, sid))
             con.execute("INSERT INTO state_audit VALUES(?,?,?,?,?,?,?,?)",
                         (str(uuid.uuid4()), sid, row["state"], state, expected_version,
                          expected_version + 1, actor["sub"], now))

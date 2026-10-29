@@ -69,6 +69,13 @@ class Store:
                   consumer_id TEXT NOT NULL, event_id TEXT NOT NULL REFERENCES outbox(event_id),
                   acknowledged_at TEXT NOT NULL, PRIMARY KEY(consumer_id, event_id)
                 );
+                CREATE TABLE IF NOT EXISTS fixture_jobs(
+                  job_id TEXT PRIMARY KEY, tenant_id TEXT NOT NULL, session_id TEXT NOT NULL REFERENCES sessions(session_id),
+                  status TEXT NOT NULL CHECK(status IN ('QUEUED','LEASED','SUCCEEDED','CANCELLED','DEAD_LETTER')),
+                  attempts INTEGER NOT NULL DEFAULT 0, leased_by TEXT, lease_until REAL,
+                  created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS fixture_jobs_ready ON fixture_jobs(status,lease_until);
             """)
         finally:
             con.close()
@@ -235,6 +242,105 @@ class Store:
             if not con.execute("SELECT 1 FROM outbox WHERE event_id=?", (event_id,)).fetchone():
                 raise DomainError(404, "event_not_found")
             con.execute("INSERT OR IGNORE INTO consumer_acks VALUES(?,?,?)", (consumer_id, event_id, _now()))
+            con.execute("COMMIT")
+        except Exception:
+            if con.in_transaction:
+                con.execute("ROLLBACK")
+            raise
+        finally:
+            con.close()
+
+
+    def enqueue_fixture_job(self, actor, sid, key):
+        """Synthetic scheduling fixture; never image processing or a real engine."""
+        self._key(key)
+        op, request = "fixture-job:" + sid, {"session_id": sid, "kind": "NO_MEDIA_TEST_FIXTURE"}
+        con = self.connect()
+        try:
+            con.execute("BEGIN IMMEDIATE")
+            row = con.execute("SELECT * FROM sessions WHERE session_id=?", (sid,)).fetchone()
+            self._authorize(actor, row)
+            if row["state"] != "CREATED":
+                raise DomainError(409, "session_not_runnable")
+            previous, digest = self._replay(con, actor, op, key, request)
+            if previous is not None:
+                con.execute("COMMIT")
+                return previous
+            job_id, now = str(uuid.uuid4()), _now()
+            con.execute("INSERT INTO fixture_jobs(job_id,tenant_id,session_id,status,attempts,created_at,updated_at) VALUES(?,?,?,'QUEUED',0,?,?)",
+                        (job_id, actor["tenant_id"], sid, now, now))
+            result = {"job_id": job_id, "status": "QUEUED", "kind": "NO_MEDIA_TEST_FIXTURE"}
+            self._remember(con, actor, op, key, digest, result)
+            con.execute("COMMIT")
+            return result
+        except Exception:
+            if con.in_transaction:
+                con.execute("ROLLBACK")
+            raise
+        finally:
+            con.close()
+
+    def lease_fixture_job(self, worker, now_seconds, seconds=30):
+        """Atomic lease after crash; at-most-one current worker. In-process test API only."""
+        if not _nonempty(worker) or type(now_seconds) not in (int, float) or not 1 <= seconds <= 300:
+            raise DomainError(400, "invalid_lease")
+        con = self.connect()
+        try:
+            con.execute("BEGIN IMMEDIATE")
+            row = con.execute("""SELECT * FROM fixture_jobs
+                        WHERE status='QUEUED' OR (status='LEASED' AND lease_until <= ?)
+                        ORDER BY created_at,job_id LIMIT 1""", (now_seconds,)).fetchone()
+            if row is None:
+                con.execute("COMMIT")
+                return None
+            # Stale lease tokens cannot succeed after another worker reacquires the job.
+            lease_id = str(uuid.uuid4())
+            con.execute("""UPDATE fixture_jobs SET status='LEASED',attempts=attempts+1,
+                        leased_by=?,lease_until=?,updated_at=? WHERE job_id=?""",
+                        (worker+":"+lease_id, now_seconds+seconds, _now(), row["job_id"]))
+            result = {"job_id": row["job_id"], "lease_token": worker+":"+lease_id,
+                      "attempt": row["attempts"]+1, "lease_until": now_seconds+seconds}
+            con.execute("COMMIT")
+            return result
+        except Exception:
+            if con.in_transaction:
+                con.execute("ROLLBACK")
+            raise
+        finally:
+            con.close()
+
+    def finish_fixture_job(self, lease_token, job_id, now_seconds, success):
+        """Reject stale worker success; policy failure after 3 attempts dead-letters a fixture."""
+        if not _nonempty(lease_token) or not _nonempty(job_id) or type(now_seconds) not in (int, float) or type(success) is not bool:
+            raise DomainError(400, "invalid_completion")
+        con = self.connect()
+        try:
+            con.execute("BEGIN IMMEDIATE")
+            row = con.execute("SELECT * FROM fixture_jobs WHERE job_id=?", (job_id,)).fetchone()
+            if row is None:
+                raise DomainError(404, "job_not_found")
+            if row["status"] != "LEASED" or row["leased_by"] != lease_token or now_seconds >= row["lease_until"]:
+                raise DomainError(409, "stale_lease_completion")
+            next_state = "SUCCEEDED" if success else ("DEAD_LETTER" if row["attempts"] >= 3 else "QUEUED")
+            con.execute("UPDATE fixture_jobs SET status=?,leased_by=NULL,lease_until=NULL,updated_at=? WHERE job_id=?",
+                        (next_state, _now(), job_id))
+            con.execute("COMMIT")
+            return next_state
+        except Exception:
+            if con.in_transaction:
+                con.execute("ROLLBACK")
+            raise
+        finally:
+            con.close()
+
+    def cancel_fixture_jobs(self, actor, sid):
+        """Represents revocation/safety cancellation in a no-media local fixture."""
+        con = self.connect()
+        try:
+            con.execute("BEGIN IMMEDIATE")
+            self._authorize(actor, con.execute("SELECT * FROM sessions WHERE session_id=?", (sid,)).fetchone())
+            con.execute("""UPDATE fixture_jobs SET status='CANCELLED',leased_by=NULL,lease_until=NULL,updated_at=?
+                         WHERE session_id=? AND status IN ('QUEUED','LEASED')""", (_now(), sid))
             con.execute("COMMIT")
         except Exception:
             if con.in_transaction:

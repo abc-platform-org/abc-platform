@@ -28,9 +28,9 @@ Prior 0001–0011 migration contents and Phase02 contracts remain unchanged. Mig
 
 ## 3. Verified results and evidence
 
-- A validated integration run has **225/225** tests successful, with PostgreSQL16, container nonroot, all 12 migration journal checks and no-paid-API synthetic walkthrough. Additional least-privilege proof and output source review were subsequently added and require **a new exact-head CI success** before accepting this draft.
-- [Foundation CI history for PR #34](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/34/checks).
-- Previously caught and fixed: unbound shared-worker consumer claim, globally colliding evidence IDs, SQL trigger syntax errors, and ENG06 early candidate generation with unknown maintenance preference. A failing test is not a passed release gate.
+- **Verified exact executable-code HEAD** `ba04afdcddab9ce0ec68667af9803baec4b0be83`: [Foundation CI #40866034276](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40866034276) **SUCCESS — 226/226 Python integration/unit tests**, disposable PostgreSQL 16 with migration **0001–0012**, independent staging migrator journal/checksum/repeatability, RLS role and source restrictions, physical PostgreSQL trigger checks, two authorized subscribers of one answer, crash fencing, 3-attempt DLQ, private startup guards, Docker non-root and zero-paid-API synthetic walkthrough. [Documentation integrity #40866034252](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40866034252) **SUCCESS**.
+- Additional source validation rejects an invented analysis source or an ungated ENG06 candidate at the database level. The analysis worker lacks SELECT privileges on ENG03 fencing-token columns. Four required fields must be known for candidate generation; test-only knowledge provenance and source-specific facts are checked on final results.
+- [All PR #34 CI runs](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/34/checks). Earlier failed candidate runs caught unbound shared-worker consumer claim, global evidence ID collision, malformed SQL, ENG06 early generation while maintenance was unknown, and a PL/pgSQL alias collision; these were corrected and retested. **An earlier failure is not counted as a success.**
 
 ## 4. Critical non-release blockers
 

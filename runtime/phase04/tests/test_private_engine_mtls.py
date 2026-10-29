@@ -21,6 +21,7 @@ from abc_foundation.private_engine_transport import (
      private_engine_server,send_private_engine_message)
 from abc_foundation.service_mesh_identity import BoundEngineIdentity
 from abc_foundation.isolated_engine_service import VERSION
+from abc_foundation.private_engine_service_server import configure_private_engine_service
 from abc_foundation.store import DomainError
 
 
@@ -150,3 +151,20 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
                          "engine_request_rejected")
         self.assertEqual(self.call(token=self.token(expires=-30))["error"],
                          "engine_request_rejected")
+    def test_three_independent_servers_cannot_start_without_managed_material(self):
+        config={"ABC_ENV":"LOCAL_INTEGRATION_ONLY",
+                "ABC_NETWORK_BOUNDARY":"LOOPBACK_ONLY",
+                "ABC_ENGINE_SYNTHETIC_ONLY":"true",
+                "ABC_ENGINE_ID":"ENG-05",
+                "ABC_CALLER_ENGINE_ID":"ENG-04",
+                "ABC_ENGINE_CONSUMER_ID":"ci-consumer-01",
+                "ABC_ENGINE_PORT":"11005"}
+        with self.assertRaisesRegex(ValueError,"externally_managed_tls"):
+            configure_private_engine_service(config)
+        for change in ({"ABC_ENV":"PRODUCTION"},
+                       {"ABC_NETWORK_BOUNDARY":"PUBLIC_HTTP"},
+                       {"ABC_ENGINE_SYNTHETIC_ONLY":"false"},
+                       {"ABC_ENGINE_ID":"ENG-04"},
+                       {"ABC_ENGINE_PORT":"80"}):
+            with self.subTest(change=change),self.assertRaises(ValueError):
+                configure_private_engine_service({**config,**change})

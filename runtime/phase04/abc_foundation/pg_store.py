@@ -82,46 +82,27 @@ class PostgresStore:
                 raise DomainError(403,"branch_not_authorized_or_ambiguous")
             tenant=permitted[0]["tenant_id"]
             self._scope(con,issuer,sub,tenant,branch)
-            operation="create"
-            # Serialize only the same principal + tenant + intent key. Unique index
-            # remains the source of truth; the advisory lock avoids a duplicate 500.
-            lock_name="|".join((tenant,sub,operation,key))
-            con.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))",(lock_name,))
-            fingerprint=_fingerprint(body)
-            replay=con.execute("""SELECT fingerprint,response_json FROM abc.idempotency
-                    WHERE tenant_id=%s AND actor_id=%s AND operation=%s AND request_key=%s""",
-                    (tenant,sub,operation,key)).fetchone()
-            if replay:
-                if replay["fingerprint"]!=fingerprint:
-                    raise DomainError(409,"idempotency_payload_conflict")
-                return replay["response_json"]
-            sid,eid=uuid.uuid4(),uuid.uuid4()
-            now=datetime.now(timezone.utc)
-            row=con.execute("""INSERT INTO abc.sessions
-                (session_id,tenant_id,branch_id,specialist_id,client_id,appointment_id,service_id,
-                 state,state_version,created_at,updated_at,last_event_id)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,'CREATED',0,%s,%s,%s)
-                RETURNING *""",
-                (sid,tenant,branch,sub,body.get("client_id"),body.get("appointment_id"),
-                 body.get("service_id"),now,now,eid)).fetchone()
-            response=self._public(row)
-            event={
-              "event_id":str(eid),"event_type":"SESSION_CREATED",
-              "event_schema_version":"1.0.0-draft","tenant_id":tenant,
-              "branch_id":branch,"session_id":str(sid),"aggregate_id":str(sid),
-              "aggregate_version":0,"occurred_at":_stamp(now),"correlation_id":str(sid),
-              "actor":{"user_id":sub,"role":"SPECIALIST"},
-              "payload":{"session_id":str(sid),"branch_id":branch},
-              "producer_engine_id":"ENG-01","trace_id":str(uuid.uuid4())
-            }
-            con.execute("""INSERT INTO abc.outbox
-                (event_id,tenant_id,aggregate_id,aggregate_version,event_json,created_at)
-                VALUES(%s,%s,%s,0,%s,%s)""",
-                (eid,tenant,sid,json.dumps(event),now))
-            con.execute("""INSERT INTO abc.idempotency
-                (tenant_id,actor_id,operation,request_key,fingerprint,response_json)
-                VALUES(%s,%s,%s,%s,%s,%s)""",
-                (tenant,sub,operation,key,fingerprint,json.dumps(response)))
+            # One database-owned transaction now governs session + event +
+            # idempotency receipt + create audit. The app role cannot INSERT
+            # sessions or outbox rows directly after migration 0016.
+            try:
+                result=con.execute(
+                    "SELECT abc.eng01_create_session(%s::jsonb,%s) AS response",
+                    (json.dumps(body,sort_keys=True,separators=(",",":"),allow_nan=False),key)
+                ).fetchone()
+            except psycopg.errors.UniqueViolation:
+                raise DomainError(409,"idempotency_payload_conflict") from None
+            except psycopg.errors.CheckViolation:
+                raise DomainError(403,"eng01_creation_broker_denied") from None
+            if not result or not isinstance(result.get("response"),dict):
+                raise DomainError(500,"eng01_create_broker_postcondition_violation")
+            response=result["response"]
+            if (response.get("tenant_id")!=tenant or
+                response.get("branch_id")!=branch or
+                response.get("specialist_id")!=sub or
+                response.get("state")!="CREATED" or
+                response.get("state_version")!=0):
+                raise DomainError(500,"eng01_create_broker_postcondition_violation")
             return response
 
     def get(self, principal, session_id):

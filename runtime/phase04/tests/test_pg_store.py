@@ -270,3 +270,51 @@ class PostgresRuntimeTests(unittest.TestCase):
         self.assertEqual(doc["tenant_id"],self.tenant)
         self.assertEqual(doc["aggregate_version"],0)
         self.assertEqual(doc["payload"]["branch_id"],self.branch)
+
+    def test_broker_is_only_session_and_outbox_write_authority(self):
+        session_id, event_id = uuid.uuid4(), uuid.uuid4()
+        with psycopg.connect(DSN) as con:
+            self.store._scope(con, ISS, self.subject,self.tenant,self.branch)
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""INSERT INTO abc.sessions
+                   (session_id,tenant_id,branch_id,specialist_id,state,
+                    state_version,created_at,updated_at,last_event_id)
+                   VALUES(%s,%s,%s,%s,'CREATED',0,now(),now(),%s)""",
+                   (session_id,self.tenant,self.branch,self.subject,event_id))
+        with psycopg.connect(DSN) as con:
+            self.store._scope(con, ISS, self.subject,self.tenant,self.branch)
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("""INSERT INTO abc.outbox
+                     (event_id,tenant_id,aggregate_id,aggregate_version,event_json,created_at)
+                     VALUES(%s,%s,%s,0,'{}'::jsonb,now())""",
+                    (event_id,self.tenant,session_id))
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("SELECT count(*) FROM abc.sessions WHERE session_id=%s",
+                                         (session_id,)).fetchone()[0],0)
+
+    def test_direct_create_receipt_forgery_denied(self):
+        with psycopg.connect(DSN) as con:
+            self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("""INSERT INTO abc.idempotency
+                    (tenant_id,actor_id,operation,request_key,fingerprint,response_json)
+                    VALUES(%s,%s,'create','forged-receipt-1','fake','{}'::jsonb)""",
+                    (self.tenant,self.subject))
+
+    def test_broker_writes_exactly_one_version_zero_audit_and_event(self):
+        result=self.create("create-broker-audit-1")
+        sid=result["session_id"]
+        with psycopg.connect(ADMIN) as con:
+            rows=con.execute("""SELECT a.tenant_id,a.actor_id,
+                a.event_id,o.aggregate_version,o.event_json->>'event_type',
+                s.state,s.state_version
+                FROM abc.eng01_create_audit a
+                JOIN abc.sessions s ON s.session_id=a.session_id
+                JOIN abc.outbox o ON o.event_id=a.event_id
+                WHERE a.session_id=%s""",(sid,)).fetchall()
+        self.assertEqual(rows,[(self.tenant,self.subject,
+                     uuid.UUID(result["last_event_id"]),0,"SESSION_CREATED","CREATED",0)])
+        self.assertEqual(self.create("create-broker-audit-1"),result)
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng01_create_audit
+                   WHERE session_id=%s""",(sid,)).fetchone()[0],1)

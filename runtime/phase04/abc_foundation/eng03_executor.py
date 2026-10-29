@@ -70,7 +70,7 @@ class ENG03Executor:
                    (self.consumer_id,))
             row=con.execute("""WITH next AS (
                 SELECT job_id FROM abc.eng03_input_jobs
-                WHERE consumer_id=%s AND (
+                WHERE consumer_id=%s AND attempts<3 AND (
                     (status='QUEUED_PENDING_ENGINE' AND next_attempt_at<=clock_timestamp())
                    OR (status='LEASED' AND lease_until<=clock_timestamp()))
                 ORDER BY updated_at,job_id

@@ -21,7 +21,7 @@ OIDC verifier → Principal(issuer,subject) → authoritative PostgresStore.get 
 
 | Work package | Current status | Proof needed |
 | --- | --- | --- |
-| WP01 Canonical graph/read-only NextAction + pause command | SOURCE_IMPLEMENTED, exact SHA CI pending | strict drift, scope, replay and PG concurrency |
+| WP01 Canonical graph/read-only NextAction + pause command | IMPLEMENTED / TESTED on SHA 8303e603bbdfa10f6593a641ecdb6761b739a2a1 | strict drift, scope, replay and PG concurrency |
 | WP02 Authenticated typed commands for independent engines | NOT_STARTED | server-bound service identity, versioned input/output schema |
 | WP03 All guarded, durable state transitions and orchestration event ledger | NOT_STARTED | transactional evidence and policy recheck in same DB transaction |
 | WP04 Durable work scheduling, cancellation, timeout, jitter, poison DLQ, stale-output fencing | NOT_STARTED | independent worker / chaos replay |
@@ -40,3 +40,7 @@ OIDC verifier → Principal(issuer,subject) → authoritative PostgresStore.get 
 Each engine has independent code, contracts, test evidence and maturity gate. No fake microservice availability or claim that 19 engines are complete.
 
 **Disposition:** ENG-01 PARTIAL IMPLEMENTATION, NOT RELEASED; ENG-02..06 NOT IMPLEMENTED in this branch; Phase04 IN_PROGRESS; no new paid infrastructure authorized.
+
+## CI execution evidence
+
+GitHub Actions foundation CI [#40851158189](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40851158189) SUCCESS at source commit 8303e603bbdfa10f6593a641ecdb6761b739a2a1. Full suite **116/116 Python unittest PASS** (97 baseline + 19 ENG01 additions). Graph drift validator PASS, concurrent durable PostgreSQL audit/replay PASS, isolated migrator and Docker non-root checks PASS. Documentation integrity workflow [#40851158267](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40851158267) SUCCESS. This is CI evidence for the implementation, not a service review or full engine exit. Subsequent documentation-only commits require their own exact-head CI check.

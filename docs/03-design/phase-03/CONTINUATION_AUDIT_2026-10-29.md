@@ -14,7 +14,7 @@
 - 70 original package files and historical reference lineage were preserved; prior GPTs-only Notion documents are history, not current implementation authority.
 - Release gates G-00 through G-09 and phase exit reviews have separate meanings. Specifically **Phase 03 UX exit is not the product release G-03 visual-quality gate**.
 
-Evidence: [integration PR #19](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/19), [baseline merge](https://github.com/saleheebrahimi2029-hub/abc-platform/commit/1b479453c155b5744ec95e136733cce16a34ae88), [roadmap](../../../../docs/05-delivery/MASTER_ROADMAP_16_PHASES.md), [release gate policy](../../../../docs/05-delivery/RELEASE_GATES.md), [engine registry](../../../../docs/02-architecture/ENGINE_REGISTRY.md).
+Evidence: [integration PR #19](https://github.com/saleheebrahimi2029-hub/abc-platform/pull/19), [baseline merge](https://github.com/saleheebrahimi2029-hub/abc-platform/commit/1b479453c155b5744ec95e136733cce16a34ae88), [roadmap](../../../docs/05-delivery/MASTER_ROADMAP_16_PHASES.md), [release gate policy](../../../docs/05-delivery/RELEASE_GATES.md), [engine registry](../../../docs/02-architecture/ENGINE_REGISTRY.md).
 
 ## 2. Inspected Phase-03 implementation
 

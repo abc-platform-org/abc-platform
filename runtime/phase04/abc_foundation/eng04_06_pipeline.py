@@ -59,7 +59,7 @@ class SyntheticAnalysisPipeline:
                 (self.consumer_id,))
             item=con.execute("""WITH chosen AS (
                 SELECT job_id FROM abc.eng04_06_jobs
-                WHERE consumer_id=%s AND (
+                WHERE consumer_id=%s AND attempts<3 AND (
                       (status='QUEUED' AND next_attempt_at<=clock_timestamp())
                    OR (status='LEASED' AND lease_until<=clock_timestamp()))
                 ORDER BY updated_at,job_id FOR UPDATE SKIP LOCKED LIMIT 1

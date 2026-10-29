@@ -1,0 +1,66 @@
+{
+  "registry_version": "eng02.synthetic.1",
+  "kind": "SYNTHETIC_FIXTURE_NOT_APPROVED_SERVICE_PACK",
+  "profiles": [
+    {
+      "profile_id": "SYNTHETIC_HAIR_CONSULTATION_V1",
+      "service_id": "synthetic:hair-color",
+      "profile_version": "synthetic-1.0.0",
+      "enabled_for_real_clients": false,
+      "questions": [
+        {
+          "question_id": "synthetic:prior-treatment",
+          "field": "prior_treatment",
+          "text": "Has there been a previous chemical hair treatment? (synthetic test)",
+          "reason": "SAFETY_NECESSITY",
+          "priority": 100,
+          "critical": true,
+          "allowed_values": [
+            "YES",
+            "NO",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "question_id": "synthetic:sensitivity",
+          "field": "sensitivity_flag",
+          "text": "Has the client reported sensitivity requiring specialist review? (synthetic test)",
+          "reason": "SAFETY_NECESSITY",
+          "priority": 95,
+          "critical": true,
+          "allowed_values": [
+            "YES",
+            "NO",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "question_id": "synthetic:desired-goal",
+          "field": "goal",
+          "text": "What is the intended style direction? (synthetic test)",
+          "reason": "DECISION_IMPACT",
+          "priority": 50,
+          "critical": false,
+          "allowed_values": [
+            "SUBTLE",
+            "BOLD",
+            "UNSURE"
+          ]
+        },
+        {
+          "question_id": "synthetic:maintenance",
+          "field": "maintenance",
+          "text": "What is the maintenance preference? (synthetic test)",
+          "reason": "DECISION_IMPACT",
+          "priority": 35,
+          "critical": false,
+          "allowed_values": [
+            "LOW",
+            "FLEXIBLE",
+            "UNKNOWN"
+          ]
+        }
+      ]
+    }
+  ]
+}

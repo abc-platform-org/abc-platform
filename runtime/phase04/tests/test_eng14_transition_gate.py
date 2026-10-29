@@ -131,3 +131,53 @@ class ENG14DatabaseGate(unittest.TestCase):
         with psycopg.connect(ADMIN) as con:
             self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng14_state_guard_audit
                  WHERE session_id=%s""",(self.sid,)).fetchone()[0],0)
+
+    def test_application_sql_cannot_insert_paused_or_forged_initial_version(self):
+        # The 0014 trigger covers UPDATE(state), not INSERT. A SQL client
+        # holding abc_app credentials must not skip S0 creation invariants.
+        bad_initial_states = (
+            ("PAUSED", 1, "CREATED"),
+            ("CREATED", 4, None),
+            ("CREATED", 0, "CREATED"),
+        )
+        for state, version, checkpoint in bad_initial_states:
+            with self.subTest(state=state, version=version, checkpoint=checkpoint):
+                attempt = uuid.uuid4()
+                with self.assertRaises(psycopg.errors.CheckViolation):
+                    with psycopg.connect(APP) as con:
+                        self.store._scope(con, ISS, self.s, self.t, self.b)
+                        con.execute("""INSERT INTO abc.sessions(
+                             session_id,tenant_id,branch_id,specialist_id,service_id,
+                             state,state_version,checkpoint,created_at,updated_at,last_event_id)
+                             VALUES(%s,%s,%s,%s,%s,%s,%s,%s,
+                               clock_timestamp(),clock_timestamp(),%s)""",
+                            (attempt,self.t,self.b,self.s,"synthetic:hair-color",
+                             state,version,checkpoint,uuid.uuid4()))
+                with psycopg.connect(ADMIN) as con:
+                    count = con.execute("SELECT count(*) FROM abc.sessions WHERE session_id=%s",
+                                        (attempt,)).fetchone()[0]
+                self.assertEqual(count, 0)
+
+    def test_application_sql_cannot_modify_session_version_or_metadata(self):
+        # ENG01 legacy/typed pause uses the narrow ENG14 broker. Direct
+        # state_version writes could otherwise poison CAS/audit ordering.
+        commands = (
+            ("UPDATE abc.sessions SET state_version=state_version+1 WHERE session_id=%s",
+             (self.sid,), psycopg.errors.InsufficientPrivilege),
+            ("UPDATE abc.sessions SET updated_at=clock_timestamp() WHERE session_id=%s",
+             (self.sid,), psycopg.errors.CheckViolation),
+            ("UPDATE abc.sessions SET last_event_id=%s WHERE session_id=%s",
+             (uuid.uuid4(),self.sid), psycopg.errors.InsufficientPrivilege),
+        )
+        for statement, params, denied_error in commands:
+            with self.subTest(statement=statement):
+                with self.assertRaises(denied_error):
+                    with psycopg.connect(APP) as con:
+                        self.store._scope(con, ISS, self.s, self.t, self.b)
+                        con.execute(statement, params)
+        current = self.store.get(self.p, self.sid)
+        self.assertEqual((current["state"],current["state_version"]),("CREATED",0))
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute(
+                 "SELECT count(*) FROM abc.eng14_state_guard_audit WHERE session_id=%s",
+                 (self.sid,)).fetchone()[0],0)

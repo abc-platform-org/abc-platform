@@ -76,29 +76,44 @@ def apply_migrations(env=None):
         current=con.execute("SELECT current_user").fetchone()[0]
         if current != "abc_staging_migrator":
             raise ValueError("database_identity_mismatch")
-        _role(con,"abc_app",env["ABC_STAGING_APP_PASSWORD"])
-        _role(con,"abc_worker",env["ABC_STAGING_WORKER_PASSWORD"])
-        con.execute("""
-            CREATE TABLE IF NOT EXISTS public.abc_schema_migrations(
-                filename text PRIMARY KEY, sha256 text NOT NULL,
-                applied_at timestamptz NOT NULL DEFAULT clock_timestamp()
-            )
-        """)
-        con.execute("""REVOKE ALL ON public.abc_schema_migrations
-                     FROM PUBLIC, abc_app, abc_worker""")
-        for filename,digest in plan:
-            row=con.execute("SELECT sha256 FROM public.abc_schema_migrations WHERE filename=%s",
-                            (filename,)).fetchone()
-            if row:
-                if row[0] != digest:
-                    raise ValueError("migration_checksum_drift_"+filename)
-                continue
-            # Every migration file has explicit BEGIN/COMMIT.
-            con.execute((MIGRATIONS / filename).read_text())
-            con.execute("INSERT INTO public.abc_schema_migrations(filename,sha256) VALUES(%s,%s)",
-                        (filename,digest))
-            print("Applied", filename, flush=True)
-        print("ABC staging schema verified and least-privilege roles configured",flush=True)
+        # Serialize all independent migration invocations before role creation or schema writes.
+        con.execute("SELECT pg_advisory_lock(hashtext('abc_staging_p04_migrations_v1'))")
+        try:
+            _role(con,"abc_app",env["ABC_STAGING_APP_PASSWORD"])
+            _role(con,"abc_worker",env["ABC_STAGING_WORKER_PASSWORD"])
+            with con.transaction():
+                con.execute("""
+                    CREATE TABLE IF NOT EXISTS public.abc_schema_migrations(
+                        filename text PRIMARY KEY, sha256 text NOT NULL,
+                        applied_at timestamptz NOT NULL DEFAULT clock_timestamp()
+                    )
+                """)
+                con.execute("""REVOKE ALL ON public.abc_schema_migrations
+                             FROM PUBLIC, abc_app, abc_worker""")
+            for filename,digest in plan:
+                source=(MIGRATIONS / filename).read_text().strip()
+                if not source.startswith("--") or "BEGIN;" not in source or not source.endswith("COMMIT;"):
+                    raise ValueError("nontransactional_migration_"+filename)
+                # Strip the migration file's own outer transaction so the applied
+                # SQL and matching checksum receipt commit (or roll back) together.
+                start=source.find("BEGIN;")
+                ddl=source[start+len("BEGIN;"):-len("COMMIT;")].strip()
+                if not ddl:
+                    raise ValueError("empty_migration_"+filename)
+                with con.transaction():
+                    row=con.execute("SELECT sha256 FROM public.abc_schema_migrations WHERE filename=%s FOR UPDATE",
+                                    (filename,)).fetchone()
+                    if row:
+                        if row[0] != digest:
+                            raise ValueError("migration_checksum_drift_"+filename)
+                        continue
+                    con.execute(ddl)
+                    con.execute("INSERT INTO public.abc_schema_migrations(filename,sha256) VALUES(%s,%s)",
+                                (filename,digest))
+                print("Applied", filename, flush=True)
+            print("ABC staging schema verified and least-privilege roles configured",flush=True)
+        finally:
+            con.execute("SELECT pg_advisory_unlock(hashtext('abc_staging_p04_migrations_v1'))")
 
 
 if __name__=="__main__":

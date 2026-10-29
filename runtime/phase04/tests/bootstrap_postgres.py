@@ -19,7 +19,8 @@ with psycopg.connect(dsn,autocommit=True) as con:
         END IF;
         END $$""")
     con.execute("CREATE ROLE abc_orchestrator LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS PASSWORD 'integration-only-abc-orchestrator'")
-    for role in ('abc_app', 'abc_worker', 'abc_orchestrator'):
+    con.execute("CREATE ROLE abc_answer_worker LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS PASSWORD 'integration-only-abc-answer-worker'")
+    for role in ('abc_app', 'abc_worker', 'abc_orchestrator', 'abc_answer_worker'):
         r=con.execute("SELECT rolsuper,rolbypassrls,rolcreaterole,rolcreatedb FROM pg_roles WHERE rolname=%s",(role,)).fetchone()
         if any(r):
             raise SystemExit(role+" role is not least-privilege")

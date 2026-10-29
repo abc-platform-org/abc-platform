@@ -7,6 +7,7 @@ services:
   - type: pserv
     name: abc-eng04-private-synthetic
     runtime: docker
+    numInstances: 1
     dockerfilePath: ./runtime/phase04/Dockerfile
     dockerContext: ./runtime/phase04
     dockerCommand: python -m abc_foundation.private_engine_service_server
@@ -43,6 +44,7 @@ services:
   - type: pserv
     name: abc-eng05-private-synthetic
     runtime: docker
+    numInstances: 1
     dockerfilePath: ./runtime/phase04/Dockerfile
     dockerContext: ./runtime/phase04
     dockerCommand: python -m abc_foundation.private_engine_service_server
@@ -79,6 +81,7 @@ services:
   - type: pserv
     name: abc-eng06-private-synthetic
     runtime: docker
+    numInstances: 1
     dockerfilePath: ./runtime/phase04/Dockerfile
     dockerContext: ./runtime/phase04
     dockerCommand: python -m abc_foundation.private_engine_service_server

@@ -1,7 +1,7 @@
 {
   "schema_version": "abc.engine-quality-gates.v1",
   "completion_rule": "ALL_MANDATORY_GATES_WITH_EXTERNAL_EVIDENCE_AND_DUAL_INDEPENDENT_ATTESTATION",
-  "scope": "ABC_IN_SALON_SHARED_SCREEN",
+  "scope": "IN_SALON_SHARED_SCREEN",
   "allowed_statuses": [
     "IN_PROGRESS",
     "BLOCKED",

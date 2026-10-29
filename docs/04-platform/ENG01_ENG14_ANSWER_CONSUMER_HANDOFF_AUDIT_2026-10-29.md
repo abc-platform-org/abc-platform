@@ -36,3 +36,7 @@ The log-level 206-test figure is the count of the exact cited SHA, not a claim o
 - WP-D: Staging only after explicit budget and privacy/security approval; negative pentests, realistic SLO/chaos, restore and signoffs. Main stays frozen until gate approvals.
 
 **Disposition:** ENG01/14 ANSWER-SCOPE POLICY + INDEPENDENT ANSWER WORKER = CODE IMPLEMENTED AND LOCALLY CI-TESTED, **NOT PRODUCT RELEASED**. ENG03 queue = durable **pending** handoff only. P04=IN_PROGRESS. Paid API=NOT_USED. Cloud=NOT_DEPLOYED.
+
+## ENG01 legacy checkpoint safety regression
+
+The old internal PostgresStore.checkpoint_command had an executable PAUSED to CREATED resume without transactional ENG14 and verified consent re-evaluation. That resume path is now explicitly blocked with 501 (`resume_requires_eng14_and_verified_consent`); a regression test requires session to remain PAUSED with one audit entry. This does **not** mean the missing policy-safe resume path is implemented, nor that the remaining ENG01 transitions are released. The existing pause-only synthetic checkpoint remains unchanged.

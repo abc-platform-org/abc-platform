@@ -13,9 +13,15 @@ with psycopg.connect(dsn,autocommit=True) as con:
             CREATE ROLE abc_app LOGIN PASSWORD 'integration-only-abc-app';
         END IF;
         END $$""")
-    r=con.execute("SELECT rolsuper,rolbypassrls,rolcreaterole FROM pg_roles WHERE rolname='abc_app'").fetchone()
-    if any(r):
-        raise SystemExit("abc_app role is not least-privilege")
+    con.execute("""DO $ BEGIN
+        IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='abc_worker') THEN
+            CREATE ROLE abc_worker LOGIN PASSWORD 'integration-only-abc-worker';
+        END IF;
+        END $""")
+    for role in ('abc_app', 'abc_worker'):
+        r=con.execute("SELECT rolsuper,rolbypassrls,rolcreaterole,rolcreatedb FROM pg_roles WHERE rolname=%s",(role,)).fetchone()
+        if any(r):
+            raise SystemExit(role+" role is not least-privilege")
     for migration in sorted((Path(__file__).resolve().parents[1]/"migrations").glob("*.sql")):
         con.execute(migration.read_text())
         print("Applied", migration.name)

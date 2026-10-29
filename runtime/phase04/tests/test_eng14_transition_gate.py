@@ -72,10 +72,14 @@ class ENG14DatabaseGate(unittest.TestCase):
              "guard-"+suffix)["session_id"]
 
     def test_untrusted_direct_state_update_rejected(self):
+        # FORCE RLS hides the row completely when there is no trusted
+        # session scope, so the update affects ZERO rows without running a
+        # row trigger. This is secure denial, not an expected SQL exception.
         with psycopg.connect(APP) as con:
-            with self.assertRaises(psycopg.errors.CheckViolation):
-                con.execute("UPDATE abc.sessions SET state='PAUSED',state_version=1,checkpoint='CREATED' WHERE session_id=%s",
-                            (self.sid,))
+            affected=con.execute("""UPDATE abc.sessions SET state='PAUSED',
+                state_version=1,checkpoint='CREATED' WHERE session_id=%s""",
+                (self.sid,)).rowcount
+            self.assertEqual(affected,0)
         self.assertEqual(self.store.get(self.p,self.sid)["state"],"CREATED")
 
     def test_state_pause_approved_only_after_verified_membership_and_audited(self):

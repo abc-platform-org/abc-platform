@@ -1,0 +1,165 @@
+{
+  "schema_version": "abc.engine-quality-registry.v1",
+  "as_of": "2026-10-30",
+  "baseline_commit": "c223e8a194870ce8091e571952c20ba8a96e5f0b",
+  "baseline_pr": 42,
+  "assessment": "EVIDENCE_INCOMPLETE",
+  "stage": "PHASE04_FOUNDATION_AND_PRIVATE_SECURITY_IN_PROGRESS",
+  "mandatory_gate_policy": "governance/engine_quality_policy.v1.json",
+  "engine_count": 7,
+  "engines": [
+    {
+      "id": "ENG-01",
+      "name": "Orchestration & trusted workflow control",
+      "target_architecture_role": "ENG-01 secure orchestration gateway / transitions",
+      "observed_maturity": "FOUNDATION_CI_TESTED",
+      "current_state": "IN_PROGRESS",
+      "completion_claim": false,
+      "real_customer_ready": false,
+      "implemented_and_tested_scope": [
+        "OIDC+Postgres session broker",
+        "created-to-paused synthetic gate",
+        "20 states / 102 canonical edges frozen"
+      ],
+      "critical_blockers": [
+        "41 public operations need implementation and traceable sequencing",
+        "real private multi-service deployment and broker authentication",
+        "consent/rollback/recovery and full supported transition coverage"
+      ],
+      "gate_evidence": {},
+      "target_service_scope": "IN_SALON_SHARED_SCREEN"
+    },
+    {
+      "id": "ENG-02",
+      "name": "In-salon consultation / consent / session",
+      "target_architecture_role": "ENG-02 consultations and evidence provenance",
+      "observed_maturity": "FOUNDATION_CI_TESTED",
+      "current_state": "IN_PROGRESS",
+      "completion_claim": false,
+      "real_customer_ready": false,
+      "implemented_and_tested_scope": [
+        "session create/get local harness",
+        "synthetic consultation fixture",
+        "transactional outbox & worker contracts"
+      ],
+      "critical_blockers": [
+        "complete professional intake and client history with consent",
+        "structured validated multi-service profile and audit",
+        "real data privacy, DSAR and specialist workflow evaluation"
+      ],
+      "gate_evidence": {},
+      "target_service_scope": "IN_SALON_SHARED_SCREEN"
+    },
+    {
+      "id": "ENG-03",
+      "name": "Evidence processor / durable execution",
+      "target_architecture_role": "ENG-03 independent evidence runtime & Claim/Lease/ACK",
+      "observed_maturity": "FOUNDATION_CI_TESTED",
+      "current_state": "IN_PROGRESS",
+      "completion_claim": false,
+      "real_customer_ready": false,
+      "implemented_and_tested_scope": [
+        "PostgreSQL Claim/Lease/ACK worker",
+        "source-to-evidence provenance ledger",
+        "synthetic outbox pipeline"
+      ],
+      "critical_blockers": [
+        "independent managed workload identity and private deployment",
+        "real load/recovery and multi-consumer replay safety",
+        "validated evidence lifecycle and service specific quality"
+      ],
+      "gate_evidence": {},
+      "target_service_scope": "IN_SALON_SHARED_SCREEN"
+    },
+    {
+      "id": "ENG-04",
+      "name": "Visual analysis + recommendation",
+      "target_architecture_role": "ENG-04 recommendation engine, leveraging visual/evidence analysis",
+      "observed_maturity": "SYNTHETIC_PROCESS_CI_TESTED",
+      "current_state": "IN_PROGRESS",
+      "completion_claim": false,
+      "real_customer_ready": false,
+      "implemented_and_tested_scope": [
+        "synthetic non-media evidence analyzer",
+        "separate OS process & TLS1.3 test port",
+        "versioned internal synthetic JSON contracts"
+      ],
+      "critical_blockers": [
+        "current runtime implementation is analysis only; align target Recommendation role via ADR",
+        "real image understanding, masks/reference fidelity & uncertainty validation",
+        "real private deployment, performance and qualified domain benchmark"
+      ],
+      "gate_evidence": {},
+      "target_service_scope": "IN_SALON_SHARED_SCREEN"
+    },
+    {
+      "id": "ENG-05",
+      "name": "Knowledge + decision",
+      "target_architecture_role": "ENG-05 decision intelligence, using audited knowledge",
+      "observed_maturity": "SYNTHETIC_PROCESS_CI_TESTED",
+      "current_state": "IN_PROGRESS",
+      "completion_claim": false,
+      "real_customer_ready": false,
+      "implemented_and_tested_scope": [
+        "synthetic offline knowledge fixture",
+        "separate OS process & TLS1.3 test port",
+        "source confidence UNKNOWN when unverified"
+      ],
+      "critical_blockers": [
+        "current runtime implementation is Knowledge only; align target Decision role via ADR",
+        "professional knowledge catalog validity/version ownership and decision hard filters",
+        "real private deployment, provenance and expert benchmark"
+      ],
+      "gate_evidence": {},
+      "target_service_scope": "IN_SALON_SHARED_SCREEN"
+    },
+    {
+      "id": "ENG-06",
+      "name": "Technical planning intelligence",
+      "target_architecture_role": "ENG-06 expert-validated technical procedure roadmap after Look lock",
+      "observed_maturity": "SYNTHETIC_PROCESS_CI_TESTED",
+      "current_state": "IN_PROGRESS",
+      "completion_claim": false,
+      "real_customer_ready": false,
+      "implemented_and_tested_scope": [
+        "synthetic bounded candidate selection",
+        "separate OS process & TLS1.3 test port",
+        "no professional treatment release allowed"
+      ],
+      "critical_blockers": [
+        "current runtime implementation is Decision not Technical Plan; canonical ENG06 role migration required",
+        "feasibility gate, procedure sequencing, parameters, QA, stop conditions & aftercare",
+        "specialist SOP signoff and independent real-world safety tests"
+      ],
+      "gate_evidence": {},
+      "target_service_scope": "IN_SALON_SHARED_SCREEN"
+    },
+    {
+      "id": "ENG-14",
+      "name": "Governance & secure policy enforcement",
+      "target_architecture_role": "ENG-14 policy and professional safety runtime",
+      "observed_maturity": "POLICY_FOUNDATION_CI_TESTED",
+      "current_state": "IN_PROGRESS",
+      "completion_claim": false,
+      "real_customer_ready": false,
+      "implemented_and_tested_scope": [
+        "SQL state guard/creation broker rules",
+        "S1–S3 provisional review/block classifier",
+        "mTLS DB workload identity and policy gates tested with synthetic inputs"
+      ],
+      "critical_blockers": [
+        "independent signed professional SOP/consent, privacy review",
+        "approved policy coverage beyond narrow CREATED→PAUSED",
+        "managed CA, private PostgreSQL and role security signoff"
+      ],
+      "gate_evidence": {},
+      "target_service_scope": "IN_SALON_SHARED_SCREEN"
+    }
+  ],
+  "prohibited_aggregate_claims": [
+    "ALL_ENGINES_COMPLETE",
+    "PRODUCTION_READY",
+    "CUSTOMER_RELEASE_APPROVED"
+  ],
+  "notes": "Source descriptions are current observed code scope, NOT signed acceptance. All gates require externally evidenced review and cryptographic signoff before COMPLETE."
+}

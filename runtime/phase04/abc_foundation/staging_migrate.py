@@ -51,7 +51,7 @@ def validate_migrator_config(env):
         v=env.get(key)
         if not isinstance(v,str) or len(v) < 32 or len(v) > 512:
             raise ValueError("missing_secure_role_credential_"+key)
-    values=[env[k] for k in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD","ABC_STAGING_ORCHESTRATOR_PASSWORD")]
+    values=[env[k] for k in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD","ABC_STAGING_ORCHESTRATOR_PASSWORD","ABC_STAGING_ANSWER_WORKER_PASSWORD")]
     if len(set(values))!=4:
         raise ValueError("distinct_role_credentials_required")
     return dsn

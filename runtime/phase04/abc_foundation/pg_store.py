@@ -169,6 +169,7 @@ class PostgresStore:
                     WHERE session_id=%s AND tenant_id=%s AND branch_id=%s
                       AND client_id=%s AND status='ACTIVE'
                       AND verified_at IS NOT NULL AND revoked_at IS NULL
+                      AND valid_until IS NOT NULL AND valid_until > clock_timestamp()
                       AND evidence_digest <> '' AND retention_policy_id <> ''
                       AND %s = ANY(purpose)
                     LIMIT 1

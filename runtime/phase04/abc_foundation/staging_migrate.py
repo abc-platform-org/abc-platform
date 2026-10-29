@@ -22,6 +22,7 @@ FILENAMES = (
     "0007_eng01_command_receipts.sql",
     "0008_engine_workload_eng02_answer_outbox.sql",
     "0009_answer_consumer_eng14_policy_gate.sql",
+    "0010_eng03_durable_handoff_queue.sql",
 )
 
 

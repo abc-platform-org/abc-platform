@@ -55,7 +55,7 @@ with psycopg.connect(local) as con:
     assert [name for name,digest in migration_rows]==list(staging_migrate.FILENAMES)
     for name,digest in migration_rows:
         assert digest==dict(staging_migrate.planned_migrations())[name]
-    for table in ("sessions","consent_evidence","outbox","worker_subscriptions","event_delivery","engine_workload_grants","eng02_answers","eng02_command_receipts","answer_index_projection","eng14_policy_audit","eng03_input_jobs","eng03_worker_bindings","worker_login_bindings","eng03_evidence_ledger","eng04_06_jobs","eng04_06_results"):
+    for table in ("sessions","consent_evidence","outbox","worker_subscriptions","event_delivery","engine_workload_grants","eng02_answers","eng02_command_receipts","answer_index_projection","eng14_policy_audit","eng03_input_jobs","eng03_worker_bindings","worker_login_bindings","eng14_state_guard_audit","eng03_evidence_ledger","eng04_06_jobs","eng04_06_results"):
         row=con.execute("SELECT relrowsecurity,relforcerowsecurity FROM pg_class WHERE oid=to_regclass(%s)",
                         ("abc."+table,)).fetchone()
         assert row==(True,True),table

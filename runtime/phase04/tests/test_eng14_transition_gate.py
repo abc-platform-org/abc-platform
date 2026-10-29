@@ -163,15 +163,15 @@ class ENG14DatabaseGate(unittest.TestCase):
         # state_version writes could otherwise poison CAS/audit ordering.
         commands = (
             ("UPDATE abc.sessions SET state_version=state_version+1 WHERE session_id=%s",
-             (self.sid,)),
+             (self.sid,), psycopg.errors.InsufficientPrivilege),
             ("UPDATE abc.sessions SET updated_at=clock_timestamp() WHERE session_id=%s",
-             (self.sid,)),
+             (self.sid,), psycopg.errors.CheckViolation),
             ("UPDATE abc.sessions SET last_event_id=%s WHERE session_id=%s",
-             (uuid.uuid4(),self.sid)),
+             (uuid.uuid4(),self.sid), psycopg.errors.InsufficientPrivilege),
         )
-        for statement, params in commands:
+        for statement, params, denied_error in commands:
             with self.subTest(statement=statement):
-                with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                with self.assertRaises(denied_error):
                     with psycopg.connect(APP) as con:
                         self.store._scope(con, ISS, self.s, self.t, self.b)
                         con.execute(statement, params)

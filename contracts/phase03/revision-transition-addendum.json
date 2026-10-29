@@ -1,0 +1,13 @@
+{
+  "id":"ABC-CR-03-001",
+  "status":"PROPOSED_DESIGN_EXTENSION_NOT_RUNTIME_AUTHORIZATION",
+  "base_version":"1.0.0-draft",
+  "machine":"CONSULTATION_SESSION",
+  "actor":"SPECIALIST",
+  "from":["LOOK_SELECTED","FEASIBILITY_REVIEW","PLAN_DRAFTED","SPECIALIST_REVIEW"],
+  "to":"REVISION_REQUESTED",
+  "guards":["verified_tenant_and_specialist","expected_state_version_matches","idempotency_key","active_image_consent","selected_immutable_parent_pinned","no_committed_handoff"],
+  "atomic_effects":["preserve_original_look_versions","clear_selected_pointer","invalidate_feasibility_plan_validation","cancel_superseded_jobs","append_audit_with_parent_and_reason"],
+  "forbidden_from":["HANDOFF","CLOSED","CANCELLED","SAFETY_BLOCKED"],
+  "prototype":"synthetic UX demonstration; baseline v1 contracts unchanged; approval needed before backend adoption"
+}

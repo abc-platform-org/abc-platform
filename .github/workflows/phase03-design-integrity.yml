@@ -1,0 +1,18 @@
+name: Phase 03 design and prototype integrity
+on: [pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  prototype:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate_phase03.py
+      - run: node --check prototypes/phase03/app.mjs
+      - run: node --test tests/phase03/model.test.mjs

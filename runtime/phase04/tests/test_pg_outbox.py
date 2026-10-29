@@ -32,6 +32,10 @@ class OutboxIntegrationTests(unittest.TestCase):
             con.execute("""INSERT INTO abc.memberships(issuer,subject,tenant_id,branch_id,role,active)
                 VALUES (%s,%s,%s,%s,'SPECIALIST',true)""",
                 (ISS,self.subject,self.tenant,self.branch))
+            con.execute("""INSERT INTO abc.worker_subscriptions
+                (consumer_id,tenant_id,event_type,active)
+                VALUES(%s,%s,'SESSION_CREATED',true)""",
+                (self.consumer,self.tenant))
 
     def create(self,key):
         return self.pg.create(self.principal,{"branch_id":self.branch,"scope":"IN_SALON_SHARED_SCREEN"},key)
@@ -103,6 +107,10 @@ class OutboxIntegrationTests(unittest.TestCase):
     def test_different_consumer_receives_independent_ack(self):
         self.create("create-"+uuid.uuid4().hex)
         second=self.consumer+"-2"
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.worker_subscriptions
+                    (consumer_id,tenant_id,event_type,active)
+                    VALUES(%s,%s,'SESSION_CREATED',true)""",(second,self.tenant))
         self.worker.register(self.consumer)
         self.worker.register(second)
         first=self.worker.lease(self.consumer)
@@ -140,3 +148,42 @@ class OutboxIntegrationTests(unittest.TestCase):
         with psycopg.connect(APP) as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("SELECT * FROM abc.outbox LIMIT 1")
+
+
+# Additional tenant-boundary adversarial tests without client images.
+def _test_outbox_tenant_cross_event_never_delivered(self):
+    sid=self.create("event-"+uuid.uuid4().hex)
+    # Unrelated tenant creates a second event with a different active specialist.
+    other=uuid.uuid4().hex[:12]
+    t,b,u="tenant-"+other,"branch-"+other,"specialist-"+other
+    with psycopg.connect(ADMIN) as con:
+        con.execute("INSERT INTO abc.tenants VALUES(%s)",(t,))
+        con.execute("INSERT INTO abc.branches VALUES(%s,%s)",(t,b))
+        con.execute("""INSERT INTO abc.memberships(issuer,subject,tenant_id,branch_id,role,active)
+            VALUES(%s,%s,%s,%s,'SPECIALIST',true)""",(ISS,u,t,b))
+    another=PostgresStore(APP).create(Principal(u,ISS),
+        {"branch_id":b,"scope":"IN_SALON_SHARED_SCREEN"},"isolation-"+other)
+    self.assertEqual(self.worker.register(self.consumer),1)
+    leased=self.worker.lease(self.consumer)
+    self.assertEqual(leased["tenant_id"],self.tenant)
+    self.assertEqual(leased["event"]["session_id"],sid["session_id"])
+    self.assertNotEqual(leased["event"]["session_id"],another["session_id"])
+    self.worker.complete(self.consumer,leased["event_id"],leased["lease_token"],succeeded=True)
+    self.assertIsNone(self.worker.lease(self.consumer))
+
+def _test_outbox_subscription_revocation_fences_completion(self):
+    self.create("event-"+uuid.uuid4().hex)
+    self.worker.register(self.consumer)
+    first=self.worker.lease(self.consumer)
+    with psycopg.connect(ADMIN) as con:
+        con.execute("UPDATE abc.worker_subscriptions SET active=false WHERE consumer_id=%s",(self.consumer,))
+    with self.assertRaises(DomainError) as ex:
+        self.worker.complete(self.consumer,first["event_id"],first["lease_token"],succeeded=True)
+    self.assertEqual(ex.exception.status,403)
+    with self.assertRaises(DomainError):
+        self.worker.register(self.consumer)
+    with self.assertRaises(DomainError):
+        self.worker.lease(self.consumer)
+
+OutboxIntegrationTests.test_outbox_tenant_cross_event_never_delivered=_test_outbox_tenant_cross_event_never_delivered
+OutboxIntegrationTests.test_outbox_subscription_revocation_fences_completion=_test_outbox_subscription_revocation_fences_completion

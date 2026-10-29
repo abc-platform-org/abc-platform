@@ -37,12 +37,18 @@ class OutboxDispatcher:
         """
         self._consumer(consumer_id)
         with self._connect() as con:
+            scope = con.execute("""
+                SELECT tenant_id,event_type FROM abc.worker_subscriptions
+                WHERE consumer_id=%s AND active=true
+            """,(consumer_id,)).fetchone()
+            if scope is None:
+                raise DomainError(403,"consumer_not_provisioned")
             cursor = con.execute("""
                 INSERT INTO abc.event_delivery(consumer_id,event_id,tenant_id)
                 SELECT %s, event_id, tenant_id FROM abc.outbox
-                WHERE event_json->>'event_type'='SESSION_CREATED'
+                WHERE tenant_id=%s AND event_json->>'event_type'=%s
                 ON CONFLICT(consumer_id,event_id) DO NOTHING
-            """, (consumer_id,))
+            """, (consumer_id,scope["tenant_id"],scope["event_type"]))
             return cursor.rowcount
 
     def lease(self, consumer_id, *, seconds=30):
@@ -51,6 +57,12 @@ class OutboxDispatcher:
             raise DomainError(400, "invalid_lease_duration")
         token = uuid.uuid4()
         with self._connect() as con:
+            allowed = con.execute("""
+                SELECT 1 FROM abc.worker_subscriptions
+                WHERE consumer_id=%s AND active=true
+            """,(consumer_id,)).fetchone()
+            if allowed is None:
+                raise DomainError(403,"consumer_not_provisioned")
             item = con.execute("""
                 WITH claimed AS (
                   SELECT event_id FROM abc.event_delivery
@@ -91,6 +103,12 @@ class OutboxDispatcher:
         except (TypeError, ValueError):
             raise DomainError(400, "invalid_delivery_token") from None
         with self._connect() as con:
+            allowed = con.execute("""
+                SELECT 1 FROM abc.worker_subscriptions
+                WHERE consumer_id=%s AND active=true
+            """,(consumer_id,)).fetchone()
+            if allowed is None:
+                raise DomainError(403,"consumer_not_provisioned")
             record = con.execute("""
                 SELECT state,attempts,lease_token,lease_until FROM abc.event_delivery
                 WHERE consumer_id=%s AND event_id=%s FOR UPDATE

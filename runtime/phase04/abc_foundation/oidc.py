@@ -36,7 +36,7 @@ class OIDCVerifier:
         # No per-signing-key indefinite cache: respect key rotation via short JWKS TTL.
         self.keys = jwks_client or PyJWKClient(
             jwks_uri, cache_keys=False, cache_jwk_set=True, lifespan=120,
-            timeout=3, cooldown_duration=0)
+            timeout=3, cooldown_duration=30)
 
     def verify(self, authorization):
         if not isinstance(authorization, str) or not authorization.startswith("Bearer "):

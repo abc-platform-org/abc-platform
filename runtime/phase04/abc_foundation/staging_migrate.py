@@ -50,12 +50,12 @@ def validate_migrator_config(env):
             or c.get("host") in (None, "", "localhost", "127.0.0.1", "::1")
             or c.get("dbname") != "abc_staging"):
         raise ValueError("unexpected_managed_staging_database")
-    for key in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD","ABC_STAGING_ORCHESTRATOR_PASSWORD","ABC_STAGING_ANSWER_WORKER_PASSWORD"):
+    for key in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD","ABC_STAGING_ORCHESTRATOR_PASSWORD","ABC_STAGING_ANSWER_WORKER_PASSWORD","ABC_STAGING_ENG03_PASSWORD","ABC_STAGING_PIPELINE_PASSWORD"):
         v=env.get(key)
         if not isinstance(v,str) or len(v) < 32 or len(v) > 512:
             raise ValueError("missing_secure_role_credential_"+key)
-    values=[env[k] for k in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD","ABC_STAGING_ORCHESTRATOR_PASSWORD","ABC_STAGING_ANSWER_WORKER_PASSWORD")]
-    if len(set(values))!=4:
+    values=[env[k] for k in ("ABC_STAGING_APP_PASSWORD","ABC_STAGING_WORKER_PASSWORD","ABC_STAGING_ORCHESTRATOR_PASSWORD","ABC_STAGING_ANSWER_WORKER_PASSWORD","ABC_STAGING_ENG03_PASSWORD","ABC_STAGING_PIPELINE_PASSWORD")]
+    if len(set(values))!=6:
         raise ValueError("distinct_role_credentials_required")
     return dsn
 
@@ -90,6 +90,8 @@ def apply_migrations(env=None):
             _role(con,"abc_worker",env["ABC_STAGING_WORKER_PASSWORD"])
             _role(con,"abc_orchestrator",env["ABC_STAGING_ORCHESTRATOR_PASSWORD"])
             _role(con,"abc_answer_worker",env["ABC_STAGING_ANSWER_WORKER_PASSWORD"])
+            _role(con,"abc_eng03_worker",env["ABC_STAGING_ENG03_PASSWORD"])
+            _role(con,"abc_pipeline_worker",env["ABC_STAGING_PIPELINE_PASSWORD"])
             with con.transaction():
                 con.execute("""
                     CREATE TABLE IF NOT EXISTS public.abc_schema_migrations(
@@ -98,7 +100,7 @@ def apply_migrations(env=None):
                     )
                 """)
                 con.execute("""REVOKE ALL ON public.abc_schema_migrations
-                             FROM PUBLIC, abc_app, abc_worker, abc_orchestrator, abc_answer_worker""")
+                             FROM PUBLIC, abc_app, abc_worker, abc_orchestrator, abc_answer_worker, abc_eng03_worker, abc_pipeline_worker""")
             for filename,digest in plan:
                 source=(MIGRATIONS / filename).read_text().strip()
                 if not source.startswith("--") or "BEGIN;" not in source or not source.endswith("COMMIT;"):

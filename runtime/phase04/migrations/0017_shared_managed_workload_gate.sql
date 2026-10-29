@@ -263,4 +263,21 @@ DO $owner$ BEGIN
      FOR ALL TO abc_staging_migrator USING(true) WITH CHECK(true);
  END IF;
 END $owner$;
+-- SECURITY INVOKER sees the active role of the *actual* DML statement.
+-- Legacy 0015 checked session_user, which differs for managed logins.
+-- Restrict UPDATE(updated_at) even when a managed LOGIN has SET ROLE abc_app.
+CREATE OR REPLACE FUNCTION abc.eng14_app_metadata_write_gate() RETURNS trigger
+LANGUAGE plpgsql SECURITY INVOKER
+SET search_path=pg_catalog,abc
+AS $metadata$
+BEGIN
+  IF current_user='abc_app'
+     AND NEW.state IS NOT DISTINCT FROM OLD.state
+  THEN
+    RAISE EXCEPTION 'ENG14 app metadata-only session UPDATE denied'
+      USING ERRCODE='23514';
+  END IF;
+  RETURN NEW;
+END;
+$metadata$;
 COMMIT;

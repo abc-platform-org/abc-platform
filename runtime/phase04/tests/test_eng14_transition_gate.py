@@ -143,7 +143,7 @@ class ENG14DatabaseGate(unittest.TestCase):
         for state, version, checkpoint in bad_initial_states:
             with self.subTest(state=state, version=version, checkpoint=checkpoint):
                 attempt = uuid.uuid4()
-                with self.assertRaises(psycopg.errors.CheckViolation):
+                with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                     with psycopg.connect(APP) as con:
                         self.store._scope(con, ISS, self.s, self.t, self.b)
                         con.execute("""INSERT INTO abc.sessions(

@@ -1,0 +1,80 @@
+name: ABC Phase 04 local foundation CI
+on:
+  pull_request:
+    paths:
+      - 'runtime/phase04/**'
+      - 'docs/04-platform/**'
+      - '.github/workflows/phase04-foundation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_TEST_PG_ADMIN_DSN: postgresql://postgres:abc-integration-only-password@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_DSN: postgresql://abc_app:integration-only-abc-app@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_WORKER_DSN: postgresql://abc_worker:integration-only-abc-worker@127.0.0.1:5432/abc_phase04_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install trusted JWT and PostgreSQL client libraries
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Apply PostgreSQL migration with least-privilege runtime role
+        run: python runtime/phase04/tests/bootstrap_postgres.py
+      - name: Install audited Blueprint YAML parser
+        run: python -m pip install PyYAML==6.0.2
+      - name: Enforce private Render staging topology
+        run: python scripts/validate_phase04_staging.py
+      - name: Validate 41-operation Phase-02/04 traceability
+        run: python scripts/validate_phase04.py
+      - name: Compile local-only runtime
+        run: python -m compileall -q runtime/phase04/abc_foundation
+      - name: Execute integration, isolation, replay and persistence tests
+        working-directory: runtime/phase04
+        run: python -m unittest discover -s tests -v
+      - name: Verify dedicated staging migrator against isolated ephemeral PostgreSQL
+        working-directory: runtime/phase04
+        run: python tests/verify_staging_migration_ci.py
+      - name: Build nonroot staging container from exact PR code
+        run: docker build -f runtime/phase04/Dockerfile -t abc-phase04-staging:ci runtime/phase04
+      - name: Verify image runs as dedicated unprivileged UID
+        run: |
+          test "$(docker image inspect abc-phase04-staging:ci --format '{{.Config.User}}')" = "10001:10001"
+          echo "PASS: nonroot runtime user"
+      - name: Verify container refuses unconfigured staging startup
+        run: |
+          if docker run --rm abc-phase04-staging:ci python -m abc_foundation.staging_api; then
+            echo "FAIL: staging container started without credentials and private environment" >&2
+            exit 1
+          fi
+          echo "PASS: no implicit staging credentials or public start"
+      - name: Check strict source constraints
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('runtime/phase04/abc_foundation')
+          server=(root/'server.py').read_text()
+          api=(root/'http_api.py').read_text()
+          assert 'ABC_ENV' in server and 'LOCAL_INTEGRATION_ONLY' in server
+          assert 'if host not in ("127.0.0.1", "::1")' in api
+          assert 'capability_not_implemented' in api
+          assert 'verify_bearer' in api
+          print('PASS: explicit loopback/local-only and fail-closed stubs')
+          PY

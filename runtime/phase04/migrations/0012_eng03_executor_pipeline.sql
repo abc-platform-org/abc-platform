@@ -85,7 +85,12 @@ CREATE POLICY eng03_evidence_analysis_scope ON abc.eng03_evidence_ledger
 REVOKE ALL ON abc.eng03_evidence_ledger FROM PUBLIC,abc_app,abc_worker,
   abc_answer_worker,abc_orchestrator;
 GRANT INSERT ON abc.eng03_evidence_ledger TO abc_eng03_worker;
-GRANT SELECT ON abc.eng03_evidence_ledger TO abc_pipeline_worker;
+-- The analysis worker can read only fields required for its job.
+-- In particular, it must not receive ENG03's historical lease fencing token.
+GRANT SELECT(consumer_id,evidence_id,evidence_json,evidence_digest,
+  aggregate_version,source_job_id,policy_decision_id,question_id,
+  tenant_id,branch_id,session_id)
+  ON abc.eng03_evidence_ledger TO abc_pipeline_worker;
 
 CREATE TABLE abc.eng04_06_jobs (
   job_id uuid PRIMARY KEY,
@@ -340,6 +345,28 @@ BEGIN
        WHERE e.consumer_id=NEW.consumer_id AND e.tenant_id=NEW.tenant_id
          AND e.session_id=NEW.session_id AND e.aggregate_version<=NEW.aggregate_version;
   IF jsonb_array_length(NEW.decision_json->'candidates')>0 THEN
+      IF NEW.knowledge_json->>'ontology_version' IS DISTINCT FROM 'synthetic-ontology.1'
+         OR NEW.knowledge_json->'retrieval_sources'->0->>'source_id'
+               IS DISTINCT FROM 'synthetic:offline-catalog'
+         OR NEW.knowledge_json->'retrieval_sources'->0->>'source_version'
+               IS DISTINCT FROM 'test-v1'
+         OR NEW.knowledge_json->'retrieval_sources'->0->>'validated_by'
+               IS DISTINCT FROM 'TEST_FIXTURE_ONLY'
+         OR NEW.analysis_json->>'engine_version'
+               IS DISTINCT FROM 'eng04.synthetic-evidence.1'
+         OR NEW.decision_json->>'decision_engine_version'
+               IS DISTINCT FROM 'eng06.synthetic.1'
+         OR jsonb_typeof(NEW.knowledge_json->'grounded_facts') IS DISTINCT FROM 'array'
+         OR jsonb_array_length(NEW.knowledge_json->'grounded_facts')<>2
+         OR EXISTS(SELECT 1 FROM abc.eng03_evidence_ledger e
+            WHERE e.consumer_id=NEW.consumer_id AND e.tenant_id=NEW.tenant_id
+              AND e.session_id=NEW.session_id AND e.aggregate_version<=NEW.aggregate_version
+              AND (e.evidence_json->>'evidence_class' IS DISTINCT FROM 'USER_REPORTED'
+                  OR e.evidence_json->>'value' IN ('UNKNOWN','UNSURE')
+                  OR e.evidence_json->>'value' IS NULL))
+      THEN
+         RAISE EXCEPTION 'synthetic source unreviewed or incomplete' USING ERRCODE='23514';
+      END IF;
       IF n<>4 OR
          jsonb_array_length(COALESCE(NEW.knowledge_json->'retrieval_sources','[]'::jsonb))<>1 OR
          EXISTS(SELECT 1 FROM abc.eng03_evidence_ledger e
@@ -358,6 +385,11 @@ BEGIN
        OR candidate->>'feasibility_label' IS DISTINCT FROM 'PROFESSIONAL_CHECK_REQUIRED'
        OR candidate->>'hard_filter_status' IS DISTINCT FROM 'CONDITIONALLY_PASSED'
        OR candidate->>'reason' IS DISTINCT FROM 'SYNTHETIC_TEST_ONLY_REQUIRES_PROFESSIONAL_REVIEW'
+       OR NOT EXISTS (
+          SELECT 1 FROM jsonb_array_elements(NEW.knowledge_json->'grounded_facts') AS item
+          WHERE item->>'key'=candidate->>'candidate_id'
+             AND item->>'source_id'='synthetic:offline-catalog'
+             AND item->'value'='true'::jsonb)
     THEN
        RAISE EXCEPTION 'synthetic candidate was upgraded or invented' USING ERRCODE='23514';
     END IF;

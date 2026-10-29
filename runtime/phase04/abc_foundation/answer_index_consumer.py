@@ -71,7 +71,9 @@ class AnswerIndexConsumer:
         tenant,branch,qid=event.get("tenant_id"),event.get("branch_id"),payload.get("question_id")
         if any(not isinstance(v,str) or not 1<=len(v)<=128 for v in (tenant,branch,qid)):
             raise DomainError(422,"invalid_answer_event_scope")
-        if not qid.startswith("synthetic:") or event.get("actor",{}).get("role")!="SPECIALIST":
+        if (not qid.startswith("synthetic:") or
+                not isinstance(event.get("actor"),dict) or
+                event["actor"].get("role")!="SPECIALIST"):
             raise DomainError(422,"non_synthetic_answer_denied")
         # A projection may be written twice after a crash-before-ACK; database
         # uniqueness ensures one row. Do not mutate any ENG03/04/05/06 state.
@@ -83,6 +85,18 @@ class AnswerIndexConsumer:
                 ON CONFLICT DO NOTHING""",
                 (self.consumer_id,eid,tenant,branch,sid,
                  event["aggregate_version"],qid,aid))
+            # Durable handoff is committed with the projection. It contains
+            # only event/session IDs, never the answer itself or an AI result.
+            # No claim that ENG03 has actually run or analyzed a client.
+            job_id=uuid.uuid5(uuid.NAMESPACE_URL,
+                        "abc:eng03:handoff:"+self.consumer_id+":"+str(eid))
+            con.execute("""INSERT INTO abc.eng03_input_jobs
+                (job_id,consumer_id,source_event_id,tenant_id,branch_id,
+                 session_id,aggregate_version)
+                 VALUES(%s,%s,%s,%s,%s,%s,%s)
+                 ON CONFLICT DO NOTHING""",
+                 (job_id,self.consumer_id,eid,tenant,branch,sid,
+                  event["aggregate_version"]))
         return str(eid)
 
     def run_once(self):

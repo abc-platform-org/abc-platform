@@ -106,8 +106,11 @@ hostssl all abc_api_ci 0.0.0.0/0 cert clientname=CN
 host all all 0.0.0.0/0 reject
 host all all ::/0 reject
 """)
+        (root/"10-ci-role.sql").write_text(
+            "CREATE ROLE abc_api_ci LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS;\\n")
         (root/"Dockerfile").write_text("""FROM postgres:16
 COPY --chown=postgres:postgres server.crt server.key ca.crt pg_hba.conf /etc/abc-pki/
+COPY 10-ci-role.sql /docker-entrypoint-initdb.d/10-ci-role.sql
 RUN chmod 0600 /etc/abc-pki/server.key && chmod 0644 /etc/abc-pki/server.crt /etc/abc-pki/ca.crt /etc/abc-pki/pg_hba.conf
 CMD ["postgres","-c","ssl=on","-c","ssl_min_protocol_version=TLSv1.3","-c","ssl_cert_file=/etc/abc-pki/server.crt","-c","ssl_key_file=/etc/abc-pki/server.key","-c","ssl_ca_file=/etc/abc-pki/ca.crt","-c","hba_file=/etc/abc-pki/pg_hba.conf"]
 """)
@@ -123,15 +126,17 @@ CMD ["postgres","-c","ssl=on","-c","ssl_min_protocol_version=TLSv1.3","-c","ssl_
             match=re.search(r"127\.0\.0\.1:(\d+)",port_text)
             if not match: raise AssertionError("unexpected_docker_private_mapping")
             port=match.group(1)
-            for attempt in range(50):
-                ready=cmd("docker","exec",container,"pg_isready","-U","postgres",
-                          "-d","abc_mtls_ci",check=False,timeout=6)
-                if ready.returncode==0:break
-                time.sleep(0.15)
-            else:raise AssertionError("ephemeral_tls_postgres_did_not_start")
-            created=cmd("docker","exec",container,"psql","-v","ON_ERROR_STOP=1",
-                "-U","postgres","-d","abc_mtls_ci","-c",
-                "CREATE ROLE abc_api_ci LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS")
+            # initdb executes 10-ci-role.sql before the server begins
+            # listening. Avoid pg_isready's initialization/shutdown race.
+            for attempt in range(70):
+                ready=cmd("docker","exec",container,"psql","-U","postgres",
+                    "-d","abc_mtls_ci","-tAc",
+                    "SELECT 1 FROM pg_roles WHERE rolname='abc_api_ci'",
+                    check=False,timeout=6)
+                if ready.returncode==0 and ready.stdout.strip()=="1":
+                    break
+                time.sleep(0.2)
+            else:raise AssertionError("ephemeral_tls_postgres_role_not_ready")
             base=("host=localhost hostaddr=127.0.0.1 port="+port+
                   " dbname=abc_mtls_ci user=abc_api_ci "+
                   "sslmode=verify-full sslrootcert="+str(root/"ca.crt")+" ")

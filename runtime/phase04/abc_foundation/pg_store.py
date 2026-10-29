@@ -138,3 +138,42 @@ class PostgresStore:
                 if found:
                     return self._public(found)
         raise DomainError(404,"not_found")
+
+
+    def has_verified_consent(self, principal, session_id, purpose):
+        """Fail-closed read-only purpose check. No consent collection/issuance route.
+
+        ACTIVE records can only be inserted by an independent approved evidence
+        verifier in future. The abc_app role cannot mint or modify these records.
+        """
+        allowed = {"CAPTURE", "AI_PROCESSING", "PREVIEW_STORAGE", "INTERNAL_HANDOFF"}
+        if purpose not in allowed:
+            return False
+        try:
+            sid = uuid.UUID(session_id)
+        except (ValueError, TypeError):
+            return False
+        issuer, sub = self._principal(principal)
+        with self._connect() as con:
+            scopes = self._memberships(con, principal)
+            for scope in scopes:
+                self._scope(con, issuer, sub, scope["tenant_id"], scope["branch_id"])
+                # RLS additionally requires this specialist's session assignment.
+                session = con.execute(
+                    "SELECT client_id FROM abc.sessions WHERE session_id=%s", (sid,)
+                ).fetchone()
+                if not session or not session["client_id"]:
+                    continue
+                evidence = con.execute("""
+                    SELECT consent_id FROM abc.consent_evidence
+                    WHERE session_id=%s AND tenant_id=%s AND branch_id=%s
+                      AND client_id=%s AND status='ACTIVE'
+                      AND verified_at IS NOT NULL AND revoked_at IS NULL
+                      AND evidence_digest <> '' AND retention_policy_id <> ''
+                      AND %s = ANY(purpose)
+                    LIMIT 1
+                """, (sid, scope["tenant_id"], scope["branch_id"],
+                      session["client_id"], purpose)).fetchone()
+                if evidence:
+                    return True
+        return False

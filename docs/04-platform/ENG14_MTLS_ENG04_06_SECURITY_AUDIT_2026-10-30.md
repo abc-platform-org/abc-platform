@@ -43,3 +43,11 @@
 **Final gate:** `ENG14_DB_S0_PAUSE=CI_TESTED`, `MTLS_LOOPBACK=CI_TESTED`, `ENG04_05_06_SUBPROCESSES=CI_TESTED`; `MANAGED_CLOUD_IDENTITIES=NOT_DEPLOYED`, `ENG14_FULL_S0_S3=BLOCKED`, `ENG04_05_06_CLOUD_SERVICES=NOT_DEPLOYED`, `P04=IN_PROGRESS`, `RELEASE=BLOCKED`.
 
 No change to `main`; draft PR requires independent code/security review and a successful exact-document-head CI before merge.
+
+## Additional independent-engine transport regression
+
+At code commit `e6fc4b52356eb67bdae502dc8c598cb391a0d1c9`, the synthetic pipeline accepts an injected test transport adapter without changing the ENG03 evidence/outbox transaction boundary. A new PostgreSQL-backed test asserts the ordered calls `ENG-04 → ENG-05 → ENG-06`, one final persisted result, and exactly-once ACK after the same source-bound lease. This verifies transport interchangeability while retaining the existing source-provenance and policy-gated persistence rules; it does **not** constitute remote/managed production connectivity.
+
+[Foundation CI #40960782615](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40960782615): **SUCCESS, 256/256 tests**, PostgreSQL 16 migrations 0001–0014 and staging checksum, non-root container, offline synthetic demo. [Docs integrity #40960782654](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40960782654): **SUCCESS**.
+
+Remaining blockers, P04 `IN_PROGRESS`, Draft PR #36 and the `main` boundary are unchanged.

@@ -49,6 +49,9 @@ jobs:
       - name: Execute integration, isolation, replay and persistence tests
         working-directory: runtime/phase04
         run: python -m unittest discover -s tests -v
+      - name: Verify dedicated staging migrator against isolated ephemeral PostgreSQL
+        working-directory: runtime/phase04
+        run: python tests/verify_staging_migration_ci.py
       - name: Build nonroot staging container from exact PR code
         run: docker build -f runtime/phase04/Dockerfile -t abc-phase04-staging:ci runtime/phase04
       - name: Verify container refuses unconfigured staging startup

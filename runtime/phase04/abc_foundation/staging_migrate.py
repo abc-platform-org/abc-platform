@@ -19,6 +19,7 @@ FILENAMES = (
     "0004_tenant_subscriptions.sql",
     "0005_consent_lifecycle.sql",
     "0006_session_index_projection.sql",
+    "0007_eng01_command_receipts.sql",
 )
 
 

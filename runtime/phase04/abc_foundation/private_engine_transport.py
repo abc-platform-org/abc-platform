@@ -62,7 +62,7 @@ class _Handler(socketserver.BaseRequestHandler):
                 expected_engine=self.server.caller,
                 expected_consumer=self.server.consumer)
             message=request["message"]
-            if message.get("consumer_id")!=identity["consumer_id"]:
+            if not isinstance(message,dict) or message.get("consumer_id")!=identity["consumer_id"]:
                 raise DomainError(403,"cross_consumer_message")
             response=dispatch(message,self.server.target)
             _write_frame(self.request,response)
@@ -73,7 +73,7 @@ class _Handler(socketserver.BaseRequestHandler):
 
 def private_engine_server(*,host,port,target_engine,caller_engine,consumer_id,
                           certfile,keyfile,ca_file,verifier):
-    if host!="127.0.0.1" or target_engine not in ENGINES or not 1<=port<=65535:
+    if host!="127.0.0.1" or target_engine not in ENGINES or not 0<=port<=65535:
         raise ValueError("local_integration_private_only")
     if caller_engine==target_engine or verifier is None or not isinstance(consumer_id,str):
         raise ValueError("distinct_authenticated_caller_required")

@@ -40,3 +40,10 @@ python -m unittest discover -s tests -v
 - Independent formal Phase-03 accessibility and UX acceptance, real identity/consent/privacy/SOP/security experts and real deployment are still gate blockers.
 - Proposed \`CR-03-001\` selected-look change after specialist selection is **not adopted** into frozen v1; do not add that transition to this runtime without a separate compatible contract version.
 - Detailed exit matrix and unresolved controls: [PHASE04_EXECUTION.md](../../docs/04-platform/PHASE04_EXECUTION.md).
+
+
+## Durable fixture job proof (not image processing)
+
+The local store additionally exercises \`NO_MEDIA_TEST_FIXTURE\` jobs with durable queue state, atomic leases, bounded retry, dead-letter and stale-worker rejection. These methods have **no HTTP exposure**, no actual model calls and never accept image bytes. Pausing a session fences outstanding fixture jobs atomically. Tests prove crash/restart and old-lease denial. This is a prerequisite for future ENG-01 worker orchestration, not an implementation of ENG-08..11 visual engines.
+
+The frozen Phase-02 API inventory is explicitly tracked: 2 operations have a local harness; 39 remain unimplemented, all 41 \`NOT_RELEASED\`. Run \`python scripts/validate_phase04.py\` from repository root.

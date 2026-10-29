@@ -20,7 +20,7 @@ class StagingGuardTests(unittest.TestCase):
     def test_migration_manifest_complete_and_sha256(self):
         plan=planned_migrations()
         self.assertEqual(tuple(x[0] for x in plan),FILENAMES)
-        self.assertEqual(len(plan),7)
+        self.assertEqual(len(plan),8)
         self.assertTrue(all(len(digest)==64 for _,digest in plan))
 
     def test_staging_dsn_rejects_admin_or_missing_tls(self):
@@ -107,6 +107,7 @@ class StagingGuardTests(unittest.TestCase):
             "ABC_STAGING_MIGRATOR_DSN":"postgresql://abc_staging_migrator@db.private/abc_staging?sslmode=require",
             "ABC_STAGING_APP_PASSWORD":"A"*32,
             "ABC_STAGING_WORKER_PASSWORD":"B"*32,
+            "ABC_STAGING_ORCHESTRATOR_PASSWORD":"C"*32,
         }
         self.assertIsInstance(validate_migrator_config(base),str)
         for bad in (
@@ -114,6 +115,8 @@ class StagingGuardTests(unittest.TestCase):
             {"ABC_MIGRATION_APPROVAL":""},
             {"ABC_STAGING_APP_PASSWORD":"weak"},
             {"ABC_STAGING_WORKER_PASSWORD":"A"*32},
+            {"ABC_STAGING_ORCHESTRATOR_PASSWORD":"A"*32},
+            {"ABC_STAGING_ORCHESTRATOR_PASSWORD":"short"},
             {"ABC_STAGING_MIGRATOR_DSN":"postgresql://postgres@db.private/abc_staging?sslmode=require"},
             {"ABC_STAGING_MIGRATOR_DSN":"postgresql://abc_staging_migrator@db.private/abc_staging"},
         ):

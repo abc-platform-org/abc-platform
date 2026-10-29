@@ -107,8 +107,12 @@ class ENG03Executor:
             raise DomainError(422,"untrusted_question_source")
         value=source["answer_value"]
         missing=value in ("UNKNOWN","UNSURE")
-        evid=str(uuid.uuid5(uuid.NAMESPACE_URL,"abc:eng03:source:"+
-                            source["answer_id"])) if missing else source["answer_id"]
+        # Evidence IDs are scoped to a specific authorized consumer, not
+        # globally identical to the ENG02 answer ID. Preserve immutable
+        # source_answer_id separately for verifiable provenance.
+        evid=str(uuid.UUID(hex=hashlib.sha256(
+            (self.consumer_id+"|"+source["answer_id"]).encode("utf-8")
+        ).hexdigest()[:32]))
         return {
             "evidence_id":evid,"session_id":source["session_id"],
             "service_id":"synthetic:hair-color","attribute_key":q["field"],

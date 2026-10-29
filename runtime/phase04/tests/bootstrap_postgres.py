@@ -16,5 +16,7 @@ with psycopg.connect(dsn,autocommit=True) as con:
     r=con.execute("SELECT rolsuper,rolbypassrls,rolcreaterole FROM pg_roles WHERE rolname='abc_app'").fetchone()
     if any(r):
         raise SystemExit("abc_app role is not least-privilege")
-    con.execute((Path(__file__).resolve().parents[1]/"migrations/0001_postgres_core.sql").read_text())
+    for migration in sorted((Path(__file__).resolve().parents[1]/"migrations").glob("*.sql")):
+        con.execute(migration.read_text())
+        print("Applied", migration.name)
 print("PASS: core PostgreSQL migration applied under admin, abc_app has no BYPASSRLS")

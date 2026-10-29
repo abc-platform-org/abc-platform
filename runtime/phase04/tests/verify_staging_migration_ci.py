@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import psycopg
+from psycopg import sql
 
 from abc_foundation import staging_migrate
 
@@ -20,8 +21,8 @@ worker_pass="disposable-test-worker-"+("b"*40)
 migration_pass="disposable-test-migrator-"+("c"*40)
 
 with psycopg.connect(ADMIN,autocommit=True) as con:
-    con.execute("""CREATE ROLE abc_staging_migrator LOGIN CREATEROLE
-                 NOSUPERUSER NOCREATEDB NOBYPASSRLS PASSWORD %s""",(migration_pass,))
+    con.execute(sql.SQL("""CREATE ROLE abc_staging_migrator LOGIN CREATEROLE
+                 NOSUPERUSER NOCREATEDB NOBYPASSRLS PASSWORD {}""").format(sql.Literal(migration_pass)))
     con.execute("GRANT abc_app,abc_worker TO abc_staging_migrator WITH ADMIN OPTION")
     con.execute("CREATE DATABASE abc_staging OWNER abc_staging_migrator")
 

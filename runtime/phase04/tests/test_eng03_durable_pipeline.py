@@ -334,6 +334,39 @@ class ENG03PipelineTests(unittest.TestCase):
         self.assertIsNone(self.worker.claim())
         self.assertIsNone(self.pipeline.claim())
 
+    def test_two_authorized_consumers_keep_independent_evidence_lineage(self):
+        # Same verified source can be independently delivered to two
+        # admin-provisioned consumers without foreign-key cross-linking or
+        # a global answer/evidence ID collision.
+        other="eng03-second-"+uuid.uuid4().hex[:12]
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.worker_subscriptions
+                (consumer_id,tenant_id,event_type,active)
+                VALUES(%s,%s,'ANSWER_RECORDED',true)""",(other,self.tenant))
+            for role in ("abc_eng03_worker","abc_pipeline_worker"):
+                con.execute("""INSERT INTO abc.eng03_worker_bindings
+                   (worker_role,consumer_id,tenant_id,active)
+                   VALUES(%s,%s,%s,true)""",(role,other,self.tenant))
+        receipt=self.arrive()
+        self.assertEqual(AnswerIndexConsumer(ANSWER,other).run_once(),"PROJECTED")
+        first=self.worker.claim()
+        second_worker=ENG03Executor(ENG03,other)
+        second=second_worker.claim()
+        self.assertEqual(first["source_event_id"],second["source_event_id"])
+        self.worker.complete(first["job_id"],first["lease_token"])
+        second_worker.complete(second["job_id"],second["lease_token"])
+        with psycopg.connect(ADMIN) as con:
+            rows=con.execute("""SELECT evidence_id,source_answer_id,consumer_id
+               FROM abc.eng03_evidence_ledger WHERE session_id=%s""",
+               (self.sid,)).fetchall()
+            self.assertEqual(len(rows),2)
+            self.assertEqual({r[2] for r in rows},{self.consumer,other})
+            self.assertEqual(len({r[0] for r in rows}),2)
+            self.assertEqual({str(r[1]) for r in rows},{receipt["answer_id"]})
+        self.assertEqual(SyntheticAnalysisPipeline(PIPELINE,other).run_once(),"ACKED")
+        self.assertEqual(self.pipeline.run_once(),"ACKED")
+        self.assertEqual(self.count("abc.eng04_06_results"),2)
+
     def test_unknown_critical_answer_still_bounded_by_eng14(self):
         self.arrive(value="UNKNOWN")
         self.assertEqual(self.worker.run_once(),"ACKED")

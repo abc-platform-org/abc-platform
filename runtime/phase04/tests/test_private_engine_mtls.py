@@ -22,6 +22,7 @@ from abc_foundation.private_engine_transport import (
 from abc_foundation.service_mesh_identity import BoundEngineIdentity
 from abc_foundation.isolated_engine_service import VERSION
 from abc_foundation.private_engine_service_server import configure_private_engine_service
+from abc_foundation.managed_engine_client import ManagedMTLSEngineClient
 from abc_foundation.store import DomainError
 
 
@@ -145,6 +146,32 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
                 caller_engine="ENG-04",consumer_id=self.consumer,
                 certfile=self.server_cert,keyfile=self.server_key,
                 ca_file=self.ca_path,verifier=self.verifier)
+
+    def test_real_mtls_client_adapter_executes_independent_eng05(self):
+        adapter=ManagedMTLSEngineClient(
+            endpoints={"ENG-05":{"host":"127.0.0.1","port":self.port,
+                       "server_name":"localhost"}},
+            client_cert=self.client_cert,client_key=self.client_key,
+            trust_ca=self.ca_path,
+            workload_token_provider=lambda target,consumer:self.token())
+        result=adapter.call("ENG-05",consumer_id=self.consumer,
+            session_id=self.message["session_id"],payload=self.message["payload"])
+        self.assertEqual(result["ontology_version"],"synthetic-ontology.1")
+        with self.assertRaises(DomainError):
+            adapter.call("ENG-04",consumer_id=self.consumer,
+                         session_id=self.message["session_id"],payload={})
+
+    def test_remote_client_rejects_unbound_token(self):
+        adapter=ManagedMTLSEngineClient(
+            endpoints={"ENG-05":{"host":"127.0.0.1","port":self.port,
+                       "server_name":"localhost"}},
+            client_cert=self.client_cert,client_key=self.client_key,
+            trust_ca=self.ca_path,
+            workload_token_provider=lambda target,consumer:self.token(
+                      binding="forged-certificate-thumbprint"))
+        with self.assertRaises(DomainError):
+            adapter.call("ENG-05",consumer_id=self.consumer,
+                session_id=self.message["session_id"],payload=self.message["payload"])
 
     def test_wrong_token_lifetime_denied(self):
         self.assertEqual(self.call(token=self.token(expires=121))["error"],

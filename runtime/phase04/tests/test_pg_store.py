@@ -137,7 +137,7 @@ class PostgresRuntimeTests(unittest.TestCase):
         # the state after independent verification, NOT client self-consent.
         with psycopg.connect(ADMIN) as con:
             con.execute("""UPDATE abc.consent_evidence
-                    SET status='ACTIVE',verified_at=now() WHERE consent_id=%s""",(consent_id,))
+                    SET status='ACTIVE',verified_at=now(),valid_until=now()+interval '1 day' WHERE consent_id=%s""",(consent_id,))
         self.assertTrue(self.store.has_verified_consent(self.principal,sid,"AI_PROCESSING"))
         self.assertFalse(self.store.has_verified_consent(self.principal,sid,"CAPTURE"))
         self.assertFalse(self.store.has_verified_consent(self.principal,sid,"UNKNOWN_PURPOSE"))
@@ -152,10 +152,14 @@ class PostgresRuntimeTests(unittest.TestCase):
         with psycopg.connect(ADMIN) as con:
             con.execute("""INSERT INTO abc.consent_evidence
                     (consent_id,tenant_id,branch_id,session_id,client_id,status,purpose,
-                     evidence_digest,disclosure_version,retention_policy_id,verified_at)
-                    VALUES(%s,%s,%s,%s,%s,'ACTIVE',%s,%s,%s,%s,now())""",
+                     evidence_digest,disclosure_version,retention_policy_id)
+                    VALUES(%s,%s,%s,%s,%s,'PENDING_VERIFICATION',%s,%s,%s,%s)""",
                     (uuid.uuid4(),self.tenant,self.branch,s["session_id"],
                      "client-B",["AI_PROCESSING"],"synthetic-hash","v1","policy-1"))
+            con.execute("""UPDATE abc.consent_evidence
+                SET status='ACTIVE',verified_at=now(),
+                valid_until=now()+interval '1 day'
+                WHERE session_id=%s""",(s["session_id"],))
         self.assertFalse(self.store.has_verified_consent(self.principal,s["session_id"],"AI_PROCESSING"))
 
 

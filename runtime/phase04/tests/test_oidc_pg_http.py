@@ -114,7 +114,7 @@ class OIDCHttpTests(unittest.TestCase):
         status,_=self.call("GET","/v1/consultations/"+payload["session_id"])
         self.assertEqual(status,404)
 
-    def test_checkpoint_and_consent_are_not_silently_implemented(self):
+    def test_checkpoint_is_durable_but_unverified_consent_is_blocked(self):
         status,body=self.call("POST","/v1/consultations",
             {"scope":"IN_SALON_SHARED_SCREEN","branch_id":self.branch},
             headers={"Idempotency-Key":"disabled-intent-123"})
@@ -122,7 +122,10 @@ class OIDCHttpTests(unittest.TestCase):
         path="/_foundation/v0/consultations/"+body["session_id"]+"/pause"
         st,p=self.call("POST",path,{},
              headers={"X-Expected-State-Version":"0","Idempotency-Key":"cmd-paused-123"})
-        self.assertEqual((st,p["error"]),(501,"checkpoint_migration_not_implemented"))
+        self.assertEqual((st,p["state"],p["state_version"]),(200,"PAUSED",1))
+        st,p=self.call("POST","/_foundation/v0/consultations/"+body["session_id"]+"/resume",{},
+             headers={"X-Expected-State-Version":"1","Idempotency-Key":"cmd-resume-123"})
+        self.assertEqual((st,p["state"],p["state_version"]),(200,"CREATED",2))
         st,p=self.call("POST","/v1/consultations/"+body["session_id"]+"/consents",{},
              headers={"Idempotency-Key":"no-consent-123"})
         self.assertEqual((st,p["error"]),(501,"capability_not_implemented"))

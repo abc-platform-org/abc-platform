@@ -177,3 +177,71 @@ class PostgresStore:
                 if evidence:
                     return True
         return False
+
+
+    def checkpoint_command(self, principal, session_id, action, expected_version, key):
+        """Postgres-backed internal CREATED ↔ PAUSED checkpoint with CAS and replay.
+
+        A draft internal API only, not a new approved v1 public operation/event.
+        Real engine jobs are not enqueued by this adapter.
+        """
+        self._key(key)
+        if action not in ("pause", "resume") or type(expected_version) is not int or expected_version < 0:
+            raise DomainError(400, "invalid_checkpoint_command")
+        try:
+            sid=uuid.UUID(session_id)
+        except (ValueError,TypeError):
+            raise DomainError(404,"not_found") from None
+        issuer, sub=self._principal(principal)
+        with self._connect() as con:
+            scopes=self._memberships(con, principal)
+            scope=None
+            row=None
+            for candidate in scopes:
+                self._scope(con,issuer,sub,candidate["tenant_id"],candidate["branch_id"])
+                row=con.execute("SELECT * FROM abc.sessions WHERE session_id=%s FOR UPDATE",(sid,)).fetchone()
+                if row:
+                    scope=candidate
+                    break
+            if not row:
+                raise DomainError(404,"not_found")
+            tenant,branch=scope["tenant_id"],scope["branch_id"]
+            op=action+":"+str(sid)
+            request={"session_id":str(sid),"action":action,"expected_state_version":expected_version}
+            digest=_fingerprint(request)
+            prior=con.execute("""SELECT fingerprint,response_json FROM abc.idempotency
+                WHERE tenant_id=%s AND actor_id=%s AND operation=%s AND request_key=%s""",
+                (tenant,sub,op,key)).fetchone()
+            if prior:
+                if prior["fingerprint"]!=digest:
+                    raise DomainError(409,"idempotency_payload_conflict")
+                return prior["response_json"]
+            if row["state_version"]!=expected_version:
+                raise DomainError(409,"state_version_conflict")
+            if action=="pause":
+                if row["state"]!="CREATED":
+                    raise DomainError(409,"invalid_transition")
+                state,checkpoint="PAUSED","CREATED"
+            else:
+                if row["state"]!="PAUSED" or row["checkpoint"]!="CREATED":
+                    raise DomainError(409,"missing_or_invalid_checkpoint")
+                state,checkpoint="CREATED",None
+            now=datetime.now(timezone.utc)
+            result=con.execute("""UPDATE abc.sessions SET state=%s,checkpoint=%s,
+                    state_version=state_version+1, updated_at=%s
+                    WHERE session_id=%s AND state_version=%s RETURNING *""",
+                    (state,checkpoint,now,sid,expected_version)).fetchone()
+            if result is None:
+                raise DomainError(409,"state_version_conflict")
+            con.execute("""INSERT INTO abc.state_audit
+                (audit_id,tenant_id,branch_id,session_id,from_state,to_state,
+                 from_version,to_version,actor_id,occurred_at)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (uuid.uuid4(),tenant,branch,sid,row["state"],state,
+                 expected_version,expected_version+1,sub,now))
+            response=self._public(result)
+            con.execute("""INSERT INTO abc.idempotency
+                (tenant_id,actor_id,operation,request_key,fingerprint,response_json)
+                VALUES(%s,%s,%s,%s,%s,%s)""",
+                (tenant,sub,op,key,digest,json.dumps(response)))
+            return response

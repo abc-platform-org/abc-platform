@@ -1,4 +1,6 @@
 import {test,expect} from '@playwright/test';
+import {mkdirSync} from 'node:fs';
+mkdirSync('test-results/screenshots',{recursive:true});
 const base='http://127.0.0.1:8765';
 test('synthetic Studio renders at three responsive viewports without document-level overflow',async({page})=>{
  for(const width of [390,768,1440]){
@@ -8,6 +10,7 @@ test('synthetic Studio renders at three responsive viewports without document-le
   await expect(page.locator('#title')).toHaveText('آغاز یک تجربهٔ شخصی');
   const shape=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
   expect(shape.scrollWidth).toBeLessThanOrEqual(shape.clientWidth+2);
+  await page.screenshot({path:'test-results/screenshots/studio-'+width+'.png',fullPage:true});
  }
 });
 test('complete synthetic salon journey never claims production execution',async({page})=>{
@@ -53,6 +56,7 @@ test('synthetic management permissions, branch switching, tentative booking and 
  await page.goto(base+'/management.html');
  await page.locator('#role').selectOption('Client');
  await expect(page.locator('#heading')).toContainText('محدود');
+ await page.screenshot({path:'test-results/screenshots/management-denied.png',fullPage:true});
  await expect(page.locator('#navigation button')).toHaveCount(0);
  await page.locator('#role').selectOption('Reception');
  await expect(page.locator('#branch')).toBeDisabled();
@@ -67,6 +71,7 @@ test('synthetic management permissions, branch switching, tentative booking and 
  await expect(page.locator('#branch')).toBeEnabled();
  await page.locator('#branch').selectOption('DEMO-BRANCH-02');
  await expect(page.locator('#notice')).toContainText('شعبهٔ نمایشی');
+ await page.screenshot({path:'test-results/screenshots/management-owner.png',fullPage:true});
 });
 test('management module access cannot be elevated by reception to staff qualifications',async({page})=>{
  await page.goto(base+'/management.html');

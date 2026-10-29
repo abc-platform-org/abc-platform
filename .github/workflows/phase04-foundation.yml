@@ -1,0 +1,36 @@
+name: ABC Phase 04 local foundation CI
+on:
+  pull_request:
+    paths:
+      - 'runtime/phase04/**'
+      - 'docs/04-platform/**'
+      - '.github/workflows/phase04-foundation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile local-only runtime
+        run: python -m compileall -q runtime/phase04/abc_foundation
+      - name: Execute integration, isolation, replay and persistence tests
+        working-directory: runtime/phase04
+        run: python -m unittest discover -s tests -v
+      - name: Check strict source constraints
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('runtime/phase04/abc_foundation')
+          server=(root/'server.py').read_text()
+          api=(root/'http_api.py').read_text()
+          assert 'LOCAL_INTEGRATION_ONLY' in server and '0.0.0.0' in api
+          assert 'capability_not_implemented' in api
+          assert 'verify_bearer' in api
+          print('PASS: explicit loopback/local-only and fail-closed stubs')
+          PY

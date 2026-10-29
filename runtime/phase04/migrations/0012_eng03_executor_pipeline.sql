@@ -54,6 +54,7 @@ CREATE TABLE abc.eng03_evidence_ledger (
   source_event_id uuid NOT NULL,
   source_answer_id uuid NOT NULL,
   policy_decision_id uuid NOT NULL,
+  source_lease_token uuid NOT NULL,
   tenant_id text NOT NULL,
   branch_id text NOT NULL,
   session_id uuid NOT NULL,
@@ -205,4 +206,91 @@ END
 $body$;
 REVOKE ALL ON FUNCTION abc.eng03_source_for_lease(uuid,uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION abc.eng03_source_for_lease(uuid,uuid) TO abc_eng03_worker;
+-- An executor cannot forge source attributes, answer values or policy approval
+-- even with valid INSERT rights. Validate immutable snapshot at the DB boundary.
+CREATE FUNCTION abc.verify_eng03_evidence_source() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path=pg_catalog,abc
+AS $source$
+DECLARE a record; expected_key text; expected_kind text;
+BEGIN
+  IF session_user<>'abc_eng03_worker' THEN
+     RAISE EXCEPTION 'trusted eng03 writer required' USING ERRCODE='42501';
+  END IF;
+  SELECT answer.value,answer.answer_source,answer.question_id,
+         answer.answer_id,answer.policy_decision_id
+    INTO a
+    FROM abc.eng03_input_jobs j
+    JOIN abc.answer_index_projection proj
+      ON proj.consumer_id=j.consumer_id AND proj.event_id=j.source_event_id
+      AND proj.session_id=j.session_id AND proj.tenant_id=j.tenant_id
+      AND proj.branch_id=j.branch_id AND proj.aggregate_version=j.aggregate_version
+    JOIN abc.eng02_answers answer
+      ON answer.answer_id=proj.answer_id AND answer.session_id=j.session_id
+      AND answer.tenant_id=j.tenant_id AND answer.branch_id=j.branch_id
+      AND answer.aggregate_version=j.aggregate_version
+    JOIN abc.eng14_policy_audit policy
+      ON policy.decision_id=answer.policy_decision_id
+         AND policy.session_id=j.session_id AND policy.tenant_id=j.tenant_id
+         AND policy.aggregate_version=j.aggregate_version
+         AND policy.decision='ALLOW' AND policy.policy_version='eng14.synthetic.1'
+    JOIN abc.eng03_worker_bindings b
+      ON b.worker_role=session_user AND b.consumer_id=j.consumer_id
+         AND b.tenant_id=j.tenant_id AND b.active
+    WHERE j.job_id=NEW.source_job_id AND j.consumer_id=NEW.consumer_id
+      AND j.source_event_id=NEW.source_event_id
+      AND j.tenant_id=NEW.tenant_id AND j.branch_id=NEW.branch_id
+      AND j.session_id=NEW.session_id AND j.aggregate_version=NEW.aggregate_version
+      AND j.status='LEASED' AND j.lease_token=NEW.source_lease_token
+      AND j.lease_until>clock_timestamp();
+  expected_key=CASE a.question_id
+     WHEN 'synthetic:prior-treatment' THEN 'prior_treatment'
+     WHEN 'synthetic:sensitivity' THEN 'sensitivity_flag'
+     WHEN 'synthetic:desired-goal' THEN 'goal'
+     WHEN 'synthetic:maintenance' THEN 'maintenance'
+     ELSE NULL END;
+  expected_kind=CASE a.answer_source
+       WHEN 'CLIENT' THEN 'CLIENT_ANSWER'
+       WHEN 'SPECIALIST' THEN 'SALON_RECORD'
+       ELSE NULL END;
+  IF expected_key IS NULL OR NEW.source_answer_id IS DISTINCT FROM a.answer_id
+      OR NEW.policy_decision_id IS DISTINCT FROM a.policy_decision_id
+      OR NEW.question_id IS DISTINCT FROM a.question_id
+      OR NEW.source_kind IS DISTINCT FROM a.answer_source
+      OR NEW.evidence_json->>'session_id' IS DISTINCT FROM NEW.session_id::text
+      OR NEW.evidence_json->>'service_id' IS DISTINCT FROM 'synthetic:hair-color'
+      OR NEW.evidence_json->>'evidence_id' IS DISTINCT FROM NEW.evidence_id::text
+      OR NEW.evidence_json->>'attribute_key' IS DISTINCT FROM expected_key
+      OR NEW.evidence_json->>'confidence_label' IS DISTINCT FROM 'UNRATED'
+      OR NEW.evidence_digest !~ '^[0-9a-f]{64}
+
+  THEN
+      RAISE EXCEPTION 'ENG03 trusted evidence lineage mismatch' USING ERRCODE='23514';
+  END IF;
+  IF a.value IN ('UNKNOWN','UNSURE') THEN
+    IF NEW.evidence_json->>'evidence_class' IS DISTINCT FROM 'UNKNOWN'
+      OR NEW.evidence_json->>'source_type' IS DISTINCT FROM 'NOT_AVAILABLE'
+      OR (NEW.evidence_json ? 'source_id')
+      OR NEW.evidence_json->'value' IS DISTINCT FROM 'null'::jsonb
+    THEN
+      RAISE EXCEPTION 'ENG03 unknown value cannot be promoted' USING ERRCODE='23514';
+    END IF;
+  ELSE
+    IF NEW.evidence_json->>'evidence_class' IS DISTINCT FROM 'USER_REPORTED'
+      OR NEW.evidence_json->>'source_type' IS DISTINCT FROM expected_kind
+      OR NEW.evidence_json->>'value' IS DISTINCT FROM a.value
+      OR NEW.evidence_json->>'source_id' IS DISTINCT FROM a.answer_id::text
+      OR NEW.evidence_id IS DISTINCT FROM a.answer_id
+    THEN
+      RAISE EXCEPTION 'ENG03 reported source may not be fabricated' USING ERRCODE='23514';
+    END IF;
+  END IF;
+  RETURN NEW;
+END
+$source$;
+REVOKE ALL ON FUNCTION abc.verify_eng03_evidence_source() FROM PUBLIC;
+CREATE TRIGGER eng03_evidence_lineage_gate
+  BEFORE INSERT ON abc.eng03_evidence_ledger
+  FOR EACH ROW EXECUTE FUNCTION abc.verify_eng03_evidence_source();
+
 COMMIT;

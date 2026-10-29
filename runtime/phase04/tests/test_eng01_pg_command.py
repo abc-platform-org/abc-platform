@@ -96,6 +96,32 @@ class AtomicCommandPortTests(unittest.TestCase):
             self.execute()
         self.assertIn(ctx.exception.status,(403,404))
 
+    def test_same_tenant_different_actor_command_uuid_conflict_rolls_back(self):
+        # Same UUID is visible to first specialist only (RLS). The second
+        # specialist must get a controlled 409, not a database 500, and its
+        # own session/audit must remain unchanged.
+        first=self.execute()
+        second_sub="second-"+uuid.uuid4().hex[:12]
+        second=Principal(second_sub,ISS)
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.memberships
+                        (issuer,subject,tenant_id,branch_id,role,active)
+                        VALUES(%s,%s,%s,%s,'SPECIALIST',true)""",
+                        (ISS,second_sub,self.tenant,self.branch))
+        second_session=self.store.create(second,{
+            "branch_id":self.branch,"scope":"IN_SALON_SHARED_SCREEN"
+        },"egw-other-session-"+uuid.uuid4().hex[:8])
+        changed={**self.cmd,"session_id":second_session["session_id"],
+                 "actor":{"user_id":second_sub,"role":"SPECIALIST"}}
+        with self.assertRaises(DomainError) as ctx:
+            self.gateway.execute(second,changed)
+        self.assertEqual(ctx.exception.status,409)
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("SELECT state FROM abc.sessions WHERE session_id=%s",
+                                 (second_session["session_id"],)).fetchone()[0],"CREATED")
+            self.assertEqual(con.execute("SELECT count(*) FROM abc.state_audit WHERE session_id=%s",
+                                 (second_session["session_id"],)).fetchone()[0],0)
+
     def test_worker_cannot_read_engine_command_receipts(self):
         with psycopg.connect(WORKER) as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):

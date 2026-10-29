@@ -12,6 +12,7 @@ class PrivateAPIBlueprintTests(unittest.TestCase):
         service=data["services"][0]
         self.assertEqual(service["type"],"pserv")
         self.assertEqual(service["runtime"],"docker")
+        self.assertEqual(service["numInstances"],1)
         self.assertEqual(service["autoDeployTrigger"],"off")
         self.assertEqual(service["dockerfilePath"],"./runtime/phase04/Dockerfile")
         self.assertIn("staging_api",service["dockerCommand"])

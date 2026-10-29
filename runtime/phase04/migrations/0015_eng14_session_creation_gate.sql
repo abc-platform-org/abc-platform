@@ -26,8 +26,7 @@ BEGIN
             AND m.subject=NEW.specialist_id
             AND m.tenant_id=NEW.tenant_id
             AND m.branch_id=NEW.branch_id
-            AND m.role='SPECIALIST' AND m.active
-          FOR SHARE)
+            AND m.role='SPECIALIST' AND m.active)
   THEN
     RAISE EXCEPTION 'ENG14 initial session state denied'
       USING ERRCODE='23514';

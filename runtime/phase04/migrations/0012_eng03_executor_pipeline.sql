@@ -165,7 +165,7 @@ SET search_path=pg_catalog,abc
 AS $body$
 DECLARE result jsonb;
 BEGIN
-  IF current_user<>'abc_eng03_worker' THEN
+  IF session_user<>'abc_eng03_worker' THEN
      RAISE EXCEPTION 'dedicated eng03 worker required' USING ERRCODE='42501';
   END IF;
   SELECT jsonb_build_object(
@@ -179,7 +179,7 @@ BEGIN
   FROM abc.eng03_input_jobs j
   JOIN abc.eng03_worker_bindings b
     ON b.consumer_id=j.consumer_id AND b.tenant_id=j.tenant_id
-       AND b.worker_role=current_user AND b.active
+       AND b.worker_role=session_user AND b.active
   JOIN abc.answer_index_projection proj
     ON proj.consumer_id=j.consumer_id AND proj.event_id=j.source_event_id
        AND proj.tenant_id=j.tenant_id AND proj.branch_id=j.branch_id

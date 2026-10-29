@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate 41-operation Phase-02/04 traceability
+        run: python scripts/validate_phase04.py
       - name: Compile local-only runtime
         run: python -m compileall -q runtime/phase04/abc_foundation
       - name: Execute integration, isolation, replay and persistence tests

@@ -67,6 +67,11 @@ class TypedCheckpointGateway:
         if (not _nonempty(command.get("tenant_id")) or
                 not _nonempty(command.get("branch_id"))):
             raise DomainError(400,"invalid_scope")
+        # Until a separate durable command journal is implemented, bind each
+        # command UUID to its idempotency key, preventing forged distinct
+        # command IDs from sharing a successful database receipt.
+        if command["idempotency_key"] != command["command_id"]:
+            raise DomainError(400,"command_idempotency_binding_required")
         self.orchestrator.store._key(command["idempotency_key"])
         if type(command["expected_state_version"]) is not int or command["expected_state_version"]<0:
             raise DomainError(400,"invalid_expected_state_version")

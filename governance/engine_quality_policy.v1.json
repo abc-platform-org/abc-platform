@@ -1,0 +1,168 @@
+{
+  "schema_version": "abc.engine-quality-gates.v1",
+  "completion_rule": "ALL_MANDATORY_GATES_WITH_EXTERNAL_EVIDENCE_AND_DUAL_INDEPENDENT_ATTESTATION",
+  "scope": "ABC_IN_SALON_SHARED_SCREEN",
+  "allowed_statuses": [
+    "IN_PROGRESS",
+    "BLOCKED",
+    "COMPLETE"
+  ],
+  "mandatory_gates": [
+    {
+      "id": "G01_ARCHITECTURE",
+      "name": "Vision, ownership & target architecture",
+      "acceptance": [
+        "Target engine capability inventory and in-salon user journey signed off",
+        "Canonical responsibility and ENG-ID mapping aligned with ADR and frozen versioned contracts",
+        "No unresolved critical architectural drift or dual ownership"
+      ],
+      "evidence": [
+        "signed architecture ADR",
+        "requirements traceability",
+        "contract compatibility matrix"
+      ]
+    },
+    {
+      "id": "G02_DOMAIN_CAPABILITY",
+      "name": "Functional completeness and professional fidelity",
+      "acceptance": [
+        "Every required MVP/V2/V3 in-scope behavior implemented with pass/fail scenarios",
+        "Real service-specific edge cases, failure modes and uncertainty handled",
+        "No hidden synthetic fixtures or invented expertise represented as real execution"
+      ],
+      "evidence": [
+        "domain capability test report",
+        "negative adversarial cases",
+        "feature acceptance matrix"
+      ]
+    },
+    {
+      "id": "G03_CONTRACTS",
+      "name": "Typed versioned interfaces and traceability",
+      "acceptance": [
+        "Published schema validation and backward compatibility matrix",
+        "Idempotency, causality, input provenance and error taxonomy enforced",
+        "All required input/output handoffs and integration tests passing"
+      ],
+      "evidence": [
+        "contract conformance results",
+        "producer-consumer matrix",
+        "version compatibility report"
+      ]
+    },
+    {
+      "id": "G04_INDEPENDENCE",
+      "name": "Independent execution and deployment",
+      "acceptance": [
+        "Own independently deployable process/image, config and lifecycle",
+        "Identity, secret, health and resource isolation under managed private networking",
+        "Independent kill/restart/upgrade and no hidden in-process/mock fallback"
+      ],
+      "evidence": [
+        "real private deployment service ID",
+        "separate process and failure isolation test",
+        "rollback exercise report"
+      ]
+    },
+    {
+      "id": "G05_SECURITY_PRIVACY",
+      "name": "Zero trust / tenant / consent",
+      "acceptance": [
+        "Managed service identity mTLS with issuer, cert revocation and JWT audience/nonce replay protections",
+        "Tenant+branch+session RLS, deny-by-default data handling and least privileges verified",
+        "Consent purpose, erasure/retention, logs redaction and independent security review complete"
+      ],
+      "evidence": [
+        "live cert and PKI verification record",
+        "tenant adversarial tests",
+        "privacy review report"
+      ]
+    },
+    {
+      "id": "G06_RELIABILITY",
+      "name": "Durability and resilience",
+      "acceptance": [
+        "Claim/Lease/ACK or equivalent exact event contract, idempotency and reprocessing",
+        "DLQ, backpressure, timeout, retry and compensation under faults",
+        "Backup/restore, outage recovery and no duplicated durable effects"
+      ],
+      "evidence": [
+        "fault injection run",
+        "DB restore drill",
+        "delivery/concurrency report"
+      ]
+    },
+    {
+      "id": "G07_PERFORMANCE",
+      "name": "Measured system performance and capacity",
+      "acceptance": [
+        "Business SLOs, load model and hardware class approved before benchmark",
+        "p50/p95/p99 latency, errors and saturation measured with reproducible fixtures",
+        "Sustained concurrency, cold start, memory/CPU and rollback under load pass SLO"
+      ],
+      "evidence": [
+        "reproducible benchmark with load and environment",
+        "approved SLO values",
+        "profiling and capacity report"
+      ]
+    },
+    {
+      "id": "G08_PROFESSIONAL_VALIDATION",
+      "name": "Real-world service and specialist quality",
+      "acceptance": [
+        "Service expert verifies correctness against approved SOP and safety bounds",
+        "Uncertainty and unknown evidence block unsafe recommendations or technical plans",
+        "Identity preservation, visual fidelity and real-world feasibility independently evaluated where applicable"
+      ],
+      "evidence": [
+        "qualified specialist evaluation and scope",
+        "service-specific reference benchmark",
+        "SOP/stop-conditions acceptance"
+      ]
+    },
+    {
+      "id": "G09_OBSERVABILITY_OPERATIONS",
+      "name": "Operability and lifecycle",
+      "acceptance": [
+        "End-to-end trace correlation, metrics, alerts and audit with retention controls",
+        "Versioned deploy/rollback, on-call owner, incident escalation and runbooks",
+        "No secrets or PII leak in logs, metrics or error messages"
+      ],
+      "evidence": [
+        "live trace/correlation evidence",
+        "alert and incident drill",
+        "operational runbook"
+      ]
+    },
+    {
+      "id": "G10_INDEPENDENT_SIGNOFF",
+      "name": "Separate accountable acceptance",
+      "acceptance": [
+        "External professional and independent security reviewers both verified by distinct trust issuers",
+        "Attestations bind exact engine ID, commit SHA, evidence manifest digest and approved product scope",
+        "Owner reviews real deployment/cost/rollback evidence separately from design approval"
+      ],
+      "evidence": [
+        "professional signed attestation",
+        "security signed attestation",
+        "release authority decision record"
+      ]
+    }
+  ],
+  "required_roles": [
+    "ENGINE_AUDITOR",
+    "PROFESSIONAL",
+    "SECURITY"
+  ],
+  "completion_prohibited_if": [
+    "any mandatory gate missing/blocked",
+    "any unresolved critical blocker",
+    "missing real-provider deployment and operational data",
+    "synthetic-only capabilities presented as real AI",
+    "missing independent signed professional/security decisions",
+    "untrusted verification or unknown issuer",
+    "untested failure/rollover/recovery",
+    "target engine identity mapping unresolved"
+  ],
+  "release_separate_from_engine_complete": true
+}

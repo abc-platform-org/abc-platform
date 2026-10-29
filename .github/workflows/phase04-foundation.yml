@@ -76,6 +76,8 @@ jobs:
           assert p["conditionally_listed_test_candidates"] == ["synthetic:style-a"]
           print("PASS: no-API controlled ENG02→03→04+05→06 synthetic demo")
           PY
+      - name: Verify actual isolated PostgreSQL client certificate authentication
+        run: python runtime/phase04/tests/verify_real_pg_mtls_ci.py
       - name: Build nonroot staging container from exact PR code
         run: docker build -f runtime/phase04/Dockerfile -t abc-phase04-staging:ci runtime/phase04
       - name: Verify image runs as dedicated unprivileged UID

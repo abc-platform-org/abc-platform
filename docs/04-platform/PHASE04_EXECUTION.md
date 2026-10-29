@@ -61,3 +61,19 @@ The session/restore/replay/tenant test suite is prerequisite engineering evidenc
 - **Automated traceability:** \`python scripts/validate_phase04.py\` fails if canonical operation IDs, route mapping, implementation status or release assertions drift. Runs in the Phase04 CI workflow.
 
 **Boundary:** the local test-token issuer is *not* commercial identity infrastructure. \`G-06/G-08/G-09\` and formal Phase-04 exit are still NOT_PASSED. Do not accept real customers, photos, bookings, financial records or procedures. The documented 39 API operations and distributed orchestration/consent/privacy/production infrastructure backlog remain mandatory.
+
+
+## Subsequent integrated implementation and revised gate — 2026-10-29
+
+The point-in-time "managed OIDC and PostgreSQL still pending" statements above refer to the **earlier local SQLite slice**. The subsequent PR branch now implements **tested staging adapters**, not an actual connected managed provider:
+
+- RSA-signed OIDC access-token verifier with configured/pinned HTTPS issuer, audience and JWKS; only issuer+subject enter the authorization pipeline. The JWT does not grant role/tenant access by its own claims.
+- PostgreSQL 16 core migrations \`0001_postgres_core.sql\`, \`0002_checkpoint_audit.sql\`, dedicated non-BYPASSRLS \`abc_app\` role, FORCE RLS and server-verified active membership.
+- PostgreSQL atomic session create/get, session checkpoint pause/resume with CAS and state audit, request idempotency and canonical outbox event.
+- End-to-end HTTP → OIDC → PostgreSQL membership → RLS tests, including revocation. Legacy HS256 and SQLite remain explicitly local test harnesses.
+- Read-only purpose/client/session-bound consent gate. Actual client attestation and withdrawal services are NOT implemented; no images, AI jobs or customer data can enter.
+- Real temporary PostgreSQL CI database and 70 Python test scenarios, plus the frozen 41-operation traceability check.
+
+**Current authoritative audit:** [IDENTITY_POSTGRES_CONSENT_AUDIT_2026-10-29.md](IDENTITY_POSTGRES_CONSENT_AUDIT_2026-10-29.md). Read this together with the historical baseline, not as a replacement for P02 contracts.
+
+**Gate decision:** \`WP-004-01 = STAGING_ADAPTERS_IMPLEMENTED_PENDING_FINAL_HEAD_CHECK\` until exact-commit CI passes; \`P04 = IN_PROGRESS\`; external IdP/managed DB, independent consent verifier/DSR, distributed jobs, full 19 engines, observability, product deployment, human security and privacy approval remain OPEN. No merge to main or live usage authorized.

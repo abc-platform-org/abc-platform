@@ -1,0 +1,51 @@
+# ABC — ENG01/ENG14 Authorization + ANSWER_RECORDED Independent Delivery and ENG03 Handoff
+Date: 2026-10-29. Branch `engine/eng01-answer-consumer-eng14-20261029`; draft PR #33 stacked on #32 → #31 → #29 → P04 #23. No main merge, no new paid resources, no real client data, no frozen Phase02 contract edits.
+
+## 1. What actually executes
+1. Migration **0009** extends the existing admin-provisioned subscription registry to ANSWER_RECORDED. New `abc_answer_worker` login is separate from `abc_worker`, `abc_app` and `abc_orchestrator`. Worker RLS on `abc.worker_subscriptions`, `abc.outbox`, `abc.event_delivery` and a dedicated `abc.answer_index_projection` allows only its active event type, tenant and consumer scope. Its SELECT/UPDATE grants do not include session, memberships, consent, ENG02 answers or engine-workload ACL.
+2. `answer_index_consumer.py` has a separate at-least-once dispatcher. Reconcile → lease → validate canonical event envelope/version/source/tenant → insert idempotent projection → ACK. If crash occurs between effect and ACK, retry is a no-op through unique keys. Invalid events exhaust bounded retries and go to DLQ; transient PostgreSQL failures leave lease unacknowledged for later retry. Projection stores **only** IDs, question ID, aggregate version and branch, **never answer values or media**.
+3. Migration **0010** adds a durable `abc.eng03_input_jobs` metadata-only handoff with status `QUEUED_PENDING_ENGINE`; new consumer transaction commits projection and ENG03 queue entry together. A deterministic job ID and unique event/version constraints ensure replay does not duplicate. The answer-worker cannot run or mark jobs complete. **No ENG03 model/analysis actually executes here** and ENG04/05/06 are not connected to this PostgreSQL queue.
+4. Migration **0009** also introduces versioned `abc.eng14_policy_audit` and a PostgreSQL trigger that refuses answer INSERT without a same-tenant/branch/session/actor/aggregate-version ALLOW attestation; ENG14 Python policy engine independently checks the synthetic question scope, missing critical evidence, reported sensitivity and deterministic question sequence.
+5. Migration **0011** tightens the initial design: runtime `abc_orchestrator` has **no INSERT privilege on `eng14_policy_audit`**. It must call DB-owned, restricted `abc.issue_eng14_answer_proof`, which re-verifies active specialist and admin workload grants, assignment, session state and version, synthetic-only service/profile, canonical question order and critical stop rules within the original transaction. The backend DB trigger validates the authorization receipt and exact answer vocabulary. **This is an additional independent SQL authorization gate, not trust in a client-supplied PolicyDecision or model output.**
+6. The existing ENG02 trusted writer calls the policy engine and the SQL broker before writing any answer. Its answer, canonical ANSWER_RECORDED event, version, policy attestation and command receipt commit or roll back in **one PostgreSQL transaction**. The event is subsequently delivered via the independent consumer and queues an ENG03 metadata job.
+
+## 2. Actual verified evidence
+At exact implementation commit `ac9537e5adc6f927ad8139b4265cbc39172cf962`, [GitHub Foundation CI #40860306932](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40860306932) **SUCCESS: 206/206 Python integration/unit tests**, disposable PostgreSQL 16, migrations 0001–0011 checksum/staging migrator, Docker nonroot, contract-integrity guards and no-API synthetic demonstration PASS.
+
+Test cases cover: answer-only RLS, no SELECT on sensitive tables; tenant/subscription revocation; replay after projection but before ACK; duplicate delivery, wrong event/producer/tenant; malformed-event pending retry; remote role cannot write ENG03 jobs; valid policy attestation bound to answer in same PG transaction; direct DB answer without attestation rejected; orchestrator direct policy-table INSERT denied; standalone broker denies invalid policy profile; critical unknown stops subsequent answer; independent earlier ENG01/02 signed bearer, timestamp/nonce, branch, SQL atomic replay and error rollback tests.
+
+The log-level 206-test figure is the count of the exact cited SHA, not a claim of production deployment or 206 unique attack classes. Updated documentation commits must pass fresh exact-head CI before merge.
+
+## 3. Residual security threats and strict product limits
+**P0:** Production ENG14 policy across *all 102 canonical ENG01 state transitions* is **NOT implemented**. This release candidate protects only the synthetic ENG02 QUESTION/ANSWER database mutation; ENG01 PAUSE retains its earlier baseline behavior. S1–S3 risk tiers, specialist safety governance, real-client informed consent, and physical service decisions remain blocked. Do not describe this as full non-bypassable policy for all engines.
+
+**P0:** The privileged PostgreSQL broker is a strong extra gate against ordinary runtime code skipping ENG14, but a stolen runtime database credential could still change custom PostgreSQL context settings and impersonate an eligible synthetic specialist; token verification happens at the application boundary, not inside PostgreSQL. A compromised migrator/DB owner can alter policies. Production must use network-bound per-workload DB credentials, independent IAM, DB role/secret rotation and penetration testing before release.
+
+**P0:** The new worker uses an admin-provisioned consumer subscription and RLS, but the shared `abc_answer_worker` credential can set its own session-local `abc.consumer_id`; a stolen shared credential could select another admin-enabled ANSWER_RECORDED subscription. Use per-consumer DB workload identities, signed/managed service identity and host/network isolation for real multi-tenant deployment. RLS alone does not prove cryptographic consumer identity.
+
+**P1:** No real managed IdP, JWT rotation/signing lifecycle, internal network TLS/mTLS, Render private deployment, or external restore/incident drill is in this branch. Blueprint for Phase04 is not the deployed architecture of this work.
+
+**P1:** Only the ACK+read model of ANSWER_RECORDED is implemented. The ENG03 job is queued but no separate authorized ENG03 claiming/analysis runtime exists; no ENG04 vision, ENG05 real knowledge or ENG06 expert decision integration. This is a *durable event-to-work handoff*, not a complete 19-engine runtime.
+
+**P1:** No customer PII or media is accepted; synthetic service ID only. The question registry and eng14.synthetic.1 policy have no salon/medical expert approval. No visual input, treatment clearance, billing, order or preview can be created.
+
+## 4. Independent follow-on work and acceptance gates
+- WP-A: Per-workload/multi-tenant DB account binding and service identity + JWKS rotation, private mTLS, full authenticated engine-to-engine command transport and resilience.
+- WP-B: Extend ENG14 S0–S3 decision/interception to all *executable* ENG01 transitions using policy-signed immutable source evidence; add specialist verification/consent revocation and concurrency tests.
+- WP-C: Provision strictly scoped ENG03 consumer (separate DB role), idempotent claim/lease/ACK for `eng03_input_jobs`, provenance-preserving synthetic evidence conversion, trace persistence, then ENG04/05/06 async version-pinned inputs.
+- WP-D: Staging only after explicit budget and privacy/security approval; negative pentests, realistic SLO/chaos, restore and signoffs. Main stays frozen until gate approvals.
+
+**Disposition:** ENG01/14 ANSWER-SCOPE POLICY + INDEPENDENT ANSWER WORKER = CODE IMPLEMENTED AND LOCALLY CI-TESTED, **NOT PRODUCT RELEASED**. ENG03 queue = durable **pending** handoff only. P04=IN_PROGRESS. Paid API=NOT_USED. Cloud=NOT_DEPLOYED.
+
+## ENG01 legacy checkpoint safety regression
+
+The old internal PostgresStore.checkpoint_command had an executable PAUSED to CREATED resume without transactional ENG14 and verified consent re-evaluation. That resume path is now explicitly blocked with 501 (`resume_requires_eng14_and_verified_consent`); a regression test requires session to remain PAUSED with one audit entry. This does **not** mean the missing policy-safe resume path is implemented, nor that the remaining ENG01 transitions are released. The existing pause-only synthetic checkpoint remains unchanged.
+
+
+## 5. ENG01 legacy resume security closure — regression recovery
+
+**Confirmed at code SHA `7801d7e0cad0857d2ae8b5e0654314ee53fe9142`:** [Foundation CI #40861612754](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40861612754) **SUCCESS 207/207 Python tests**; [Documentation integrity #40861612847](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40861612847) **SUCCESS**. The directly preceding commit `fb45b5480a837c0d1bc7efde16559d28d925f29f` initially failed one obsolete HTTP regression test because it incorrectly still expected a 200/resumed state. The HTTP test was corrected to assert the new fail-closed result.
+
+**Behavior:** `PostgresStore.checkpoint_command(action="resume")` now rejects the legacy state transition as `501 resume_requires_eng14_and_verified_consent` until the system has a newly implemented authoritative, version-bound consent and ENG14 guarded resume. The request does not mutate session state or increment version, and does not append a state audit entry. Both direct PG and real OIDC-signed HTTP regression paths assert PAUSED/version 1 remains unchanged. The already-tested synthetic `ANSWER_RECORDED` consumer, policy gate and ENG03 pending jobs remain intact. **No alternative resume pathway is hereby approved**; wider transition-path closure still requires full architecture and code audit.
+
+**Operational disposition:** A known unsafe feature is intentionally unavailable; this is not a claim that the full ENG01 engine or ENG14 policy has been finished. No production restore, deployment, or client action occurred. PR #33 remains DRAFT and unmerged into main; P04 remains IN_PROGRESS.

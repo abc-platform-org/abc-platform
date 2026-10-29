@@ -125,7 +125,9 @@ class OIDCHttpTests(unittest.TestCase):
         self.assertEqual((st,p["state"],p["state_version"]),(200,"PAUSED",1))
         st,p=self.call("POST","/_foundation/v0/consultations/"+body["session_id"]+"/resume",{},
              headers={"X-Expected-State-Version":"1","Idempotency-Key":"cmd-resume-123"})
-        self.assertEqual((st,p["state"],p["state_version"]),(200,"CREATED",2))
+        self.assertEqual((st,p["error"]),(501,"resume_requires_eng14_and_verified_consent"))
+        st,still=self.call("GET","/v1/consultations/"+body["session_id"])
+        self.assertEqual((st,still["state"],still["state_version"]),(200,"PAUSED",1))
         st,p=self.call("POST","/v1/consultations/"+body["session_id"]+"/consents",{},
              headers={"Idempotency-Key":"no-consent-123"})
         self.assertEqual((st,p["error"]),(501,"capability_not_implemented"))

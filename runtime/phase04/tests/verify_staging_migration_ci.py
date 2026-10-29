@@ -21,12 +21,13 @@ assert os.environ.get("ABC_ENV")=="LOCAL_INTEGRATION_ONLY" and ADMIN, "test-only
 app_pass="disposable-test-app-"+("a"*40)
 worker_pass="disposable-test-worker-"+("b"*40)
 orchestrator_pass="disposable-test-orchestrator-"+("d"*40)
+answer_worker_pass="disposable-test-answer-worker-"+("e"*40)
 migration_pass="disposable-test-migrator-"+("c"*40)
 
 with psycopg.connect(ADMIN,autocommit=True) as con:
     con.execute(sql.SQL("""CREATE ROLE abc_staging_migrator LOGIN CREATEROLE
                  NOSUPERUSER NOCREATEDB NOBYPASSRLS PASSWORD {}""").format(sql.Literal(migration_pass)))
-    con.execute("GRANT abc_app,abc_worker,abc_orchestrator TO abc_staging_migrator WITH ADMIN OPTION")
+    con.execute("GRANT abc_app,abc_worker,abc_orchestrator,abc_answer_worker TO abc_staging_migrator WITH ADMIN OPTION")
     con.execute("CREATE DATABASE abc_staging OWNER abc_staging_migrator")
 
 local=ADMIN.replace("postgres:abc-integration-only-password",
@@ -39,17 +40,18 @@ env={"ABC_ENV":"STAGING_MIGRATION_PRIVATE",
      "ABC_MIGRATION_APPROVAL":"APPROVED_STAGING_ONLY",
      "ABC_STAGING_APP_PASSWORD":app_pass,
      "ABC_STAGING_WORKER_PASSWORD":worker_pass,
-     "ABC_STAGING_ORCHESTRATOR_PASSWORD":orchestrator_pass}
+     "ABC_STAGING_ORCHESTRATOR_PASSWORD":orchestrator_pass,
+     "ABC_STAGING_ANSWER_WORKER_PASSWORD":answer_worker_pass}
 with patch.object(staging_migrate,"validate_migrator_config",return_value=local):
     staging_migrate.apply_migrations(env)
     staging_migrate.apply_migrations(env)
 with psycopg.connect(local) as con:
     migration_rows=con.execute("SELECT filename,sha256 FROM public.abc_schema_migrations ORDER BY filename").fetchall()
-    assert len(migration_rows)==8
+    assert len(migration_rows)==11
     assert [name for name,digest in migration_rows]==list(staging_migrate.FILENAMES)
     for name,digest in migration_rows:
         assert digest==dict(staging_migrate.planned_migrations())[name]
-    for table in ("sessions","consent_evidence","outbox","worker_subscriptions","event_delivery","engine_workload_grants","eng02_answers","eng02_command_receipts"):
+    for table in ("sessions","consent_evidence","outbox","worker_subscriptions","event_delivery","engine_workload_grants","eng02_answers","eng02_command_receipts","answer_index_projection","eng14_policy_audit","eng03_input_jobs"):
         row=con.execute("SELECT relrowsecurity,relforcerowsecurity FROM pg_class WHERE oid=to_regclass(%s)",
                         ("abc."+table,)).fetchone()
         assert row==(True,True),table

@@ -170,12 +170,15 @@ class PostgresRuntimeTests(unittest.TestCase):
         restarted=PostgresStore(DSN)
         replay=restarted.checkpoint_command(self.principal,sid,"pause",0,"pause-intent-0001")
         self.assertEqual(replay,first)
-        resume=restarted.checkpoint_command(self.principal,sid,"resume",1,"resume-intent-0001")
-        self.assertEqual((resume["state"],resume["state_version"]),("CREATED",2))
-        self.assertEqual(self.store.get(self.principal,sid)["state_version"],2)
+        with self.assertRaises(DomainError) as err:
+            restarted.checkpoint_command(self.principal,sid,"resume",1,"resume-intent-0001")
+        self.assertEqual(err.exception.status,501)
+        self.assertEqual(err.exception.code,"resume_requires_eng14_and_verified_consent")
+        self.assertEqual(self.store.get(self.principal,sid)["state"],"PAUSED")
+        self.assertEqual(self.store.get(self.principal,sid)["state_version"],1)
         with psycopg.connect(ADMIN) as con:
             audit=con.execute("SELECT count(*) FROM abc.state_audit WHERE session_id=%s",(sid,)).fetchone()[0]
-        self.assertEqual(audit,2)
+        self.assertEqual(audit,1)
 
     def test_pg_checkpoint_stale_concurrent_change_is_rejected(self):
         sid=self.create("create-for-race")["session_id"]

@@ -50,3 +50,14 @@ Canonical [ABC-MEP-01.1](../05-delivery/MASTER_ROADMAP_16_PHASES.md) requires de
 \`G06/G08/G09 = NOT_RUN\`; \`P03-UX-EXIT = BLOCKED\` independently.
 
 The session/restore/replay/tenant test suite is prerequisite engineering evidence, not product-release authorization. No merge to \`main\` until review and gating.
+
+
+## WP-004-01 implementation expansion — 2026-10-29
+
+- **Local durable fixture job worker:** \`Store.enqueue_fixture_job / lease_fixture_job / finish_fixture_job / cancel_fixture_jobs\` with transactional SQLite lease ownership, forced stale-worker rejection, at-most-one live lease, three-failure dead-letter state and per-session cancellation. This proves **foundation queue semantics only**, not AI image processing or distributed queue production readiness.
+- **Pause/race hardening:** a successful transition to PAUSED now invalidates queued/leased synthetic jobs **in the same transaction**, so late worker results cannot be acknowledged. Resume requires a fresh job intent and new idempotency key.
+- **Contract inventory:** \`API_IMPLEMENTATION_MATRIX.csv\` maps all **41** frozen v1 operation IDs and routes to implementation status: exactly two \`LOCAL_HARNESS_ONLY\` and 39 \`NOT_IMPLEMENTED\`. None is released.
+- **Additional executable tests:** 36 Python unittest cases including durable restart, tenant isolation, schema alignment, concurrent state-version compare-and-swap, idempotent replay, event envelope, lease crash recovery/expired-worker fencing and pause cancellation.
+- **Automated traceability:** \`python scripts/validate_phase04.py\` fails if canonical operation IDs, route mapping, implementation status or release assertions drift. Runs in the Phase04 CI workflow.
+
+**Boundary:** the local test-token issuer is *not* commercial identity infrastructure. \`G-06/G-08/G-09\` and formal Phase-04 exit are still NOT_PASSED. Do not accept real customers, photos, bookings, financial records or procedures. The documented 39 API operations and distributed orchestration/consent/privacy/production infrastructure backlog remain mandatory.

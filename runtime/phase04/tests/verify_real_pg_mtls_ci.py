@@ -107,7 +107,7 @@ host all all 0.0.0.0/0 reject
 host all all ::/0 reject
 """)
         (root/"10-ci-role.sql").write_text(
-            "CREATE ROLE abc_api_ci LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS;\\n")
+            "CREATE ROLE abc_api_ci LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS;\n")
         (root/"Dockerfile").write_text("""FROM postgres:16
 COPY --chown=postgres:postgres server.crt server.key ca.crt pg_hba.conf /etc/abc-pki/
 COPY 10-ci-role.sql /docker-entrypoint-initdb.d/10-ci-role.sql

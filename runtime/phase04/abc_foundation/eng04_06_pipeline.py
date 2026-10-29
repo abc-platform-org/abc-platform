@@ -75,7 +75,7 @@ class SyntheticAnalysisPipeline:
 
     def _snapshot(self,con,job):
         rows=con.execute("""SELECT evidence_id,evidence_json,evidence_digest,
-                    aggregate_version,source_evidence_id,source_job_id,
+                    aggregate_version,source_job_id,
                     policy_decision_id,question_id,tenant_id,branch_id,session_id
                FROM abc.eng03_evidence_ledger
                WHERE consumer_id=%s AND tenant_id=%s AND branch_id=%s

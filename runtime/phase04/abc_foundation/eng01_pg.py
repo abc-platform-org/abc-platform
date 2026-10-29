@@ -66,8 +66,11 @@ class ENG01PostgresCommandStore(PostgresStore):
             # The app role no longer has SQL UPDATE permission on state.
             # Both the typed command and legacy checkpoint must converge
             # on the DB-owned transactional ENG14 broker and row trigger.
-            new=con.execute("""SELECT * FROM abc.eng14_apply_pause(%s,%s)""",
-                            (sid,version)).fetchone()
+            try:
+                new=con.execute("""SELECT * FROM abc.eng14_apply_pause(%s,%s)""",
+                                (sid,version)).fetchone()
+            except psycopg.errors.CheckViolation:
+                raise DomainError(403,"eng14_workload_or_policy_denied") from None
             if new is None:
                 raise DomainError(409,"state_version_conflict")
             con.execute("""INSERT INTO abc.state_audit

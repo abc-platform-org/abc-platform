@@ -29,7 +29,7 @@ def validate_managed_db_dsn(dsn, *, expected_login):
     return True
 
 
-def assert_managed_db_peer(con, *, expected_login, client_dn, issuer_dn):
+def assert_managed_db_peer(con, *, expected_login, client_dn, issuer_dn, certificate_serial):
     """Inspect immutable authenticated login and the live PostgreSQL TLS peer.
 
     Server must additionally enforce clientcert=verify-full and a controlled
@@ -37,15 +37,17 @@ def assert_managed_db_peer(con, *, expected_login, client_dn, issuer_dn):
     are never evidence of a service identity.
     """
     if (not _LOGIN.fullmatch(expected_login or "") or
-        not all(isinstance(x,str) and x.strip() for x in (client_dn,issuer_dn))):
+        not all(isinstance(x,str) and x.strip() for x in (client_dn,issuer_dn,certificate_serial))):
         raise ValueError("managed_db_identity_pins_required")
     row=con.execute("""SELECT session_user AS login,current_user AS active_role,
-             s.ssl,s.version,s.client_dn,s.issuer_dn
+             s.ssl,s.version,s.client_dn,s.issuer_dn,s.client_serial
           FROM pg_stat_ssl s WHERE s.pid=pg_backend_pid()""").fetchone()
     if (not row or row["login"]!=expected_login or
         row["active_role"]!=expected_login or
         row["ssl"] is not True or row["version"]!="TLSv1.3" or
-        row["client_dn"]!=client_dn or row["issuer_dn"]!=issuer_dn):
+        row["client_dn"]!=client_dn or row["issuer_dn"]!=issuer_dn or
+        row["client_serial"] is None or
+        str(row["client_serial"])!=certificate_serial):
         raise ValueError("database_authenticated_tls_workload_mismatch")
     return {"authenticated_login":expected_login,"tls_version":"TLSv1.3",
             "identity_source":"POSTGRES_SESSION_USER_AND_TLS_PEER",

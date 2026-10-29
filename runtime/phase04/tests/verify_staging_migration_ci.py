@@ -51,11 +51,11 @@ with patch.object(staging_migrate,"validate_migrator_config",return_value=local)
     staging_migrate.apply_migrations(env)
 with psycopg.connect(local) as con:
     migration_rows=con.execute("SELECT filename,sha256 FROM public.abc_schema_migrations ORDER BY filename").fetchall()
-    assert len(migration_rows)==16
+    assert len(migration_rows)==17
     assert [name for name,digest in migration_rows]==list(staging_migrate.FILENAMES)
     for name,digest in migration_rows:
         assert digest==dict(staging_migrate.planned_migrations())[name]
-    for table in ("sessions","consent_evidence","outbox","worker_subscriptions","event_delivery","engine_workload_grants","eng02_answers","eng02_command_receipts","answer_index_projection","eng14_policy_audit","eng03_input_jobs","eng03_worker_bindings","worker_login_bindings","eng14_state_guard_audit","eng01_create_audit","eng03_evidence_ledger","eng04_06_jobs","eng04_06_results"):
+    for table in ("sessions","consent_evidence","outbox","worker_subscriptions","event_delivery","engine_workload_grants","eng02_answers","eng02_command_receipts","answer_index_projection","eng14_policy_audit","eng03_input_jobs","eng03_worker_bindings","worker_login_bindings","eng14_state_guard_audit","eng01_create_audit","eng14_tenant_workload_mode","eng03_evidence_ledger","eng04_06_jobs","eng04_06_results"):
         row=con.execute("SELECT relrowsecurity,relforcerowsecurity FROM pg_class WHERE oid=to_regclass(%s)",
                         ("abc."+table,)).fetchone()
         assert row==(True,True),table

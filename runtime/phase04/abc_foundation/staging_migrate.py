@@ -29,6 +29,7 @@ FILENAMES = (
     "0014_eng14_state_guard.sql",
     "0015_eng14_session_creation_gate.sql",
     "0016_eng01_atomic_session_broker.sql",
+    "0017_shared_managed_workload_gate.sql",
 )
 
 

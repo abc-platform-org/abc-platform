@@ -14,6 +14,7 @@ import psycopg
 from psycopg.rows import dict_row
 
 from .store import DomainError
+from .eng14_policy import SyntheticQuestionPolicy
 
 _PROFILE_FILE=Path(__file__).with_name("eng02_synthetic_profiles.json")
 _PROFILE=json.loads(_PROFILE_FILE.read_text())["profiles"][0]
@@ -160,6 +161,15 @@ class PGENG02CommandWriter:
                                 if q["question_id"] not in recorded),None)
             if command["question_id"]!=next_question:
                 raise DomainError(409,"question_order_or_duplicate_denied")
+            # ENG14 interception occurs after trusted DB ACL, membership and
+            # row lock, but before ANY session/answer/outbox mutation.
+            policy=SyntheticQuestionPolicy()
+            decision=policy.evaluate(
+                command_id=str(command_id),tenant_id=tenant,session_id=str(session_id),
+                service_id=row["service_id"],state=row["state"],
+                answers=recorded,question_id=command["question_id"],
+                expected_question=next_question,profile_version=command["profile_version"])
+            policy.require_allow(decision)
             eid,aid=uuid.uuid4(),uuid.uuid4()
             newversion=row["state_version"]+1
             updated=con.execute("""UPDATE abc.sessions SET state_version=%s,
@@ -169,13 +179,21 @@ class PGENG02CommandWriter:
                         (newversion,now,eid,session_id,row["state_version"])).fetchone()
             if updated is None:
                 raise DomainError(409,"state_version_conflict")
+            con.execute("""INSERT INTO abc.eng14_policy_audit
+                (decision_id,command_id,tenant_id,branch_id,session_id,
+                 actor_id,aggregate_version,policy_version,scope,decision,
+                 input_digest,evaluated_at)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,'QUESTION','ALLOW',%s,%s)""",
+                (uuid.UUID(decision["policy_decision_id"]),command_id,tenant,branch,
+                 session_id,subject,newversion,decision["policy_version"],digest,now))
             con.execute("""INSERT INTO abc.eng02_answers
                  (tenant_id,branch_id,session_id,question_profile_version,
-                  question_id,value,answer_source,actor_id,answer_id,aggregate_version)
-                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                  question_id,value,answer_source,actor_id,answer_id,
+                  aggregate_version,policy_decision_id)
+                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                  (tenant,branch,session_id,_PROFILE["profile_version"],
                   command["question_id"],command["value"],command["answer_source"],
-                  subject,aid,newversion))
+                  subject,aid,newversion,uuid.UUID(decision["policy_decision_id"])))
             event={"event_id":str(eid),"event_type":"ANSWER_RECORDED",
               "event_schema_version":"1.0.0-draft","tenant_id":tenant,"branch_id":branch,
               "session_id":str(session_id),"aggregate_id":str(session_id),

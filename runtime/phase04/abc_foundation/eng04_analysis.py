@@ -49,7 +49,7 @@ class SyntheticBeautyAnalysis:
                 attrs.append({"key":key,"value":None,"evidence_class":"UNKNOWN",
                               "source_evidence_id":eid})
             else:
-                if (record.get("source_type")!="CLIENT_ANSWER"
+                if (record.get("source_type") not in ("CLIENT_ANSWER","SALON_RECORD")
                     or record.get("value") is None
                     or not isinstance(record.get("value"),str)):
                     raise DomainError(422,"unverified_observation_disallowed")

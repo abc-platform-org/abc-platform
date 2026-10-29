@@ -262,8 +262,7 @@ BEGIN
       OR NEW.evidence_json->>'evidence_id' IS DISTINCT FROM NEW.evidence_id::text
       OR NEW.evidence_json->>'attribute_key' IS DISTINCT FROM expected_key
       OR NEW.evidence_json->>'confidence_label' IS DISTINCT FROM 'UNRATED'
-      OR NEW.evidence_digest !~ '^[0-9a-f]{64}
-
+      OR NEW.evidence_digest !~ '^[0-9a-f]{64}'
   THEN
       RAISE EXCEPTION 'ENG03 trusted evidence lineage mismatch' USING ERRCODE='23514';
   END IF;

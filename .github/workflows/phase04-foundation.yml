@@ -54,6 +54,24 @@ jobs:
       - name: Verify dedicated staging migrator against isolated ephemeral PostgreSQL
         working-directory: runtime/phase04
         run: python tests/verify_staging_migration_ci.py
+      - name: Execute synthetic-only consultation to decision offline walkthrough
+        working-directory: runtime/phase04
+        env:
+          ABC_DEMO_SYNTHETIC: "yes"
+        run: |
+          python demo_offline_engines.py > /tmp/abc-synthetic-demo.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('/tmp/abc-synthetic-demo.json').read_text())
+          assert p["simulation"] == "SYNTHETIC_INTERNAL_ONLY"
+          assert p["released_to_customers"] is False
+          assert p["paid_API_calls"] == 0
+          assert p["question_count"] == 4
+          assert p["human_validation"] == "REQUIRED_BEFORE_REAL_USE"
+          assert p["conditionally_listed_test_candidates"] == ["synthetic:style-a"]
+          print("PASS: no-API controlled ENG02→03→04+05→06 synthetic demo")
+          PY
       - name: Build nonroot staging container from exact PR code
         run: docker build -f runtime/phase04/Dockerfile -t abc-phase04-staging:ci runtime/phase04
       - name: Verify image runs as dedicated unprivileged UID

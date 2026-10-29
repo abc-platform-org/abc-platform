@@ -280,4 +280,27 @@ BEGIN
   RETURN NEW;
 END;
 $metadata$;
+-- Managed-mode also fences direct runtime SQL reads of sessions/receipts,
+-- not just state-mutating broker calls. Existing permissive RLS policies
+-- remain necessary; these RESTRICTIVE policies AND with them.
+CREATE POLICY abc_managed_session_workload ON abc.sessions
+  AS RESTRICTIVE FOR ALL TO abc_app
+  USING (abc.eng14_workload_allowed(tenant_id))
+  WITH CHECK (abc.eng14_workload_allowed(tenant_id));
+CREATE POLICY abc_managed_idempotency_workload ON abc.idempotency
+  AS RESTRICTIVE FOR ALL TO abc_app
+  USING (abc.eng14_workload_allowed(tenant_id))
+  WITH CHECK (abc.eng14_workload_allowed(tenant_id));
+CREATE POLICY abc_managed_state_audit_workload ON abc.state_audit
+  AS RESTRICTIVE FOR ALL TO abc_app
+  USING (abc.eng14_workload_allowed(tenant_id))
+  WITH CHECK (abc.eng14_workload_allowed(tenant_id));
+CREATE POLICY abc_managed_command_receipt_workload ON abc.eng01_command_receipts
+  AS RESTRICTIVE FOR ALL TO abc_app
+  USING (abc.eng14_workload_allowed(tenant_id))
+  WITH CHECK (abc.eng14_workload_allowed(tenant_id));
+CREATE POLICY abc_managed_consent_workload ON abc.consent_evidence
+  AS RESTRICTIVE FOR SELECT TO abc_app
+  USING (abc.eng14_workload_allowed(tenant_id));
+
 COMMIT;

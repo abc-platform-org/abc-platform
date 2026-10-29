@@ -272,6 +272,42 @@ class ENG02PostgresIntegration(unittest.TestCase):
                 con.execute("""UPDATE abc.engine_workload_grants SET active=true
                          WHERE tenant_id=%s""",(self.tenant,))
 
+    def test_actual_signed_http_socket_through_pg_commit(self):
+        import http.client
+        from threading import Thread
+        from abc_foundation.eng01_internal_http import make_synthetic_server,PATH
+        server=make_synthetic_server(self.ingress,environ={
+            "ABC_ENV":"LOCAL_INTEGRATION_ONLY",
+            "ABC_ENABLE_SYNTHETIC_S2S":"yes"})
+        thread=Thread(target=server.serve_forever,daemon=True)
+        thread.start()
+        try:
+            def request(service_header):
+                conn=http.client.HTTPConnection("127.0.0.1",server.server_port,timeout=4)
+                headers={"Content-Type":"application/json",
+                         "Authorization":self.user_header}
+                if service_header:
+                    headers["X-ABC-Service-Authorization"]=service_header
+                conn.request("POST",PATH,body=json.dumps(self.cmd),headers=headers)
+                response=conn.getresponse()
+                status=response.status
+                data=json.loads(response.read())
+                conn.close()
+                return status,data
+            self.assertEqual(request(None)[0],401)
+            self.assertEqual(self.count("abc.outbox"),1)
+            status,receipt=request(self.service_header)
+            self.assertEqual(status,200)
+            self.assertEqual(receipt["status"],"ANSWER_RECORDED_ATOMICALLY_SYNTHETIC_ONLY")
+            self.assertEqual(receipt,request(self.service_header)[1])
+            self.assertEqual(self.count("abc.eng02_answers"),1)
+            self.assertEqual(self.count("abc.outbox"),2)
+            self.assertEqual(self.count("abc.eng02_command_receipts"),1)
+        finally:
+            server.shutdown()
+            thread.join(timeout=3)
+            server.server_close()
+
     def test_role_cannot_read_other_engine_records(self):
         with psycopg.connect(ORCH) as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):

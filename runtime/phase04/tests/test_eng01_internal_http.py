@@ -28,8 +28,8 @@ class InternalHTTPTests(unittest.TestCase):
         self.thread=Thread(target=self.server.serve_forever,daemon=True)
         self.thread.start()
         self.addCleanup(self.server.server_close)
-        self.addCleanup(self.server.shutdown)
         self.addCleanup(self.thread.join,2)
+        self.addCleanup(self.server.shutdown)
         self.host,self.port=self.server.server_address
 
     def send(self,*,method="POST",path=PATH,body=b'{"test_command":"safe"}',headers=None):

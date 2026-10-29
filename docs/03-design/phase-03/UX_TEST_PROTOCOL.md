@@ -28,3 +28,19 @@ Run `node --test tests/phase03/model.test.mjs` on the PR tree. The suite exercis
 - Advanced Studio modes and management projections.
 
 Record test ID, input state, steps, observed result, exact source SHA, environment, reviewer and evidence. Unexecuted is not PASS. Human domain review must never be simulated by the assistant.
+
+
+## Post-interruption Phase-03 execution additions (2026-10-29)
+
+**Executable:** \`tests/phase03/model.test.mjs\` (43 modeled scenarios), \`tests/phase03/management.test.mjs\` (20 modeled scenarios), \`tests/phase03/contrast.test.mjs\` (defined WCAG token contrast pairs), \`tests/phase03/browser.spec.mjs\` (5 Chromium E2E cases). All run through \`.github/workflows/phase03-design-integrity.yml\`. Observed outcomes must always be cited to the exact PR SHA, not inferred from test source.
+
+Chromium coverage:
+- 390, 768, 1440 CSS-pixel widths; document-level overflow check; retained screenshots;
+- shared salon consultation → synthetic preview → selected Look → protected specialist review → technical plan/receipt → close;
+- unauthorized attempt to enter private area without explicit screen handling;
+- handoff private projection, return to shared, hide receipt, re-enter specialist;
+- dialog Escape and focus return, RTL/LTR change, management Client denial, Reception blocked/allowed booking paths, Manager qualification and OrganizationOwner branch-only scope.
+
+**Still NOT_EXECUTED / independent acceptance:** true 200% user browser zoom (deviceScaleFactor does **not** count), functional contrast across all states, actual physical mobile/tablet orientation+touch+virtual keyboard, VoiceOver iOS, NVDA desktop, independent salon client/specialist observation, historical six-reference image comparison, real backend security and real visual QA. None of these may be marked PASS by a browser screenshot or synthetic unit test.
+
+**Reproduction:** \`python scripts/build_phase03_review.py --check\` guarantees committed standalone review files match source; Chromium CI uploads screenshots as an artifact attached to the exact run. All red-team fixtures are synthetic and non-identifying.

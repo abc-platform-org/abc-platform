@@ -30,6 +30,26 @@ class SyntheticScopedStore:
             raise DomainError(404,"not_found")
         return dict(self.row)
 
+    def execute_eng01_pause(self,principal,command):
+        import hashlib,json
+        digest=hashlib.sha256(json.dumps(command,sort_keys=True,separators=(",",":")).encode()).hexdigest()
+        key=command["command_id"]
+        if key in self.receipts:
+            previous,result=self.receipts[key]
+            if previous!=digest:
+                raise DomainError(409,"idempotency_payload_conflict")
+            return dict(result)
+        self.calls+=1
+        self.get(principal,command["session_id"])
+        if self.row["state"]!="CREATED" or command["expected_state_version"]!=self.row["state_version"]:
+            raise DomainError(409,"state_version_conflict")
+        self.row["state"],self.row["state_version"]="PAUSED",1
+        result={**self.row,"engine_id":"ENG-01","status":"DURABLE_CHECKPOINT_COMMITTED",
+                "publication_status":"INTERNAL_SYNTHETIC_ONLY",
+                "command_id":key,"correlation_id":command["correlation_id"]}
+        self.receipts[key]=(digest,dict(result))
+        return result
+
     def checkpoint_command(self,principal,sid,action,version,key):
         self.calls+=1
         self.get(principal,sid)
@@ -126,6 +146,13 @@ class TypedGatewayTests(unittest.TestCase):
     def test_different_command_id_same_idempotency_key_cannot_replay(self):
         self.invoke()
         self.deny("command_idempotency_binding_required",command_id=str(uuid.uuid4()))
+
+    def test_changed_correlation_under_same_command_uuid_rejected(self):
+        self.invoke()
+        self.deny("idempotency_payload_conflict",correlation_id=str(uuid.uuid4()))
+
+    def test_forged_policy_token_is_not_authorized(self):
+        self.deny("policy_gate_not_connected",policy_decision_id="not-verified")
 
     def test_missing_deadline_is_accepted_for_same_safe_internal_command(self):
         self.assertEqual(self.invoke()["state"],"PAUSED")

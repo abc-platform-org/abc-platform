@@ -20,7 +20,7 @@ ACCEPTED_MATURITY={
 
 def verify(policy,registry):
     assert policy["schema_version"]=="abc.engine-quality-gates.v1"
-    assert policy["scope"]=="ABC_IN_SALON_SHARED_SCREEN"
+    assert policy["scope"]=="IN_SALON_SHARED_SCREEN"
     assert policy["release_separate_from_engine_complete"] is True
     assert tuple(g["id"] for g in policy["mandatory_gates"])==GATE_IDS
     assert len(set(GATE_IDS))==10

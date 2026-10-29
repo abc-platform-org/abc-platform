@@ -14,6 +14,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python scripts/validate_phase03.py
+      - run: python scripts/build_phase03_review.py --check
       - run: node --check prototypes/phase03/app.mjs
       - run: node --check prototypes/phase03/management.mjs
       - run: node --check prototypes/phase03/management-model.mjs

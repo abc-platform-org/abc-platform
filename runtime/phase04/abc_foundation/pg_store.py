@@ -233,10 +233,11 @@ class PostgresStore:
                     raise DomainError(409,"missing_or_invalid_checkpoint")
                 state,checkpoint="CREATED",None
             now=datetime.now(timezone.utc)
-            result=con.execute("""UPDATE abc.sessions SET state=%s,checkpoint=%s,
-                    state_version=state_version+1, updated_at=%s
-                    WHERE session_id=%s AND state_version=%s RETURNING *""",
-                    (state,checkpoint,now,sid,expected_version)).fetchone()
+            # The app DB role has no UPDATE(state,checkpoint) privilege.
+            # A DB-owned, narrowly scoped ENG14 broker and independent
+            # BEFORE UPDATE trigger must both approve this mutation.
+            result=con.execute("""SELECT * FROM abc.eng14_apply_pause(%s,%s)""",
+                    (sid,expected_version)).fetchone()
             if result is None:
                 raise DomainError(409,"state_version_conflict")
             con.execute("""INSERT INTO abc.state_audit

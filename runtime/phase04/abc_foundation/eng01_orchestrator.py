@@ -186,8 +186,14 @@ class OrchestrationEngine:
         else:
             if row["state_version"]!=expected_state_version+1:
                 raise DomainError(409,"state_version_conflict")
-        # Token membership + tenant scope rechecked atomically by PostgresStore.
-        # CHECKPOINT and state_audit persist together; no client-provided proof.
+        # ENG14 evaluates every edge from the frozen canonical machine;
+        # only this synthetic S0 edge may proceed. PostgreSQL gate 0014
+        # independently validates the state mutation inside the transaction.
+        from .eng14_transition_policy import ENG14TransitionPolicy
+        policy=ENG14TransitionPolicy(self.machine)
+        policy.require_allowed(policy.evaluate(
+            from_state="CREATED",to_state="PAUSED",actor="SPECIALIST",
+            expected_version=expected_state_version))
         response=self.store.checkpoint_command(
             principal,row["session_id"],"pause",expected_state_version,idempotency_key)
         if (response.get("session_id")!=row["session_id"] or

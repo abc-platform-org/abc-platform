@@ -25,7 +25,7 @@ _BY_FIELD={q["field"]:q for q in QUESTION_REGISTRY["questions"]}
 
 class SyntheticAnalysisPipeline:
     ENGINE_IDS=("ENG-04","ENG-05","ENG-06")
-    def __init__(self,dsn,consumer_id,*,knowledge_fixture=None):
+    def __init__(self,dsn,consumer_id,*,knowledge_fixture=None,engine_runner=None):
         if not isinstance(dsn,str) or not dsn:
             raise ValueError("independent_analysis_database_dsn_required")
         if not isinstance(consumer_id,str) or not CONSUMER.fullmatch(consumer_id):
@@ -33,6 +33,9 @@ class SyntheticAnalysisPipeline:
         self.dsn=dsn
         self.consumer_id=consumer_id
         self.fixture=knowledge_fixture
+        if engine_runner is not None and not callable(getattr(engine_runner,"call",None)):
+            raise ValueError("trusted_engine_transport_required")
+        self.engine_runner=engine_runner
         # The knowledge engine independently rejects any unreviewed source.
         if knowledge_fixture is not None:
             SyntheticKnowledgeEngine().resolve(service_id=SYNTHETIC_SERVICE,
@@ -167,10 +170,18 @@ class SyntheticAnalysisPipeline:
             job=self._leased(con,jid,token)
             evidence,rows=self._snapshot(con,job)
             sid=str(job["session_id"])
-            analysis=SyntheticBeautyAnalysis().analyse(session_id=sid,evidence=evidence)
-            knowledge=SyntheticKnowledgeEngine().resolve(service_id=SYNTHETIC_SERVICE,
-                                                        fixture=self.fixture)
-            decision=SyntheticDecisionEngine().decide(analysis=analysis,knowledge=knowledge)
+            # Each engine runs in its own child OS process with strict
+            # versioned port; the database-capable pipeline remains the only
+            # owner of the transaction and never forwards its PG credentials.
+            from .isolated_engine_runner import IsolatedEngineRunner
+            runner=self.engine_runner or IsolatedEngineRunner()
+            consumer=job["consumer_id"]
+            analysis=runner.call("ENG-04",consumer_id=consumer,session_id=sid,
+                                 payload={"evidence":evidence})
+            knowledge=runner.call("ENG-05",consumer_id=consumer,session_id=sid,
+                                  payload={"service_id":SYNTHETIC_SERVICE,"fixture":self.fixture})
+            decision=runner.call("ENG-06",consumer_id=consumer,session_id=sid,
+                                 payload={"analysis":analysis,"knowledge":knowledge})
             if (analysis["session_id"]!=sid or decision["session_id"]!=sid
                 or decision["service_id"]!=SYNTHETIC_SERVICE
                 or any(c.get("feasibility_label")!="PROFESSIONAL_CHECK_REQUIRED"

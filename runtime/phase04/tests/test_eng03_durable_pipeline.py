@@ -297,6 +297,23 @@ class ENG03PipelineTests(unittest.TestCase):
         self.assertEqual(row[1]["unknowns"],[])
         self.assertEqual(row[2]["retrieval_sources"][0]["validated_by"],"TEST_FIXTURE_ONLY")
 
+    def test_engine_runner_injection_preserves_persistent_provenance_and_ack(self):
+        from abc_foundation.isolated_engine_runner import IsolatedEngineRunner
+        class TraceRunner:
+            def __init__(self):self.engine_ids=[]
+            def call(self,engine_id,**kwargs):
+                self.engine_ids.append(engine_id)
+                return IsolatedEngineRunner().call(engine_id,**kwargs)
+        self.arrive()
+        self.worker.run_once()
+        traced=TraceRunner()
+        worker=SyntheticAnalysisPipeline(self.pipeline_dsn,self.consumer,
+                                          engine_runner=traced)
+        self.assertEqual(worker.run_once(),"ACKED")
+        self.assertEqual(traced.engine_ids,["ENG-04","ENG-05","ENG-06"])
+        self.assertEqual(self.count("abc.eng04_06_results"),1)
+        self.assertIsNone(worker.run_once())
+
     def test_pipeline_crash_stale_token_and_replay(self):
         self.arrive()
         self.worker.run_once()

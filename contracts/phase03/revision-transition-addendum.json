@@ -1,13 +1,53 @@
 {
-  "id":"ABC-CR-03-001",
-  "status":"PROPOSED_DESIGN_EXTENSION_NOT_RUNTIME_AUTHORIZATION",
-  "base_version":"1.0.0-draft",
-  "machine":"CONSULTATION_SESSION",
-  "actor":"SPECIALIST",
-  "from":["LOOK_SELECTED","FEASIBILITY_REVIEW","PLAN_DRAFTED","SPECIALIST_REVIEW"],
-  "to":"REVISION_REQUESTED",
-  "guards":["verified_tenant_and_specialist","expected_state_version_matches","idempotency_key","active_image_consent","selected_immutable_parent_pinned","no_committed_handoff"],
-  "atomic_effects":["preserve_original_look_versions","clear_selected_pointer","invalidate_feasibility_plan_validation","cancel_superseded_jobs","append_audit_with_parent_and_reason"],
-  "forbidden_from":["HANDOFF","CLOSED","CANCELLED","SAFETY_BLOCKED"],
-  "prototype":"synthetic UX demonstration; baseline v1 contracts unchanged; approval needed before backend adoption"
+  "id": "ABC-CR-03-001",
+  "status": "ACCEPTED_FOR_PHASE03_SYNTHETIC_DESIGN_ONLY",
+  "base_version": "1.0.0-draft",
+  "machine": "CONSULTATION_SESSION",
+  "actor": "SPECIALIST",
+  "from": [
+    "LOOK_SELECTED",
+    "FEASIBILITY_REVIEW",
+    "PLAN_DRAFTED",
+    "SPECIALIST_REVIEW"
+  ],
+  "to": "REVISION_REQUESTED",
+  "guards": [
+    "verified_tenant_and_specialist",
+    "expected_state_version_matches",
+    "idempotency_key",
+    "active_image_consent",
+    "selected_immutable_parent_pinned",
+    "no_committed_handoff",
+    "protected_specialist_projection",
+    "no_conflicting_concurrent_decision",
+    "no_pending_irreversible_external_effect"
+  ],
+  "atomic_effects": [
+    "preserve_original_look_versions",
+    "clear_selected_pointer",
+    "invalidate_feasibility_plan_validation",
+    "cancel_superseded_jobs",
+    "append_audit_with_parent_and_reason",
+    "write_version_scoped_outbox_events",
+    "verify_new_revision_parent_does_not_mutate_selected_snapshot"
+  ],
+  "forbidden_from": [
+    "HANDOFF",
+    "CLOSED",
+    "CANCELLED",
+    "SAFETY_BLOCKED"
+  ],
+  "prototype": "synthetic UX demonstration; baseline v1 contracts unchanged; approval needed before backend adoption",
+  "design_decision": "DELEGATED_DESIGN_DECISION_2026-10-29; independently qualified runtime review NOT performed",
+  "server_contract_status": "PROPOSED_FUTURE_VERSION_NOT_IN_V1",
+  "failure_policy": {
+    "version_conflict": "409_CONFLICT_NO_MUTATION_RELOAD_AND_REVIEW",
+    "duplicate_idempotency_key": "RETURN_IDENTICAL_PRIOR_COMMAND_RESULT",
+    "job_cancel_race": "MARK_SUPERSEDED_AND_IGNORE_COMPLETION",
+    "partial_commit": "ROLLBACK_IF_BEFORE_OUTBOX_COMMIT",
+    "committed_handoff": "REQUIRE_SEPARATE_EXPLICIT_COMPENSATING_BUSINESS_ACTION",
+    "lost_consent": "DENY_AND_ENTER_SAFETY_HOLD"
+  },
+  "privacy": "Backend must check authenticated tenant/branch, qualified specialist and purpose-specific consent; a client-facing UI control is not authority.",
+  "design_test_evidence": "tests/phase03/model.test.mjs; no production persistence or concurrency implemented"
 }

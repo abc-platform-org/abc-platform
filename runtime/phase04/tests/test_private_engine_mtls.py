@@ -255,3 +255,20 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
                         server_name=host,certfile="external",keyfile="external",
                         ca_file="external",token="external",message=msg,
                         managed_private=True)
+
+    def test_same_jti_replay_is_rejected_even_with_valid_mtls(self):
+        signed=self.token()
+        accepted=self.call(token=signed)
+        self.assertEqual(accepted["engine_id"],"ENG-05")
+        replay=self.call(token=signed)
+        self.assertEqual(replay["error"],"engine_request_rejected")
+        # A newly issued token with a distinct jti remains functional.
+        self.assertEqual(self.call()["engine_id"],"ENG-05")
+
+    def test_replay_window_over_capacity_denies_new_tokens_without_eviction(self):
+        from abc_foundation.private_engine_transport import _LocalReplayWindow
+        window=_LocalReplayWindow(ttl=130,capacity=2)
+        self.assertTrue(window.reserve("jti-a"))
+        self.assertTrue(window.reserve("jti-b"))
+        self.assertFalse(window.reserve("jti-a"))
+        self.assertFalse(window.reserve("jti-c"))

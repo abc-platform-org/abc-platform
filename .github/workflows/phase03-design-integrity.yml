@@ -18,7 +18,7 @@ jobs:
       - run: node --check prototypes/phase03/app.mjs
       - run: node --check prototypes/phase03/management.mjs
       - run: node --check prototypes/phase03/management-model.mjs
-      - run: node --test tests/phase03/model.test.mjs tests/phase03/management.test.mjs
+      - run: node --test tests/phase03/model.test.mjs tests/phase03/management.test.mjs tests/phase03/contrast.test.mjs
 
   browser:
     runs-on: ubuntu-latest

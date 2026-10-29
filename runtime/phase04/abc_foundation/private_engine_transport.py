@@ -6,6 +6,9 @@ required. Fail closed if a client certificate or bound signed JWT is missing.
 """
 import json
 import re
+from collections import OrderedDict
+from threading import Lock
+from time import monotonic
 import socket
 import socketserver
 import struct
@@ -38,6 +41,32 @@ def _write_frame(sock,item):
     sock.sendall(struct.pack("!I",len(content))+content)
 
 
+class _LocalReplayWindow:
+    """Bounded, process-local JWT jti replay rejection (not cluster-global).
+
+    External shared replay storage is required before a multi-node rollout.
+    A full cache fails closed rather than evicting live JTI reservations.
+    """
+    def __init__(self, *, ttl=130, capacity=8192):
+        self.ttl=ttl;self.capacity=capacity
+        self._entries=OrderedDict()
+        self._lock=Lock()
+
+    def reserve(self,token_id):
+        if not isinstance(token_id,str) or not token_id:
+            return False
+        now=monotonic()
+        with self._lock:
+            while self._entries:
+                oldest,expires=next(iter(self._entries.items()))
+                if expires>now:break
+                self._entries.popitem(last=False)
+            if token_id in self._entries or len(self._entries)>=self.capacity:
+                return False
+            self._entries[token_id]=now+self.ttl
+            return True
+
+
 class _Server(socketserver.ThreadingMixIn,socketserver.TCPServer):
     allow_reuse_address=True
     daemon_threads=True
@@ -62,6 +91,8 @@ class _Handler(socketserver.BaseRequestHandler):
                 request["token"],self.request.getpeercert(binary_form=True),
                 expected_engine=self.server.caller,
                 expected_consumer=self.server.consumer)
+            if not self.server.replay_window.reserve(identity.get("token_id")):
+                raise DomainError(401,"workload_token_replay_or_capacity_denied")
             message=request["message"]
             if not isinstance(message,dict) or message.get("consumer_id")!=identity["consumer_id"]:
                 raise DomainError(403,"cross_consumer_message")
@@ -85,6 +116,7 @@ def private_engine_server(*,host,port,target_engine,caller_engine,consumer_id,
     server=_Server((host,port),_Handler)
     server.context=context
     server.verifier=verifier
+    server.replay_window=_LocalReplayWindow()
     server.caller=caller_engine
     server.target=target_engine
     server.consumer=consumer_id

@@ -4,6 +4,7 @@ import re
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from .auth import AuthError, verify_bearer
+from .oidc import IdentityError
 from .store import DomainError
 
 SESSION_RE = re.compile(r"^/v1/consultations/([a-f0-9-]{36})$")
@@ -11,7 +12,7 @@ COMMAND_RE = re.compile(r"^/_foundation/v0/consultations/([a-f0-9-]{36})/(pause|
 MAX_BODY = 4096
 
 
-def handler_factory(store, signing_secret):
+def handler_factory(store, signing_secret, identity_verifier=None):
     class Handler(BaseHTTPRequestHandler):
         server_version = "ABC-Foundation-Local/0.1"
         sys_version = ""
@@ -32,8 +33,10 @@ def handler_factory(store, signing_secret):
 
         def _actor(self):
             try:
+                if identity_verifier is not None:
+                    return identity_verifier.verify(self.headers.get("Authorization"))
                 return verify_bearer(self.headers.get("Authorization"), signing_secret)
-            except (AuthError, UnicodeError, ValueError):
+            except (AuthError, IdentityError, UnicodeError, ValueError):
                 raise DomainError(401, "unauthenticated") from None
 
         def _body(self):
@@ -68,7 +71,7 @@ def handler_factory(store, signing_secret):
         def do_GET(self):
             def action():
                 if self.path == "/healthz":
-                    return self._json(200, {"status": "ok", "capability": "LOCAL_INTEGRATION_ONLY"})
+                    return self._json(200, {"status": "ok", "capability": "OIDC_PG_LOOPBACK" if identity_verifier else "LOCAL_INTEGRATION_ONLY"})
                 actor = self._actor()
                 match = SESSION_RE.fullmatch(self.path)
                 if not match:
@@ -88,6 +91,8 @@ def handler_factory(store, signing_secret):
                     body = self._body()
                     if body:
                         raise DomainError(400, "unexpected_command_body")
+                    if identity_verifier is not None:
+                        raise DomainError(501, "checkpoint_migration_not_implemented")
                     result = store.checkpoint_command(
                         actor, match.group(1), match.group(2),
                         self._expected(), self.headers.get("Idempotency-Key"))
@@ -107,3 +112,18 @@ def create_http_server(store, secret, host="127.0.0.1", port=0):
     if not isinstance(secret, str) or len(secret.encode("utf-8")) < 32:
         raise ValueError("min 32-byte local test signing secret required")
     return ThreadingHTTPServer((host, port), handler_factory(store, secret))
+
+
+
+def create_oidc_pg_http_server(store, identity_verifier, host="127.0.0.1", port=0):
+    """Real asymmetric OIDC verifier + PostgreSQL memberships, but loopback-only.
+
+    This intentionally is NOT a public ingress. Production reverse proxy/TLS,
+    abuse controls, auditing, trusted network and real IdP credentials are pending.
+    """
+    if host not in ("127.0.0.1", "::1"):
+        raise ValueError("OIDC_PG_LOOPBACK: no public bind permitted")
+    if identity_verifier is None:
+        raise ValueError("verified OIDC configuration required")
+    return ThreadingHTTPServer((host, port),
+                               handler_factory(store, None, identity_verifier))

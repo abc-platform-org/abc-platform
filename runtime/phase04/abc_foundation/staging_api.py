@@ -52,7 +52,7 @@ def make_private_server(environ=None, store=None, verifier=None):
         raise ValueError("invalid_staging_port")
     if store is None:
         dsn=env.get("ABC_PG_DSN")
-        auth_mode=env.get("ABC_DB_AUTH_MODE","LEGACY_SYNTHETIC")
+        auth_mode=env.get("ABC_DB_AUTH_MODE","UNCONFIGURED")
         if auth_mode=="MANAGED_MTLS":
             required=("ABC_DB_WORKLOAD_LOGIN","ABC_DB_CLIENT_DN",
                       "ABC_DB_ISSUER_DN","ABC_DB_CERT_SERIAL")
@@ -63,6 +63,8 @@ def make_private_server(environ=None, store=None, verifier=None):
                 client_dn=env["ABC_DB_CLIENT_DN"],issuer_dn=env["ABC_DB_ISSUER_DN"],
                 certificate_serial=env["ABC_DB_CERT_SERIAL"])
         elif auth_mode=="LEGACY_SYNTHETIC":
+            if env.get("ABC_SYNTHETIC_LEGACY_DB_COMPAT")!="true":
+                raise ValueError("legacy_shared_database_login_not_explicitly_approved")
             validate_staging_dsn(dsn,"abc_app")
             store=PostgresStore(dsn)
         else:

@@ -54,13 +54,13 @@ BEGIN
     AND v_ssl.version='TLSv1.3'
     AND nullif(v_ssl.client_dn,'') IS NOT NULL
     AND nullif(v_ssl.issuer_dn,'') IS NOT NULL
-    AND nullif(v_ssl.client_serial,'') IS NOT NULL
+    AND v_ssl.client_serial IS NOT NULL
     AND nullif(v_binding.certificate_client_dn,'') IS NOT NULL
     AND nullif(v_binding.certificate_issuer_dn,'') IS NOT NULL
     AND nullif(v_binding.certificate_serial,'') IS NOT NULL
     AND v_ssl.client_dn=v_binding.certificate_client_dn
     AND v_ssl.issuer_dn=v_binding.certificate_issuer_dn
-    AND v_ssl.client_serial=v_binding.certificate_serial;
+    AND v_ssl.client_serial::text=v_binding.certificate_serial;
 END;
 $workload$;
 REVOKE ALL ON FUNCTION abc.eng14_workload_allowed(text) FROM PUBLIC;

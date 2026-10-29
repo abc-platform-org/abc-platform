@@ -5,6 +5,7 @@ identity/CA, per-engine network identity, private mesh and release review are
 required. Fail closed if a client certificate or bound signed JWT is missing.
 """
 import json
+import re
 import socket
 import socketserver
 import struct
@@ -72,8 +73,11 @@ class _Handler(socketserver.BaseRequestHandler):
 
 
 def private_engine_server(*,host,port,target_engine,caller_engine,consumer_id,
-                          certfile,keyfile,ca_file,verifier):
-    if host!="127.0.0.1" or target_engine not in ENGINES or not 0<=port<=65535:
+                          certfile,keyfile,ca_file,verifier,managed_private=False):
+    # The wildcard listener is ONLY for an externally verified private-only
+    # hosting service; mTLS remains mandatory at the application protocol.
+    if (not (host=="127.0.0.1" or (managed_private is True and host=="0.0.0.0"))
+        or target_engine not in ENGINES or not 0<=port<=65535):
         raise ValueError("local_integration_private_only")
     if caller_engine==target_engine or verifier is None or not isinstance(consumer_id,str):
         raise ValueError("distinct_authenticated_caller_required")
@@ -88,9 +92,14 @@ def private_engine_server(*,host,port,target_engine,caller_engine,consumer_id,
 
 
 def send_private_engine_message(*,host,port,server_name,certfile,keyfile,ca_file,
-                                token,message):
-    if host!="127.0.0.1" or not 1<=port<=65535 or server_name!="localhost":
-        raise ValueError("private_loopback_required")
+                                token,message,managed_private=False):
+    private_host=(isinstance(host,str) and host.endswith(".internal")
+        and bool(re.fullmatch(r"[a-z][a-z0-9-]{2,62}\\.internal",host))
+        and server_name==host)
+    if (not 1<=port<=65535 or
+        not ((host=="127.0.0.1" and server_name=="localhost")
+             or (managed_private is True and private_host))):
+        raise ValueError("private_mtls_endpoint_required")
     context=require_mtls_context(certificate=certfile,key=keyfile,ca_file=ca_file,server=False)
     with socket.create_connection((host,port),timeout=4) as sock:
         with context.wrap_socket(sock,server_hostname=server_name) as secure:

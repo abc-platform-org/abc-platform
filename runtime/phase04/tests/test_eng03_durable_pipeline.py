@@ -11,6 +11,8 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime,timezone
 
 import psycopg
+from psycopg import sql
+from psycopg.conninfo import make_conninfo
 from abc_foundation.answer_index_consumer import AnswerIndexConsumer
 from abc_foundation.eng01_service_identity import WorkloadPrincipal
 from abc_foundation.eng02_pg_outbox import PGENG02CommandWriter
@@ -58,14 +60,40 @@ class ENG03PipelineTests(unittest.TestCase):
             for role in ("abc_eng03_worker","abc_pipeline_worker"):
                 con.execute("""INSERT INTO abc.eng03_worker_bindings(worker_role,consumer_id,tenant_id,active)
                         VALUES(%s,%s,%s,true)""",(role,self.consumer,self.tenant))
+        self.eng03_dsn,self.pipeline_dsn,self.worker_login_eng03,self.worker_login_pipeline=self._provision_scoped_worker_logins(self.consumer)
         self.sid=PostgresStore(APP).create(self.human,{
             "branch_id":self.branch,"service_id":"synthetic:hair-color",
             "scope":"IN_SALON_SHARED_SCREEN"
         },"eng03-create-"+marker)["session_id"]
         self.writer=PGENG02CommandWriter(ORCH)
         self.answer_worker=AnswerIndexConsumer(ANSWER,self.consumer)
-        self.worker=ENG03Executor(ENG03,self.consumer)
-        self.pipeline=SyntheticAnalysisPipeline(PIPELINE,self.consumer)
+        self.worker=ENG03Executor(self.eng03_dsn,self.consumer)
+        self.pipeline=SyntheticAnalysisPipeline(self.pipeline_dsn,self.consumer)
+
+    def _provision_scoped_worker_logins(self,consumer):
+        # Explicit administrator setup, never executed from an application
+        # or workload role. Unique login per engine+consumer with NOINHERIT.
+        short=uuid.uuid4().hex[:14]
+        name_eng03="abc_e3_"+short
+        name_pipeline="abc_p6_"+short
+        dsn_pairs=[]
+        with psycopg.connect(ADMIN) as con:
+            for login,group,base in (
+                (name_eng03,"abc_eng03_worker",ENG03),
+                (name_pipeline,"abc_pipeline_worker",PIPELINE)):
+                password="ci-synthetic-only-"+uuid.uuid4().hex
+                con.execute(sql.SQL("""CREATE ROLE {} LOGIN NOINHERIT NOSUPERUSER
+                    NOCREATEROLE NOCREATEDB NOBYPASSRLS PASSWORD {}""").format(
+                    sql.Identifier(login),sql.Literal(password)))
+                con.execute(sql.SQL(
+                    "GRANT {} TO {} WITH INHERIT FALSE, SET TRUE").format(
+                    sql.Identifier(group),sql.Identifier(login)))
+                con.execute("""INSERT INTO abc.worker_login_bindings(
+                    login_name,worker_role,consumer_id,tenant_id,active)
+                    VALUES(%s,%s,%s,%s,true)""",
+                    (login,group,consumer,self.tenant))
+                dsn_pairs.append(make_conninfo(base,user=login,password=password))
+        return (*dsn_pairs,name_eng03,name_pipeline)
 
     def answer(self,qid="synthetic:prior-treatment",value="NO",version=0):
         command={
@@ -94,7 +122,7 @@ class ENG03PipelineTests(unittest.TestCase):
         receipt=self.arrive()
         item=self.worker.claim()
         self.assertEqual(item["tenant_id"],self.tenant)
-        with psycopg.connect(ENG03) as con:
+        with self.worker._connect() as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("SELECT * FROM abc.eng02_answers")
         result=self.worker.complete(item["job_id"],item["lease_token"])
@@ -124,7 +152,7 @@ class ENG03PipelineTests(unittest.TestCase):
             con.execute("""UPDATE abc.eng03_input_jobs
                 SET lease_until=clock_timestamp()-interval '1 second'
                 WHERE job_id=%s""",(leased["job_id"],))
-        fresh=ENG03Executor(ENG03,self.consumer).claim()
+        fresh=ENG03Executor(self.eng03_dsn,self.consumer).claim()
         self.assertEqual(fresh["job_id"],leased["job_id"])
         self.assertNotEqual(fresh["lease_token"],leased["lease_token"])
         with self.assertRaises(DomainError) as ex:
@@ -151,16 +179,18 @@ class ENG03PipelineTests(unittest.TestCase):
         with self.assertRaises((DomainError,psycopg.errors.InsufficientPrivilege)) as err:
             self.worker.complete(leased["job_id"],leased["lease_token"])
         self.assertEqual(self.count("abc.eng03_evidence_ledger"),0)
-        self.assertIsNone(self.worker.claim())
+        with self.assertRaises(DomainError) as denied:
+            self.worker.claim()
+        self.assertEqual(denied.exception.status,403)
 
     def test_worker_cannot_forge_admin_grant_or_write_answer(self):
-        with psycopg.connect(ENG03) as con:
+        with self.worker._connect() as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("UPDATE abc.eng03_worker_bindings SET active=true")
-        with psycopg.connect(ENG03) as con:
+        with self.worker._connect() as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("SELECT * FROM abc.eng14_policy_audit")
-        with psycopg.connect(PIPELINE) as con:
+        with self.pipeline._connect() as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("SELECT * FROM abc.eng02_answers")
 
@@ -200,7 +230,7 @@ class ENG03PipelineTests(unittest.TestCase):
     def test_source_broker_requires_lease_and_correct_token(self):
         self.arrive()
         item=self.worker.claim()
-        with psycopg.connect(ENG03) as con:
+        with self.worker._connect() as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("SELECT abc.eng03_source_for_lease(%s,%s)",
                            (item["job_id"],uuid.uuid4()))
@@ -247,7 +277,7 @@ class ENG03PipelineTests(unittest.TestCase):
         with psycopg.connect(ADMIN) as con:
             self.assertEqual(con.execute("SELECT count(*) FROM abc.eng03_evidence_ledger WHERE session_id=%s",
                                        (self.sid,)).fetchone()[0],4)
-        fixture_pipeline=SyntheticAnalysisPipeline(PIPELINE,self.consumer,knowledge_fixture=FIXTURE)
+        fixture_pipeline=SyntheticAnalysisPipeline(self.pipeline_dsn,self.consumer,knowledge_fixture=FIXTURE)
         for _ in range(4):
             item=fixture_pipeline.claim()
             self.assertIsNotNone(item)
@@ -284,7 +314,7 @@ class ENG03PipelineTests(unittest.TestCase):
     def test_database_rejects_forged_eng03_source_and_policy(self):
         receipt=self.arrive()
         leased=self.worker.claim()
-        with psycopg.connect(ENG03) as con:
+        with self.worker._connect() as con:
             with self.assertRaises(psycopg.errors.CheckViolation):
                 con.execute("""INSERT INTO abc.eng03_evidence_ledger(
                     evidence_id,consumer_id,source_job_id,source_event_id,
@@ -312,7 +342,7 @@ class ENG03PipelineTests(unittest.TestCase):
                   "candidates":[{"candidate_id":"real:unsafe","reason":"FAKE",
                        "feasibility_label":"VISUALLY_PLAUSIBLE",
                        "hard_filter_status":"PASSED"}]}
-        with psycopg.connect(PIPELINE) as con:
+        with self.pipeline._connect() as con:
             with self.assertRaises(psycopg.errors.CheckViolation):
                 con.execute("""INSERT INTO abc.eng04_06_results(
                     result_id,consumer_id,source_pipeline_job_id,
@@ -331,8 +361,10 @@ class ENG03PipelineTests(unittest.TestCase):
         with psycopg.connect(ADMIN) as con:
             con.execute("""UPDATE abc.eng03_worker_bindings SET active=false
               WHERE consumer_id=%s""",(self.consumer,))
-        self.assertIsNone(self.worker.claim())
-        self.assertIsNone(self.pipeline.claim())
+        for engine in (self.worker,self.pipeline):
+            with self.assertRaises(DomainError) as denied:
+                engine.claim()
+            self.assertEqual(denied.exception.status,403)
 
     def test_two_authorized_consumers_keep_independent_evidence_lineage(self):
         # Same verified source can be independently delivered to two
@@ -350,7 +382,8 @@ class ENG03PipelineTests(unittest.TestCase):
         receipt=self.arrive()
         self.assertEqual(AnswerIndexConsumer(ANSWER,other).run_once(),"PROJECTED")
         first=self.worker.claim()
-        second_worker=ENG03Executor(ENG03,other)
+        other_e3,other_p6,_,_=self._provision_scoped_worker_logins(other)
+        second_worker=ENG03Executor(other_e3,other)
         second=second_worker.claim()
         self.assertEqual(first["source_event_id"],second["source_event_id"])
         self.worker.complete(first["job_id"],first["lease_token"])
@@ -363,14 +396,58 @@ class ENG03PipelineTests(unittest.TestCase):
             self.assertEqual({r[2] for r in rows},{self.consumer,other})
             self.assertEqual(len({r[0] for r in rows}),2)
             self.assertEqual({str(r[1]) for r in rows},{receipt["answer_id"]})
-        self.assertEqual(SyntheticAnalysisPipeline(PIPELINE,other).run_once(),"ACKED")
+        self.assertEqual(SyntheticAnalysisPipeline(other_p6,other).run_once(),"ACKED")
         self.assertEqual(self.pipeline.run_once(),"ACKED")
         self.assertEqual(self.count("abc.eng04_06_results"),2)
 
     def test_pipeline_role_cannot_read_eng03_fencing_secrets(self):
-        with psycopg.connect(PIPELINE) as con:
+        with self.pipeline._connect() as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("SELECT source_lease_token FROM abc.eng03_evidence_ledger")
+
+    def test_shared_engine_groups_cannot_login_after_hardening(self):
+        for direct in (ENG03,PIPELINE):
+            with self.subTest(direct=direct.split("@")[0][:24]):
+                with self.assertRaises(psycopg.OperationalError):
+                    psycopg.connect(direct,connect_timeout=3)
+
+    def test_valid_workload_login_cannot_claim_another_consumer(self):
+        other="eng03-denied-"+uuid.uuid4().hex[:12]
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.worker_subscriptions
+              (consumer_id,tenant_id,event_type,active)
+              VALUES(%s,%s,'ANSWER_RECORDED',true)""",(other,self.tenant))
+            for role in ("abc_eng03_worker","abc_pipeline_worker"):
+                con.execute("""INSERT INTO abc.eng03_worker_bindings
+                    (worker_role,consumer_id,tenant_id,active)
+                    VALUES(%s,%s,%s,true)""",(role,other,self.tenant))
+        with self.assertRaises(DomainError) as e:
+            ENG03Executor(self.eng03_dsn,other).claim()
+        self.assertEqual(e.exception.status,403)
+        with self.assertRaises(DomainError) as e:
+            SyntheticAnalysisPipeline(self.pipeline_dsn,other).claim()
+        self.assertEqual(e.exception.status,403)
+
+    def test_revoked_individual_db_login_blocks_claim(self):
+        self.arrive()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.worker_login_bindings
+                SET active=false WHERE login_name=%s""",(self.worker_login_eng03,))
+        with self.assertRaises(DomainError) as e:
+            self.worker.claim()
+        self.assertEqual(e.exception.status,403)
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute(
+                "SELECT count(*) FROM abc.eng03_input_jobs WHERE consumer_id=%s AND status='LEASED'",
+                (self.consumer,)).fetchone()[0],0)
+
+    def test_workload_cannot_change_engine_role(self):
+        with psycopg.connect(self.eng03_dsn) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SET ROLE abc_pipeline_worker")
+        with psycopg.connect(self.pipeline_dsn) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SET ROLE abc_eng03_worker")
 
     def test_unknown_critical_answer_still_bounded_by_eng14(self):
         self.arrive(value="UNKNOWN")

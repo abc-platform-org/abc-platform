@@ -22,7 +22,7 @@ class StagingGuardTests(unittest.TestCase):
     def test_migration_manifest_complete_and_sha256(self):
         plan=planned_migrations()
         self.assertEqual(tuple(x[0] for x in plan),FILENAMES)
-        self.assertEqual(len(plan),12)
+        self.assertEqual(len(plan),13)
         self.assertTrue(all(len(digest)==64 for _,digest in plan))
 
     def test_staging_dsn_rejects_admin_or_missing_tls(self):
@@ -91,6 +91,28 @@ class StagingGuardTests(unittest.TestCase):
             configure_engine_worker("PIPELINE",base)
         with self.assertRaises(ValueError):
             configure_engine_worker("UNKNOWN",base)
+
+    def test_engine_staging_requires_exact_scoped_login_not_group_secret(self):
+        prefix={"ABC_ENV":"STAGING_PRIVATE",
+              "ABC_STAGING_PURPOSE":"SYNTHETIC_NO_CLIENT_DATA",
+              "ABC_NETWORK_BOUNDARY":"RENDER_BACKGROUND_WORKER",
+              "ABC_ENGINE_CONSUMER_ID":"approved-consumer-test",
+              "ABC_ENGINE_TENANT_ID":"synthetic-test-tenant",
+              "ABC_ENGINE_DSN":"postgresql://abc_eng03_worker:old@db.private/abc_staging?sslmode=require"}
+        with self.assertRaisesRegex(ValueError,"per_consumer_database_login_required"):
+            configure_engine_worker("ENG03",prefix)
+        with self.assertRaisesRegex(ValueError,"staging_database_role_mismatch"):
+            configure_engine_worker("ENG03",{
+                **prefix,"ABC_ENGINE_WORKLOAD_LOGIN":"abc_e3_0123456789abcd"
+            })
+        with self.assertRaisesRegex(ValueError,"per_consumer_database_login_required"):
+            configure_engine_worker("ENG03",{
+                **prefix,"ABC_ENGINE_WORKLOAD_LOGIN":"abc_p6_0123456789abcd"
+            })
+        with self.assertRaisesRegex(ValueError,"per_consumer_database_login_required"):
+            configure_engine_worker("PIPELINE",{
+                **prefix,"ABC_ENGINE_WORKLOAD_LOGIN":"abc_e3_0123456789abcd"
+            })
 
     def test_private_smoke_rejects_public_and_unexpected_urls(self):
         bad=[

@@ -49,10 +49,37 @@ class ENG03Executor:
 
     def _connect(self):
         con=psycopg.connect(self.dsn,row_factory=dict_row,connect_timeout=4)
-        if con.execute("SELECT current_user AS role").fetchone()["role"]!=_WORKER_ROLE:
+        try:
+            principal=con.execute(
+                "SELECT current_user AS actual_login, session_user AS verified_login"
+            ).fetchone()
+            # Shared engine group identities are NOLOGIN in migration 0013.
+            # Never trust an asserted consumer or a caller-owned custom GUC.
+            if (principal["actual_login"]!=principal["verified_login"]
+                or principal["verified_login"]=="abc_eng03_worker"):
+                raise DomainError(403,"unscoped_workload_database_identity")
+            con.execute("SET ROLE abc_eng03_worker")
+            permitted=con.execute("""SELECT 1 FROM abc.worker_login_bindings
+                WHERE login_name=session_user AND worker_role=current_user
+                  AND consumer_id=%s AND active=true""",
+                (self.consumer_id,)).fetchone()
+            if permitted is None:
+                raise DomainError(403,"consumer_login_binding_denied")
+            bound=con.execute("""SELECT 1 FROM abc.eng03_worker_bindings b
+                JOIN abc.worker_login_bindings login
+                  ON login.consumer_id=b.consumer_id
+                 AND login.tenant_id=b.tenant_id
+                 AND login.worker_role=b.worker_role
+                WHERE login.login_name=session_user AND login.active
+                  AND b.worker_role=current_user AND b.active
+                  AND b.consumer_id=%s""",
+                (self.consumer_id,)).fetchone()
+            if bound is None:
+                raise DomainError(403,"consumer_binding_revoked")
+            return con
+        except BaseException:
             con.close()
-            raise DomainError(403,"eng03_independent_database_identity_required")
-        return con
+            raise
 
     def claim(self,*,seconds=30):
         if type(seconds) is not int or not 1<=seconds<=300:

@@ -25,6 +25,7 @@ FILENAMES = (
     "0010_eng03_durable_handoff_queue.sql",
     "0011_eng14_privileged_policy_broker.sql",
     "0012_eng03_executor_pipeline.sql",
+    "0013_per_consumer_db_workload_identity.sql",
 )
 
 

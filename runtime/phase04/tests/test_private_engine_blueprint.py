@@ -15,6 +15,7 @@ class PrivateEngineBlueprintTests(unittest.TestCase):
             with self.subTest(engine=i):
                 self.assertEqual(service["type"],"pserv")
                 self.assertEqual(service["runtime"],"docker")
+                self.assertEqual(service["numInstances"],1)
                 self.assertEqual(service["dockerfilePath"],"./runtime/phase04/Dockerfile")
                 self.assertEqual(service["dockerContext"],"./runtime/phase04")
                 self.assertIn("private_engine_service_server",service["dockerCommand"])

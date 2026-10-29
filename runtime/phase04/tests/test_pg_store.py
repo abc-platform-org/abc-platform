@@ -370,3 +370,60 @@ class PostgresRuntimeTests(unittest.TestCase):
                 self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
                 con.execute("SELECT abc.eng01_create_session(%s::jsonb,%s)",
                             (body,"revoked-managed-1"))
+
+    def test_managed_tenant_mode_denies_shared_login_on_both_create_and_pause(self):
+        existing=self.create("create-before-managed-mode")["session_id"]
+        with psycopg.connect(ADMIN) as admin:
+            admin.execute("""INSERT INTO abc.eng14_tenant_workload_mode
+                (tenant_id,managed_required,activated_at,activated_by)
+                VALUES(%s,true,clock_timestamp(),'ci-security-operator')""",(self.tenant,))
+        with self.assertRaises(DomainError) as create_error:
+            self.create("create-after-managed-mode")
+        self.assertEqual(create_error.exception.status,403)
+        with self.assertRaises(DomainError) as pause_error:
+            self.store.checkpoint_command(self.principal,existing,"pause",0,
+                                          "pause-after-managed-mode")
+        self.assertEqual(pause_error.exception.status,403)
+        with psycopg.connect(ADMIN) as admin:
+            session=admin.execute("""SELECT state,state_version FROM abc.sessions
+                WHERE session_id=%s""",(existing,)).fetchone()
+            self.assertEqual(session,("CREATED",0))
+            self.assertEqual(admin.execute("""SELECT count(*) FROM abc.eng14_state_guard_audit
+                WHERE session_id=%s""",(existing,)).fetchone()[0],0)
+        with psycopg.connect(DSN) as con:
+            self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+            self.assertFalse(con.execute("SELECT abc.eng14_workload_allowed(%s)",
+                                          (self.tenant,)).fetchone()[0])
+
+    def test_managed_identity_requires_real_server_certificate_not_database_guc(self):
+        from psycopg import sql
+        from psycopg.conninfo import make_conninfo
+        suffix=uuid.uuid4().hex[:16]
+        login="abc_api_"+suffix
+        password="test-synthetic-"+suffix
+        with psycopg.connect(ADMIN) as admin:
+            admin.execute(sql.SQL("""CREATE ROLE {} LOGIN NOINHERIT NOSUPERUSER
+                NOCREATEROLE NOBYPASSRLS PASSWORD {}""").format(
+                sql.Identifier(login),sql.Literal(password)))
+            admin.execute(sql.SQL("GRANT abc_app TO {} WITH SET TRUE").format(
+                sql.Identifier(login)))
+            admin.execute("""INSERT INTO abc.eng01_api_login_bindings
+              (login_name,tenant_id,consumer_id,engine_id,active,approved_at,
+               certificate_client_dn,certificate_issuer_dn,certificate_serial)
+              VALUES(%s,%s,'ci-managed-identity','ENG-01',true,clock_timestamp(),
+                     'CN=ci-managed','CN=ci-ca','AABB')""",
+              (login,self.tenant))
+            admin.execute("""INSERT INTO abc.eng14_tenant_workload_mode
+              (tenant_id,managed_required,activated_at,activated_by)
+              VALUES(%s,true,clock_timestamp(),'ci-security-operator')""",
+              (self.tenant,))
+        dsn=make_conninfo(DSN,user=login,password=password)
+        with psycopg.connect(dsn) as con:
+            con.execute("SET ROLE abc_app")
+            self.store._scope(con,ISS,self.subject,self.tenant,self.branch)
+            # Synthetic CI PostgreSQL has no verified mTLS client cert.
+            self.assertFalse(con.execute("SELECT abc.eng14_workload_allowed(%s)",
+                                          (self.tenant,)).fetchone()[0])
+            with self.assertRaises(psycopg.errors.CheckViolation):
+                con.execute("SELECT abc.eng01_create_session(%s::jsonb,%s)",
+                    (json.dumps(self.body()),"ci-bad-cert-entry-1"))

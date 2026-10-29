@@ -217,8 +217,11 @@ class PostgresStore:
             # The app DB role has no UPDATE(state,checkpoint) privilege.
             # A DB-owned, narrowly scoped ENG14 broker and independent
             # BEFORE UPDATE trigger must both approve this mutation.
-            result=con.execute("""SELECT * FROM abc.eng14_apply_pause(%s,%s)""",
-                    (sid,expected_version)).fetchone()
+            try:
+                result=con.execute("""SELECT * FROM abc.eng14_apply_pause(%s,%s)""",
+                        (sid,expected_version)).fetchone()
+            except psycopg.errors.CheckViolation:
+                raise DomainError(403,"eng14_workload_or_policy_denied") from None
             if result is None:
                 raise DomainError(409,"state_version_conflict")
             con.execute("""INSERT INTO abc.state_audit

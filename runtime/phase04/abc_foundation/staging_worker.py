@@ -19,9 +19,7 @@ def configure_worker(env=None):
     consumer = env.get("ABC_CONSUMER_ID")
     OutboxDispatcher._consumer(consumer)
     service=SessionIndexConsumer(dsn,consumer)
-    class ConnectionCheck:
-        _connect = service.dispatcher._connect
-    assert_staging_database(ConnectionCheck(), "abc_worker", [
+    assert_staging_database(service.dispatcher, "abc_worker", [
         "abc.event_delivery", "abc.worker_subscriptions", "abc.session_index_projection"])
     with service.dispatcher._connect() as con:
         active = con.execute("""

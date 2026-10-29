@@ -179,7 +179,9 @@ class ENG03PipelineTests(unittest.TestCase):
         with self.assertRaises((DomainError,psycopg.errors.InsufficientPrivilege)) as err:
             self.worker.complete(leased["job_id"],leased["lease_token"])
         self.assertEqual(self.count("abc.eng03_evidence_ledger"),0)
-        self.assertIsNone(self.worker.claim())
+        with self.assertRaises(DomainError) as denied:
+            self.worker.claim()
+        self.assertEqual(denied.exception.status,403)
 
     def test_worker_cannot_forge_admin_grant_or_write_answer(self):
         with self.worker._connect() as con:
@@ -359,8 +361,10 @@ class ENG03PipelineTests(unittest.TestCase):
         with psycopg.connect(ADMIN) as con:
             con.execute("""UPDATE abc.eng03_worker_bindings SET active=false
               WHERE consumer_id=%s""",(self.consumer,))
-        self.assertIsNone(self.worker.claim())
-        self.assertIsNone(self.pipeline.claim())
+        for engine in (self.worker,self.pipeline):
+            with self.assertRaises(DomainError) as denied:
+                engine.claim()
+            self.assertEqual(denied.exception.status,403)
 
     def test_two_authorized_consumers_keep_independent_evidence_lineage(self):
         # Same verified source can be independently delivered to two

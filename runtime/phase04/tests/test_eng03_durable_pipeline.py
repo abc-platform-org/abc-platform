@@ -164,6 +164,39 @@ class ENG03PipelineTests(unittest.TestCase):
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("SELECT * FROM abc.eng02_answers")
 
+    def test_eng03_repeated_crash_expired_lease_goes_to_dlq(self):
+        self.arrive()
+        for index in range(3):
+            lease=self.worker.claim()
+            self.assertIsNotNone(lease)
+            with psycopg.connect(ADMIN) as con:
+                con.execute("""UPDATE abc.eng03_input_jobs
+                    SET lease_until=clock_timestamp()-interval '1 second'
+                    WHERE job_id=%s""",(lease["job_id"],))
+        self.assertIsNone(self.worker.claim())
+        with psycopg.connect(ADMIN) as con:
+            row=con.execute("""SELECT status,error_code,attempts
+                FROM abc.eng03_input_jobs WHERE session_id=%s""",(self.sid,)).fetchone()
+        self.assertEqual(row,("DLQ","LEASE_RETRY_EXHAUSTED",3))
+        self.assertEqual(self.count("abc.eng03_evidence_ledger"),0)
+
+    def test_analysis_repeated_crash_expired_lease_goes_to_dlq(self):
+        self.arrive()
+        self.worker.run_once()
+        for index in range(3):
+            lease=self.pipeline.claim()
+            self.assertIsNotNone(lease)
+            with psycopg.connect(ADMIN) as con:
+                con.execute("""UPDATE abc.eng04_06_jobs
+                    SET lease_until=clock_timestamp()-interval '1 second'
+                    WHERE job_id=%s""",(lease["job_id"],))
+        self.assertIsNone(self.pipeline.claim())
+        with psycopg.connect(ADMIN) as con:
+            row=con.execute("""SELECT status,error_code,attempts
+                FROM abc.eng04_06_jobs WHERE session_id=%s""",(self.sid,)).fetchone()
+        self.assertEqual(row,("DLQ","LEASE_RETRY_EXHAUSTED",3))
+        self.assertEqual(self.count("abc.eng04_06_results"),0)
+
     def test_source_broker_requires_lease_and_correct_token(self):
         self.arrive()
         item=self.worker.claim()
@@ -224,6 +257,12 @@ class ENG03PipelineTests(unittest.TestCase):
                 FROM abc.eng04_06_results WHERE session_id=%s AND aggregate_version=4""",
                 (self.sid,)).fetchone()
         self.assertEqual(len(row[0]["candidates"]),1)
+        with psycopg.connect(ADMIN) as con:
+            previous=con.execute("""SELECT decision_json FROM abc.eng04_06_results
+                 WHERE session_id=%s AND aggregate_version<4
+                 ORDER BY aggregate_version""",(self.sid,)).fetchall()
+        self.assertEqual(len(previous),3)
+        self.assertTrue(all(not r[0]["candidates"] for r in previous))
         self.assertEqual(row[0]["candidates"][0]["feasibility_label"],"PROFESSIONAL_CHECK_REQUIRED")
         self.assertEqual(row[1]["unknowns"],[])
         self.assertEqual(row[2]["retrieval_sources"][0]["validated_by"],"TEST_FIXTURE_ONLY")

@@ -60,7 +60,7 @@ class ENG03PipelineTests(unittest.TestCase):
             for role in ("abc_eng03_worker","abc_pipeline_worker"):
                 con.execute("""INSERT INTO abc.eng03_worker_bindings(worker_role,consumer_id,tenant_id,active)
                         VALUES(%s,%s,%s,true)""",(role,self.consumer,self.tenant))
-        self.eng03_dsn,self.pipeline_dsn=self._provision_scoped_worker_logins(self.consumer)
+        self.eng03_dsn,self.pipeline_dsn,self.worker_login_eng03,self.worker_login_pipeline=self._provision_scoped_worker_logins(self.consumer)
         self.sid=PostgresStore(APP).create(self.human,{
             "branch_id":self.branch,"service_id":"synthetic:hair-color",
             "scope":"IN_SALON_SHARED_SCREEN"
@@ -93,7 +93,7 @@ class ENG03PipelineTests(unittest.TestCase):
                     VALUES(%s,%s,%s,%s,true)""",
                     (login,group,consumer,self.tenant))
                 dsn_pairs.append(make_conninfo(base,user=login,password=password))
-        return tuple(dsn_pairs)
+        return (*dsn_pairs,name_eng03,name_pipeline)
 
     def answer(self,qid="synthetic:prior-treatment",value="NO",version=0):
         command={
@@ -378,7 +378,7 @@ class ENG03PipelineTests(unittest.TestCase):
         receipt=self.arrive()
         self.assertEqual(AnswerIndexConsumer(ANSWER,other).run_once(),"PROJECTED")
         first=self.worker.claim()
-        other_e3,other_p6=self._provision_scoped_worker_logins(other)
+        other_e3,other_p6,_,_=self._provision_scoped_worker_logins(other)
         second_worker=ENG03Executor(other_e3,other)
         second=second_worker.claim()
         self.assertEqual(first["source_event_id"],second["source_event_id"])
@@ -400,6 +400,50 @@ class ENG03PipelineTests(unittest.TestCase):
         with self.pipeline._connect() as con:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 con.execute("SELECT source_lease_token FROM abc.eng03_evidence_ledger")
+
+    def test_shared_engine_groups_cannot_login_after_hardening(self):
+        for direct in (ENG03,PIPELINE):
+            with self.subTest(direct=direct.split("@")[0][:24]):
+                with self.assertRaises(psycopg.OperationalError):
+                    psycopg.connect(direct,connect_timeout=3)
+
+    def test_valid_workload_login_cannot_claim_another_consumer(self):
+        other="eng03-denied-"+uuid.uuid4().hex[:12]
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.worker_subscriptions
+              (consumer_id,tenant_id,event_type,active)
+              VALUES(%s,%s,'ANSWER_RECORDED',true)""",(other,self.tenant))
+            for role in ("abc_eng03_worker","abc_pipeline_worker"):
+                con.execute("""INSERT INTO abc.eng03_worker_bindings
+                    (worker_role,consumer_id,tenant_id,active)
+                    VALUES(%s,%s,%s,true)""",(role,other,self.tenant))
+        with self.assertRaises(DomainError) as e:
+            ENG03Executor(self.eng03_dsn,other).claim()
+        self.assertEqual(e.exception.status,403)
+        with self.assertRaises(DomainError) as e:
+            SyntheticAnalysisPipeline(self.pipeline_dsn,other).claim()
+        self.assertEqual(e.exception.status,403)
+
+    def test_revoked_individual_db_login_blocks_claim(self):
+        self.arrive()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.worker_login_bindings
+                SET active=false WHERE login_name=%s""",(self.worker_login_eng03,))
+        with self.assertRaises(DomainError) as e:
+            self.worker.claim()
+        self.assertEqual(e.exception.status,403)
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute(
+                "SELECT count(*) FROM abc.eng03_input_jobs WHERE consumer_id=%s AND status='LEASED'",
+                (self.consumer,)).fetchone()[0],0)
+
+    def test_workload_cannot_change_engine_role(self):
+        with psycopg.connect(self.eng03_dsn) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SET ROLE abc_pipeline_worker")
+        with psycopg.connect(self.pipeline_dsn) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SET ROLE abc_eng03_worker")
 
     def test_unknown_critical_answer_still_bounded_by_eng14(self):
         self.arrive(value="UNKNOWN")

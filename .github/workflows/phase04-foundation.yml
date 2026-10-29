@@ -29,7 +29,8 @@ jobs:
           root=Path('runtime/phase04/abc_foundation')
           server=(root/'server.py').read_text()
           api=(root/'http_api.py').read_text()
-          assert 'LOCAL_INTEGRATION_ONLY' in server and '0.0.0.0' in api
+          assert 'ABC_ENV' in server and 'LOCAL_INTEGRATION_ONLY' in server
+          assert 'if host not in ("127.0.0.1", "::1")' in api
           assert 'capability_not_implemented' in api
           assert 'verify_bearer' in api
           print('PASS: explicit loopback/local-only and fail-closed stubs')

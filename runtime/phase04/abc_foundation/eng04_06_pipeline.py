@@ -167,10 +167,18 @@ class SyntheticAnalysisPipeline:
             job=self._leased(con,jid,token)
             evidence,rows=self._snapshot(con,job)
             sid=str(job["session_id"])
-            analysis=SyntheticBeautyAnalysis().analyse(session_id=sid,evidence=evidence)
-            knowledge=SyntheticKnowledgeEngine().resolve(service_id=SYNTHETIC_SERVICE,
-                                                        fixture=self.fixture)
-            decision=SyntheticDecisionEngine().decide(analysis=analysis,knowledge=knowledge)
+            # Each engine runs in its own child OS process with strict
+            # versioned port; the database-capable pipeline remains the only
+            # owner of the transaction and never forwards its PG credentials.
+            from .isolated_engine_runner import IsolatedEngineRunner
+            runner=IsolatedEngineRunner()
+            consumer=job["consumer_id"]
+            analysis=runner.call("ENG-04",consumer_id=consumer,session_id=sid,
+                                 payload={"evidence":evidence})
+            knowledge=runner.call("ENG-05",consumer_id=consumer,session_id=sid,
+                                  payload={"service_id":SYNTHETIC_SERVICE,"fixture":self.fixture})
+            decision=runner.call("ENG-06",consumer_id=consumer,session_id=sid,
+                                 payload={"analysis":analysis,"knowledge":knowledge})
             if (analysis["session_id"]!=sid or decision["session_id"]!=sid
                 or decision["service_id"]!=SYNTHETIC_SERVICE
                 or any(c.get("feasibility_label")!="PROFESSIONAL_CHECK_REQUIRED"

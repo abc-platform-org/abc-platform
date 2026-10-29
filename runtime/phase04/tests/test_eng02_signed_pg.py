@@ -117,9 +117,12 @@ class ENG02PostgresIntegration(unittest.TestCase):
              command=cmd or self.cmd)
 
     def count(self,table):
+        if table not in ("abc.outbox","abc.eng02_answers","abc.eng02_command_receipts"):
+            raise AssertionError("invalid_test_table")
+        col="aggregate_id" if table=="abc.outbox" else "session_id"
         with psycopg.connect(ADMIN) as con:
             return con.execute("SELECT count(*) FROM "+table+
-                " WHERE session_id=%s",(self.sid,)).fetchone()[0]
+                " WHERE "+col+"=%s",(self.sid,)).fetchone()[0]
 
     def test_one_transaction_answer_event_version_and_receipt(self):
         result=self.execute()

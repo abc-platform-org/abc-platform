@@ -40,3 +40,12 @@ The log-level 206-test figure is the count of the exact cited SHA, not a claim o
 ## ENG01 legacy checkpoint safety regression
 
 The old internal PostgresStore.checkpoint_command had an executable PAUSED to CREATED resume without transactional ENG14 and verified consent re-evaluation. That resume path is now explicitly blocked with 501 (`resume_requires_eng14_and_verified_consent`); a regression test requires session to remain PAUSED with one audit entry. This does **not** mean the missing policy-safe resume path is implemented, nor that the remaining ENG01 transitions are released. The existing pause-only synthetic checkpoint remains unchanged.
+
+
+## 5. ENG01 legacy resume security closure — regression recovery
+
+**Confirmed at code SHA `7801d7e0cad0857d2ae8b5e0654314ee53fe9142`:** [Foundation CI #40861612754](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40861612754) **SUCCESS 207/207 Python tests**; [Documentation integrity #40861612847](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/40861612847) **SUCCESS**. The directly preceding commit `fb45b5480a837c0d1bc7efde16559d28d925f29f` initially failed one obsolete HTTP regression test because it incorrectly still expected a 200/resumed state. The HTTP test was corrected to assert the new fail-closed result.
+
+**Behavior:** `PostgresStore.checkpoint_command(action="resume")` now rejects the legacy state transition as `501 resume_requires_eng14_and_verified_consent` until the system has a newly implemented authoritative, version-bound consent and ENG14 guarded resume. The request does not mutate session state or increment version, and does not append a state audit entry. Both direct PG and real OIDC-signed HTTP regression paths assert PAUSED/version 1 remains unchanged. The already-tested synthetic `ANSWER_RECORDED` consumer, policy gate and ENG03 pending jobs remain intact. **No alternative resume pathway is hereby approved**; wider transition-path closure still requires full architecture and code audit.
+
+**Operational disposition:** A known unsafe feature is intentionally unavailable; this is not a claim that the full ENG01 engine or ENG14 policy has been finished. No production restore, deployment, or client action occurred. PR #33 remains DRAFT and unmerged into main; P04 remains IN_PROGRESS.

@@ -6,6 +6,8 @@ only the network-location check is injected for the ephemeral loopback database.
 """
 import os
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from unittest.mock import patch
 
 import psycopg

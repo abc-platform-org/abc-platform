@@ -292,4 +292,76 @@ CREATE TRIGGER eng03_evidence_lineage_gate
   BEFORE INSERT ON abc.eng03_evidence_ledger
   FOR EACH ROW EXECUTE FUNCTION abc.verify_eng03_evidence_source();
 
+
+-- Independent DB gate: even a compromised pipeline INSERT path cannot mark
+-- a synthetic candidate as professionally/physically approved or invent a
+-- real service, bypass an ENG14-approved evidence source or write after lease.
+CREATE FUNCTION abc.verify_synthetic_pipeline_result() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path=pg_catalog,abc
+AS $pipeline$
+DECLARE candidate jsonb; item record; n integer;
+BEGIN
+  IF session_user<>'abc_pipeline_worker' THEN
+    RAISE EXCEPTION 'dedicated pipeline principal required' USING ERRCODE='42501';
+  END IF;
+  SELECT j.job_id,j.source_evidence_id INTO item
+    FROM abc.eng04_06_jobs j
+    JOIN abc.eng03_worker_bindings b
+      ON b.worker_role=session_user AND b.consumer_id=j.consumer_id
+       AND b.tenant_id=j.tenant_id AND b.active
+    JOIN abc.eng03_evidence_ledger e
+      ON e.evidence_id=j.source_evidence_id
+       AND e.consumer_id=j.consumer_id AND e.tenant_id=j.tenant_id
+       AND e.session_id=j.session_id AND e.aggregate_version=j.aggregate_version
+       AND e.policy_decision_id IS NOT NULL
+    WHERE j.job_id=NEW.source_pipeline_job_id AND j.consumer_id=NEW.consumer_id
+      AND j.tenant_id=NEW.tenant_id AND j.branch_id=NEW.branch_id
+      AND j.session_id=NEW.session_id AND j.aggregate_version=NEW.aggregate_version
+      AND j.status='LEASED' AND j.lease_until>clock_timestamp();
+  IF NOT FOUND OR NEW.policy_version<>'eng14.synthetic.1'
+     OR NEW.analysis_json->>'session_id' IS DISTINCT FROM NEW.session_id::text
+     OR NEW.knowledge_json->>'service_id' IS DISTINCT FROM 'synthetic:hair-color'
+     OR NEW.decision_json->>'session_id' IS DISTINCT FROM NEW.session_id::text
+     OR NEW.decision_json->>'service_id' IS DISTINCT FROM 'synthetic:hair-color'
+     OR jsonb_typeof(NEW.decision_json->'candidates') IS DISTINCT FROM 'array'
+     OR jsonb_array_length(NEW.decision_json->'candidates')>2
+     OR NEW.source_evidence_digest !~ '^[0-9a-f]{64}'
+  THEN
+     RAISE EXCEPTION 'synthetic pipeline policy context invalid' USING ERRCODE='23514';
+  END IF;
+  SELECT count(*) INTO n FROM abc.eng03_evidence_ledger e
+       WHERE e.consumer_id=NEW.consumer_id AND e.tenant_id=NEW.tenant_id
+         AND e.session_id=NEW.session_id AND e.aggregate_version<=NEW.aggregate_version;
+  IF jsonb_array_length(NEW.decision_json->'candidates')>0 THEN
+      IF n<>4 OR
+         jsonb_array_length(COALESCE(NEW.knowledge_json->'retrieval_sources','[]'::jsonb))<>1 OR
+         EXISTS(SELECT 1 FROM abc.eng03_evidence_ledger e
+           WHERE e.consumer_id=NEW.consumer_id AND e.tenant_id=NEW.tenant_id
+             AND e.session_id=NEW.session_id AND e.aggregate_version<=NEW.aggregate_version
+             AND ((e.evidence_json->>'attribute_key' IN ('prior_treatment','sensitivity_flag')
+                      AND e.evidence_json->>'evidence_class'<>'USER_REPORTED')
+                   OR (e.evidence_json->>'attribute_key'='sensitivity_flag'
+                      AND e.evidence_json->>'value'='YES')))
+      THEN
+         RAISE EXCEPTION 'critical evidence blocks synthetic candidates' USING ERRCODE='23514';
+      END IF;
+  END IF;
+  FOR candidate IN SELECT value FROM jsonb_array_elements(NEW.decision_json->'candidates') LOOP
+    IF candidate->>'candidate_id' NOT IN ('synthetic:style-a','synthetic:style-b')
+       OR candidate->>'feasibility_label' IS DISTINCT FROM 'PROFESSIONAL_CHECK_REQUIRED'
+       OR candidate->>'hard_filter_status' IS DISTINCT FROM 'CONDITIONALLY_PASSED'
+       OR candidate->>'reason' IS DISTINCT FROM 'SYNTHETIC_TEST_ONLY_REQUIRES_PROFESSIONAL_REVIEW'
+    THEN
+       RAISE EXCEPTION 'synthetic candidate was upgraded or invented' USING ERRCODE='23514';
+    END IF;
+  END LOOP;
+  RETURN NEW;
+END;
+$pipeline$;
+REVOKE ALL ON FUNCTION abc.verify_synthetic_pipeline_result() FROM PUBLIC;
+CREATE TRIGGER synthetic_pipeline_result_gate
+  BEFORE INSERT ON abc.eng04_06_results
+  FOR EACH ROW EXECUTE FUNCTION abc.verify_synthetic_pipeline_result();
+
 COMMIT;

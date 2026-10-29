@@ -1,0 +1,20 @@
+"""Run migration against CI-only Postgres. Never use this script with real data."""
+import os
+from pathlib import Path
+
+import psycopg
+
+dsn=os.environ.get("ABC_TEST_PG_ADMIN_DSN","")
+if not dsn or os.environ.get("ABC_ENV")!="LOCAL_INTEGRATION_ONLY":
+    raise SystemExit("CI/local integration database only")
+with psycopg.connect(dsn,autocommit=True) as con:
+    con.execute("""DO $$ BEGIN
+        IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='abc_app') THEN
+            CREATE ROLE abc_app LOGIN PASSWORD 'integration-only-abc-app';
+        END IF;
+        END $$""")
+    r=con.execute("SELECT rolsuper,rolbypassrls,rolcreaterole FROM pg_roles WHERE rolname='abc_app'").fetchone()
+    if any(r):
+        raise SystemExit("abc_app role is not least-privilege")
+    con.execute((Path(__file__).resolve().parents[1]/"migrations/0001_postgres_core.sql").read_text())
+print("PASS: core PostgreSQL migration applied under admin, abc_app has no BYPASSRLS")

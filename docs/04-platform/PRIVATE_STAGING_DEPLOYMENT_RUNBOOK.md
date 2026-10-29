@@ -53,3 +53,12 @@ The migration runner is deliberately not called by API/Worker startup. The worke
 | Independent security/privacy/UX approvals | **BLOCKED** |
 
 **Gating rule:** \`P04=IN_PROGRESS\`, \`P04_STAGING_DEPLOYMENT=BLOCKED_EXTERNAL_PROVISIONING\`, \`LIVE_CUSTOMER_ACCESS=FORBIDDEN\`. Do not merge draft PR #23 as complete Phase 04.
+
+## Pending ENG01/ENG02 workload-security staging preconditions (PR #32; NOT DEPLOYED)
+
+- Provision a **separate internal-only orchestrator service** using least-privilege role `abc_orchestrator`; do not embed its secret in `abc_app` or the worker. Existing Blueprint is an earlier-phase configuration, not a deployment approval for this new service.
+- Configure **two independent signing authorities**: human OIDC (`abc-api`) and service-workload issuer (`abc-eng01-internal`, RS256, pinned same-host JWKS). Provision external workload identity, rotation and revocation; **the source currently tests generated RSA keys, not a managed provider**.
+- Admin-provision `abc.engine_workload_grants` with exact `(issuer, service_subject, engine_id, tenant_id, branch_id, permission, active)` after security review. Never allow runtime services to self-register grants or elevate permissions.
+- Run new negative tests for missing/forged workload token, wrong audience/service, revoked specialist/grant, cross-tenant/cross-branch, concurrent replay and RLS. Run separate restore and external network isolation evidence. The implemented HTTP transport binds only `127.0.0.1` with `ABC_ENV=LOCAL_INTEGRATION_ONLY` and is **not** a production network gateway or a replacement for TLS/mTLS.
+- The synthetic answer path emits an `ANSWER_RECORDED` canonical event in the same DB transaction as the answer, session aggregate version and receipt; **the existing worker subscription still consumes only `SESSION_CREATED`**. Delivery of `ANSWER_RECORDED` to a distinct, admin-authorized subscriber is a separate future gate.
+- Maintain `P04=IN_PROGRESS`, real-customer access prohibited, cloud spend deferred and Phase02 frozen contracts unchanged.

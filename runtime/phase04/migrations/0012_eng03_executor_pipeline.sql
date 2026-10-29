@@ -66,6 +66,7 @@ CREATE TABLE abc.eng03_evidence_ledger (
   created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
   UNIQUE(consumer_id,source_event_id),
   UNIQUE(consumer_id,session_id,aggregate_version),
+  UNIQUE(consumer_id,evidence_id),
   FOREIGN KEY(consumer_id,tenant_id)
     REFERENCES abc.worker_subscriptions(consumer_id,tenant_id)
 );
@@ -105,6 +106,8 @@ CREATE TABLE abc.eng04_06_jobs (
   updated_at timestamptz NOT NULL DEFAULT clock_timestamp(),
   UNIQUE(consumer_id,source_job_id),
   UNIQUE(consumer_id,source_evidence_id),
+  FOREIGN KEY(consumer_id,source_evidence_id)
+    REFERENCES abc.eng03_evidence_ledger(consumer_id,evidence_id),
   FOREIGN KEY(consumer_id,tenant_id)
     REFERENCES abc.worker_subscriptions(consumer_id,tenant_id),
   CHECK(status<>'LEASED' OR (lease_token IS NOT NULL AND lease_until IS NOT NULL))
@@ -279,7 +282,10 @@ BEGIN
       OR NEW.evidence_json->>'source_type' IS DISTINCT FROM expected_kind
       OR NEW.evidence_json->>'value' IS DISTINCT FROM a.value
       OR NEW.evidence_json->>'source_id' IS DISTINCT FROM a.answer_id::text
-      OR NEW.evidence_id IS DISTINCT FROM a.answer_id
+      OR NEW.evidence_id IS DISTINCT FROM
+           substring(encode(sha256(convert_to(
+              NEW.consumer_id||'|'||a.answer_id::text,'UTF8'
+            )),'hex'),1,32)::uuid
     THEN
       RAISE EXCEPTION 'ENG03 reported source may not be fabricated' USING ERRCODE='23514';
     END IF;

@@ -193,3 +193,19 @@ class StagingGuardTests(unittest.TestCase):
         ):
             with self.subTest(bad=bad),self.assertRaises(ValueError):
                 validate_migrator_config({**base,**bad})
+
+    def test_staging_cannot_implicitly_fall_back_to_shared_database_login(self):
+        with self.assertRaisesRegex(ValueError,"unapproved_database_auth_mode"):
+            make_private_server(environ={**STAGING_ENV,
+                "ABC_PG_DSN":"postgresql://abc_app:synthetic@db.private/abc_staging?sslmode=require"},
+                verifier=Mock())
+        with self.assertRaisesRegex(ValueError,"legacy_shared_database_login"):
+            make_private_server(environ={**STAGING_ENV,
+                "ABC_DB_AUTH_MODE":"LEGACY_SYNTHETIC",
+                "ABC_PG_DSN":"postgresql://abc_app:synthetic@db.private/abc_staging?sslmode=require"},
+                verifier=Mock())
+        with self.assertRaisesRegex(ValueError,"managed_mtls_database_identity_pins"):
+            make_private_server(environ={**STAGING_ENV,
+                "ABC_DB_AUTH_MODE":"MANAGED_MTLS",
+                "ABC_PG_DSN":"postgresql://abc_api_ci@db.private/abc_staging?sslmode=verify-full"},
+                verifier=Mock())

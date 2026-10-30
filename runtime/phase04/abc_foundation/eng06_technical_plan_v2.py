@@ -36,7 +36,8 @@ def _gate_accepted(gate, request):
     # issuer. This interface intentionally has NO in-repo trust root.
     try:
         return gate.verify(
-            engine_id="ENG-06",tenant_id=request["tenant_id"],
+            engine_id="ENG-06",service_kind=request["payload"]["service_kind"],
+            tenant_id=request["tenant_id"],
             branch_id=request["branch_id"],session_id=request["session_id"],
             state_version=request["state_version"],
             selected_look_lock=request["payload"]["selected_look_lock"],

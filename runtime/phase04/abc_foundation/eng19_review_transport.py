@@ -58,3 +58,42 @@ def send_local_review_handoff(*,port,token,message,
             tls.settimeout(4)
             _write_frame(tls,{"token":token,"message":message})
             return _read_frame(tls)
+
+
+def deliver_review_with_bounded_retry(*,token_provider,max_attempts=2,
+                                      transport=None,**transport_args):
+    """Transport-only retry with a fresh one-time JWT and identical handoff ID.
+
+    Retries never reinterpret a server rejection as a network outage. A
+    receipt is not an engine result. The inbox enforces exact content match
+    after the first successful commit, including when its reply is lost.
+    """
+    if (os.environ.get("ABC_ENV")!="LOCAL_INTEGRATION_ONLY"
+        or not callable(token_provider)
+        or type(max_attempts) is not int or not 1<=max_attempts<=3
+        or "token" in transport_args or "message" not in transport_args):
+        raise ValueError("bounded_local_delivery_only")
+    call=transport or send_local_review_handoff
+    if not callable(call):
+        raise ValueError("review_transport_required")
+    issued=set()
+    for attempt in range(max_attempts):
+        signed=token_provider()
+        if type(signed) is not str or not signed or signed in issued:
+            raise DomainError(403,"review_retry_requires_fresh_signed_jwt")
+        issued.add(signed)
+        try:
+            response=call(token=signed,**transport_args)
+        except OSError as exc:
+            if attempt+1==max_attempts:
+                raise DomainError(503,"review_transport_unavailable") from exc
+            continue
+        if not isinstance(response,dict) or response.get("status") not in (
+             "RECORDED_REVIEW_ONLY","ALREADY_RECORDED_REVIEW_ONLY"):
+            raise DomainError(403,"review_server_rejected_no_unsafe_retry")
+        if (response.get("durable_review_receipt") is not True
+            or response.get("consumer_execution_authorized") is not False
+            or response.get("customer_release_approved") is not False):
+            raise DomainError(403,"untrusted_review_receipt")
+        return response
+    raise DomainError(503,"review_transport_unavailable")

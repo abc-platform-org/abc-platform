@@ -29,6 +29,13 @@ def validate():
     assert actual==expected
     assert {x["target_engine"] for x in r["adapters"]}<={
         x["engine_id"] for x in c["engines"]}
+    roles={"ENG-04":("eng04.recommendation.v2.json","RECOMMENDATION_INTELLIGENCE"),
+           "ENG-05":("eng05.decision.v2.json","DECISION_INTELLIGENCE"),
+           "ENG-06":("eng06.technical-plan.v2.json","TECHNICAL_PLANNING_INTELLIGENCE")}
+    for engine,(filename,role) in roles.items():
+        old=json.loads((ROOT/"runtime/phase04/abc_foundation/engine_v2"/filename).read_text())
+        assert old["engine_id"]==engine and old["role"]==role
+        assert old["status"]=="CONTRACT_DRAFT_NO_RUNTIME_RELEASE"
     for index,item in enumerate(r["adapters"]):
         assert item["runtime_enabled"] is False
         assert item["migration_status"]=="UNMIGRATED"

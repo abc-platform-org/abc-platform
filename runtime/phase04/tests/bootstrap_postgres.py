@@ -29,4 +29,15 @@ with psycopg.connect(dsn,autocommit=True) as con:
     for migration in sorted((Path(__file__).resolve().parents[1]/"migrations").glob("*.sql")):
         con.execute(migration.read_text())
         print("Applied", migration.name)
-print("PASS: core PostgreSQL migration applied under admin, abc_app has no BYPASSRLS")
+    # CI-only dedicated NOINHERIT physical LOGIN; the permission group itself
+    # remains NOLOGIN as required by migration 0013. No hosted principal issued.
+    con.execute("""CREATE ROLE abc_eng05_ci_login LOGIN NOINHERIT
+        NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS
+        PASSWORD 'integration-only-eng05-physical-login'""")
+    con.execute("GRANT abc_pipeline_worker TO abc_eng05_ci_login")
+    flags=con.execute("""SELECT rolcanlogin,rolsuper,rolbypassrls,rolinherit
+       FROM pg_roles WHERE rolname='abc_eng05_ci_login'""").fetchone()
+    assert flags==(True,False,False,False),flags
+    group=con.execute("SELECT rolcanlogin FROM pg_roles WHERE rolname='abc_pipeline_worker'").fetchone()
+    assert group==(False,),group
+print("PASS: core PostgreSQL migrations and isolated physical ENG05 CI login; permission group NOLOGIN")

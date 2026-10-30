@@ -32,7 +32,9 @@ DECLARE
   v_digest text;
   v_now timestamptz:=clock_timestamp();
 BEGIN
-  -- SECURITY DEFINER changes current_user, but session_user remains the\n  -- immutable DB-authenticated principal checked by workload_allowed.\n  IF (p_tenant IS NULL OR length(p_tenant) NOT BETWEEN 1 AND 128
+  -- SECURITY DEFINER changes current_user, but session_user remains the
+  -- immutable DB-authenticated principal checked by workload_allowed.
+  IF (p_tenant IS NULL OR length(p_tenant) NOT BETWEEN 1 AND 128
       OR p_issuer IS NULL OR length(p_issuer) NOT BETWEEN 9 AND 512
       OR p_issuer NOT LIKE 'https://%'
       OR p_audience IS NULL OR length(p_audience) NOT BETWEEN 3 AND 256

@@ -1,0 +1,58 @@
+{
+  "schema_version": "abc.professional-source-intake.v1",
+  "as_of": "2026-10-30",
+  "state": "REVIEW_PENDING_NO_SIGNED_CONTENT",
+  "authority": "NONE_CONFIGURED",
+  "automatically_ingestable": false,
+  "engine05_publish_allowed": false,
+  "engine06_sop_publish_allowed": false,
+  "sources": [
+    {
+      "id": "US_FDA_HAIR_DYE_SAFETY",
+      "service_kind": "HAIR_COLOR",
+      "origin": "FDA",
+      "url": "https://www.fda.gov/cosmetics/cosmetic-products/hair-dyes",
+      "type": "REGULATOR_CONSUMER_SAFETY",
+      "validation": "SOURCE_IDENTIFIED_NOT_SPECIALIST_APPROVED",
+      "critical_review": "Interpret local applicability, manufacturer IFU, contraindications, scope and update date."
+    },
+    {
+      "id": "EU_SCCS_OPINIONS",
+      "service_kind": "HAIR_COLOR",
+      "origin": "EUROPEAN_COMMISSION_SCCS",
+      "url": "https://health.ec.europa.eu/scientific-committees/scientific-committee-consumer-safety-sccs/sccs-opinions_en",
+      "type": "SCIENTIFIC_REGULATORY_OPINION_INDEX",
+      "validation": "SOURCE_IDENTIFIED_NOT_SPECIALIST_APPROVED",
+      "critical_review": "Opinion by substance/product category and updated EU regulation; not a salon operating SOP."
+    },
+    {
+      "id": "UK_NHS_HAIR_DYE_REACTIONS",
+      "service_kind": "HAIR_COLOR",
+      "origin": "UK_NHS",
+      "url": "https://www.nhs.uk/conditions/hair-dye-reactions/",
+      "type": "PUBLIC_HEALTH_SAFETY_GUIDANCE",
+      "validation": "SOURCE_IDENTIFIED_NOT_SPECIALIST_APPROVED",
+      "critical_review": "Escalation and allergy guidance; not individualized diagnosis or validated procedure."
+    }
+  ],
+  "professional_sop_intake": {
+    "service_kind": "HAIR_COLOR",
+    "status": "AWAITING_QUALIFIED_SPECIALIST",
+    "requires": [
+      "qualified_review_record_external",
+      "manufacturer_specific_current_IFU",
+      "service_scope_and_contraindications",
+      "product_and_materials_verified",
+      "baseline_assessment",
+      "purpose_consent_and_revoke_provenance",
+      "tool_material_parameters_professionally_approved",
+      "step_sequence_professionally_approved",
+      "quality_checkpoints_and_stop_conditions",
+      "aftercare_signed",
+      "version_digest_signature_and_expiry",
+      "external_policy_approval"
+    ],
+    "operations_authorized": false,
+    "chemical_parameters_published": false
+  }
+}

@@ -16,11 +16,13 @@ class _ReviewHandler(socketserver.BaseRequestHandler):
     def handle(self):
         try:
             frame=_read_frame(self.request)
-            if not isinstance(frame,dict) or set(frame)!={"token","message"}:
+            if not isinstance(frame,dict) or set(frame) not in (
+                {"token","message"},{"token","message","source_artifact"}):
                 raise DomainError(403,"review_transport_envelope_invalid")
             result=self.server.consumer.accept(
                 message=frame["message"],token=frame["token"],
-                verified_peer_certificate_der=self.request.getpeercert(binary_form=True))
+                verified_peer_certificate_der=self.request.getpeercert(binary_form=True),
+                source_artifact=frame.get("source_artifact"))
             _write_frame(self.request,result)
         except (DomainError,KeyError,TypeError,ValueError,OSError):
             try:
@@ -47,7 +49,7 @@ def start_local_review_consumer(*,consumer,certfile,keyfile,ca_file,port=0):
 
 
 def send_local_review_handoff(*,port,token,message,
-                              client_cert,client_key,server_ca):
+                              client_cert,client_key,server_ca,source_artifact=None):
     if (os.environ.get("ABC_ENV")!="LOCAL_INTEGRATION_ONLY"
         or type(port) is not int or not 1<=port<=65535):
         raise ValueError("review_producer_local_only")
@@ -56,7 +58,10 @@ def send_local_review_handoff(*,port,token,message,
     with socket.create_connection(("127.0.0.1",port),timeout=4) as sock:
         with ssl_context.wrap_socket(sock,server_hostname="localhost") as tls:
             tls.settimeout(4)
-            _write_frame(tls,{"token":token,"message":message})
+            frame={"token":token,"message":message}
+            if source_artifact is not None:
+                frame["source_artifact"]=source_artifact
+            _write_frame(tls,frame)
             return _read_frame(tls)
 
 

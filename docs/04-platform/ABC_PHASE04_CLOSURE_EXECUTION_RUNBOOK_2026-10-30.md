@@ -67,3 +67,12 @@ Run with synthetic data only:
 **Human specialist/security required:** SOPs, qualifications, privacy and final independent signoff.
 
 Current source-controlled evidence is developer CI and controlled in-memory fixtures. It is **not** verified evidence of the provider, a real client's consent, or an approved salon intervention. Do not mark any of the seven engines COMPLETE.
+
+## 4. Proven local v2 private-network acceptance lane (not deployment)
+
+- `private_v2_engine_transport.py`: independent loopback TCP listener wrapped in TLS1.3 with mandatory CA-verified mutual client certificate. Each request is a bounded framed `token/message` envelope with explicit v2 target check; exceptions return a sanitized rejection and no customer data.
+- The request enters `ScopedV2Ingress` with a separate immutable-verification chain: certificate thumbprint plus JWT issuer/audience/SAN/JTI; independently scoped tenant/branch/session/state-version authorization; PostgreSQL atomic single-use receipt; strict engine v2 request/response contracts.
+- The current listener **cannot run in STAGING_PRIVATE/PRODUCTION**; it fails closed unless `ABC_ENV=LOCAL_INTEGRATION_ONLY`. It is not connected to a real managed IdP, permanent certificate issuer, service identity registry, ENG01 authorization adapter or customer image store.
+- `test_private_v2_mtls_pg_e2e.py` actually exercises TLS1.3 mutual peer authentication and an RS256 signed service token, two independent TLS servers sharing one real PostgreSQL replay ledger, one accepted token followed by cross-server denial, and negative cases for wrong audience, incorrect certificate thumbprint, wrong tenant, v1 contract downgrade, unbound consumer, missing client certificate, and forbidden hosted start. In this test only, a pinned test-double represents the external session policy verifier; **this does not validate real access to customer records**.
+- The public legacy synthetic `v1` engine is untouched. v2 is distinct and is intentionally not silently switched on. Full live work requires real ENG01/Postgres session membership proof, durable transport delivery and recovery under an externally controlled mTLS PKI.
+- The ten P04 gates in `governance/phase04_readiness.v1.json` remain `OPEN`; the exact-head CI is a **code acceptance milestone only**, not an independent infrastructure/professional signoff.

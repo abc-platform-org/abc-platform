@@ -1,3 +1,5 @@
+> **Superseded for engineering design by [ADR-ENG-002](ADR_ENG_002_V2_ENGINE_CONTRACT_ARCHITECTURE_2026-10-30.md).** ADR-001 is retained as the documented discovery of semantic drift. ADR-ENG-002 establishes the v2 target role baseline. It does not provide independent security or specialist approval, and it does not alter the synthetic v1 runtime.
+
 # ABC ADR-ENG-001 — Engine responsibility and versioning
 
 **Date:** 2026-10-30. **State: PROPOSED, not approved.**

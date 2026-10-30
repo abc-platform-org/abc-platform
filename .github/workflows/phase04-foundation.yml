@@ -11,6 +11,7 @@ on:
       - 'scripts/validate_abc_19_engine_architecture.py'
       - 'scripts/validate_abc_v2_19_adapters.py'
       - 'scripts/validate_eng19_review_inbox.py'
+      - 'scripts/validate_eng05_review_worker.py'
       - 'contracts/review/**'
       - 'scripts/validate_phase04_readiness.py'
       - 'scripts/validate_p04_provider_fit.py'
@@ -44,11 +45,14 @@ jobs:
       ABC_TEST_PG_ANSWER_WORKER_DSN: postgresql://abc_answer_worker:integration-only-abc-answer-worker@127.0.0.1:5432/abc_phase04_ci
       ABC_TEST_PG_ENG03_DSN: postgresql://abc_eng03_worker:integration-only-eng03-worker@127.0.0.1:5432/abc_phase04_ci
       ABC_TEST_PG_PIPELINE_DSN: postgresql://abc_pipeline_worker:integration-only-pipeline-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Preflight ENG05 migration SQL structure before database bootstrap
+        run: python scripts/validate_eng05_review_worker.py
       - name: Install trusted JWT and PostgreSQL client libraries
         run: python -m pip install -r runtime/phase04/requirements.txt
       - name: Apply PostgreSQL migration with least-privilege runtime role
@@ -73,6 +77,8 @@ jobs:
         run: python scripts/validate_abc_v2_19_adapters.py
       - name: Verify review inbox DB edges equal the canonical 19-engine graph
         run: python scripts/validate_eng19_review_inbox.py
+      - name: Reject unsafe ENG05 worker identity, stale lease and automatic ENG06 release
+        run: python scripts/validate_eng05_review_worker.py
       - name: Phase04 externally evidenced release gate remains closed
         run: python scripts/validate_phase04_readiness.py
       - name: Compile local-only runtime

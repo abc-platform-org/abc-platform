@@ -57,7 +57,9 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
             .sign(self.ca,hashes.SHA256()))
         self.ca_path=_write(self.root/"ca.pem",
             self.ca_cert.public_bytes(serialization.Encoding.PEM))
-        self.consumer="ci-consumer-01"
+        self.consumer=getattr(self,"consumer_override","ci-consumer-01")
+        if not isinstance(self.consumer,str) or not 3<=len(self.consumer)<=64:
+            raise ValueError("invalid_ci_consumer_override")
         self.client_uri="spiffe://abc.internal/eng04/"+self.consumer
         def issue(common,san,is_server):
             private=key()

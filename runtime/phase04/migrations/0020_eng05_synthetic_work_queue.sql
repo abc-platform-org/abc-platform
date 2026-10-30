@@ -219,39 +219,7 @@ AS $fail$
 DECLARE j abc.eng19_synthetic_jobs%ROWTYPE;v_status text;
 BEGIN
  IF session_user<>'abc_pipeline_worker'
-    OR p_error IS NULL OR p_error !~ '^CI_[A-Z_]{3,60}
- THEN RAISE EXCEPTION 'synthetic worker failure denied' USING ERRCODE='42501'; END IF;
- SELECT * INTO j FROM abc.eng19_synthetic_jobs WHERE handoff_id=p_handoff FOR UPDATE;
- IF NOT FOUND OR j.status<>'LEASED' OR j.lease_token IS DISTINCT FROM p_lease
-    OR j.lease_until<=clock_timestamp()
-    OR NOT EXISTS(SELECT 1 FROM abc.eng03_worker_bindings b
-      WHERE b.consumer_id=j.consumer_id AND b.tenant_id=j.tenant_id
-        AND b.worker_role=session_user AND b.active)
- THEN RAISE EXCEPTION 'stale worker fail receipt' USING ERRCODE='42501'; END IF;
- v_status:=CASE WHEN j.attempts>=3 THEN 'DLQ' ELSE 'QUEUED' END;
- UPDATE abc.eng19_synthetic_jobs SET status=v_status,
-    available_at=clock_timestamp()+make_interval(secs=>j.attempts),
-    failure_code=p_error,lease_token=NULL,lease_until=NULL,
-    updated_at=clock_timestamp() WHERE handoff_id=p_handoff;
- RETURN v_status;
-END;$fail$;
-
-DO $functions$ DECLARE f text; BEGIN
- FOREACH f IN ARRAY ARRAY[
-   'abc.eng19_submit_synthetic(uuid,text,text,uuid,integer,uuid,text,text,bytea,text)',
-   'abc.eng19_claim_synthetic(text,integer)',
-   'abc.eng19_ack_synthetic(uuid,uuid,bytea,uuid)',
-   'abc.eng19_fail_synthetic(uuid,uuid,text)'] LOOP
-   EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC',f);
- END LOOP;
-END $functions$;
-GRANT EXECUTE ON FUNCTION abc.eng19_submit_synthetic(uuid,text,text,uuid,integer,uuid,text,text,bytea,text) TO abc_app;
-GRANT EXECUTE ON FUNCTION abc.eng19_claim_synthetic(text,integer) TO abc_pipeline_worker;
-GRANT EXECUTE ON FUNCTION abc.eng19_ack_synthetic(uuid,uuid,bytea,uuid) TO abc_pipeline_worker;
-GRANT EXECUTE ON FUNCTION abc.eng19_fail_synthetic(uuid,uuid,text) TO abc_pipeline_worker;
-COMMIT;
-
- THEN RAISE EXCEPTION 'synthetic worker failure denied' USING ERRCODE='42501'; END IF;
+    OR p_error IS NULL OR p_error !~ '^CI_[A-Z_]{3,60} THEN RAISE EXCEPTION 'synthetic worker failure denied' USING ERRCODE='42501'; END IF;
  SELECT * INTO j FROM abc.eng19_synthetic_jobs WHERE handoff_id=p_handoff FOR UPDATE;
  IF NOT FOUND OR j.status<>'LEASED' OR j.lease_token IS DISTINCT FROM p_lease
     OR j.lease_until<=clock_timestamp()

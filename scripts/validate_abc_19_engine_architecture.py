@@ -12,6 +12,7 @@ REGISTRY=ROOT/"governance/abc_engine_registry_19.v0.review.json"
 WORKFLOW=ROOT/"governance/abc_workflow_19.v0.review.json"
 HANDOFF_SCHEMA=ROOT/"contracts/review/engine19_handoff.v0.schema.json"
 QUALITY=ROOT/"governance/engine_quality_policy.v1.json"
+GATE_MATRIX=ROOT/"governance/abc_engine_quality_19.v0.review.json"
 CORE_19=[f"ENG-{n:02d}" for n in range(1,20)]
 FOUNDATION={f"ENG-{n:02d}" for n in (1,2,3,4,5,6,14)}
 FLOW=[f"ENG-{n:02d}" for n in (2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19)]
@@ -30,10 +31,10 @@ VERSION="abc.internal.capability.v3.review"
 def load():
     return (json.loads(REGISTRY.read_text()),json.loads(WORKFLOW.read_text()),
             json.loads(HANDOFF_SCHEMA.read_text()),
-            json.loads(QUALITY.read_text()))
+            json.loads(QUALITY.read_text()),json.loads(GATE_MATRIX.read_text()))
 
 
-def validate(registry,graph,handoff,quality):
+def validate(registry,graph,handoff,quality,gate_matrix):
     assert registry["schema_version"]=="abc.canonical-19-engine-registry.v0.review"
     assert registry["decision_status"]=="PROPOSED_FOR_ARCHITECTURE_OWNER_REVIEW"
     assert registry["architecture_authority"]=="ADR-ENG-003_PROPOSED"
@@ -52,6 +53,26 @@ def validate(registry,graph,handoff,quality):
     required_gates=[g["id"] for g in quality["mandatory_gates"]]
     assert len(required_gates)==10
     assert registry["mandatory_gates"]==required_gates
+    assert gate_matrix["schema_version"]=="abc.engine19-gate-matrix.v0.review"
+    assert gate_matrix["decision_status"]=="UNSIGNED_BASELINE_NO_COMPLETIONS"
+    assert gate_matrix["scope"]=="IN_SALON_SHARED_SCREEN"
+    assert gate_matrix["gate_policy"]=="governance/engine_quality_policy.v1.json"
+    assert gate_matrix["required_gates"]==required_gates
+    assert gate_matrix["completion_count"]==0
+    assert gate_matrix["open_gate_count"]==190
+    assert gate_matrix["independent_attestation_issuer_provisioned"] is False
+    assert gate_matrix["customer_release_approved"] is False
+    assert len(gate_matrix["engines"])==19
+    assert [r["engine_id"] for r in gate_matrix["engines"]]==CORE_19
+    total_open=0
+    for r in gate_matrix["engines"]:
+        assert list(r["gate_status"])==required_gates
+        assert all(s=="OPEN" for s in r["gate_status"].values())
+        assert r["evidence_refs"]=={}
+        assert r["signed_reviews"]=={}
+        assert r["completion_signed"] is False
+        total_open+=len(r["gate_status"])
+    assert total_open==190
     for e in entries:
         id=e["engine_id"]
         expected="IN_PROGRESS" if id in FOUNDATION else "NOT_INDEPENDENTLY_IMPLEMENTED"
@@ -183,7 +204,7 @@ def validate(registry,graph,handoff,quality):
             "correlation_id","artifact_sha256","policy_proof_ref"}<=set(handoff["required"])
     return {"canonical_engines":19,"core_stages":15,"optional_stages":2,
         "proposed_handoffs":16,"external_gates":7,"legacy_port_adapters_unmigrated":5,
-        "engine_complete":0,"runtime_dispatch_authorized":False,
+        "engine_complete":0,"open_engine_quality_gates":190,"runtime_dispatch_authorized":False,
         "customer_release_approved":False}
 
 

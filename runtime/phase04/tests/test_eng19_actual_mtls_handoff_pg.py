@@ -550,6 +550,26 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
         self.assertEqual(len(result["decision"]["excluded_options"]),2)
         self.assertFalse(result["downstream_dispatch_authorized"])
 
+    def test_eng06_runs_in_distinct_os_process_without_releasing_look(self):
+        import subprocess
+        import sys
+        import json
+        worker,message=self._eng06_review_job()
+        env={**os.environ,"ABC_ENG06_CI_CONSUMER":self.fixture.consumer}
+        run=subprocess.run([sys.executable,"-m",
+              "abc_foundation.eng06_review_worker"],
+              env=env,capture_output=True,text=True,timeout=15)
+        self.assertEqual(run.returncode,0,run.stderr)
+        payload=json.loads(run.stdout)
+        self.assertEqual(payload["status"],"ACKED_BLOCKED_REVIEW_ONLY")
+        self.assertFalse(payload["downstream_dispatched"])
+        self.assertFalse(payload["customer_release_approved"])
+        self.assertIsNone(worker.process_once())
+        with psycopg.connect(self.admin) as con:
+            status=con.execute("""SELECT status FROM abc.eng19_synthetic_outbox
+              WHERE handoff_id=%s""",(message["handoff_id"],)).fetchone()[0]
+        self.assertEqual(status,"BLOCKED_PENDING_AUTHORITY")
+
     def test_eng06_parallel_claim_single_lease_then_stale_reclaim(self):
         worker,msg=self._eng06_review_job()
         with ThreadPoolExecutor(max_workers=4) as pool:

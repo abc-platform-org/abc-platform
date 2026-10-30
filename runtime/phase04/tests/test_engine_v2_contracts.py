@@ -53,7 +53,8 @@ def request(engine):
            "current_state_evidence_ids":[L],
            "professional_findings":[{"finding_ref":"synthetic:current-evidence",
               "review_status":"UNVERIFIED"}],
-           "approved_sop_ref":None,"consent_status":"MISSING"}
+           "approved_sop_ref":None,"consent_status":"MISSING",
+           "consent_proof_digest":None}
     return {**common,"payload":payload}
 
 
@@ -167,6 +168,14 @@ class EngineV2PortTests(unittest.TestCase):
         msg["payload"]["decision_ref"]["state_version"]=3
         with self.assertRaises(DomainError):
             validate_port(msg,engine="ENG-06")
+        fake_consent=copy.deepcopy(req)
+        fake_consent["payload"]["consent_status"]="VERIFIED_BY_ENG14"
+        with self.assertRaises(DomainError):
+            validate_port(fake_consent,engine="ENG-06")
+        out=response(req)
+        out["result"]["status"]="DRAFT_REQUIRES_SPECIALIST_REVIEW"
+        with self.assertRaises(DomainError):
+            validate_port(out,engine="ENG-06",response=True,request=req)
         out=response(req)
         out["result"]["operational_handoff_authorized"]=True
         with self.assertRaises(DomainError):

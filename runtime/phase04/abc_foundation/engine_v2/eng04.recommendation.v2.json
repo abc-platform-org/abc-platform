@@ -1,0 +1,210 @@
+{
+  "contract_id": "abc.internal.eng04.recommendation.v2.draft",
+  "engine_id": "ENG-04",
+  "role": "RECOMMENDATION_INTELLIGENCE",
+  "status": "CONTRACT_DRAFT_NO_RUNTIME_RELEASE",
+  "upstream": [
+    "ENG-03",
+    "AI_STUDIO_VISUAL_QA"
+  ],
+  "downstream": [
+    "ENG-05",
+    "AI_STUDIO_LOOK_WORKSPACE"
+  ],
+  "errors": [
+    "INVALID_CONTEXT",
+    "UNVERIFIED_EVIDENCE",
+    "UNSUPPORTED_SERVICE",
+    "REGION_POLICY_VIOLATION",
+    "REFERENCE_ISOLATION_FAILURE",
+    "MISSING_IDENTITY_LOCK",
+    "NOT_IMPLEMENTED"
+  ],
+  "request_payload_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "service_kind",
+      "evidence",
+      "current_media_ref",
+      "reference_media_refs",
+      "edit_regions",
+      "identity_lock",
+      "target_intent"
+    ],
+    "properties": {
+      "service_kind": {
+        "enum": [
+          "HAIRCUT",
+          "HAIR_COLOR",
+          "BEARD",
+          "MAKEUP",
+          "NAILS",
+          "SKIN",
+          "EXTENSIONS",
+          "KERATIN",
+          "CORRECTIVE"
+        ]
+      },
+      "evidence": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 64,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "evidence_id",
+            "source_digest",
+            "evidence_class"
+          ],
+          "properties": {
+            "evidence_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "source_digest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "evidence_class": {
+              "enum": [
+                "USER_REPORTED",
+                "SPECIALIST_OBSERVED",
+                "UNKNOWN"
+              ]
+            }
+          }
+        }
+      },
+      "current_media_ref": {
+        "type": "string",
+        "pattern": "^synthetic:[a-z0-9-]{3,64}$"
+      },
+      "reference_media_refs": {
+        "type": "array",
+        "maxItems": 6,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "pattern": "^synthetic:[a-z0-9-]{3,64}$"
+        }
+      },
+      "edit_regions": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 4,
+        "uniqueItems": true,
+        "items": {
+          "enum": [
+            "HAIR",
+            "BEARD",
+            "MAKEUP",
+            "NAILS",
+            "SKIN"
+          ]
+        }
+      },
+      "identity_lock": {
+        "const": true
+      },
+      "target_intent": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 500
+      }
+    }
+  },
+  "response_result_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "status",
+      "candidate_looks",
+      "uncertainty",
+      "visual_qa_status",
+      "professional_approval_verified"
+    ],
+    "properties": {
+      "status": {
+        "enum": [
+          "BLOCKED",
+          "DRAFT_FOR_SPECIALIST_REVIEW"
+        ]
+      },
+      "candidate_looks": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "look_id",
+            "spec_digest",
+            "evidence_ids",
+            "edit_regions",
+            "feasibility"
+          ],
+          "properties": {
+            "look_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "spec_digest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "evidence_ids": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "edit_regions": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "HAIR",
+                  "BEARD",
+                  "MAKEUP",
+                  "NAILS",
+                  "SKIN"
+                ]
+              }
+            },
+            "feasibility": {
+              "const": "NOT_VERIFIED"
+            }
+          }
+        }
+      },
+      "uncertainty": {
+        "type": "array",
+        "maxItems": 32,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128
+        }
+      },
+      "visual_qa_status": {
+        "enum": [
+          "NOT_VERIFIED",
+          "FAILED",
+          "REQUIRES_REVIEW"
+        ]
+      },
+      "professional_approval_verified": {
+        "const": false
+      }
+    }
+  }
+}

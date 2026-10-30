@@ -364,6 +364,14 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
                 VALUES('abc_pipeline_worker',%s,'tenant-test',true)
                 ON CONFLICT(worker_role,consumer_id,tenant_id)
                 DO UPDATE SET active=true""",(self.fixture.consumer,))
+            con.execute("""INSERT INTO abc.worker_login_bindings(
+                login_name,worker_role,consumer_id,tenant_id,active)
+                VALUES('abc_eng05_ci_login','abc_pipeline_worker',%s,'tenant-test',true)
+                ON CONFLICT(login_name) DO UPDATE SET
+                  worker_role=EXCLUDED.worker_role,
+                  consumer_id=EXCLUDED.consumer_id,
+                  tenant_id=EXCLUDED.tenant_id,active=true""",
+                (self.fixture.consumer,))
         response=send_local_review_handoff(
             port=self.listeners[0].server_address[1],
             token=self.fixture.token(),message=msg,source_artifact=source,
@@ -371,7 +379,7 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
             client_key=self.fixture.client_key,server_ca=self.fixture.ca_path)
         self.assertEqual(response["status"],"RECORDED_REVIEW_ONLY")
         worker= SyntheticEng05ReviewWorker(
-           store=PostgresStore(os.environ["ABC_TEST_PG_PIPELINE_DSN"]),
+           store=PostgresStore(os.environ["ABC_TEST_PG_ENG05_LOGIN_DSN"]),
            consumer_id=self.fixture.consumer)
         return worker,source,msg
 
@@ -460,10 +468,29 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
 
     def test_independent_worker_role_cannot_read_or_edit_job_tables(self):
         self._synthetic_job()
-        for dsn in (self.app,os.environ["ABC_TEST_PG_PIPELINE_DSN"]):
+        for dsn in (self.app,os.environ["ABC_TEST_PG_ENG05_LOGIN_DSN"]):
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 with psycopg.connect(dsn) as con:
                     con.execute("SELECT * FROM abc.eng19_synthetic_jobs")
+
+    def test_revoked_physical_eng05_login_binding_fences_ack(self):
+        from abc_foundation.eng05_knowledge import SyntheticKnowledgeEngine
+        from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
+        worker,_,message=self._synthetic_job()
+        claim=worker.claim()
+        self.assertIsNotNone(claim)
+        with psycopg.connect(self.admin,autocommit=True) as con:
+            con.execute("""UPDATE abc.worker_login_bindings SET active=false
+                WHERE login_name='abc_eng05_ci_login'
+                  AND worker_role='abc_pipeline_worker'""")
+        output=SyntheticKnowledgeEngine().resolve(
+            service_id=SYNTHETIC_SERVICE,fixture=None)
+        with self.assertRaises(DomainError):
+            worker.ack(claim,output,next_handoff_id=str(uuid.uuid4()))
+        with psycopg.connect(self.admin) as con:
+            row=con.execute("""SELECT count(*) FROM abc.eng19_synthetic_outbox
+                WHERE handoff_id=%s""",(message["handoff_id"],)).fetchone()
+        self.assertEqual(row[0],0)
 
     def test_source_artifact_tamper_is_rejected_before_job_creation(self):
         worker,source,message=self._synthetic_job()

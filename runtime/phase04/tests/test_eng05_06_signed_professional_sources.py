@@ -4,6 +4,7 @@ No real salon specialist credentials or approvals are created by these tests.
 """
 import base64
 import copy
+import hashlib
 import json
 import os
 import unittest
@@ -31,13 +32,19 @@ class SignedProfessionalSourceTests(unittest.TestCase):
         self.private=Ed25519PrivateKey.generate()
         self.pub=self.private.public_key().public_bytes(Encoding.Raw,PublicFormat.Raw)
         self.entries={}
+        self.materials={
+            REF:b"OFFLINE_SYNTHETIC_KNOWLEDGE_FIXTURE_V2_NOT_PROFESSIONALLY_APPROVED",
+            SOP:b"OFFLINE_SYNTHETIC_SOP_METADATA_V2_NOT_PROFESSIONALLY_APPROVED"
+        }
+        self.digests={ref:hashlib.sha256(blob).hexdigest()
+                      for ref,blob in self.materials.items()}
         self.reviewers={"specialist-test-reviewer":{
             "issuer_id":"test-professional-issuer",
             "service_kinds":["HAIR_COLOR"],
             "review_types":["KNOWLEDGE","SOP"],
             "qualification_valid_until":"2027-06-01T00:00:00Z"}}
-        self.add_record(REF,"KNOWLEDGE","draft-v2","a"*64)
-        self.add_record(SOP,"SOP","v2-sop-1","c"*64)
+        self.add_record(REF,"KNOWLEDGE","draft-v2",self.digests[REF])
+        self.add_record(SOP,"SOP","v2-sop-1",self.digests[SOP])
 
     def add_record(self,ref,kind,version,digest,expires="2027-02-01T00:00:00Z"):
         record={"record_ref":ref,"record_type":kind,"service_kind":"HAIR_COLOR",
@@ -57,13 +64,14 @@ class SignedProfessionalSourceTests(unittest.TestCase):
             pinned_public_keys=changes.get("keys",{"test-professional-issuer":self.pub}),
             qualified_reviewers=changes.get("reviewers",self.reviewers),
             signed_records=changes.get("entries",self.entries),
+            approved_content=changes.get("materials",self.materials),
             revoked_refs=changes.get("revoked",()),
             clock=changes.get("clock",lambda:NOW))
 
     def test_registry_positive_exact_signature_digest_and_scope(self):
         reg=self.registry()
         self.assertTrue(reg.verify(ref=REF,record_type="KNOWLEDGE",
-            service_kind="HAIR_COLOR",version="draft-v2",digest="a"*64))
+            service_kind="HAIR_COLOR",version="draft-v2",digest=self.digests[REF]))
         self.assertTrue(reg.verify(ref=SOP,record_type="SOP",
             service_kind="HAIR_COLOR"))
         self.assertFalse(reg.verify(ref=SOP,record_type="KNOWLEDGE",
@@ -72,11 +80,12 @@ class SignedProfessionalSourceTests(unittest.TestCase):
             service_kind="SKIN",version="draft-v2",digest="a"*64))
 
     def test_tampered_content_fake_signature_and_unknown_issuer_denied(self):
-        for mutation in ("wrong_digest","wrong_reviewer","bad_signature",
+        for mutation in ("wrong_digest","wrong_reviewer","bad_signature","tampered_material",
                          "revoked","wrong_pin","unqualified","expired"):
             entries=copy.deepcopy(self.entries)
             reviewers=copy.deepcopy(self.reviewers)
             keys={"test-professional-issuer":self.pub}
+            materials=dict(self.materials)
             revoked=[]
             clock=lambda:NOW
             if mutation=="wrong_digest":
@@ -85,6 +94,8 @@ class SignedProfessionalSourceTests(unittest.TestCase):
                 entries[REF]["record"]["reviewer_id"]="untrusted-specialist"
             if mutation=="bad_signature":
                 entries[REF]["signature_b64"]="AAAAAAAAAAAAAAAAAAAAAA=="
+            if mutation=="tampered_material":
+                materials[REF]=b"ALTERED_BYTES_WITH_OLD_SIGNATURE"
             if mutation=="revoked":
                 revoked=[REF]
             if mutation=="wrong_pin":
@@ -97,7 +108,8 @@ class SignedProfessionalSourceTests(unittest.TestCase):
                 clock=lambda: datetime(2028,1,1,tzinfo=timezone.utc)
             with self.subTest(mutation=mutation):
                 reg=self.registry(entries=entries,reviewers=reviewers,
-                                  keys=keys,revoked=revoked,clock=clock)
+                                  keys=keys,revoked=revoked,clock=clock,
+                                  materials=materials)
                 self.assertFalse(reg.verify(ref=REF,
                     record_type="KNOWLEDGE",service_kind="HAIR_COLOR",
                     version="draft-v2",digest="a"*64))
@@ -105,6 +117,7 @@ class SignedProfessionalSourceTests(unittest.TestCase):
     def test_eng05_requires_signed_catalog_and_separate_policy_verifier(self):
         req=request("ENG-05")
         req["payload"]["knowledge_sources"][0]["review_status"]="SPECIALIST_REVIEWED"
+        req["payload"]["knowledge_sources"][0]["digest"]=self.digests[REF]
         req["payload"]["critical_unknowns"]=[]
         req["payload"]["policy_gate"]["decision"]="REVIEW_REQUIRED"
         # Caller string review_status alone is not a trusted signature.

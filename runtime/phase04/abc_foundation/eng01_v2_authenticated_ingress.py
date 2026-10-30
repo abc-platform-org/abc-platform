@@ -5,6 +5,7 @@ authority and database-backed atomic jti replay claim. It is not an HTTP
 listener, not a credential issuer and not deployed to customer environments.
 """
 import os
+import re
 from datetime import datetime,timezone
 from .engine_v2_contracts import validate_port,FILES
 from .engine_v2_runtime import execute
@@ -49,10 +50,10 @@ class ScopedV2Ingress:
             or identity.get("consumer_id")!=self.consumer
             or message["consumer_id"]!=self.consumer
             or not isinstance(identity.get("issuer"),str)
-            or not isinstance(identity.get("audience"),str)
+            or identity.get("audience")!="abc-engine:"+target
             or not isinstance(identity.get("token_id"),str)
             or not isinstance(identity.get("cert_sha256"),str)
-            or len(identity["cert_sha256"])!=64
+            or re.fullmatch(r"[0-9a-f]{64}",identity["cert_sha256"]) is None
             or not isinstance(identity.get("expires_at"),datetime)
             or identity["expires_at"].tzinfo is None):
             raise DomainError(401,"untrusted_workload_proof")

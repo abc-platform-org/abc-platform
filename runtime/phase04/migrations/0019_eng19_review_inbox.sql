@@ -53,6 +53,13 @@ REVOKE ALL ON abc.eng19_review_inbox FROM PUBLIC,abc_app,abc_worker,
   abc_answer_worker,abc_orchestrator,abc_eng03_worker,abc_pipeline_worker;
 DO $policy$ BEGIN
   IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='abc_staging_migrator') THEN
+    -- The SECURITY DEFINER migrator owns schema and is already trusted.
+    -- FORCE RLS otherwise hides sessions/consent from the DB-owned gate;
+    -- this does NOT give application, worker or direct client any access.
+    CREATE POLICY eng19_migrator_session_read
+      ON abc.sessions FOR SELECT TO abc_staging_migrator USING(true);
+    CREATE POLICY eng19_migrator_consent_read
+      ON abc.consent_evidence FOR SELECT TO abc_staging_migrator USING(true);
     CREATE POLICY eng19_review_migrator
       ON abc.eng19_review_inbox FOR ALL TO abc_staging_migrator
       USING(true) WITH CHECK(true);

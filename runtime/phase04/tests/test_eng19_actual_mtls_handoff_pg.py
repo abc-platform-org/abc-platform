@@ -218,10 +218,15 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
         self.assertEqual(self.call(token=self.fixture.token(
             binding="invalid-thumbprint"))["status"],"REJECTED")
         ctx=ssl.create_default_context(ssl.Purpose.SERVER_AUTH,cafile=self.fixture.ca_path)
-        with self.assertRaises((ssl.SSLError,OSError,ConnectionError)):
+        # TLS client authentication alerts can surface at first READ rather
+        # than wrap_socket or sendall, depending on OpenSSL scheduling.
+        from abc_foundation.private_engine_transport import _read_frame
+        with self.assertRaises((ssl.SSLError,OSError,ConnectionError,ValueError)):
             with socket.create_connection(("127.0.0.1",self.listeners[0].server_address[1])) as sock:
                 with ctx.wrap_socket(sock,server_hostname="localhost") as secured:
+                    secured.settimeout(4)
                     secured.sendall(b"abcd")
+                    _read_frame(secured)
 
     def test_no_hosted_start_or_untrusted_public_endpoint(self):
         from unittest.mock import patch

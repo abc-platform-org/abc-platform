@@ -1,0 +1,663 @@
+{
+  "schema_version": "abc.w0-engine-interface-matrix.v0.review",
+  "as_of": "2026-10-31",
+  "authority": "ADR-ENG-003_PROPOSED",
+  "status": "CANDIDATE_NOT_RATIFIED",
+  "source_of_truth": {
+    "registry": "governance/abc_engine_registry_19.v0.review.json",
+    "workflow": "governance/abc_workflow_19.v0.review.json",
+    "adapters": "governance/abc_v2_to_19_adapters.v0.review.json"
+  },
+  "execution_authorized": false,
+  "customer_release_approved": false,
+  "interfaces": [
+    {
+      "engine_id": "ENG-01",
+      "capability_owner_key": "ORCHESTRATION",
+      "name": "Orchestration & Workflow Control",
+      "port_kind": "CONTROL_PLANE",
+      "input_artifacts": [
+        "AUTHORIZED_SESSION_COMMAND",
+        "ENGINE_EXECUTION_RECEIPT",
+        "POLICY_DECISION_REFERENCE"
+      ],
+      "output_artifact": "SESSION_WORKFLOW_COMMAND",
+      "required_dependencies": [
+        "ENG-14"
+      ],
+      "upstream_engines": [],
+      "downstream_engines": [],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-02",
+      "capability_owner_key": "CONSULTATION",
+      "name": "Consultation & Session Intelligence",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [],
+      "output_artifact": "PURPOSE_BOUND_CONSULTATION_EVIDENCE",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14"
+      ],
+      "upstream_engines": [],
+      "downstream_engines": [
+        "ENG-03"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-03",
+      "capability_owner_key": "EVIDENCE_QUALITY",
+      "name": "Evidence & Input Quality",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "PURPOSE_BOUND_CONSULTATION_EVIDENCE"
+      ],
+      "output_artifact": "TRACEABLE_EVIDENCE_PACKAGE",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-02"
+      ],
+      "upstream_engines": [
+        "ENG-02"
+      ],
+      "downstream_engines": [
+        "ENG-04"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-04",
+      "capability_owner_key": "BEAUTY_ANALYSIS",
+      "name": "Beauty & Visual Analysis",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "TRACEABLE_EVIDENCE_PACKAGE"
+      ],
+      "output_artifact": "BEAUTY_ANALYSIS_REPORT",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-03"
+      ],
+      "upstream_engines": [
+        "ENG-03"
+      ],
+      "downstream_engines": [
+        "ENG-05"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-05",
+      "capability_owner_key": "KNOWLEDGE_ONTOLOGY",
+      "name": "Professional Knowledge & Ontology",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "BEAUTY_ANALYSIS_REPORT"
+      ],
+      "output_artifact": "PROFESSIONAL_KNOWLEDGE_BUNDLE",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-04"
+      ],
+      "upstream_engines": [
+        "ENG-04"
+      ],
+      "downstream_engines": [
+        "ENG-06"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-06",
+      "capability_owner_key": "DECISION_RECOMMENDATION",
+      "name": "Decision & Recommendation Intelligence",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "PROFESSIONAL_KNOWLEDGE_BUNDLE"
+      ],
+      "output_artifact": "AUDITABLE_RECOMMENDATION_DECISION",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-05"
+      ],
+      "upstream_engines": [
+        "ENG-05"
+      ],
+      "downstream_engines": [
+        "ENG-07"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-07",
+      "capability_owner_key": "LOOK_SPECIFICATION",
+      "name": "Look Specification",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "AUDITABLE_RECOMMENDATION_DECISION"
+      ],
+      "output_artifact": "VERSIONED_LOOK_SPECIFICATION",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-06"
+      ],
+      "upstream_engines": [
+        "ENG-06"
+      ],
+      "downstream_engines": [
+        "ENG-08"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-08",
+      "capability_owner_key": "VISUAL_SEGMENTATION",
+      "name": "Visual Segmentation",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "VERSIONED_LOOK_SPECIFICATION"
+      ],
+      "output_artifact": "AUTHORIZED_REGION_MASK_SET",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-07"
+      ],
+      "upstream_engines": [
+        "ENG-07"
+      ],
+      "downstream_engines": [
+        "ENG-09"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-09",
+      "capability_owner_key": "VISUAL_GENERATION",
+      "name": "Controlled Visual Generation",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "AUTHORIZED_REGION_MASK_SET"
+      ],
+      "output_artifact": "DRAFT_VISUAL_VARIANT",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-08"
+      ],
+      "upstream_engines": [
+        "ENG-08"
+      ],
+      "downstream_engines": [
+        "ENG-10"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-10",
+      "capability_owner_key": "COMPOSITING",
+      "name": "Image Compositing",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "DRAFT_VISUAL_VARIANT"
+      ],
+      "output_artifact": "COMPOSITED_PREVIEW",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-09"
+      ],
+      "upstream_engines": [
+        "ENG-09"
+      ],
+      "downstream_engines": [
+        "ENG-11"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-11",
+      "capability_owner_key": "VISUAL_QA",
+      "name": "Visual Quality Assurance",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "COMPOSITED_PREVIEW"
+      ],
+      "output_artifact": "MASKED_VISUAL_QA_REPORT",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-10"
+      ],
+      "upstream_engines": [
+        "ENG-10"
+      ],
+      "downstream_engines": [
+        "ENG-12"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-12",
+      "capability_owner_key": "LOOK_VERSIONING",
+      "name": "Visual State & Versioning",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "MASKED_VISUAL_QA_REPORT"
+      ],
+      "output_artifact": "IMMUTABLE_LOOK_VERSION_AND_LOCK",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-11"
+      ],
+      "upstream_engines": [
+        "ENG-11"
+      ],
+      "downstream_engines": [
+        "ENG-13"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-13",
+      "capability_owner_key": "SERVICE_FEASIBILITY",
+      "name": "Service Feasibility",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "IMMUTABLE_LOOK_VERSION_AND_LOCK"
+      ],
+      "output_artifact": "EVIDENCE_GATED_FEASIBILITY_REPORT",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-12"
+      ],
+      "upstream_engines": [
+        "ENG-12"
+      ],
+      "downstream_engines": [
+        "ENG-15"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-14",
+      "capability_owner_key": "SAFETY_POLICY",
+      "name": "Safety, Policy & Governance",
+      "port_kind": "CONTROL_PLANE",
+      "input_artifacts": [
+        "POLICY_EVALUATION_REQUEST",
+        "ACTIVE_CONSENT_EVIDENCE",
+        "QUALIFICATION_ATTESTATION_REFERENCE"
+      ],
+      "output_artifact": "INDEPENDENT_POLICY_DECISION",
+      "required_dependencies": [],
+      "upstream_engines": [],
+      "downstream_engines": [],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-15",
+      "capability_owner_key": "TECHNICAL_PLANNING",
+      "name": "Professional Technical Planning",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "EVIDENCE_GATED_FEASIBILITY_REPORT"
+      ],
+      "output_artifact": "SPECIALIST_REVIEWABLE_TECHNICAL_PLAN",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-13"
+      ],
+      "upstream_engines": [
+        "ENG-13"
+      ],
+      "downstream_engines": [
+        "ENG-16"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-16",
+      "capability_owner_key": "SPECIALIST_VALIDATION",
+      "name": "Specialist Validation",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "SPECIALIST_REVIEWABLE_TECHNICAL_PLAN"
+      ],
+      "output_artifact": "SIGNED_SPECIALIST_VALIDATION",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-15"
+      ],
+      "upstream_engines": [
+        "ENG-15"
+      ],
+      "downstream_engines": [
+        "ENG-17"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-17",
+      "capability_owner_key": "OUTPUT_HANDOFF",
+      "name": "Output & Operational Handoff",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "SIGNED_SPECIALIST_VALIDATION"
+      ],
+      "output_artifact": "AUTHORIZED_OPERATIONAL_HANDOFF",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-16"
+      ],
+      "upstream_engines": [
+        "ENG-16"
+      ],
+      "downstream_engines": [
+        "ENG-18"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-18",
+      "capability_owner_key": "BUSINESS_INTELLIGENCE",
+      "name": "Salon Business Intelligence",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "AUTHORIZED_OPERATIONAL_HANDOFF"
+      ],
+      "output_artifact": "AUDITABLE_SALON_KPI_FACTS",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-17"
+      ],
+      "upstream_engines": [
+        "ENG-17"
+      ],
+      "downstream_engines": [
+        "ENG-19"
+      ],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    },
+    {
+      "engine_id": "ENG-19",
+      "capability_owner_key": "OPPORTUNITY_AUTOMATION",
+      "name": "Opportunity & Controlled Automation",
+      "port_kind": "DATA_PLANE",
+      "input_artifacts": [
+        "AUDITABLE_SALON_KPI_FACTS"
+      ],
+      "output_artifact": "POLICY_APPROVED_SALON_ACTION",
+      "required_dependencies": [
+        "ENG-01",
+        "ENG-14",
+        "ENG-18"
+      ],
+      "upstream_engines": [
+        "ENG-18"
+      ],
+      "downstream_engines": [],
+      "contract_version": "abc.internal.capability.v3.review",
+      "legacy_compatibility": "EXPLICIT_ADAPTER_ONLY_NO_IN_PLACE_ALIAS",
+      "execution_approved": false,
+      "customer_processing_approved": false,
+      "independent_service_identity_verified": false,
+      "deployment_boundary": "ENGINE_OWNED_PRIVATE_WORKLOAD_REQUIRED_BEFORE_EXECUTION",
+      "quality_gate_status": "G01_G10_OPEN",
+      "required_crosscutting_proofs": [
+        "TENANT_BRANCH_SESSION_STATE_SCOPE",
+        "EVIDENCE_DIGEST_AND_PROVENANCE",
+        "INDEPENDENT_SERVICE_IDENTITY",
+        "ENG14_AUTHORITY_IF_APPLICABLE",
+        "REPLAY_AND_LEASE_FENCING"
+      ]
+    }
+  ]
+}

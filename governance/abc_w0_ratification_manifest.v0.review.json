@@ -1,0 +1,53 @@
+{
+  "schema_version": "abc.w0-ratification-manifest.v0.review",
+  "date": "2026-10-31",
+  "status": "PENDING_INDEPENDENT_REVIEWS",
+  "design_freeze_approved": false,
+  "live_routing_allowed": false,
+  "customer_release_approved": false,
+  "source_commit": "3c4f978288d412ddb44f010a4162a35ad3a9ba1a",
+  "artifacts": [
+    "governance/abc_engine_registry_19.v0.review.json",
+    "governance/abc_workflow_19.v0.review.json",
+    "governance/abc_v2_to_19_adapters.v0.review.json",
+    "governance/abc_w0_engine_interfaces.v0.review.json",
+    "contracts/review/engine19_handoff.v0.schema.json",
+    "governance/abc_engine_quality_19.v0.review.json"
+  ],
+  "expected": {
+    "engines": 19,
+    "stages": 17,
+    "edges": 16,
+    "gates": 7,
+    "adapters": 6,
+    "open_quality_gates": 190
+  },
+  "approval_slots": [
+    {
+      "role": "ARCHITECTURE_OWNER",
+      "state": "PENDING",
+      "review_ref": null
+    },
+    {
+      "role": "SECURITY_REVIEWER",
+      "state": "PENDING",
+      "review_ref": null
+    },
+    {
+      "role": "PROFESSIONAL_LEAD",
+      "state": "PENDING",
+      "review_ref": null
+    },
+    {
+      "role": "PLATFORM_SRE",
+      "state": "PENDING",
+      "review_ref": null
+    }
+  ],
+  "next_action": "REVIEW_ARCHITECTURE_AND_W1_W2_DESIGN",
+  "blocked_actions": [
+    "LIVE_V3_ROUTING",
+    "AUTOMATED_TREATMENT",
+    "CUSTOMER_RELEASE"
+  ]
+}

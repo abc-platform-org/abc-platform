@@ -499,6 +499,156 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
                 WHERE handoff_id=%s""",(message["handoff_id"],)).fetchone()
         self.assertEqual(row[0],0)
 
+    def _eng06_review_job(self):
+        from abc_foundation.eng06_review_worker import SyntheticEng06ReviewWorker
+        worker05,_,message=self._synthetic_job()
+        accepted=worker05.process_once()
+        self.assertEqual(accepted["status"],"ACKED_REVIEW_ONLY")
+        with psycopg.connect(self.admin,autocommit=True) as con:
+            con.execute("""INSERT INTO abc.eng06_ci_worker_bindings
+                 (login_name,consumer_id,tenant_id,active)
+                 VALUES('abc_eng06_ci_login',%s,'tenant-test',true)
+                 ON CONFLICT(login_name) DO UPDATE SET
+                   consumer_id=EXCLUDED.consumer_id,
+                   tenant_id=EXCLUDED.tenant_id,active=true""",
+                   (self.fixture.consumer,))
+            # This is deliberately ADMIN CI SEEDING ONLY, not a release of the
+            # blocked outbox. No runtime role receives INSERT on this table.
+            con.execute("""INSERT INTO abc.eng06_ci_jobs(
+                  upstream_handoff,consumer_id,tenant_id,branch_id,
+                  session_id,state_version)
+                  VALUES(%s,%s,'tenant-test','branch-test',%s,2)""",
+                  (message["handoff_id"],self.fixture.consumer,self.session))
+        worker06=SyntheticEng06ReviewWorker(
+            store=PostgresStore(os.environ["ABC_TEST_PG_ENG06_LOGIN_DSN"]),
+            consumer_id=self.fixture.consumer)
+        return worker06,message
+
+    def test_eng06_isolated_claim_decide_blocked_ack_without_automatic_dispatch(self):
+        worker,message=self._eng06_review_job()
+        receipt=worker.process_once()
+        self.assertEqual(receipt["status"],"ACKED_BLOCKED_REVIEW_ONLY")
+        self.assertEqual(receipt["engine_id"],"ENG-06")
+        self.assertFalse(receipt["downstream_dispatched"])
+        self.assertFalse(receipt["customer_release_approved"])
+        self.assertIsNone(worker.process_once())
+        with psycopg.connect(self.admin,row_factory=dict_row) as con:
+            j=con.execute("""SELECT status,attempts FROM abc.eng06_ci_jobs
+                 WHERE upstream_handoff=%s""",(message["handoff_id"],)).fetchone()
+            out=con.execute("""SELECT status FROM abc.eng19_synthetic_outbox
+                 WHERE handoff_id=%s""",(message["handoff_id"],)).fetchone()
+            r=con.execute("""SELECT status,engine_id,engine_version,
+                    analysis_sha256,knowledge_sha256,output_sha256,output_bytes
+                    FROM abc.eng06_ci_results WHERE upstream_handoff=%s""",
+                    (message["handoff_id"],)).fetchone()
+        self.assertEqual(j["status"],"ACKED")
+        self.assertEqual(j["attempts"],1)
+        self.assertEqual(out["status"],"BLOCKED_PENDING_AUTHORITY")
+        self.assertEqual(r["status"],"BLOCKED_PROFESSIONAL_SOURCE")
+        result=__import__("json").loads(r["output_bytes"])
+        self.assertEqual(result["decision"]["candidates"],[])
+        self.assertEqual(len(result["decision"]["excluded_options"]),2)
+        self.assertFalse(result["downstream_dispatch_authorized"])
+
+    def test_eng06_runs_in_distinct_os_process_without_releasing_look(self):
+        import subprocess
+        import sys
+        import json
+        worker,message=self._eng06_review_job()
+        env={**os.environ,"ABC_ENG06_CI_CONSUMER":self.fixture.consumer}
+        run=subprocess.run([sys.executable,"-m",
+              "abc_foundation.eng06_review_worker"],
+              env=env,capture_output=True,text=True,timeout=15)
+        self.assertEqual(run.returncode,0,run.stderr)
+        payload=json.loads(run.stdout)
+        self.assertEqual(payload["status"],"ACKED_BLOCKED_REVIEW_ONLY")
+        self.assertFalse(payload["downstream_dispatched"])
+        self.assertFalse(payload["customer_release_approved"])
+        self.assertIsNone(worker.process_once())
+        with psycopg.connect(self.admin) as con:
+            status=con.execute("""SELECT status FROM abc.eng19_synthetic_outbox
+              WHERE handoff_id=%s""",(message["handoff_id"],)).fetchone()[0]
+        self.assertEqual(status,"BLOCKED_PENDING_AUTHORITY")
+
+    def test_eng06_parallel_claim_single_lease_then_stale_reclaim(self):
+        worker,msg=self._eng06_review_job()
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            claims=list(pool.map(lambda _:worker.claim(),range(4)))
+        self.assertEqual(len([c for c in claims if c is not None]),1)
+        old=next(c for c in claims if c is not None)
+        with psycopg.connect(self.admin,autocommit=True) as con:
+            con.execute("""UPDATE abc.eng06_ci_jobs
+              SET lease_until=clock_timestamp()-interval '1 second'
+              WHERE upstream_handoff=%s""",(msg["handoff_id"],))
+        fresh=worker.claim()
+        self.assertIsNotNone(fresh)
+        self.assertNotEqual(fresh["lease_token"],old["lease_token"])
+        with self.assertRaises(DomainError):
+            worker.ack(old,worker.decide_blocked(old))
+        ack=worker.ack(fresh,worker.decide_blocked(fresh))
+        self.assertEqual(ack["status"],"ACKED_BLOCKED_REVIEW_ONLY")
+
+    def test_eng06_revoked_consent_fences_ack(self):
+        worker,msg=self._eng06_review_job()
+        claim=worker.claim()
+        self.assertIsNotNone(claim)
+        output=worker.decide_blocked(claim)
+        with psycopg.connect(self.admin,autocommit=True) as con:
+            con.execute("""UPDATE abc.consent_evidence SET
+              status='WITHDRAWN',revoked_at=clock_timestamp()
+              WHERE consent_id=%s""",(self.consent,))
+        with self.assertRaises(DomainError):
+            worker.ack(claim,output)
+        with psycopg.connect(self.admin) as con:
+            count=con.execute("""SELECT count(*) FROM abc.eng06_ci_results
+              WHERE upstream_handoff=%s""",(msg["handoff_id"],)).fetchone()[0]
+        self.assertEqual(count,0)
+
+    def test_eng06_physical_login_revocation_fences_ack(self):
+        worker,msg=self._eng06_review_job()
+        claim=worker.claim()
+        self.assertIsNotNone(claim)
+        with psycopg.connect(self.admin,autocommit=True) as con:
+            con.execute("""UPDATE abc.eng06_ci_worker_bindings SET active=false
+               WHERE login_name='abc_eng06_ci_login'""")
+        with self.assertRaises(DomainError):
+            worker.ack(claim,worker.decide_blocked(claim))
+        with psycopg.connect(self.admin) as con:
+            count=con.execute("""SELECT count(*) FROM abc.eng06_ci_results
+              WHERE upstream_handoff=%s""",(msg["handoff_id"],)).fetchone()[0]
+        self.assertEqual(count,0)
+
+    def test_eng06_failed_worker_retries_then_dlq(self):
+        worker,msg=self._eng06_review_job()
+        for attempt in range(3):
+            claim=worker.claim()
+            self.assertEqual(claim["attempt"],attempt+1)
+            status=worker.fail(claim,"CI_INJECTED_FAILURE")
+            self.assertEqual(status,"DLQ" if attempt==2 else "QUEUED")
+            if attempt<2:
+                with psycopg.connect(self.admin,autocommit=True) as con:
+                    con.execute("""UPDATE abc.eng06_ci_jobs
+                       SET available_at=clock_timestamp()-interval '1 second'
+                       WHERE upstream_handoff=%s""",(msg["handoff_id"],))
+        self.assertIsNone(worker.claim())
+
+    def test_eng06_direct_database_access_and_live_environment_denied(self):
+        worker,msg=self._eng06_review_job()
+        for dsn in (self.app,os.environ["ABC_TEST_PG_ENG06_LOGIN_DSN"]):
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                with psycopg.connect(dsn) as con:
+                    con.execute("SELECT * FROM abc.eng06_ci_jobs")
+        with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+            with psycopg.connect(os.environ["ABC_TEST_PG_ENG06_LOGIN_DSN"]) as con:
+                con.execute("""INSERT INTO abc.eng06_ci_jobs(upstream_handoff,
+                  consumer_id,tenant_id,branch_id,session_id,state_version)
+                  VALUES(%s,%s,'tenant-test','branch-test',%s,2)""",
+                  (str(uuid.uuid4()),self.fixture.consumer,self.session))
+        from unittest.mock import patch
+        with patch.dict(os.environ,{"ABC_ENV":"STAGING_PRIVATE"}):
+            with self.assertRaises(DomainError):
+                worker.claim()
+
     def test_eng05_to_eng06_mtls_review_only_durable_receipt(self):
         """A real TLS1.3 ENG05→ENG06 receive, never ENG06 decision execution."""
         f=ManagedWorkloadMTLSTests("test_real_tls13_mutual_certificate_and_bound_jwt")

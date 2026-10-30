@@ -11,6 +11,7 @@ on:
       - 'scripts/validate_abc_19_engine_architecture.py'
       - 'scripts/validate_abc_w0_ratification_candidate.py'
       - 'scripts/validate_abc_w1w2_private_candidate.py'
+      - 'scripts/validate_eng06_isolated_review.py'
       - 'scripts/validate_abc_v2_19_adapters.py'
       - 'scripts/validate_eng19_review_inbox.py'
       - 'scripts/validate_eng05_review_worker.py'
@@ -48,6 +49,7 @@ jobs:
       ABC_TEST_PG_ENG03_DSN: postgresql://abc_eng03_worker:integration-only-eng03-worker@127.0.0.1:5432/abc_phase04_ci
       ABC_TEST_PG_PIPELINE_DSN: postgresql://abc_pipeline_worker:integration-only-pipeline-worker@127.0.0.1:5432/abc_phase04_ci
       ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG06_LOGIN_DSN: postgresql://abc_eng06_ci_login:integration-only-eng06-review-login@127.0.0.1:5432/abc_phase04_ci
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -79,6 +81,8 @@ jobs:
         run: python scripts/validate_abc_w0_ratification_candidate.py
       - name: Verify W1 W2 private readiness remains blocked with eight negative tests
         run: python scripts/validate_abc_w1w2_private_candidate.py
+      - name: Reject any ENG06 live release, weak lease, or unverified decision output
+        run: python scripts/validate_eng06_isolated_review.py
       - name: Enforce six review-only and unmigrated v2-to-19 source adapters
         run: python scripts/validate_abc_v2_19_adapters.py
       - name: Verify review inbox DB edges equal the canonical 19-engine graph

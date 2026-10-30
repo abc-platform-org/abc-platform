@@ -33,6 +33,7 @@ FILENAMES = (
     "0018_eng14_distributed_replay_ledger.sql",
     "0019_eng19_review_inbox.sql",
     "0020_eng05_synthetic_work_queue.sql",
+    "0021_eng06_synthetic_review_worker.sql",
 )
 
 

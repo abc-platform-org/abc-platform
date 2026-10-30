@@ -1,0 +1,146 @@
+{
+  "schema_version": "abc.w1w2-private-runtime-evidence.v0.review",
+  "date": "2026-10-31",
+  "purpose": "EXTERNAL_EVIDENCE_REQUIREMENTS_ONLY",
+  "state": "UNPROVISIONED_BLOCKED",
+  "synthetic_ci_is_not_operational_evidence": true,
+  "managed_private_environment_verified": false,
+  "real_media_ingress_enabled": false,
+  "eng05_to_eng06_dispatch_enabled": false,
+  "new_v3_runtime_enabled": false,
+  "customer_release_approved": false,
+  "independent_approval_received": false,
+  "reference_prs": [
+    52,
+    54,
+    55,
+    56,
+    57,
+    59
+  ],
+  "workspace_observation": "RENDER_CONNECTED_WORKSPACE_NO_MATCHED_SERVICE_OR_POSTGRES_OBSERVED_2026_10_31",
+  "criteria": [
+    {
+      "id": "W1-01_PRIVATE_NETWORK",
+      "review_domain": "NETWORK_SECURITY",
+      "exit_criterion": "Private workloads, inbound and outbound allowlists, verified service/private DNS and no publicly accessible engine listener",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W1-02_MANAGED_WORKLOAD_IDENTITY",
+      "review_domain": "SECURITY",
+      "exit_criterion": "Separate externally issued service identity per engine with short-lived credentials, tenant/consumer/engine audience binding",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W1-03_SERVICE_MTLS",
+      "review_domain": "SECURITY",
+      "exit_criterion": "TLS 1.3 mutual authentication, trusted issuer pinning, certificate revocation/rotation and negative handshake tests",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W1-04_PRIVATE_POSTGRES",
+      "review_domain": "DB_SECURITY",
+      "exit_criterion": "Managed isolated PostgreSQL with least-privilege LOGINS, NOLOGIN groups, RLS, certificate verification and migration segregation",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W1-05_SECRETS_AND_BACKUP",
+      "review_domain": "SRE",
+      "exit_criterion": "Managed secret custody/rotation, tested backup restoration, encryption at rest and key separation",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W1-06_TELEMETRY_AND_RESPONSE",
+      "review_domain": "SRE",
+      "exit_criterion": "Redacted security logs, trace IDs, audit retention, alerting, on-call ownership and incident playbooks",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W1-07_DEPLOY_ROLLBACK",
+      "review_domain": "SRE",
+      "exit_criterion": "Pinned artifacts/SBOM, signed provenance, staging-to-production approval, tested rollback and change freeze control",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W2-01_PRECAPTURE_CONSENT",
+      "review_domain": "PRIVACY",
+      "exit_criterion": "Real consent issuing/verifying authority, ENG02 capture before media, atomic recheck in future writer, retention/deletion and revocation test",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W2-02_SESSION_POLICY_GATES",
+      "review_domain": "SECURITY",
+      "exit_criterion": "ENG14 non-bypassable purpose controls, live state/version CAS, specialist and client authority, deny on stale session",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W2-03_DURABLE_ENGINE_CONTRACTS",
+      "review_domain": "PLATFORM",
+      "exit_criterion": "Independent ENG04→05 and ENG05→06 signed audited interfaces, exact versions, immutable provenance, dedupe/replay/ACK and fail-closed DLQ",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W2-04_ENG06_INDEPENDENCE",
+      "review_domain": "PLATFORM",
+      "exit_criterion": "Dedicated ENG06 runtime/identity/lease and domain evidence/knowledge validation; no legacy v2 alias or model-issued release",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    },
+    {
+      "id": "W2-05_RELEASE_VALIDATION",
+      "review_domain": "RELEASE",
+      "exit_criterion": "Independent architecture, security, professional and SRE exact-commit signoffs; performance/load and disaster recovery acceptance",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "independent_signoffs": [],
+      "provider_resource_ref": null,
+      "owner_assignment": null
+    }
+  ],
+  "next_safe_action": "PROVISION_SEPARATE_PRIVATE_STAGING_ONLY_AFTER_AUTHORIZED_SECURITY_REVIEW",
+  "release_state": "BLOCKED"
+}

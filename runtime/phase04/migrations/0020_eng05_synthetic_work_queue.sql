@@ -219,7 +219,8 @@ AS $fail$
 DECLARE j abc.eng19_synthetic_jobs%ROWTYPE;v_status text;
 BEGIN
  IF session_user<>'abc_pipeline_worker'
-    OR p_error IS NULL OR p_error !~ '^CI_[A-Z_]{3,60} THEN RAISE EXCEPTION 'synthetic worker failure denied' USING ERRCODE='42501'; END IF;
+    OR p_error IS NULL OR p_error !~ '^CI_[A-Z_]{3,60}$'
+ THEN RAISE EXCEPTION 'synthetic worker failure denied' USING ERRCODE='42501'; END IF;
  SELECT * INTO j FROM abc.eng19_synthetic_jobs WHERE handoff_id=p_handoff FOR UPDATE;
  IF NOT FOUND OR j.status<>'LEASED' OR j.lease_token IS DISTINCT FROM p_lease
     OR j.lease_until<=clock_timestamp()

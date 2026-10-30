@@ -60,7 +60,11 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
         self.consumer=getattr(self,"consumer_override","ci-consumer-01")
         if not isinstance(self.consumer,str) or not 3<=len(self.consumer)<=64:
             raise ValueError("invalid_ci_consumer_override")
-        self.client_uri="spiffe://abc.internal/eng04/"+self.consumer
+        self.source_engine=getattr(self,"source_engine_override","ENG-04")
+        self.target_engine=getattr(self,"target_engine_override","ENG-05")
+        if (self.source_engine,self.target_engine) not in (("ENG-04","ENG-05"),("ENG-05","ENG-06")):
+            raise ValueError("unapproved_ci_engine_pair")
+        self.client_uri="spiffe://abc.internal/"+self.source_engine.lower().replace("-","")+"/"+self.consumer
         def issue(common,san,is_server):
             private=key()
             subject=x509.Name([x509.NameAttribute(NameOID.COMMON_NAME,common)])
@@ -86,11 +90,11 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
         self.client_cert,self.client_key,self.client=issue(
              "client",x509.UniformResourceIdentifier(self.client_uri),False)
         self.verifier=BoundEngineIdentity(
-            issuer="https://issuer.abc-ci.example",audience="abc-engine:ENG-05",
+            issuer="https://issuer.abc-ci.example",audience="abc-engine:"+self.target_engine,
             jwks_uri="https://issuer.abc-ci.example/.well-known/jwks.json",
             jwks_client=FakeJWKS(self.signer))
         self.server=private_engine_server(host="127.0.0.1",port=0,
-           target_engine="ENG-05",caller_engine="ENG-04",
+           target_engine=self.target_engine,caller_engine=self.source_engine,
            consumer_id=self.consumer,certfile=self.server_cert,
            keyfile=self.server_key,ca_file=self.ca_path,verifier=self.verifier)
         self.addCleanup(self.server.server_close)
@@ -98,16 +102,16 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
         runner.start()
         self.addCleanup(self.server.shutdown)
         self.port=self.server.server_address[1]
-        self.message={"request_id":str(uuid.uuid4()),"engine_id":"ENG-05",
+        self.message={"request_id":str(uuid.uuid4()),"engine_id":self.target_engine,
                       "contract_version":VERSION,"consumer_id":self.consumer,
                       "session_id":str(uuid.uuid4()),
                       "payload":{"service_id":"synthetic:hair-color","fixture":None}}
 
-    def token(self,*,consumer=None,binding=None,engine="ENG-04",expires=65):
+    def token(self,*,consumer=None,binding=None,engine=None,expires=65):
         thumb=base64.urlsafe_b64encode(hashlib.sha256(
             self.client.public_bytes(serialization.Encoding.DER)).digest()).rstrip(b"=").decode()
-        claims={"iss":"https://issuer.abc-ci.example","aud":"abc-engine:ENG-05",
-             "sub":self.client_uri,"engine_id":engine,
+        claims={"iss":"https://issuer.abc-ci.example","aud":"abc-engine:"+self.target_engine,
+             "sub":self.client_uri,"engine_id":engine or self.source_engine,
              "consumer_id":consumer or self.consumer,"token_use":"service",
              "iat":int(self.now.timestamp()),"nbf":int(self.now.timestamp()),
              "exp":int(self.now.timestamp())+expires,

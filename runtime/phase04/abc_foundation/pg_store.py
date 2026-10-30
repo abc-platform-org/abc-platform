@@ -161,6 +161,55 @@ class PostgresStore:
         return False
 
 
+    def authorize_capture_preflight(self, principal, session_id, expected_version):
+        """ENG-02 guard for a FUTURE media ingress. Never returns a capture token.
+
+        This read-only check does not enable media storage or remove the need
+        for a same-transaction authorization check in a future upload writer.
+        """
+        if type(expected_version) is not int or expected_version < 0:
+            raise DomainError(400, "expected_version_required")
+        try:
+            sid = uuid.UUID(session_id)
+        except (ValueError, TypeError, AttributeError):
+            raise DomainError(404, "not_found") from None
+        issuer, sub = self._principal(principal)
+        with self._connect() as con:
+            scopes = self._memberships(con, principal)
+            for scope in scopes:
+                self._scope(con, issuer, sub, scope["tenant_id"], scope["branch_id"])
+                verified = con.execute("""
+                    SELECT ce.consent_id
+                    FROM abc.sessions s
+                    JOIN abc.consent_evidence ce
+                      ON ce.session_id=s.session_id
+                      AND ce.tenant_id=s.tenant_id
+                      AND ce.branch_id=s.branch_id
+                      AND ce.client_id=s.client_id
+                    WHERE s.session_id=%s AND s.tenant_id=%s AND s.branch_id=%s
+                      AND s.specialist_id=%s AND s.client_id IS NOT NULL
+                      AND s.state='CREATED' AND s.state_version=%s
+                      AND ce.status='ACTIVE' AND ce.verified_at IS NOT NULL
+                      AND ce.revoked_at IS NULL AND ce.valid_until IS NOT NULL
+                      AND ce.valid_until>clock_timestamp()
+                      AND ce.evidence_digest<>'' AND ce.retention_policy_id<>''
+                      AND ce.purpose @> ARRAY['CAPTURE','AI_PROCESSING']::text[]
+                    LIMIT 1
+                """, (sid,scope["tenant_id"],scope["branch_id"],
+                      sub,expected_version)).fetchone()
+                if verified:
+                    # Explicitly not a bearer capability: the upload interface
+                    # remains absent. The future writer must recheck in its
+                    # own atomic persisted-write transaction under ENG-14.
+                    return {"consent_checked": True,
+                            "capture_authorized": False,
+                            "customer_media_accepted": False,
+                            "session_id": str(sid),
+                            "state_version": expected_version,
+                            "next_step": "BLOCKED_PENDING_CAPTURE_IMPLEMENTATION"}
+        raise DomainError(403, "pre_capture_consent_or_session_denied")
+
+
     def checkpoint_command(self, principal, session_id, action, expected_version, key):
         """Postgres-backed internal CREATED ↔ PAUSED checkpoint with CAS and replay.
 

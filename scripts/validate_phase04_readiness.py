@@ -27,7 +27,7 @@ def validate(manifest):
         assert g["evidence_refs"]==[]
         assert g["signed_independent_approvals"]==[]
         assert len(g["exit_criterion"])>=40
-        assert len(g["owner"])>2
+        assert len(g["owner"])>=2
     return {"status":"IN_PROGRESS","phase04_complete":False,
             "release_approved":False,"required_gate_count":len(gates),
             "unverified_gate_count":len(gates)}

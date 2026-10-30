@@ -1,0 +1,367 @@
+{
+  "schema_version": "abc.engine19-gate-matrix.v0.review",
+  "as_of": "2026-10-30",
+  "scope": "IN_SALON_SHARED_SCREEN",
+  "decision_status": "UNSIGNED_BASELINE_NO_COMPLETIONS",
+  "gate_policy": "governance/engine_quality_policy.v1.json",
+  "required_gates": [
+    "G01_ARCHITECTURE",
+    "G02_DOMAIN_CAPABILITY",
+    "G03_CONTRACTS",
+    "G04_INDEPENDENCE",
+    "G05_SECURITY_PRIVACY",
+    "G06_RELIABILITY",
+    "G07_PERFORMANCE",
+    "G08_PROFESSIONAL_VALIDATION",
+    "G09_OBSERVABILITY_OPERATIONS",
+    "G10_INDEPENDENT_SIGNOFF"
+  ],
+  "completion_count": 0,
+  "open_gate_count": 190,
+  "independent_attestation_issuer_provisioned": false,
+  "customer_release_approved": false,
+  "engines": [
+    {
+      "engine_id": "ENG-01",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-02",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-03",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-04",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-05",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-06",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-07",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-08",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-09",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-10",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-11",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-12",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-13",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-14",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-15",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-16",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-17",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-18",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    },
+    {
+      "engine_id": "ENG-19",
+      "gate_status": {
+        "G01_ARCHITECTURE": "OPEN",
+        "G02_DOMAIN_CAPABILITY": "OPEN",
+        "G03_CONTRACTS": "OPEN",
+        "G04_INDEPENDENCE": "OPEN",
+        "G05_SECURITY_PRIVACY": "OPEN",
+        "G06_RELIABILITY": "OPEN",
+        "G07_PERFORMANCE": "OPEN",
+        "G08_PROFESSIONAL_VALIDATION": "OPEN",
+        "G09_OBSERVABILITY_OPERATIONS": "OPEN",
+        "G10_INDEPENDENT_SIGNOFF": "OPEN"
+      },
+      "evidence_refs": {},
+      "signed_reviews": {},
+      "completion_signed": false
+    }
+  ]
+}

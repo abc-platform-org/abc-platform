@@ -147,6 +147,69 @@ class PostgresRuntimeTests(unittest.TestCase):
                     revoked_at=now() WHERE consent_id=%s""",(consent_id,))
         self.assertFalse(self.store.has_verified_consent(self.principal,sid,"AI_PROCESSING"))
 
+    def test_precapture_requires_current_session_and_both_active_purposes(self):
+        client="synthetic-client-"+uuid.uuid4().hex[:12]
+        s=self.store.create(self.principal,{**self.body(),"client_id":client},
+                            "capture-guard-01")
+        sid=s["session_id"]
+        with self.assertRaises(DomainError) as denied:
+            self.store.authorize_capture_preflight(self.principal,sid,0)
+        self.assertEqual(denied.exception.code,"pre_capture_consent_or_session_denied")
+        consent=uuid.uuid4()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.consent_evidence(
+              consent_id,tenant_id,branch_id,session_id,client_id,status,
+              purpose,evidence_digest,disclosure_version,retention_policy_id)
+              VALUES(%s,%s,%s,%s,%s,'PENDING_VERIFICATION',
+              ARRAY['CAPTURE']::text[],%s,'CI-DISCLOSURE','CI-RETENTION')""",
+              (consent,self.tenant,self.branch,sid,client,"e"*64))
+            con.execute("""UPDATE abc.consent_evidence SET status='ACTIVE',
+              verified_at=clock_timestamp(),
+              valid_until=clock_timestamp()+interval '1 hour'
+              WHERE consent_id=%s""",(consent,))
+        # CAPTURE alone is insufficient for an AI Studio image.
+        with self.assertRaises(DomainError):
+            self.store.authorize_capture_preflight(self.principal,sid,0)
+        # Database permits only one live consent per session. Withdraw
+        # CAPTURE-only proof before issuing a separately scoped dual-purpose
+        # proof; never weaken the immutable-purpose or uniqueness controls.
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.consent_evidence SET status='WITHDRAWN',
+              revoked_at=clock_timestamp() WHERE consent_id=%s""",(consent,))
+        paired=uuid.uuid4()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.consent_evidence(
+              consent_id,tenant_id,branch_id,session_id,client_id,status,
+              purpose,evidence_digest,disclosure_version,retention_policy_id)
+              VALUES(%s,%s,%s,%s,%s,'PENDING_VERIFICATION',
+              ARRAY['CAPTURE','AI_PROCESSING']::text[],%s,'CI-DISCLOSURE','CI-RETENTION')""",
+              (paired,self.tenant,self.branch,sid,client,"f"*64))
+            con.execute("""UPDATE abc.consent_evidence SET status='ACTIVE',
+              verified_at=clock_timestamp(),
+              valid_until=clock_timestamp()+interval '1 hour'
+              WHERE consent_id=%s""",(paired,))
+        preflight=self.store.authorize_capture_preflight(self.principal,sid,0)
+        self.assertTrue(preflight["consent_checked"])
+        self.assertFalse(preflight["capture_authorized"])
+        self.assertFalse(preflight["customer_media_accepted"])
+        with self.assertRaises(DomainError):
+            self.store.authorize_capture_preflight(self.principal,sid,1)
+        with self.assertRaises(DomainError):
+            self.store.authorize_capture_preflight(Principal("outsider",ISS),sid,0)
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.consent_evidence SET status='WITHDRAWN',
+              revoked_at=clock_timestamp() WHERE consent_id=%s""",(paired,))
+        with self.assertRaises(DomainError):
+            self.store.authorize_capture_preflight(self.principal,sid,0)
+
+    def test_precapture_rejects_invalid_version_and_session(self):
+        s=self.create("capture-guard-02")
+        for v in (-1,True,"0",None):
+            with self.subTest(v=v),self.assertRaises(DomainError):
+                self.store.authorize_capture_preflight(self.principal,s["session_id"],v)
+        with self.assertRaises(DomainError):
+            self.store.authorize_capture_preflight(self.principal,"not-a-uuid",0)
+
     def test_pg_consent_wrong_client_or_session_cannot_authorize_image(self):
         s=self.store.create(self.principal,{**self.body(),"client_id":"client-A"},"consent-intent-2")
         with psycopg.connect(ADMIN) as con:

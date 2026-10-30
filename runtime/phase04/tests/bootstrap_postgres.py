@@ -40,4 +40,13 @@ with psycopg.connect(dsn,autocommit=True) as con:
     assert flags==(True,False,False,False),flags
     group=con.execute("SELECT rolcanlogin FROM pg_roles WHERE rolname='abc_pipeline_worker'").fetchone()
     assert group==(False,),group
-print("PASS: core PostgreSQL migrations and isolated physical ENG05 CI login; permission group NOLOGIN")
+    # A second physical identity is deliberately independent of ENG05.
+    # No production issuer, service endpoint or managed credential is created.
+    con.execute("""CREATE ROLE abc_eng06_ci_login LOGIN NOINHERIT
+        NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS
+        PASSWORD 'integration-only-eng06-review-login'""")
+    con.execute("GRANT abc_eng06_review_worker TO abc_eng06_ci_login")
+    assert con.execute("""SELECT rolcanlogin,rolsuper,rolbypassrls,rolinherit
+      FROM pg_roles WHERE rolname='abc_eng06_ci_login'""").fetchone()==(True,False,False,False)
+    assert con.execute("SELECT rolcanlogin FROM pg_roles WHERE rolname='abc_eng06_review_worker'").fetchone()==(False,)
+print("PASS: core PostgreSQL migrations and isolated ENG05/ENG06 physical CI logins; permission groups NOLOGIN")

@@ -61,6 +61,13 @@ REVOKE ALL ON FUNCTION abc.eng14_claim_v2_jti(
   text,text,text,uuid,timestamptz) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION abc.eng14_claim_v2_jti(
   text,text,text,uuid,timestamptz) TO abc_app;
+DO $owner_policy$ BEGIN
+  IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='abc_staging_migrator') THEN
+    CREATE POLICY eng14_replay_operator_policy
+      ON abc.eng14_v2_replay_ledger FOR ALL TO abc_staging_migrator
+      USING(true) WITH CHECK(true);
+  END IF;
+END $owner_policy$;
 -- GC is operator-controlled only, with explicitly reviewed retention.
 -- Runtime cannot clean/reuse tokens during a multi-replica race.
 COMMIT;

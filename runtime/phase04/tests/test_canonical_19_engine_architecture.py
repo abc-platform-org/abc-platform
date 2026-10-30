@@ -25,6 +25,7 @@ class Canonical19ArchitectureTests(unittest.TestCase):
         self.assertEqual(result["external_gates"],7)
         self.assertEqual(result["engine_complete"],0)
         self.assertEqual(result["legacy_port_adapters_unmigrated"],5)
+        self.assertEqual(result["open_engine_quality_gates"],190)
         self.assertFalse(result["runtime_dispatch_authorized"])
 
     def test_loss_of_engine_owner_and_fake_completion_rejected(self):
@@ -39,6 +40,26 @@ class Canonical19ArchitectureTests(unittest.TestCase):
             lambda a:a[0]["legacy_compatibility"][1].update(status="MIGRATED"),
             lambda a:a[0]["legacy_compatibility"][1].update(
                 canonical_capability_owners=["ENG-04"]),
+        ]
+        for mutate in mutations:
+            with self.subTest(mutate=str(mutate)):
+                a=copy.deepcopy(self.a)
+                mutate(a)
+                with self.assertRaises(AssertionError):
+                    validate(*a)
+
+    def test_all_190_quality_slots_block_false_completion(self):
+        mutations=[
+            lambda a:a[4].update(open_gate_count=189),
+            lambda a:a[4]["engines"][5]["gate_status"].update(
+                G08_PROFESSIONAL_VALIDATION="COMPLETE"),
+            lambda a:a[4]["engines"][10].update(completion_signed=True),
+            lambda a:a[4]["engines"][15]["signed_reviews"].update(
+                G01_ARCHITECTURE="fake-approval"),
+            lambda a:a[4]["engines"][2]["gate_status"].pop(
+                "G02_DOMAIN_CAPABILITY"),
+            lambda a:a[4].update(
+                independent_attestation_issuer_provisioned=True),
         ]
         for mutate in mutations:
             with self.subTest(mutate=str(mutate)):

@@ -38,7 +38,7 @@ def _canonical(payload):
 
 class ProfessionalSourceRegistry:
     def __init__(self,*,pinned_public_keys,qualified_reviewers,
-                 signed_records,revoked_refs=(),clock=None):
+                 signed_records,approved_content,revoked_refs=(),clock=None):
         """All arguments MUST come from independently governed trust storage.
 
         Supplying test-generated pins verifies only test fixtures. Neither a
@@ -47,6 +47,7 @@ class ProfessionalSourceRegistry:
         if (not isinstance(pinned_public_keys,dict) or not pinned_public_keys
             or not isinstance(qualified_reviewers,dict)
             or not isinstance(signed_records,dict)
+            or not isinstance(approved_content,dict)
             or not isinstance(revoked_refs,(list,tuple,set,frozenset))):
             raise ValueError("unprovisioned_external_trust_registry")
         self.keys={}
@@ -57,6 +58,7 @@ class ProfessionalSourceRegistry:
             self.keys[issuer]=Ed25519PublicKey.from_public_bytes(key)
         self.reviewers=qualified_reviewers
         self.records=signed_records
+        self.content=approved_content
         self.revoked=frozenset(revoked_refs)
         self.clock=clock if clock is not None else lambda: datetime.now(timezone.utc)
 
@@ -79,6 +81,11 @@ class ProfessionalSourceRegistry:
             or (digest is not None and record["content_digest"]!=digest)
             or not isinstance(record["content_digest"],str)
             or not _DIGEST.fullmatch(record["content_digest"])):
+            return False
+        material=self.content.get(ref)
+        if (type(material) is not bytes
+            or not 1<=len(material)<=2*1024*1024
+            or hashlib.sha256(material).hexdigest()!=record["content_digest"]):
             return False
         issuer=record["issuer_id"]
         key=self.keys.get(issuer)
@@ -117,12 +124,12 @@ class SignedKnowledgePolicyGate:
 
     def verify(self,**claims):
         if (not self.policy or not callable(getattr(self.policy,"verify",None))
-            or not self.policy.verify(
+            or self.policy.verify(
                 tenant_id=claims["tenant_id"],branch_id=claims["branch_id"],
                 session_id=claims["session_id"],
                 state_version=claims["state_version"],
                 recommendation_ref=claims["recommendation_ref"],
-                policy_gate=claims["policy_gate"])):
+                policy_gate=claims["policy_gate"]) is not True):
             return False
         sources=claims["knowledge_sources"]
         if not isinstance(sources,list) or not sources:

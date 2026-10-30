@@ -1,0 +1,694 @@
+{
+  "schema_version": "abc.workflow19.v0.review",
+  "date": "2026-10-30",
+  "decision_status": "PROPOSED_FOR_ARCHITECTURE_OWNER_REVIEW",
+  "workflow_id": "ABC_IN_SALON_AI_STUDIO_WITH_PROFESSIONAL_HANDOFF",
+  "workflow_version": "abc.workflow19.v0.review",
+  "contract_version": "abc.internal.capability.v3.review",
+  "environment": "SPEC_ONLY_NO_CUSTOMER_EXECUTION",
+  "logical_orchestrator": "ENG-01",
+  "independent_policy_owner": "ENG-14",
+  "product_scope": "IN_SALON_SHARED_SCREEN",
+  "entry": "ENG-02",
+  "core_final": "ENG-17",
+  "optional_downstream": [
+    "ENG-18",
+    "ENG-19"
+  ],
+  "ordered_stages": [
+    {
+      "stage_id": "S01",
+      "owner_engine": "ENG-02",
+      "input_from": [],
+      "output_artifact": "PURPOSE_BOUND_CONSULTATION_EVIDENCE",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S02",
+      "owner_engine": "ENG-03",
+      "input_from": [
+        "ENG-02"
+      ],
+      "output_artifact": "TRACEABLE_EVIDENCE_PACKAGE",
+      "requires_gates": [
+        "GATE_P0_CONSENT"
+      ],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S03",
+      "owner_engine": "ENG-04",
+      "input_from": [
+        "ENG-03"
+      ],
+      "output_artifact": "BEAUTY_ANALYSIS_REPORT",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S04",
+      "owner_engine": "ENG-05",
+      "input_from": [
+        "ENG-04"
+      ],
+      "output_artifact": "PROFESSIONAL_KNOWLEDGE_BUNDLE",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S05",
+      "owner_engine": "ENG-06",
+      "input_from": [
+        "ENG-05"
+      ],
+      "output_artifact": "AUDITABLE_RECOMMENDATION_DECISION",
+      "requires_gates": [
+        "GATE_P2_DECISION"
+      ],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S06",
+      "owner_engine": "ENG-07",
+      "input_from": [
+        "ENG-06"
+      ],
+      "output_artifact": "VERSIONED_LOOK_SPECIFICATION",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S07",
+      "owner_engine": "ENG-08",
+      "input_from": [
+        "ENG-07"
+      ],
+      "output_artifact": "AUTHORIZED_REGION_MASK_SET",
+      "requires_gates": [
+        "GATE_P1_VISUAL"
+      ],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S08",
+      "owner_engine": "ENG-09",
+      "input_from": [
+        "ENG-08"
+      ],
+      "output_artifact": "DRAFT_VISUAL_VARIANT",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S09",
+      "owner_engine": "ENG-10",
+      "input_from": [
+        "ENG-09"
+      ],
+      "output_artifact": "COMPOSITED_PREVIEW",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S10",
+      "owner_engine": "ENG-11",
+      "input_from": [
+        "ENG-10"
+      ],
+      "output_artifact": "MASKED_VISUAL_QA_REPORT",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S11",
+      "owner_engine": "ENG-12",
+      "input_from": [
+        "ENG-11"
+      ],
+      "output_artifact": "IMMUTABLE_LOOK_VERSION_AND_LOCK",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S12",
+      "owner_engine": "ENG-13",
+      "input_from": [
+        "ENG-12"
+      ],
+      "output_artifact": "EVIDENCE_GATED_FEASIBILITY_REPORT",
+      "requires_gates": [
+        "GATE_P3_SELECTED_LOOK_LOCK"
+      ],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S13",
+      "owner_engine": "ENG-15",
+      "input_from": [
+        "ENG-13"
+      ],
+      "output_artifact": "SPECIALIST_REVIEWABLE_TECHNICAL_PLAN",
+      "requires_gates": [
+        "GATE_P4_TECHNICAL_SOP"
+      ],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S14",
+      "owner_engine": "ENG-16",
+      "input_from": [
+        "ENG-15"
+      ],
+      "output_artifact": "SIGNED_SPECIALIST_VALIDATION",
+      "requires_gates": [],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S15",
+      "owner_engine": "ENG-17",
+      "input_from": [
+        "ENG-16"
+      ],
+      "output_artifact": "AUTHORIZED_OPERATIONAL_HANDOFF",
+      "requires_gates": [
+        "GATE_P5_OPERATIONAL_HANDOFF"
+      ],
+      "mode": "CORE_IN_SALON_FLOW",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S16",
+      "owner_engine": "ENG-18",
+      "input_from": [
+        "ENG-17"
+      ],
+      "output_artifact": "AUDITABLE_SALON_KPI_FACTS",
+      "requires_gates": [],
+      "mode": "OPTIONAL_ASYNC_BUSINESS_DOWNSTREAM",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    },
+    {
+      "stage_id": "S17",
+      "owner_engine": "ENG-19",
+      "input_from": [
+        "ENG-18"
+      ],
+      "output_artifact": "POLICY_APPROVED_SALON_ACTION",
+      "requires_gates": [
+        "GATE_P6_BUSINESS_AUTOMATION"
+      ],
+      "mode": "OPTIONAL_ASYNC_BUSINESS_DOWNSTREAM",
+      "execution_status": "CONTRACT_ONLY_NOT_LIVE",
+      "runtime_authorized": false,
+      "customer_media_allowed": false,
+      "version": "abc.internal.capability.v3.review"
+    }
+  ],
+  "handoffs": [
+    {
+      "from": "ENG-02",
+      "to": "ENG-03",
+      "artifact": "PURPOSE_BOUND_CONSULTATION_EVIDENCE",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-03",
+      "to": "ENG-04",
+      "artifact": "TRACEABLE_EVIDENCE_PACKAGE",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-04",
+      "to": "ENG-05",
+      "artifact": "BEAUTY_ANALYSIS_REPORT",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-05",
+      "to": "ENG-06",
+      "artifact": "PROFESSIONAL_KNOWLEDGE_BUNDLE",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-06",
+      "to": "ENG-07",
+      "artifact": "AUDITABLE_RECOMMENDATION_DECISION",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-07",
+      "to": "ENG-08",
+      "artifact": "VERSIONED_LOOK_SPECIFICATION",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-08",
+      "to": "ENG-09",
+      "artifact": "AUTHORIZED_REGION_MASK_SET",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-09",
+      "to": "ENG-10",
+      "artifact": "DRAFT_VISUAL_VARIANT",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-10",
+      "to": "ENG-11",
+      "artifact": "COMPOSITED_PREVIEW",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-11",
+      "to": "ENG-12",
+      "artifact": "MASKED_VISUAL_QA_REPORT",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-12",
+      "to": "ENG-13",
+      "artifact": "IMMUTABLE_LOOK_VERSION_AND_LOCK",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-13",
+      "to": "ENG-15",
+      "artifact": "EVIDENCE_GATED_FEASIBILITY_REPORT",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-15",
+      "to": "ENG-16",
+      "artifact": "SPECIALIST_REVIEWABLE_TECHNICAL_PLAN",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-16",
+      "to": "ENG-17",
+      "artifact": "SIGNED_SPECIALIST_VALIDATION",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-17",
+      "to": "ENG-18",
+      "artifact": "AUTHORIZED_OPERATIONAL_HANDOFF",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-18",
+      "to": "ENG-19",
+      "artifact": "AUDITABLE_SALON_KPI_FACTS",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    }
+  ],
+  "required_policy_gates": [
+    {
+      "gate_id": "GATE_P0_CONSENT",
+      "before_engine": "ENG-03",
+      "authority_engine": "ENG-14",
+      "requires": "CAPTURE_AND_AI_PROCESSING_CONSENT_ACTIVE_WITH_NONREVOKED_PURPOSE_PROOF",
+      "verification_status": "UNPROVISIONED",
+      "skip_allowed": false
+    },
+    {
+      "gate_id": "GATE_P1_VISUAL",
+      "before_engine": "ENG-08",
+      "authority_engine": "ENG-14",
+      "requires": "SCOPED_IMAGE_HANDLES_AND_SOURCE_REFERENCE_MASK_ISOLATION",
+      "verification_status": "UNPROVISIONED",
+      "skip_allowed": false
+    },
+    {
+      "gate_id": "GATE_P2_DECISION",
+      "before_engine": "ENG-06",
+      "authority_engine": "ENG-14",
+      "requires": "SIGNED_CURRENT_KNOWLEDGE_AND_CRITICAL_UNKNOWN_POLICY",
+      "verification_status": "UNPROVISIONED",
+      "skip_allowed": false
+    },
+    {
+      "gate_id": "GATE_P3_SELECTED_LOOK_LOCK",
+      "before_engine": "ENG-13",
+      "authority_engine": "ENG-01",
+      "requires": "SPECIALIST_AND_CLIENT_CONFIRM_SELECTED_LOOK_WITH_CAS_AND_CURRENT_CONSENT",
+      "verification_status": "UNPROVISIONED",
+      "skip_allowed": false
+    },
+    {
+      "gate_id": "GATE_P4_TECHNICAL_SOP",
+      "before_engine": "ENG-15",
+      "authority_engine": "ENG-14",
+      "requires": "SERVICE_SPECIFIC_SIGNED_SOP_CURRENT_FEASIBILITY_AND_SPECIALIST_CAPABILITY",
+      "verification_status": "UNPROVISIONED",
+      "skip_allowed": false
+    },
+    {
+      "gate_id": "GATE_P5_OPERATIONAL_HANDOFF",
+      "before_engine": "ENG-17",
+      "authority_engine": "ENG-14",
+      "requires": "INDEPENDENT_SPECIALIST_APPROVAL_SIGNED_CONSENT_AND_NONREVOKED_DECISION",
+      "verification_status": "UNPROVISIONED",
+      "skip_allowed": false
+    },
+    {
+      "gate_id": "GATE_P6_BUSINESS_AUTOMATION",
+      "before_engine": "ENG-19",
+      "authority_engine": "ENG-14",
+      "requires": "BUSINESS_PURPOSE_CONSENT_POLICY_APPROVAL_IDEMPOTENT_ACTION_NO_AUTO_TREATMENT",
+      "verification_status": "UNPROVISIONED",
+      "skip_allowed": false
+    }
+  ],
+  "exception_routes": [
+    {
+      "from": "ANY_PROCESSING_STAGE",
+      "to": "ENG-01",
+      "action": "PAUSE_AND_PERSIST_CHECKPOINT",
+      "requires_eng14": true,
+      "status": "NOT_IMPLEMENTED_FOR_FULL_SCOPE"
+    },
+    {
+      "from": "ANY_PROCESSING_STAGE",
+      "to": "ENG-14",
+      "action": "DENY_REVOKE_CANCEL_SENSITIVE_JOBS",
+      "requires_eng14": true,
+      "status": "PARTIAL_SYNTHETIC_CI_ONLY"
+    },
+    {
+      "from": "ENG-11",
+      "to": "ENG-07",
+      "action": "SPECIALIST_REQUESTED_REVISION_NEW_VERSION_ONLY",
+      "max_revision_count": 3,
+      "requires_selected_look_unlock": true,
+      "status": "PROPOSED_NOT_EXECUTABLE"
+    },
+    {
+      "from": "ENG-16",
+      "to": "ENG-15",
+      "action": "NEEDS_REVISION_BEFORE_ANY_HANDOFF",
+      "max_revision_count": 3,
+      "status": "PROPOSED_NOT_EXECUTABLE"
+    }
+  ],
+  "global_controls": [
+    "NO_IMPLICIT_V1_V2_TO_V3_ROUTING",
+    "NO_RAW_UNSCOPED_CUSTOMER_MEDIA",
+    "NO_AUTOMATIC_TREATMENT_EXECUTION",
+    "NO_UNSIGNED_SPECIALIST_HANDOFF",
+    "REFUSE_STALE_STATE_VERSION",
+    "CONSENT_REVOKE_CANCELS_DOWNSTREAM",
+    "OPTIONAL_BI_OR_AUTOMATION_CANNOT_BLOCK_IN_SALON_CORE",
+    "NO_LOOK_LOCK_FROM_MODEL_ONLY"
+  ],
+  "flow_complete": false,
+  "professional_validation_complete": false,
+  "private_network_e2e_complete": false
+}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <title>ABC AI Studio — Synthetic Design Preview</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div><b class="brand">ABC<span> / AI STUDIO</span></b><small>نمونه رابط داخلی | طراحی بدون داده مشتری</small></div>
+    <div class="top-meta"><span class="pill">جلسه: DEMO-SYNTHETIC-001</span><span class="pill amber">گیت‌های حرفه‌ای: تأییدنشده</span></div>
+  </header>
+  <div class="banner" role="status">PROTOTYPE — هیچ مدل هوش مصنوعی، پردازش تصویر، ذخیره‌سازی، رضایت مشتری یا برنامه فنی واقعی در این صفحه اجرا نمی‌شود.</div>
+  <div class="modes" aria-label="حالت‌های AI Studio">
+    <button type="button" data-mode="transform" class="active">Transform</button>
+    <button type="button" data-mode="tryon">Try On</button>
+    <button type="button" data-mode="compare">Compare</button>
+    <button type="button" data-mode="inspiration">Inspiration</button>
+    <button type="button" data-mode="plan">Technical Plan</button>
+  </div>
+  <main class="layout">
+    <aside class="panel controls" aria-label="Input &amp; Controls">
+      <div class="eyebrow">01 — Input & Controls</div>
+      <h2>اطلاعات جلسه</h2>
+      <div class="statbox"><b>مراجعه‌کننده آزمایشی</b><small>صرفاً داده مصنوعی — بدون تصویر واقعی</small><span class="pill">جلسه حضوری مشترک</span></div>
+      <label for="service">نوع خدمت</label>
+      <select id="service"><option value="HAIR_COLOR">رنگ مو</option><option value="HAIRCUT">کوتاهی مو</option><option value="MAKEUP">میکاپ</option></select>
+      <h3>محدوده ویرایش</h3>
+      <label class="switch"><input id="hair" type="checkbox" checked> مو — مجاز در طرح آزمایشی</label>
+      <label class="switch"><input id="skin" type="checkbox"> پوست — قفل بماند</label>
+      <label class="switch"><input id="face" type="checkbox" checked disabled> حفظ هویت چهره — اجباری</label>
+      <div class="statbox"><b>کیفیت تصویر</b><span class="flag amber">NOT VERIFIED</span><small>هیچ تصویر واقعی دریافت یا بررسی نشده است</small></div>
+      <div class="statbox"><b>Evidence & Uncertainty</b><small id="evidence-text">سابقه مواد شیمیایی: نامشخص</small><small>رضایت قابل‌استناد: موجود نیست</small></div>
+      <button id="reset" type="button" class="secondary full">بازنشانی نمونه</button>
+    </aside>
+    <section class="panel canvas" aria-label="Visual Canvas">
+      <div class="section-header"><div><div class="eyebrow">02 — Visual Canvas</div><h2>مقایسه ظاهر</h2></div><span class="pill" id="canvas-mode">Transform / Demo</span></div>
+      <div class="visual-grid">
+        <article class="visual before"><div class="visual-label">V0 — Before</div><div class="portrait"><div class="halo"></div><div class="hair-shape"></div><div class="face-shape"></div><div class="shoulders"></div></div><p>چهره و ظاهر نمونه — شماتیک</p></article>
+        <article class="visual after"><div class="visual-label">V1 — Proposed Look</div><div class="portrait"><div class="halo"></div><div class="hair-shape" id="after-hair"></div><div class="face-shape"></div><div class="shoulders"></div></div><p id="look-caption">قهوه‌ای سرد — نمونه</p></article>
+      </div>
+      <div class="canvas-footer"><span id="region-label">Region lock: FACE + BACKGROUND</span><span>Identity fidelity: NOT TESTED</span></div>
+      <div class="warning" role="status" id="canvas-warning">این شکل‌ها پیش‌نمایش شماتیک هستند، نه نتیجه تولیدشده از عکس مراجعه‌کننده.</div>
+      <section class="process">
+        <h3>جریان جلسه حضوری</h3>
+        <div class="steps"><span class="done">دریافت و مشاوره</span><span>پیشنهادهای نمونه</span><span>انتخاب Look</span><span>تأیید متخصص</span><span>تحویل برنامه</span></div>
+      </section>
+    </section>
+    <aside class="panel workspace" aria-label="Look Workspace">
+      <div class="eyebrow">03 — Look Workspace</div><h2>نسخه‌ها و گزینه‌ها</h2>
+      <div class="looks" id="looks" role="group" aria-label="گزینه‌های آزمایشی">
+        <button type="button" data-look="cool" aria-pressed="true" class="look active"><i class="swatch cool"></i><span><b>V1 — قهوه‌ای سرد</b><small>نمونه نمایشی · بررسی‌نشده</small></span></button>
+        <button type="button" data-look="warm" aria-pressed="false" class="look"><i class="swatch warm"></i><span><b>V2 — مسی گرم</b><small>نمونه نمایشی · بررسی‌نشده</small></span></button>
+        <button type="button" data-look="dark" aria-pressed="false" class="look"><i class="swatch dark"></i><span><b>V3 — تیره طبیعی</b><small>نمونه نمایشی · بررسی‌نشده</small></span></button>
+      </div>
+      <div class="statbox"><b>Visual QA</b><span class="flag amber">NOT VERIFIED</span><small>هویت، ناحیه و واقع‌گرایی نیازمند ارزیابی تخصصی‌اند</small></div>
+      <button type="button" class="primary full" id="lock-look">انتخاب Look در نمونه آزمایشی</button>
+      <div class="statbox" aria-live="polite"><b>Selected Look Lock</b><small id="lock-status">هیچ گزینه‌ای انتخاب نشده</small></div>
+      <h3>Technical Planning</h3>
+      <div class="statbox danger"><b>ENG-06: BLOCKED</b><small id="plan-status">گزارش وضعیت: نبود رضایت معتبر، شواهد کافی و SOP تأییدشده.</small><small>اجرای خدمت / Operational Handoff: غیرمجاز</small></div>
+      <button type="button" class="secondary full" id="check-plan">بررسی گیت برنامه فنی</button>
+    </aside>
+  </main>
+  <footer>ABC · AIS-001..026 Design Reference · سه ستون · بدون شبکه، API، ذخیره‌سازی یا داده واقعی</footer>
+</body>
+</html>

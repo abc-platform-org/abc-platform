@@ -141,6 +141,19 @@ CMD ["postgres","-c","ssl=on","-c","ssl_min_protocol_version=TLSv1.3","-c","ssl_
                   " dbname=abc_mtls_ci user=abc_api_ci "+
                   "sslmode=verify-full sslrootcert="+str(root/"ca.crt")+" ")
             good=base+"sslcert="+str(root/"client.crt")+" sslkey="+str(root/"client.key")
+            # The official PG image briefly starts an init server, stops it,
+            # then starts the final TLS listener. An SQL role check against
+            # the init server alone is not proof the final listener is ready.
+            # Keep the real TLS+clientcert handshake; only retry startup race.
+            for attempt in range(30):
+                try:
+                    probe=psycopg.connect(good,connect_timeout=2)
+                    probe.close()
+                    break
+                except psycopg.OperationalError:
+                    time.sleep(0.2)
+            else:
+                raise AssertionError("final_tls_postgres_not_ready")
             with psycopg.connect(good,connect_timeout=4) as con:
                 cert=con.execute("""SELECT ssl,version,client_dn,issuer_dn,
                     client_serial FROM pg_stat_ssl WHERE pid=pg_backend_pid()""").fetchone()

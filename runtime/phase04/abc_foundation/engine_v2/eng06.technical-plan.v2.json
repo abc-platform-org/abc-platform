@@ -34,7 +34,8 @@
       "current_state_evidence_ids",
       "professional_findings",
       "approved_sop_ref",
-      "consent_status"
+      "consent_status",
+      "consent_proof_digest"
     ],
     "properties": {
       "service_kind": {
@@ -181,8 +182,16 @@
         "enum": [
           "MISSING",
           "REVOKED",
-          "REQUIRES_VERIFICATION"
+          "REQUIRES_VERIFICATION",
+          "VERIFIED_BY_ENG14"
         ]
+      },
+      "consent_proof_digest": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^[a-f0-9]{64}$"
       }
     }
   },

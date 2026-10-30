@@ -464,3 +464,53 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 with psycopg.connect(dsn) as con:
                     con.execute("SELECT * FROM abc.eng19_synthetic_jobs")
+
+    def test_source_artifact_tamper_is_rejected_before_job_creation(self):
+        worker,source,message=self._synthetic_job()
+        forged={**source,"service_scope":"REAL_CUSTOMER"}
+        another={**message,"handoff_id":str(uuid.uuid4())}
+        denied=send_local_review_handoff(
+            port=self.listeners[0].server_address[1],token=self.fixture.token(),
+            message=another,source_artifact=forged,
+            client_cert=self.fixture.client_cert,
+            client_key=self.fixture.client_key,server_ca=self.fixture.ca_path)
+        self.assertEqual(denied["status"],"REJECTED")
+        with psycopg.connect(self.admin) as con:
+            self.assertEqual(con.execute(
+                 "SELECT count(*) FROM abc.eng19_synthetic_jobs WHERE handoff_id=%s",
+                 (another["handoff_id"],)).fetchone()[0],0)
+
+    def test_final_crashed_lease_is_reconciled_to_dlq(self):
+        worker,_,message=self._synthetic_job()
+        for attempt in range(3):
+            current=worker.claim()
+            self.assertIsNotNone(current)
+            with psycopg.connect(self.admin,autocommit=True) as con:
+                con.execute("""UPDATE abc.eng19_synthetic_jobs
+                     SET lease_until=clock_timestamp()-interval '1 second'
+                     WHERE handoff_id=%s""",(message["handoff_id"],))
+        self.assertIsNone(worker.claim())
+        with psycopg.connect(self.admin) as con:
+            row=con.execute("""SELECT status,attempts,failure_code
+                FROM abc.eng19_synthetic_jobs WHERE handoff_id=%s""",
+                (message["handoff_id"],)).fetchone()
+        self.assertEqual(row,("DLQ",3,"CI_LEASE_EXHAUSTED"))
+
+    def test_revoked_worker_binding_forbids_ack(self):
+        from abc_foundation.eng05_knowledge import SyntheticKnowledgeEngine
+        from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
+        worker,_,message=self._synthetic_job()
+        claim=worker.claim()
+        with psycopg.connect(self.admin,autocommit=True) as con:
+            con.execute("""UPDATE abc.eng03_worker_bindings SET active=false
+              WHERE worker_role='abc_pipeline_worker'
+                AND consumer_id=%s AND tenant_id='tenant-test'""",
+                (self.fixture.consumer,))
+        output=SyntheticKnowledgeEngine().resolve(
+            service_id=SYNTHETIC_SERVICE,fixture=None)
+        with self.assertRaises(DomainError):
+            worker.ack(claim,output,next_handoff_id=str(uuid.uuid4()))
+        with psycopg.connect(self.admin) as con:
+            self.assertEqual(con.execute("""SELECT count(*)
+                FROM abc.eng19_synthetic_outbox WHERE handoff_id=%s""",
+                (message["handoff_id"],)).fetchone()[0],0)

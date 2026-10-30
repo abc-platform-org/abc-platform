@@ -97,6 +97,10 @@ def validate_port(message,*,engine,response=False,request=None):
             if len({x["look_id"] for x in payload["candidate_looks"]})!=len(payload["candidate_looks"]):
                 raise DomainError(422,"v2_duplicate_look")
         if engine=="ENG-06":
+            verified=(payload["consent_status"]=="VERIFIED_BY_ENG14")
+            proof=payload["consent_proof_digest"]
+            if verified != (isinstance(proof,str) and bool(re.fullmatch(r"[0-9a-f]{64}",proof))):
+                raise DomainError(422,"v2_consent_status_and_proof_disagree")
             for key in ("selected_look_lock","decision_ref"):
                 ref=payload[key]
                 for f in ("session_id","tenant_id","branch_id","state_version"):
@@ -119,14 +123,25 @@ def validate_port(message,*,engine,response=False,request=None):
         output=[x["look_id"] for key in ("eligible_looks","excluded_looks") for x in payload[key]]
         if len(output)!=len(set(output)) or not set(output)<=inputs:
             raise DomainError(403,"v2_decision_candidate_fabrication")
-        if (request["payload"]["critical_unknowns"] or
+        unreviewed=not request["payload"]["knowledge_sources"] or any(
+            source["review_status"]!="SPECIALIST_REVIEWED"
+            for source in request["payload"]["knowledge_sources"])
+        if (request["payload"]["critical_unknowns"] or unreviewed or
             request["payload"]["policy_gate"]["decision"]=="BLOCK"):
             if payload["eligible_looks"] or payload["status"]!="BLOCKED":
                 raise DomainError(403,"v2_unsafe_eligibility")
-    if engine=="ENG-06" and (
-        request["payload"]["consent_status"]!="REQUIRES_VERIFICATION"
-        and payload["status"]=="DRAFT_REQUIRES_SPECIALIST_REVIEW"):
-        raise DomainError(403,"v2_consent_status_unfit_for_draft")
+    if engine=="ENG-06":
+        source=request["payload"]
+        missing=(source["consent_status"]!="VERIFIED_BY_ENG14"
+            or source["approved_sop_ref"] is None
+            or not source["professional_findings"]
+            or any(item["review_status"]!="SPECIALIST_RECORDED"
+                for item in source["professional_findings"]))
+        if missing and (payload["draft_plan"] is not None
+            or payload["status"]=="DRAFT_REQUIRES_SPECIALIST_REVIEW"):
+            raise DomainError(403,"v2_technical_plan_requires_verified_preconditions")
+        if payload["status"]=="DRAFT_REQUIRES_SPECIALIST_REVIEW" and payload["draft_plan"] is None:
+            raise DomainError(422,"v2_plan_draft_payload_missing")
     return {"valid":True,"dispatch_authorized":False,"release_approved":False}
 
 

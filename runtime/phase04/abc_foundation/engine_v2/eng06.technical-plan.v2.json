@@ -1,0 +1,303 @@
+{
+  "contract_id": "abc.internal.eng06.technical-plan.v2.draft",
+  "engine_id": "ENG-06",
+  "role": "TECHNICAL_PLANNING_INTELLIGENCE",
+  "status": "CONTRACT_DRAFT_NO_RUNTIME_RELEASE",
+  "upstream": [
+    "ENG-05",
+    "AI_STUDIO_LOOK_LOCK",
+    "ENG-14",
+    "SPECIALIST"
+  ],
+  "downstream": [
+    "SPECIALIST_REVIEW",
+    "OPERATIONAL_HANDOFF_ONLY_AFTER_EXTERNAL_AUTHORIZATION"
+  ],
+  "errors": [
+    "INVALID_CONTEXT",
+    "LOOK_NOT_LOCKED",
+    "LOOK_VERSION_STALE",
+    "DECISION_NOT_BOUND",
+    "CONSENT_NOT_VERIFIED",
+    "SOP_NOT_APPROVED",
+    "SPECIALIST_VALIDATION_MISSING",
+    "NOT_IMPLEMENTED"
+  ],
+  "request_payload_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "service_kind",
+      "selected_look_lock",
+      "decision_ref",
+      "current_state_evidence_ids",
+      "professional_findings",
+      "approved_sop_ref",
+      "consent_status"
+    ],
+    "properties": {
+      "service_kind": {
+        "enum": [
+          "HAIRCUT",
+          "HAIR_COLOR",
+          "BEARD",
+          "MAKEUP",
+          "NAILS",
+          "SKIN",
+          "EXTENSIONS",
+          "KERATIN",
+          "CORRECTIVE"
+        ]
+      },
+      "selected_look_lock": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "look_id",
+          "tenant_id",
+          "branch_id",
+          "session_id",
+          "state_version",
+          "locked_by_specialist_id",
+          "lock_event_id"
+        ],
+        "properties": {
+          "look_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 96
+          },
+          "branch_id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 96
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "locked_by_specialist_id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 96
+          },
+          "lock_event_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "decision_ref": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "engine_id",
+          "tenant_id",
+          "branch_id",
+          "session_id",
+          "state_version",
+          "digest"
+        ],
+        "properties": {
+          "engine_id": {
+            "const": "ENG-05"
+          },
+          "tenant_id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 96
+          },
+          "branch_id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 96
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "current_state_evidence_ids": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 64,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "professional_findings": {
+        "type": "array",
+        "maxItems": 32,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "finding_ref",
+            "review_status"
+          ],
+          "properties": {
+            "finding_ref": {
+              "type": "string",
+              "pattern": "^synthetic:[a-z0-9-]{3,64}$"
+            },
+            "review_status": {
+              "enum": [
+                "MISSING",
+                "UNVERIFIED",
+                "SPECIALIST_RECORDED"
+              ]
+            }
+          }
+        }
+      },
+      "approved_sop_ref": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^synthetic:[a-z0-9-]{3,64}$"
+      },
+      "consent_status": {
+        "enum": [
+          "MISSING",
+          "REVOKED",
+          "REQUIRES_VERIFICATION"
+        ]
+      }
+    }
+  },
+  "response_result_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "status",
+      "draft_plan",
+      "missing_requirements",
+      "professional_validation",
+      "operational_handoff_authorized",
+      "execution_authorized"
+    ],
+    "properties": {
+      "status": {
+        "enum": [
+          "BLOCKED",
+          "AWAITING_SPECIALIST_INPUT",
+          "DRAFT_REQUIRES_SPECIALIST_REVIEW"
+        ]
+      },
+      "draft_plan": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": false,
+        "required": [
+          "target_definition",
+          "baseline_assessment",
+          "procedure_strategy",
+          "step_sequence",
+          "tools_materials",
+          "quality_checkpoints",
+          "stop_conditions",
+          "time_resources",
+          "aftercare"
+        ],
+        "properties": {
+          "target_definition": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "baseline_assessment": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "procedure_strategy": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "step_sequence": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "tools_materials": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "maxLength": 160
+            }
+          },
+          "quality_checkpoints": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "stop_conditions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "time_resources": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "aftercare": {
+            "type": "string",
+            "maxLength": 500
+          }
+        }
+      },
+      "missing_requirements": {
+        "type": "array",
+        "maxItems": 32,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128
+        }
+      },
+      "professional_validation": {
+        "const": "NOT_VERIFIED"
+      },
+      "operational_handoff_authorized": {
+        "const": false
+      },
+      "execution_authorized": {
+        "const": false
+      }
+    }
+  }
+}

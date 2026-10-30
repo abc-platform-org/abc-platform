@@ -25,8 +25,9 @@ class DurableReplayLedgerTests(unittest.TestCase):
             raise unittest.SkipTest("CI-only PostgreSQL16 test fixture required")
         cls.tenant="replay-"+uuid.uuid4().hex
         cls.other="replay-"+uuid.uuid4().hex
+        cls.managed="replay-"+uuid.uuid4().hex
         with psycopg.connect(cls.admin,autocommit=True) as con:
-            for tenant in (cls.tenant,cls.other):
+            for tenant in (cls.tenant,cls.other,cls.managed):
                 con.execute("INSERT INTO abc.tenants(tenant_id) VALUES(%s)",(tenant,))
         cls.ledger=PostgresReplayLedger(PostgresStore(cls.app))
         cls.exp=datetime.now(timezone.utc)+timedelta(seconds=110)
@@ -35,8 +36,8 @@ class DurableReplayLedgerTests(unittest.TestCase):
         return self.ledger.claim(tenant_id=tenant or self.tenant,
              issuer="https://oidc.abc.example.test",
              audience="abc-engine-v2",
-             jti=jti or str(uuid.uuid4()),
-             expires_at=expires or self.exp)
+             jti=str(uuid.uuid4()) if jti is None else jti,
+             expires_at=self.exp if expires is None else expires)
 
     def test_first_token_passes_second_same_token_rejected(self):
         jti=str(uuid.uuid4())
@@ -100,7 +101,7 @@ class DurableReplayLedgerTests(unittest.TestCase):
         with psycopg.connect(self.admin,autocommit=True) as con:
             con.execute("""INSERT INTO abc.eng14_tenant_workload_mode
                  (tenant_id,managed_required,activated_at,activated_by)
-                 VALUES(%s,true,clock_timestamp(),'CI_TEST_ONLY')""",(self.other,))
+                 VALUES(%s,true,clock_timestamp(),'CI_TEST_ONLY')""",(self.managed,))
         with self.assertRaises(DomainError) as ctx:
-            self.claim(tenant=self.other,jti=str(uuid.uuid4()))
+            self.claim(tenant=self.managed,jti=str(uuid.uuid4()))
         self.assertEqual(ctx.exception.code,"distributed_replay_ledger_unavailable")

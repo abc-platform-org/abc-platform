@@ -1,6 +1,6 @@
 """Review physical PostgreSQL LOGIN after managed SET ROLE abc_app."""
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock,MagicMock
 
 from abc_foundation.staging_api import assert_staging_database
 
@@ -17,7 +17,7 @@ class ManagedDatabaseRoleAuditTests(unittest.TestCase):
                 cursor.fetchone.return_value={"rls":True,"forced":True}
             return cursor
         con.execute.side_effect=execute
-        store=Mock()
+        store=MagicMock()
         store._connect.return_value.__enter__.return_value=con
         return store
 

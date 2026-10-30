@@ -32,6 +32,7 @@ FILENAMES = (
     "0017_shared_managed_workload_gate.sql",
     "0018_eng14_distributed_replay_ledger.sql",
     "0019_eng19_review_inbox.sql",
+    "0020_eng05_synthetic_work_queue.sql",
 )
 
 

@@ -170,10 +170,20 @@ class PostgresRuntimeTests(unittest.TestCase):
         # CAPTURE alone is insufficient for an AI Studio image.
         with self.assertRaises(DomainError):
             self.store.authorize_capture_preflight(self.principal,sid,0)
+        # ACTIVE evidence has immutable purpose; create independently verified
+        # synthetic proof covering both purposes rather than mutate it.
+        paired=uuid.uuid4()
         with psycopg.connect(ADMIN) as con:
-            con.execute("""UPDATE abc.consent_evidence SET
-                purpose=ARRAY['CAPTURE','AI_PROCESSING']::text[]
-                WHERE consent_id=%s""",(consent,))
+            con.execute("""INSERT INTO abc.consent_evidence(
+              consent_id,tenant_id,branch_id,session_id,client_id,status,
+              purpose,evidence_digest,disclosure_version,retention_policy_id)
+              VALUES(%s,%s,%s,%s,%s,'PENDING_VERIFICATION',
+              ARRAY['CAPTURE','AI_PROCESSING']::text[],%s,'CI-DISCLOSURE','CI-RETENTION')""",
+              (paired,self.tenant,self.branch,sid,client,"f"*64))
+            con.execute("""UPDATE abc.consent_evidence SET status='ACTIVE',
+              verified_at=clock_timestamp(),
+              valid_until=clock_timestamp()+interval '1 hour'
+              WHERE consent_id=%s""",(paired,))
         preflight=self.store.authorize_capture_preflight(self.principal,sid,0)
         self.assertTrue(preflight["consent_checked"])
         self.assertFalse(preflight["capture_authorized"])
@@ -184,7 +194,7 @@ class PostgresRuntimeTests(unittest.TestCase):
             self.store.authorize_capture_preflight(Principal("outsider",ISS),sid,0)
         with psycopg.connect(ADMIN) as con:
             con.execute("""UPDATE abc.consent_evidence SET status='WITHDRAWN',
-              revoked_at=clock_timestamp() WHERE consent_id=%s""",(consent,))
+              revoked_at=clock_timestamp() WHERE consent_id=%s""",(paired,))
         with self.assertRaises(DomainError):
             self.store.authorize_capture_preflight(self.principal,sid,0)
 

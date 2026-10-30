@@ -67,9 +67,13 @@ class ScopedV2Ingress:
             raise DomainError(403,"v2_session_policy_scope_denied")
         # A verified JWT may only be used ONCE across ALL replicas, ever
         # until an externally governed post-expiration archive/GC.
-        self.replay.claim(tenant_id=message["tenant_id"],
+        receipt=self.replay.claim(tenant_id=message["tenant_id"],
             issuer=identity["issuer"],audience=identity["audience"],
             jti=identity["token_id"],expires_at=identity["expires_at"])
+        if (not isinstance(receipt,dict)
+            or receipt.get("admitted") is not True
+            or receipt.get("token_reusable") is not False):
+            raise DomainError(403,"unverified_atomic_replay_receipt")
         # No hidden v1 fallback, no real images, no treatment authorization.
         return execute(message,engine=target,
                        knowledge_policy_gate=knowledge_policy_gate,

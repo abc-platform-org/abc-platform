@@ -71,14 +71,18 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
                 VALUES(%s,'tenant-test','branch-test','specialist-ci',
                   'client-ci','synthetic:hair-color','CREATED',2,%s,%s,%s)""",
                   (self.session,now,now,uuid.uuid4()))
+            # Respect the DB lifecycle: new consent must start PENDING.
             con.execute("""INSERT INTO abc.consent_evidence(
                 consent_id,tenant_id,branch_id,session_id,client_id,status,
-                purpose,evidence_digest,disclosure_version,retention_policy_id,
-                verified_at,valid_until)
-                VALUES(%s,'tenant-test','branch-test',%s,'client-ci','ACTIVE',
-                ARRAY['AI_PROCESSING','INTERNAL_HANDOFF'],%s,
-                'CI-SYNTHETIC-NOT_LEGAL','CI-RETENTION-NO_CLIENT',%s,%s)""",
-                (self.consent,self.session,"c"*64,now,now+timedelta(hours=1)))
+                purpose,evidence_digest,disclosure_version,retention_policy_id)
+                VALUES(%s,'tenant-test','branch-test',%s,'client-ci',
+                'PENDING_VERIFICATION',ARRAY['AI_PROCESSING','INTERNAL_HANDOFF'],%s,
+                'CI-SYNTHETIC-NOT_LEGAL','CI-RETENTION-NO_CLIENT')""",
+                (self.consent,self.session,"c"*64))
+            con.execute("""UPDATE abc.consent_evidence
+                SET status='ACTIVE',verified_at=%s,valid_until=%s
+                WHERE consent_id=%s""",
+                (now,now+timedelta(hours=1),self.consent))
         self.session_gate=AuthorityFixture(self.session)
         self.consent_gate=AuthorityFixture(self.session,"CONSENT")
         self.policy_gate=AuthorityFixture(self.session)

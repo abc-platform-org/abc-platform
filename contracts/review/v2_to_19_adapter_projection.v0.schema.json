@@ -10,11 +10,30 @@
     "projection",
     "status",
     "downstream_dispatch_authorized",
-    "customer_release_approved"
+    "customer_release_approved",
+    "source_protocol",
+    "source_request_sha256",
+    "source_response_sha256",
+    "projection_sha256",
+    "tenant_id",
+    "branch_id",
+    "session_id",
+    "state_version",
+    "correlation_id",
+    "professional_validation_complete",
+    "provenance_authority_verified",
+    "service_kind"
   ],
   "properties": {
     "adapter_id": {
-      "type": "string"
+      "enum": [
+        "A04_TO_06_DECISION_INPUT",
+        "A04_TO_07_LOOK_SPEC_INPUT",
+        "A05_TO_06_DECISION_EVIDENCE",
+        "A06_TO_15_PLAN_CANDIDATE",
+        "A04_PIXEL_TO_11_QA_EVIDENCE",
+        "A06_SOURCE_TO_16_REVIEW_EVIDENCE"
+      ]
     },
     "protocol": {
       "const": "abc.bridge.v2-to-19.v0.review"
@@ -46,6 +65,52 @@
     },
     "customer_release_approved": {
       "const": false
+    },
+    "source_protocol": {
+      "const": "abc.internal.engine.v2.draft"
+    },
+    "source_request_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_response_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "projection_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "professional_validation_complete": {
+      "const": false
+    },
+    "provenance_authority_verified": {
+      "const": false
+    },
+    "service_kind": {
+      "type": "string"
     }
   }
 }

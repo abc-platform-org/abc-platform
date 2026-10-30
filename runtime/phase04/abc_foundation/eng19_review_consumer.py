@@ -28,11 +28,21 @@ class PostgresReviewInbox:
             raise ValueError("isolated_postgres_store_required")
         self.store=store
 
-    def record(self,message):
+    def record(self,message,source_artifact=None,consumer_id=None):
         """Idempotent durable review receipt, NOT an engine ACK or processing."""
         if os.environ.get("ABC_ENV")!="LOCAL_INTEGRATION_ONLY":
             raise DomainError(403,"review_inbox_live_environment_blocked")
         preflight_candidate_handoff(message)
+        if source_artifact is not None:
+            from .eng05_review_worker import canonical_bytes
+            if (not isinstance(source_artifact,dict)
+                or message["from_engine"]!="ENG-04"
+                or message["to_engine"]!="ENG-05"
+                or not isinstance(consumer_id,str) or not 3<=len(consumer_id)<=64):
+                raise DomainError(403,"source_artifact_scope_denied")
+            source_bytes=canonical_bytes(source_artifact)
+            if hashlib.sha256(source_bytes).hexdigest()!=message["artifact_sha256"]:
+                raise DomainError(403,"source_artifact_digest_mismatch")
         args=(uuid.UUID(message["handoff_id"]),
               message["tenant_id"],message["branch_id"],
               uuid.UUID(message["session_id"]),message["state_version"],
@@ -51,6 +61,16 @@ class PostgresReviewInbox:
                       "RECORDED_REVIEW_ONLY","ALREADY_RECORDED_REVIEW_ONLY"):
                     raise DomainError(503,"review_receipt_not_committed")
                 status=result["receipt"]
+                if source_artifact is not None:
+                    response=con.execute("""SELECT abc.eng19_submit_synthetic(
+                        %s,%s,%s,%s,%s,%s,%s,%s,%s,%s) AS status""",
+                        (uuid.UUID(message["handoff_id"]),message["tenant_id"],
+                         message["branch_id"],uuid.UUID(message["session_id"]),
+                         message["state_version"],uuid.UUID(message["correlation_id"]),
+                         message["artifact_sha256"],_canonical_sha(message),
+                         source_bytes,consumer_id)).fetchone()
+                    if not response or response["status"]!=status:
+                        raise DomainError(503,"source_and_job_receipt_not_atomic")
         except DomainError:
             raise
         except Exception as exc:
@@ -91,7 +111,7 @@ class AuthenticatedReviewConsumer:
         self.target=target_engine
         self.consumer=consumer_id
 
-    def accept(self,*,message,token,verified_peer_certificate_der):
+    def accept(self,*,message,token,verified_peer_certificate_der,source_artifact=None):
         if os.environ.get("ABC_ENV")!="LOCAL_INTEGRATION_ONLY":
             raise DomainError(403,"review_transport_live_execution_blocked")
         preflight_candidate_handoff(message)
@@ -134,4 +154,4 @@ class AuthenticatedReviewConsumer:
             receipt.get("admitted") is not True or
             receipt.get("token_reusable") is not False):
             raise DomainError(403,"review_atomic_replay_unverified")
-        return self.inbox.record(message)
+        return self.inbox.record(message,source_artifact=source_artifact,consumer_id=self.consumer)

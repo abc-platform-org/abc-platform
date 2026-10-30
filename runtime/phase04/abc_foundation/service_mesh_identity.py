@@ -74,7 +74,9 @@ class BoundEngineIdentity:
                 raise ValueError("token_not_bound_to_cert_or_identity")
             return {"verified":True,"engine_id":expected_engine,
                     "consumer_id":expected_consumer,"subject":expected_uri,
-                    "issuer":self.issuer,"token_id":claims["jti"],
+                    "issuer":self.issuer,"audience":self.audience,
+                    "expires_at":datetime.fromtimestamp(exp,timezone.utc),
+                    "token_id":claims["jti"],
                     "cert_sha256":hashlib.sha256(peer_der).hexdigest()}
         except (jwt.PyJWTError,ValueError,KeyError,TypeError,OverflowError,
                 x509.ExtensionNotFound) as exc:

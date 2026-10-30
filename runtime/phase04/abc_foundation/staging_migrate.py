@@ -30,6 +30,7 @@ FILENAMES = (
     "0015_eng14_session_creation_gate.sql",
     "0016_eng01_atomic_session_broker.sql",
     "0017_shared_managed_workload_gate.sql",
+    "0018_eng14_distributed_replay_ledger.sql",
 )
 
 

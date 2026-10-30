@@ -22,14 +22,15 @@ def validate_staging_dsn(dsn, expected_role):
     return True
 
 
-def assert_staging_database(store, expected_role, required_tables):
+def assert_staging_database(store, expected_role, required_tables, *, expected_login=None):
     with store._connect() as con:
         info = con.execute("""
-            SELECT current_user AS role,
+            SELECT current_user AS role,session_user AS login,
               (SELECT rolsuper OR rolbypassrls OR rolcreaterole
                  FROM pg_roles WHERE rolname=current_user) AS privileged
         """).fetchone()
-        if info["role"] != expected_role or info["privileged"]:
+        if (info["role"] != expected_role or info["privileged"]
+            or (expected_login is not None and info["login"] != expected_login)):
             raise ValueError("database_privilege_boundary_violation")
         for table in required_tables:
             row = con.execute("""
@@ -69,8 +70,13 @@ def make_private_server(environ=None, store=None, verifier=None):
             store=PostgresStore(dsn)
         else:
             raise ValueError("unapproved_database_auth_mode")
+        # The database role is abc_app *after SET ROLE*, while the
+        # physical session_user must be a distinct managed workload LOGIN.
+        expected_login=(env["ABC_DB_WORKLOAD_LOGIN"]
+            if auth_mode=="MANAGED_MTLS" else "abc_app")
         assert_staging_database(store,"abc_app",
-            ["abc.sessions","abc.memberships","abc.consent_evidence"])
+            ["abc.sessions","abc.memberships","abc.consent_evidence"],
+            expected_login=expected_login)
     if verifier is None:
         for key in ("ABC_OIDC_ISSUER", "ABC_OIDC_AUDIENCE", "ABC_OIDC_JWKS_URI"):
             if not env.get(key):

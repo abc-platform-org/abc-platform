@@ -40,7 +40,7 @@ def decide(message,*,knowledge_policy_gate=None):
         reasons.append("NO_CANDIDATE_LOOKS")
     blocked=bool(reasons)
     excluded=[{"look_id":item["look_id"],
-               "reason":reasons[0] if blocked else "UNSPECIFIED"}
+               "reason":"; ".join(reasons) if blocked else "UNSPECIFIED"}
               for item in candidates] if blocked else []
     # Even on controlled, fully populated input, candidate eligibility is
     # ONLY eligibility for human review, not evidence of salon feasibility.

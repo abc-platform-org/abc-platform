@@ -112,5 +112,215 @@
     "service_kind": {
       "type": "string"
     }
-  }
+  },
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A04_TO_06_DECISION_INPUT"
+            },
+            "source_engine": {
+              "const": "ENG-04"
+            },
+            "target_engine": {
+              "const": "ENG-06"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "candidate_looks",
+                "uncertainty",
+                "visual_qa_status",
+                "independent_decision_verified"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "candidate_looks": {},
+                "uncertainty": {},
+                "visual_qa_status": {},
+                "independent_decision_verified": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A04_TO_07_LOOK_SPEC_INPUT"
+            },
+            "source_engine": {
+              "const": "ENG-04"
+            },
+            "target_engine": {
+              "const": "ENG-07"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "draft_looks",
+                "look_lock_verified",
+                "rendered_visual_exists"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "draft_looks": {},
+                "look_lock_verified": {},
+                "rendered_visual_exists": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A05_TO_06_DECISION_EVIDENCE"
+            },
+            "source_engine": {
+              "const": "ENG-05"
+            },
+            "target_engine": {
+              "const": "ENG-06"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "eligible_look_ids",
+                "excluded_look_ids",
+                "critical_unknowns",
+                "knowledge_source_digests",
+                "signed_policy_verified",
+                "specialist_selection_authorized"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "eligible_look_ids": {},
+                "excluded_look_ids": {},
+                "critical_unknowns": {},
+                "knowledge_source_digests": {},
+                "signed_policy_verified": {},
+                "specialist_selection_authorized": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A06_TO_15_PLAN_CANDIDATE"
+            },
+            "source_engine": {
+              "const": "ENG-06"
+            },
+            "target_engine": {
+              "const": "ENG-15"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "selected_look_id",
+                "plan_template_sha256",
+                "missing_requirements",
+                "sop_and_consent_independently_verified",
+                "specialist_validation_verified",
+                "technical_procedure_authorized"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "selected_look_id": {},
+                "plan_template_sha256": {},
+                "missing_requirements": {},
+                "sop_and_consent_independently_verified": {},
+                "specialist_validation_verified": {},
+                "technical_procedure_authorized": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A04_PIXEL_TO_11_QA_EVIDENCE"
+            },
+            "source_engine": {
+              "const": "ENG-04"
+            },
+            "target_engine": {
+              "const": "ENG-11"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "source_pixel_digest",
+                "candidate_pixel_digest",
+                "changed_outside_edit_mask",
+                "changed_within_protected_face",
+                "edited_within_mask",
+                "face_mask_verified",
+                "identity_verified",
+                "reference_provenance_verified",
+                "independent_visual_review_complete"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "source_pixel_digest": {},
+                "candidate_pixel_digest": {},
+                "changed_outside_edit_mask": {},
+                "changed_within_protected_face": {},
+                "edited_within_mask": {},
+                "face_mask_verified": {},
+                "identity_verified": {},
+                "reference_provenance_verified": {},
+                "independent_visual_review_complete": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A06_SOURCE_TO_16_REVIEW_EVIDENCE"
+            },
+            "source_engine": {
+              "const": "ENG-06"
+            },
+            "target_engine": {
+              "const": "ENG-16"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "source_ref",
+                "source_record_type",
+                "signed_source_content_verified",
+                "independent_specialist_qualification_verified",
+                "professional_validation_complete"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "source_ref": {},
+                "source_record_type": {},
+                "signed_source_content_verified": {},
+                "independent_specialist_qualification_verified": {},
+                "professional_validation_complete": {}
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
 }

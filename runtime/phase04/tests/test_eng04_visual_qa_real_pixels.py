@@ -50,6 +50,7 @@ class RealPixelVisualQATests(unittest.TestCase):
         self.assertFalse(r["reference_provenance_verified"])
         self.assertGreater(r["measured"]["after"]["mean_luminance_8bit"],0)
         self.assertIn("edge_variance_proxy",r["measured"]["after"])
+        self.assertGreater(r["measured"]["editable_region_color"]["delta_e_76_region_mean"],1.0)
         self.assertFalse(r["release_approved"])
 
     def test_outside_region_and_protected_face_are_independent_hard_failures(self):

@@ -121,7 +121,7 @@ BEGIN
      OR encode(sha256(v_knowledge),'hex') IS DISTINCT FROM v_ksha
      OR convert_from(v_analysis,'UTF8')::jsonb->>'session_id' IS DISTINCT FROM j.session_id::text
      OR convert_from(v_knowledge,'UTF8')::jsonb->>'ontology_version'<>'synthetic-ontology.1'
-     OR convert_from(v_knowledge,'UTF8')::jsonb->'retrieval_sources'<>'[]'::jsonb
+     OR convert_from(v_knowledge,'UTF8')::jsonb->'retrieval_sources' IS DISTINCT FROM '[]'::jsonb
      OR NOT(convert_from(v_knowledge,'UTF8')::jsonb->'unknowns' ? 'SOURCE_UNVERIFIED')
   THEN RAISE EXCEPTION 'untrusted ENG05 provenance' USING ERRCODE='42501'; END IF;
   v_lease:=gen_random_uuid();
@@ -182,19 +182,20 @@ BEGIN
      OR v_k IS DISTINCT FROM p_knowledge_sha
   THEN RAISE EXCEPTION 'ENG06 source artifact drift' USING ERRCODE='42501'; END IF;
   v:=convert_from(p_output,'UTF8')::jsonb;
-  IF jsonb_typeof(v)<>'object' OR v->>'engine_id'<>'ENG-06'
-     OR v->>'engine_version'<>'eng06.synthetic.1'
-     OR v->>'status'<>'BLOCKED_PROFESSIONAL_SOURCE'
+  IF jsonb_typeof(v)<>'object' OR v->>'engine_id' IS DISTINCT FROM 'ENG-06'
+     OR v->>'engine_version' IS DISTINCT FROM 'eng06.synthetic.1'
+     OR v->>'status' IS DISTINCT FROM 'BLOCKED_PROFESSIONAL_SOURCE'
      OR v->>'analysis_sha256' IS DISTINCT FROM v_a
      OR v->>'knowledge_sha256' IS DISTINCT FROM v_k
-     OR v->>'downstream_dispatch_authorized'<>'false'
-     OR v->>'customer_release_approved'<>'false'
+     OR v->>'downstream_dispatch_authorized' IS DISTINCT FROM 'false'
+     OR v->>'customer_release_approved' IS DISTINCT FROM 'false'
      OR v->'decision'->>'session_id' IS DISTINCT FROM j.session_id::text
-     OR v->'decision'->>'decision_engine_version'<>'eng06.synthetic.1'
-     OR v->'decision'->'candidates'<>'[]'::jsonb
-     OR jsonb_array_length(v->'decision'->'excluded_options')<>2
+     OR v->'decision'->>'decision_engine_version' IS DISTINCT FROM 'eng06.synthetic.1'
+     OR v->'decision'->'candidates' IS DISTINCT FROM '[]'::jsonb
+     OR jsonb_typeof(v->'decision'->'excluded_options') IS DISTINCT FROM 'array'
+     OR jsonb_array_length(v->'decision'->'excluded_options') IS DISTINCT FROM 2
      OR EXISTS(SELECT 1 FROM jsonb_array_elements(v->'decision'->'excluded_options') e
-               WHERE e->>'reason'<>'UNVERIFIED_KNOWLEDGE_SOURCE')
+               WHERE e->>'reason' IS DISTINCT FROM 'UNVERIFIED_KNOWLEDGE_SOURCE')
   THEN RAISE EXCEPTION 'ENG06 unverified recommendation denied' USING ERRCODE='42501'; END IF;
   INSERT INTO abc.eng06_ci_results(
     upstream_handoff,worker_lease,engine_id,engine_version,

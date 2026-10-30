@@ -11,6 +11,7 @@ def _external_gate_accepted(gate,message):
     try:
         payload=message["payload"]
         return gate.verify(engine_id="ENG-05",
+            service_kind=payload["service_kind"],
             tenant_id=message["tenant_id"],branch_id=message["branch_id"],
             session_id=message["session_id"],
             state_version=message["state_version"],

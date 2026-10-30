@@ -82,7 +82,15 @@ class V2BoundedImplementationTests(unittest.TestCase):
         req["payload"]["critical_unknowns"]=[]
         req["payload"]["policy_gate"]["decision"]="REVIEW_REQUIRED"
         req["payload"]["knowledge_sources"][0]["review_status"]="SPECIALIST_REVIEWED"
-        result=execute(req,engine="ENG-05")["result"]
+        denied=execute(req,engine="ENG-05")["result"]
+        self.assertEqual(denied["status"],"BLOCKED")
+        self.assertEqual(denied["eligible_looks"],[])
+        class PinnedTestOnlyKnowledgeGate:
+            def verify(self,**kwargs):
+                return (kwargs["tenant_id"]=="tenant-test"
+                    and kwargs["policy_gate"]["decision"]=="REVIEW_REQUIRED")
+        result=execute(req,engine="ENG-05",
+            knowledge_policy_gate=PinnedTestOnlyKnowledgeGate())["result"]
         self.assertEqual(result["status"],"SPECIALIST_REVIEW_REQUIRED")
         self.assertEqual(result["eligible_looks"][0]["evidence_ids"],[L])
         self.assertFalse(result["specialist_selection_authorized"])

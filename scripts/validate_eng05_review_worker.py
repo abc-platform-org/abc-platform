@@ -9,6 +9,12 @@ PY=ROOT/"runtime/phase04/abc_foundation/eng05_review_worker.py"
 def validate():
     sql=SQL.read_text()
     py=PY.read_text()
+    # Fail fast on truncated/duplicated transactional SQL and a broken
+    # fail-receipt regex. PostgreSQL CI remains the authoritative SQL parser.
+    assert sql.rstrip().endswith("COMMIT;"),"migration_missing_final_commit"
+    assert sql.count("\nCOMMIT;")==1,"migration_duplicate_commit_or_tail"
+    assert sql.count("CREATE FUNCTION abc.eng19_")==4,"missing_or_duplicate_worker_function"
+    assert "OR p_error IS NULL OR p_error !~ '^CI_[A-Z_]{3,60}$'" in sql, "broken_failure_code_regex"
     for statement in (
         "CREATE FUNCTION abc.eng19_submit_synthetic",
         "CREATE FUNCTION abc.eng19_claim_synthetic",

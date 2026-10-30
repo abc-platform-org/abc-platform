@@ -33,6 +33,13 @@ class AIStudioV2OfflineUIContractTests(unittest.TestCase):
         self.assertNotIn('type="file"',self.html)
         self.assertNotIn('<form',self.html)
 
+    def test_hair_service_uses_strict_editable_region_lock(self):
+        self.assertIn('id="skin" type="checkbox" disabled',self.html)
+        self.assertIn('id="face" type="checkbox" checked disabled',self.html)
+        self.assertNotIn('value="MAKEUP"',self.html)
+        self.assertIn('if ($("hair").checked) activeRegions.push("HAIR")',self.js)
+        self.assertIn('if (!$("hair").checked) return;',self.js)
+
     def test_look_selection_is_not_a_real_plan_handoff(self):
         self.assertIn('id="lock-look"',self.html)
         self.assertIn('id="check-plan"',self.html)

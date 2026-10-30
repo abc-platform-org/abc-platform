@@ -1,0 +1,66 @@
+{
+  "schema_version": "abc.v2-to-19-adapter-registry.v0.review",
+  "protocol": "abc.bridge.v2-to-19.v0.review",
+  "source_protocol": "abc.internal.engine.v2.draft",
+  "target_protocol": "abc.internal.capability.v3.review",
+  "decision_status": "CODE_REVIEW_ONLY",
+  "owner_signoff": false,
+  "live_dispatch_enabled": false,
+  "customer_release_approved": false,
+  "adapters": [
+    {
+      "adapter_id": "A04_TO_06_DECISION_INPUT",
+      "source_engine": "ENG-04",
+      "source_role": "RECOMMENDATION_INTELLIGENCE",
+      "target_engine": "ENG-06",
+      "migration_status": "UNMIGRATED",
+      "runtime_enabled": false,
+      "customer_release_approved": false
+    },
+    {
+      "adapter_id": "A04_TO_07_LOOK_SPEC_INPUT",
+      "source_engine": "ENG-04",
+      "source_role": "RECOMMENDATION_INTELLIGENCE",
+      "target_engine": "ENG-07",
+      "migration_status": "UNMIGRATED",
+      "runtime_enabled": false,
+      "customer_release_approved": false
+    },
+    {
+      "adapter_id": "A05_TO_06_DECISION_EVIDENCE",
+      "source_engine": "ENG-05",
+      "source_role": "DECISION_INTELLIGENCE",
+      "target_engine": "ENG-06",
+      "migration_status": "UNMIGRATED",
+      "runtime_enabled": false,
+      "customer_release_approved": false
+    },
+    {
+      "adapter_id": "A06_TO_15_PLAN_CANDIDATE",
+      "source_engine": "ENG-06",
+      "source_role": "TECHNICAL_PLANNING_INTELLIGENCE",
+      "target_engine": "ENG-15",
+      "migration_status": "UNMIGRATED",
+      "runtime_enabled": false,
+      "customer_release_approved": false
+    },
+    {
+      "adapter_id": "A04_PIXEL_TO_11_QA_EVIDENCE",
+      "source_engine": "ENG-04",
+      "source_role": "EMBEDDED_PIXEL_QA",
+      "target_engine": "ENG-11",
+      "migration_status": "UNMIGRATED",
+      "runtime_enabled": false,
+      "customer_release_approved": false
+    },
+    {
+      "adapter_id": "A06_SOURCE_TO_16_REVIEW_EVIDENCE",
+      "source_engine": "ENG-06",
+      "source_role": "PROFESSIONAL_SOURCE_SIGNATURE_PRIMITIVE",
+      "target_engine": "ENG-16",
+      "migration_status": "UNMIGRATED",
+      "runtime_enabled": false,
+      "customer_release_approved": false
+    }
+  ]
+}

@@ -50,6 +50,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Preflight ENG05 migration SQL structure before database bootstrap
+        run: python scripts/validate_eng05_review_worker.py
       - name: Install trusted JWT and PostgreSQL client libraries
         run: python -m pip install -r runtime/phase04/requirements.txt
       - name: Apply PostgreSQL migration with least-privilege runtime role

@@ -1,0 +1,100 @@
+{
+  "schema_version": "abc.phase04.infrastructure-selection.v1",
+  "date": "2026-10-30",
+  "decision_status": "CANDIDATE_REQUIRES_OWNER_OPERATOR_COST_SECURITY_APPROVAL",
+  "deployment_authorized": false,
+  "billing_authorized": false,
+  "production_release_authorized": false,
+  "source_pr": 50,
+  "environment": "STAGING_PRIVATE_SYNTHETIC_ONLY",
+  "workspace": {
+    "provider": "RENDER",
+    "workspace_id": "tea-dbhglamc6qcc73fcjer0",
+    "workspace_verified": true,
+    "current_services": 0,
+    "current_postgres": 0,
+    "target_region": "frankfurt",
+    "operator_confirmation_pending": true
+  },
+  "compute": {
+    "provider": "RENDER",
+    "network": "PRIVATE_SERVICE_PSERV",
+    "requires": [
+      "private_dns_only",
+      "no_public_onrender_com_hostname",
+      "independent_service_identity",
+      "TLS_1_3_MUTUAL_AUTHENTICATION",
+      "zero_auto_deploy",
+      "synthetic_only_until_specialist_gate"
+    ],
+    "services": [
+      {
+        "name": "abc-p04-private-api",
+        "kind": "pserv",
+        "port": 10000,
+        "runtime": "abc_foundation.staging_api",
+        "status": "NOT_PROVISIONED"
+      },
+      {
+        "name": "abc-eng04-private-synthetic",
+        "kind": "pserv",
+        "port": 11004,
+        "runtime": "abc_foundation.private_engine_service_server",
+        "status": "NOT_PROVISIONED"
+      },
+      {
+        "name": "abc-eng05-private-synthetic",
+        "kind": "pserv",
+        "port": 11005,
+        "runtime": "abc_foundation.private_engine_service_server",
+        "status": "NOT_PROVISIONED"
+      },
+      {
+        "name": "abc-eng06-private-synthetic",
+        "kind": "pserv",
+        "port": 11006,
+        "runtime": "abc_foundation.private_engine_service_server",
+        "status": "NOT_PROVISIONED"
+      },
+      {
+        "name": "abc-eng03-worker",
+        "kind": "worker",
+        "runtime": "abc_foundation.staging_worker",
+        "status": "NOT_PROVISIONED"
+      }
+    ],
+    "v2_live_dispatch": "DISABLED_PENDING_REAL_SCOPE_AUTHORITY"
+  },
+  "database": {
+    "selection": "EXTERNALLY_CONTROLLED_PRIVATE_POSTGRES16_REQUIRED",
+    "render_managed_postgres_acceptable": false,
+    "reason": "Render internal PostgreSQL supports sslmode=require but not verify-ca/verify-full and does not prove physical client certificate verification required by ABC.",
+    "required": [
+      "private_network_reachability_to_compute",
+      "hostssl_certificate_verified_client_identity",
+      "clientcert_verify_full_server_policy",
+      "sslmode_verify_full_client_server_CA_pin",
+      "workload_specific_NO_INHERIT_logins",
+      "logical_and_physical_backup_restore_evidence",
+      "PITR",
+      "operator_controlled_revocation",
+      "RLS_FORCED_AND_MANAGED_TENANTS"
+    ],
+    "provisioned": false
+  },
+  "identity": {
+    "issuer": "EXTERNAL_CA_AND_OIDC_OPERATOR_REQUIRED",
+    "pki_provisioned": false,
+    "oidc_jwks_provisioned": false,
+    "secrets_manager_configured": false,
+    "no_private_keys_in_git": true
+  },
+  "owner_approval": {
+    "monthly_spend_cap_usd": null,
+    "plan_ids_approved": [],
+    "approver": null,
+    "approved_at": null,
+    "independent_security_approval": false
+  },
+  "notes": "No provider resources may be created or billed under this candidate. Existing Render connector only creates public web and standard managed Postgres. Private services require a separate authorized dashboard/Blueprint flow. P04 remains IN_PROGRESS."
+}

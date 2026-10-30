@@ -230,3 +230,50 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
                 self._start()
             with self.assertRaises(ValueError):
                 self.call()
+
+    def test_lost_reply_after_commit_retries_with_new_jwt_and_same_handoff(self):
+        from abc_foundation.eng19_review_transport import (
+            deliver_review_with_bounded_retry)
+        attempts=[]
+        def simulate_lost_first_ack(**kwargs):
+            reply=send_local_review_handoff(**kwargs)
+            attempts.append(reply["status"])
+            if len(attempts)==1:
+                raise ConnectionResetError("CI simulated lost ACK after COMMIT")
+            return reply
+        received=deliver_review_with_bounded_retry(
+            token_provider=self.fixture.token,max_attempts=2,
+            transport=simulate_lost_first_ack,
+            port=self.listeners[0].server_address[1],message=self.message,
+            client_cert=self.fixture.client_cert,
+            client_key=self.fixture.client_key,
+            server_ca=self.fixture.ca_path)
+        self.assertEqual(attempts,["RECORDED_REVIEW_ONLY",
+                                    "ALREADY_RECORDED_REVIEW_ONLY"])
+        self.assertEqual(received["status"],"ALREADY_RECORDED_REVIEW_ONLY")
+
+    def test_retry_prohibits_reusing_jwt_or_retrying_business_denial(self):
+        from abc_foundation.eng19_review_transport import (
+            deliver_review_with_bounded_retry)
+        repeated=self.fixture.token()
+        def outage(**_kw):
+            raise ConnectionResetError("CI-disposable transport failure")
+        args={"port":self.listeners[0].server_address[1],
+              "message":self.message,
+              "client_cert":self.fixture.client_cert,
+              "client_key":self.fixture.client_key,
+              "server_ca":self.fixture.ca_path}
+        with self.assertRaises(DomainError):
+            deliver_review_with_bounded_retry(token_provider=lambda:repeated,
+                max_attempts=2,transport=outage,**args)
+        calls=[]
+        def deny(**_kw):
+            calls.append(True)
+            return {"status":"REJECTED",
+                    "durable_review_receipt":False,
+                    "consumer_execution_authorized":False,
+                    "customer_release_approved":False}
+        with self.assertRaises(DomainError):
+            deliver_review_with_bounded_retry(token_provider=self.fixture.token,
+                max_attempts=3,transport=deny,**args)
+        self.assertEqual(len(calls),1)

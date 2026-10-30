@@ -27,18 +27,21 @@ from test_private_engine_mtls import ManagedWorkloadMTLSTests
 
 
 class AuthorityFixture:
-    def __init__(self,session,gate="ALL"):
+    def __init__(self,session,gate="ALL",*,source="ENG-04",target="ENG-05",artifact="BEAUTY_ANALYSIS_REPORT"):
         self.session=session
         self.allowed=True
         self.gate=gate
+        self.source=source
+        self.target=target
+        self.artifact=artifact
     def verify(self,**claims):
         return (self.allowed and claims.get("tenant_id")=="tenant-test"
             and claims.get("branch_id")=="branch-test"
             and claims.get("session_id")==self.session
             and claims.get("state_version")==2
-            and claims.get("from_engine")=="ENG-04"
-            and claims.get("to_engine")=="ENG-05"
-            and claims.get("artifact_kind")=="BEAUTY_ANALYSIS_REPORT"
+            and claims.get("from_engine")==self.source
+            and claims.get("to_engine")==self.target
+            and claims.get("artifact_kind")==self.artifact
             and claims.get("certificate_sha256") is not None
             and claims.get("policy_proof_ref")=="synthetic:eng14-policy-proof"
             and (self.gate!="CONSENT" or
@@ -495,6 +498,65 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
             row=con.execute("""SELECT count(*) FROM abc.eng19_synthetic_outbox
                 WHERE handoff_id=%s""",(message["handoff_id"],)).fetchone()
         self.assertEqual(row[0],0)
+
+    def test_eng05_to_eng06_mtls_review_only_durable_receipt(self):
+        """A real TLS1.3 ENG05→ENG06 receive, never ENG06 decision execution."""
+        f=ManagedWorkloadMTLSTests("test_real_tls13_mutual_certificate_and_bound_jwt")
+        f.consumer_override="ci-review-"+uuid.uuid4().hex[:20]
+        f.source_engine_override="ENG-05"
+        f.target_engine_override="ENG-06"
+        f.setUp()
+        self.addCleanup(f.doCleanups)
+        gate_args={"source":"ENG-05","target":"ENG-06",
+                   "artifact":"PROFESSIONAL_KNOWLEDGE_BUNDLE"}
+        session_gate=AuthorityFixture(self.session,**gate_args)
+        consent_gate=AuthorityFixture(self.session,"CONSENT",**gate_args)
+        policy_gate=AuthorityFixture(self.session,**gate_args)
+        store=PostgresStore(self.app)
+        receiver=AuthenticatedReviewConsumer(
+            identity_verifier=f.verifier,session_authority=session_gate,
+            consent_authority=consent_gate,eng14_authority=policy_gate,
+            replay_ledger=PostgresReplayLedger(store),
+            inbox=PostgresReviewInbox(store),
+            caller_engine="ENG-05",target_engine="ENG-06",
+            consumer_id=f.consumer)
+        server=start_local_review_consumer(
+            consumer=receiver,certfile=f.server_cert,
+            keyfile=f.server_key,ca_file=f.ca_path)
+        self.addCleanup(server.server_close)
+        runner=threading.Thread(target=server.serve_forever,daemon=True)
+        runner.start()
+        self.addCleanup(server.shutdown)
+        msg={**self.message,
+            "handoff_id":str(uuid.uuid4()),
+            "from_engine":"ENG-05",
+            "to_engine":"ENG-06",
+            "artifact_kind":"PROFESSIONAL_KNOWLEDGE_BUNDLE",
+            "artifact_sha256":"a"*64}
+        def call(message):
+            return send_local_review_handoff(
+                port=server.server_address[1],token=f.token(),
+                message=message,client_cert=f.client_cert,
+                client_key=f.client_key,server_ca=f.ca_path)
+        first=call(msg)
+        self.assertEqual(first["status"],"RECORDED_REVIEW_ONLY")
+        self.assertTrue(first["durable_review_receipt"])
+        self.assertFalse(first["consumer_execution_authorized"])
+        self.assertFalse(first["customer_release_approved"])
+        self.assertEqual(call(msg)["status"],"ALREADY_RECORDED_REVIEW_ONLY")
+        forged={**msg,"handoff_id":str(uuid.uuid4()),
+                "from_engine":"ENG-04",
+                "artifact_kind":"BEAUTY_ANALYSIS_REPORT"}
+        self.assertEqual(call(forged)["status"],"REJECTED")
+        policy_gate.allowed=False
+        rejected={**msg,"handoff_id":str(uuid.uuid4())}
+        self.assertEqual(call(rejected)["status"],"REJECTED")
+        with psycopg.connect(self.admin) as con:
+            row=con.execute("""SELECT from_engine,to_engine,artifact_kind
+                FROM abc.eng19_review_inbox WHERE handoff_id=%s""",
+                (msg["handoff_id"],)).fetchone()
+        self.assertEqual(tuple(row),
+            ("ENG-05","ENG-06","PROFESSIONAL_KNOWLEDGE_BUNDLE"))
 
     def test_source_artifact_tamper_is_rejected_before_job_creation(self):
         worker,source,message=self._synthetic_job()

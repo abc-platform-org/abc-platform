@@ -93,7 +93,8 @@ class V2AuthenticatedIngressTests(unittest.TestCase):
             with self.subTest(kwargs=kwargs),self.assertRaises(DomainError):
                 self.submit(self.ingress(),**kwargs)
         for claim in ({"verified":False},{"consumer_id":"other"},
-                      {"cert_sha256":None},{"token_id":None},
+                      {"cert_sha256":None},{"cert_sha256":"g"*64},
+                      {"audience":"abc-engine:ENG-06"},{"token_id":None},
                       {"expires_at":datetime.now(timezone.utc).replace(tzinfo=None)}):
             with self.subTest(claim=claim),self.assertRaises(DomainError):
                 self.submit(self.ingress(identity=FakeVerifiedIdentity(claim)))

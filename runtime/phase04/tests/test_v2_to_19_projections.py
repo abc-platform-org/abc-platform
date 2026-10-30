@@ -67,3 +67,32 @@ class StrictAdapterTests(unittest.TestCase):
             with patch.dict(os.environ,{"ABC_ENV":mode}):
                 with self.assertRaises(DomainError):
                     project_v2_response(q,r,adapter_id="A04_TO_06_DECISION_INPUT")
+
+    def test_projection_digest_changes_with_source_and_registry_blocks_release(self):
+        from abc_foundation.v2_to_19_projection import _digest
+        from pathlib import Path
+        import json
+        from jsonschema import Draft202012Validator,FormatChecker
+        q=request("ENG-04")
+        original=response(q)
+        x=project_v2_response(q,original,adapter_id="A04_TO_06_DECISION_INPUT")
+        self.assertEqual(x["projection_sha256"],_digest(x["projection"]))
+        r=copy.deepcopy(original)
+        r["result"]["uncertainty"].append("ADDITIONAL_UNCERTAINTY")
+        changed=project_v2_response(q,r,adapter_id="A04_TO_06_DECISION_INPUT")
+        self.assertNotEqual(x["source_response_sha256"],
+                            changed["source_response_sha256"])
+        self.assertNotEqual(x["projection_sha256"],
+                            changed["projection_sha256"])
+        schema=json.loads((Path(__file__).resolve().parents[3]/
+            "contracts/review/v2_to_19_adapter_projection.v0.schema.json").read_text())
+        for modification in (
+            {"downstream_dispatch_authorized":True},
+            {"customer_release_approved":True},
+            {"professional_validation_complete":True},
+            {"target_engine":"ENG-15"},
+            {"status":"LIVE"}
+        ):
+            candidate={**x,**modification}
+            self.assertFalse(Draft202012Validator(schema,
+                format_checker=FormatChecker()).is_valid(candidate))

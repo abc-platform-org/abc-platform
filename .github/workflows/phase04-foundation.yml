@@ -11,6 +11,7 @@ on:
       - 'scripts/validate_abc_19_engine_architecture.py'
       - 'scripts/validate_abc_v2_19_adapters.py'
       - 'scripts/validate_eng19_review_inbox.py'
+      - 'scripts/validate_eng05_review_worker.py'
       - 'contracts/review/**'
       - 'scripts/validate_phase04_readiness.py'
       - 'scripts/validate_p04_provider_fit.py'
@@ -73,6 +74,8 @@ jobs:
         run: python scripts/validate_abc_v2_19_adapters.py
       - name: Verify review inbox DB edges equal the canonical 19-engine graph
         run: python scripts/validate_eng19_review_inbox.py
+      - name: Reject unsafe ENG05 worker identity, stale lease and automatic ENG06 release
+        run: python scripts/validate_eng05_review_worker.py
       - name: Phase04 externally evidenced release gate remains closed
         run: python scripts/validate_phase04_readiness.py
       - name: Compile local-only runtime

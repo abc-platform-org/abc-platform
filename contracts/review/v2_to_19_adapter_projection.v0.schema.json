@@ -1,4 +1,51 @@
 {
-  "schema_version": "abc.adapter-candidate.v0.review",
-  "status": "DRAFT"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "adapter_id",
+    "protocol",
+    "source_engine",
+    "target_engine",
+    "projection",
+    "status",
+    "downstream_dispatch_authorized",
+    "customer_release_approved"
+  ],
+  "properties": {
+    "adapter_id": {
+      "type": "string"
+    },
+    "protocol": {
+      "const": "abc.bridge.v2-to-19.v0.review"
+    },
+    "source_engine": {
+      "enum": [
+        "ENG-04",
+        "ENG-05",
+        "ENG-06"
+      ]
+    },
+    "target_engine": {
+      "enum": [
+        "ENG-06",
+        "ENG-07",
+        "ENG-11",
+        "ENG-15",
+        "ENG-16"
+      ]
+    },
+    "projection": {
+      "type": "object"
+    },
+    "status": {
+      "const": "REVIEW_ONLY_UNWIRED"
+    },
+    "downstream_dispatch_authorized": {
+      "const": false
+    },
+    "customer_release_approved": {
+      "const": false
+    }
+  }
 }

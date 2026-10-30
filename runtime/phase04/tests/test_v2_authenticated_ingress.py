@@ -42,7 +42,7 @@ class RecordingReplay:
         if jti in self.ids:
             raise DomainError(409,"distributed_replay_detected")
         self.ids.add(jti)
-        return {"admitted":True}
+        return {"admitted":True,"token_reusable":False}
 
 
 class V2AuthenticatedIngressTests(unittest.TestCase):
@@ -104,6 +104,17 @@ class V2AuthenticatedIngressTests(unittest.TestCase):
         self.submit(auth)
         with self.assertRaisesRegex(DomainError,"distributed_replay_detected"):
             self.submit(auth)
+
+    def test_false_replay_receipt_never_dispatches_engine(self):
+        class UnverifiedReplay:
+            def claim(self,**kwargs):
+                return {"admitted":False,"token_reusable":True}
+        ingress=ScopedV2Ingress(identity_verifier=FakeVerifiedIdentity(),
+            scope_authority=FakeScopeAuthority(),
+            replay_ledger=UnverifiedReplay(),caller_engine="ENG-03",
+            consumer_id="test-worker")
+        with self.assertRaisesRegex(DomainError,"unverified_atomic_replay_receipt"):
+            self.submit(ingress)
 
     def test_real_workload_staging_not_enabled_by_local_gates(self):
         with patch.dict(os.environ,{"ABC_ENV":"STAGING_PRIVATE"}):

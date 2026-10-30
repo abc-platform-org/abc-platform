@@ -56,6 +56,10 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
 
     def setUp(self):
         self.fixture=ManagedWorkloadMTLSTests("test_real_tls13_mutual_certificate_and_bound_jwt")
+        # Every test owns a distinct authenticated consumer, certificate SAN,
+        # JWT subject and subscription. An older QUEUED job must never be
+        # claimable by a later test's worker.
+        self.fixture.consumer_override="ci-review-"+uuid.uuid4().hex[:20]
         self.fixture.setUp()
         self.addCleanup(self.fixture.doCleanups)
         self.session=str(uuid.uuid4())

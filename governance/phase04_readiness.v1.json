@@ -1,0 +1,104 @@
+{
+  "schema_version": "abc.phase04-readiness.v1",
+  "as_of": "2026-10-30",
+  "status": "IN_PROGRESS",
+  "release_status": "BLOCKED",
+  "scope": "PHASE04_INFRASTRUCTURE_AND_CONTROLLED_ENGINE_INTEGRATION",
+  "last_known_verified_ci": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41035423941",
+  "managed_private_deployment_verified": false,
+  "phase04_complete": false,
+  "production_release_approved": false,
+  "required_gates": [
+    {
+      "id": "P04-01",
+      "name": "CODE_CHAIN_AND_CONTRACT_FREEZE",
+      "owner": "ENGINEERING",
+      "exit_criterion": "PRs stacked and merged under independent review; contracts/v1 immutable; migration 0018 tested",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-02",
+      "name": "OPERATOR_INFRA_AND_COST",
+      "owner": "OPERATOR",
+      "exit_criterion": "Approved account provider private topology regional budget and service IDs",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-03",
+      "name": "EXTERNAL_MANAGED_PKI",
+      "owner": "SECURITY",
+      "exit_criterion": "External CA and JWKS private keys issued per engine; TLS1.3 exact SAN verified; rotation/revocation drill",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-04",
+      "name": "PHYSICAL_PG_CLIENTCERT",
+      "owner": "DBA",
+      "exit_criterion": "Real private Postgres16 hostssl clientcert enforce + verify-full client + TLS peer proof and PITR restoration",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-05",
+      "name": "WORKLOAD_IDENTITY_CUTOVER",
+      "owner": "SECURITY",
+      "exit_criterion": "ENG01/14 physical session_user binding, database RLS and consent revocation real proof",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-06",
+      "name": "PRIVATE_ENGINE_DEPLOYMENT",
+      "owner": "SRE",
+      "exit_criterion": "Private API + independently deployed ENG04/ENG05/ENG06 live IDs, no public ingress, restart/rollback isolation",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-07",
+      "name": "REAL_E2E_REPLAY_RESILIENCE",
+      "owner": "QA",
+      "exit_criterion": "Real private mTLS ENG03→ENG04/05/06 on synthetic, durable global JTI replay concurrency, DLQ and recovery",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-08",
+      "name": "PROFESSIONAL_PRIVACY_SECURITY",
+      "owner": "INDEPENDENT_REVIEWERS",
+      "exit_criterion": "Qualified specialist SOP S1-S3, privacy DSR/DPIA, pentest, incident and independent signoff",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-09",
+      "name": "PERFORMANCE_SLO_OBSERVABILITY",
+      "owner": "SRE_QA",
+      "exit_criterion": "Approved load manifest and measured p50/p95/p99, alerts/traces, failure drill, backup restore",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    },
+    {
+      "id": "P04-10",
+      "name": "INDEPENDENT_PHASE_ACCEPTANCE",
+      "owner": "RELEASE_AUTHORITY",
+      "exit_criterion": "Exact commit and deployed artifact evidence manifest, separate operator security professional signoffs and audited release decision",
+      "status": "OPEN",
+      "evidence_refs": [],
+      "signed_independent_approvals": []
+    }
+  ],
+  "notes": "No percent/progress score is an approval. Code CI is not a physical provider resource or professional qualification. Do not mark complete until independent external evidence is verified."
+}

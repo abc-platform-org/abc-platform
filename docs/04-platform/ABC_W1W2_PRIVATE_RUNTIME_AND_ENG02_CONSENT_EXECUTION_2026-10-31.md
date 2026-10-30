@@ -47,7 +47,9 @@ The existing ENG05 worker writes a transactional result and `BLOCKED_PENDING_AUT
 5. Domain benchmarks verify decisions on real authorized specialist cases; synthetic catalog output is not professional decision quality.
 6. A separately reviewed and signed operational authorization changes the outbox release policy. A CI-only receipt cannot authorize this change.
 
-**Proposed ENG06 contract status:** `DESIGN_ONLY_UNWIRED`. Do not deploy or dispatch.
+**New bounded review-only evidence:** The existing authenticated 19-engine review receiver is exercised on an isolated local TLS 1.3 `ENG-05→ENG-06` link with a dedicated synthetic ENG05 SPIFFE identity, ENG06 audience-bound JWT, durable PostgreSQL inbox, idempotent repeat receipt, forged-edge denial and independent policy denial. This proves **review-receipt mechanics only** and does not consume the ENG05 outbox, dispatch a real decision job, or independently validate specialist knowledge.
+
+**Proposed ENG06 domain-execution contract status:** `DESIGN_ONLY_UNWIRED`. Do not deploy or dispatch.
 
 ## 5. W0 ratification dependency, exact signoff
 

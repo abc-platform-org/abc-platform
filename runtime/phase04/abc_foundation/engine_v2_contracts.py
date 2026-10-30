@@ -130,9 +130,36 @@ def validate_port(message,*,engine,response=False,request=None):
     return {"valid":True,"dispatch_authorized":False,"release_approved":False}
 
 
+def error_envelope_schema(engine):
+    """Strict v2 error port: no free-text exception, client media or secret echo."""
+    port=_port(engine)
+    props={key:envelope_schema(engine)["properties"][key]
+           for key in _FIELDS if key!="payload"}
+    props.update({"error":{"type":"object","additionalProperties":False,
+        "required":["code","retryable"],"properties":{
+            "code":{"enum":port["errors"]},"retryable":{"const":False}}},
+        "release_approved":{"const":False},
+        "execution_authorized":{"const":False}})
+    return {"$schema":"https://json-schema.org/draft/2020-12/schema",
+        "type":"object","additionalProperties":False,
+        "required":[x for x in _FIELDS if x!="payload"]+
+                   ["error","release_approved","execution_authorized"],
+        "properties":props}
+
+
+def validate_error(message,*,engine,request):
+    validate_port(request,engine=engine)
+    if not Draft202012Validator(error_envelope_schema(engine),**_DEFAULT).is_valid(message):
+        raise DomainError(422,"v2_error_envelope_invalid")
+    if any(message[f]!=request[f] for f in _FIELDS if f!="payload"):
+        raise DomainError(403,"v2_error_scope_or_correlation_mismatch")
+    return True
+
 def stub_response(message,*,engine):
-    """No runtime implementation: fail closed after validation."""
+    """Return an exact typed NOT_IMPLEMENTED error. Never call any engine."""
     validate_port(message,engine=engine)
-    return {"engine_id":engine,"contract_version":VERSION,
-            "status":"NOT_IMPLEMENTED","release_approved":False,
-            "execution_authorized":False}
+    response={key:message[key] for key in _FIELDS if key!="payload"}
+    response.update({"error":{"code":"NOT_IMPLEMENTED","retryable":False},
+                     "release_approved":False,"execution_authorized":False})
+    validate_error(response,engine=engine,request=message)
+    return response

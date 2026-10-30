@@ -170,8 +170,12 @@ class PostgresRuntimeTests(unittest.TestCase):
         # CAPTURE alone is insufficient for an AI Studio image.
         with self.assertRaises(DomainError):
             self.store.authorize_capture_preflight(self.principal,sid,0)
-        # ACTIVE evidence has immutable purpose; create independently verified
-        # synthetic proof covering both purposes rather than mutate it.
+        # Database permits only one live consent per session. Withdraw
+        # CAPTURE-only proof before issuing a separately scoped dual-purpose
+        # proof; never weaken the immutable-purpose or uniqueness controls.
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.consent_evidence SET status='WITHDRAWN',
+              revoked_at=clock_timestamp() WHERE consent_id=%s""",(consent,))
         paired=uuid.uuid4()
         with psycopg.connect(ADMIN) as con:
             con.execute("""INSERT INTO abc.consent_evidence(

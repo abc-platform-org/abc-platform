@@ -32,14 +32,13 @@ DECLARE
   v_digest text;
   v_now timestamptz:=clock_timestamp();
 BEGIN
-  IF (p_tenant IS NULL OR length(p_tenant) NOT BETWEEN 1 AND 128
+  -- SECURITY DEFINER changes current_user, but session_user remains the\n  -- immutable DB-authenticated principal checked by workload_allowed.\n  IF (p_tenant IS NULL OR length(p_tenant) NOT BETWEEN 1 AND 128
       OR p_issuer IS NULL OR length(p_issuer) NOT BETWEEN 9 AND 512
       OR p_issuer NOT LIKE 'https://%'
       OR p_audience IS NULL OR length(p_audience) NOT BETWEEN 3 AND 256
       OR p_jti IS NULL OR p_expires_at IS NULL
       OR p_expires_at<=v_now
       OR p_expires_at>v_now+interval '5 minutes'
-      OR current_user<>'abc_app'
       OR NOT abc.eng14_workload_allowed(p_tenant)
   ) THEN
     RAISE EXCEPTION 'ENG14 replay gate denied' USING ERRCODE='42501';
@@ -48,7 +47,7 @@ BEGIN
   -- changes cannot turn a previously consumed bearer into a new token.
   -- Digest avoids storing reusable bearer content.
   v_digest:=encode(sha256(convert_to(
-      p_issuer||E'\\x1f'||p_audience||E'\\x1f'||p_jti::text,'UTF8'
+      p_issuer||chr(31)||p_audience||chr(31)||p_jti::text,'UTF8'
     )),'hex');
   INSERT INTO abc.eng14_v2_replay_ledger(
       replay_digest,tenant_id,issuer,audience,issued_jti,expires_at)

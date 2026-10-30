@@ -12,6 +12,7 @@
 - Three SQL broker functions `eng06_ci_claim`, `eng06_ci_ack`, and `eng06_ci_fail` enforce exact physical session login/tenant/consumer, bounded leases, stale ACK protection, retry and DLQ. Jobs are claimable only while live, matching session state and non-revoked AI_PROCESSING+INTERNAL_HANDOFF consent are observed.
 - Source lineage is joined to the preceding *ACKED* ENG05 job, validated ENG05 result digest and immutable ENG05 outbox record. The outbox remains `BLOCKED_PENDING_AUTHORITY`. `ENG06` cannot infer a professional source from unverified synthetic knowledge.
 - The independent Python worker runs the bounded deterministic `SyntheticDecisionEngine` on its own claim, cross-validates ENG04/ENG05 artifact hashes, and records only `BLOCKED_PROFESSIONAL_SOURCE`. It is *not* allowed to create ENG07 look specifications, treat clients, perform technical planning or suggest an approved service.
+- A standalone **OS process** entrypoint (`python -m abc_foundation.eng06_review_worker`) is available only when `ABC_ENV=LOCAL_INTEGRATION_ONLY`, an exact disposable `abc_phase04_ci` PostgreSQL DSN and an explicit consumer ID are present. CI invokes it as a subprocess to confirm isolation; no private hosted service has been started.
 - **No production enqueue capability** exists: only an ephemeral CI database administrator explicitly inserts synthetic jobs from a previously ACKED ENG05 result. This is a disconnected *test bridge*, not the operational ENG05→06 dispatcher.
 
 ## 2. Security and failure model

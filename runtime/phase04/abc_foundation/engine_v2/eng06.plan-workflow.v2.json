@@ -1,0 +1,127 @@
+{
+  "schema_version": "abc.eng06.plan-workflow.v2.draft",
+  "status": "DESIGN_ONLY_ALL_EXECUTION_GUARDS_DISABLED",
+  "engine_id": "ENG-06",
+  "initial": "LOOK_SELECTED",
+  "terminal": [
+    "REJECTED",
+    "OPERATIONAL_HANDOFF"
+  ],
+  "states": [
+    "LOOK_SELECTED",
+    "PLAN_REQUESTED",
+    "EVIDENCE_CHECK",
+    "MISSING_REQUIRED_EVIDENCE",
+    "AWAITING_SPECIALIST_INPUT",
+    "SUFFICIENT_FOR_DRAFT",
+    "PLAN_DRAFTED",
+    "SPECIALIST_REVIEW",
+    "REJECTED",
+    "NEEDS_REVISION",
+    "CONDITIONALLY_VALIDATED",
+    "VALIDATED",
+    "OPERATIONAL_HANDOFF"
+  ],
+  "transitions": [
+    {
+      "from": "LOOK_SELECTED",
+      "to": "PLAN_REQUESTED",
+      "guard": "specialist_selected_look_and_session_cas",
+      "currently_executable": false
+    },
+    {
+      "from": "PLAN_REQUESTED",
+      "to": "EVIDENCE_CHECK",
+      "guard": "eng01_authorized_request",
+      "currently_executable": false
+    },
+    {
+      "from": "EVIDENCE_CHECK",
+      "to": "MISSING_REQUIRED_EVIDENCE",
+      "guard": "eng14_missing_evidence",
+      "currently_executable": false
+    },
+    {
+      "from": "MISSING_REQUIRED_EVIDENCE",
+      "to": "AWAITING_SPECIALIST_INPUT",
+      "guard": "specialist_input_required",
+      "currently_executable": false
+    },
+    {
+      "from": "AWAITING_SPECIALIST_INPUT",
+      "to": "EVIDENCE_CHECK",
+      "guard": "new_verified_evidence_and_cas",
+      "currently_executable": false
+    },
+    {
+      "from": "EVIDENCE_CHECK",
+      "to": "SUFFICIENT_FOR_DRAFT",
+      "guard": "all_required_provenance_and_policy_verified",
+      "currently_executable": false
+    },
+    {
+      "from": "SUFFICIENT_FOR_DRAFT",
+      "to": "PLAN_DRAFTED",
+      "guard": "versioned_draft_and_sop_source",
+      "currently_executable": false
+    },
+    {
+      "from": "PLAN_DRAFTED",
+      "to": "SPECIALIST_REVIEW",
+      "guard": "qualified_specialist_review_queue",
+      "currently_executable": false
+    },
+    {
+      "from": "SPECIALIST_REVIEW",
+      "to": "REJECTED",
+      "guard": "signed_rejection",
+      "currently_executable": false
+    },
+    {
+      "from": "SPECIALIST_REVIEW",
+      "to": "NEEDS_REVISION",
+      "guard": "signed_revision_request",
+      "currently_executable": false
+    },
+    {
+      "from": "NEEDS_REVISION",
+      "to": "EVIDENCE_CHECK",
+      "guard": "new_plan_version_and_evidence",
+      "currently_executable": false
+    },
+    {
+      "from": "SPECIALIST_REVIEW",
+      "to": "CONDITIONALLY_VALIDATED",
+      "guard": "signed_conditional_verdict",
+      "currently_executable": false
+    },
+    {
+      "from": "SPECIALIST_REVIEW",
+      "to": "VALIDATED",
+      "guard": "independent_qualified_specialist_validation_and_consent",
+      "currently_executable": false
+    },
+    {
+      "from": "CONDITIONALLY_VALIDATED",
+      "to": "SPECIALIST_REVIEW",
+      "guard": "conditions_resolved_and_rechecked",
+      "currently_executable": false
+    },
+    {
+      "from": "VALIDATED",
+      "to": "OPERATIONAL_HANDOFF",
+      "guard": "independent_eng14_gate_and_signed_operator_release",
+      "currently_executable": false
+    }
+  ],
+  "global_preconditions": [
+    "same_verified_tenant_branch_session",
+    "expected_state_version_cas",
+    "selected_look_lock_not_revoked",
+    "consent_purpose_and_revocation_verified",
+    "service_sop_signed_and_in_date",
+    "eng14_policy_evaluated",
+    "operator_authorization_for_handoff"
+  ],
+  "notes": "This is NOT a running state machine. Transitions cannot be executed until independent qualified specialist, consent and ENG14 policy verifier are deployed."
+}

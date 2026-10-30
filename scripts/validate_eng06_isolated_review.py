@@ -43,7 +43,7 @@ def check():
     ))
     assert "send_local_review_handoff(" not in PY
     assert "dispatch(" not in PY
-    assert "FROM abc.eng19_synthetic_outbox o" in SQL
+    assert "JOIN abc.eng19_synthetic_outbox o" in SQL
     assert any(e["from"]=="ENG-05" and e["to"]=="ENG-06"
                and e["artifact"]=="PROFESSIONAL_KNOWLEDGE_BUNDLE"
                and e["status"]=="SPEC_ONLY_UNWIRED"

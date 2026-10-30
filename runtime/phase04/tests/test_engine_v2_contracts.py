@@ -6,7 +6,7 @@ import uuid
 from pathlib import Path
 
 from abc_foundation.engine_v2_contracts import (
-    VERSION,FILES,envelope_schema,validate_port,stub_response)
+    VERSION,FILES,envelope_schema,validate_port,validate_error,stub_response)
 from abc_foundation.store import DomainError
 
 S="11111111-1111-4111-8111-111111111111"
@@ -171,6 +171,27 @@ class EngineV2PortTests(unittest.TestCase):
         out["result"]["operational_handoff_authorized"]=True
         with self.assertRaises(DomainError):
             validate_port(out,engine="ENG-06",response=True,request=req)
+
+    def test_v2_failure_envelope_is_scoped_and_fail_closed(self):
+        for engine in FILES:
+            req=request(engine)
+            error=stub_response(req,engine=engine)
+            self.assertTrue(validate_error(error,engine=engine,request=req))
+            self.assertEqual(error["error"]["code"],"NOT_IMPLEMENTED")
+            self.assertFalse(error["error"]["retryable"])
+            self.assertFalse(error["execution_authorized"])
+            self.assertNotIn("result",error)
+            self.assertNotIn("payload",error)
+            for change in (
+                {"tenant_id":"different-tenant"},
+                {"contract_version":"abc.internal.engine.synthetic.v1"},
+                {"execution_authorized":True},
+                {"error":{"code":"NOT_IMPLEMENTED","retryable":True}},
+                {"error":{"code":"SOME_UNKNOWN_ERROR","retryable":False}},
+            ):
+                unsafe={**error,**change}
+                with self.subTest(engine=engine,change=change),self.assertRaises(DomainError):
+                    validate_error(unsafe,engine=engine,request=req)
 
     def test_v1_dispatcher_and_contract_are_not_v2_routers(self):
         from abc_foundation import isolated_engine_service

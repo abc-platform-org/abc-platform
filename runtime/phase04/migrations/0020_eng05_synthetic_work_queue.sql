@@ -64,6 +64,9 @@ DO $migrator_read$ BEGIN
     CREATE POLICY eng19_migrator_binding_read
       ON abc.eng03_worker_bindings FOR SELECT TO abc_staging_migrator
       USING(true);
+    CREATE POLICY eng19_migrator_worker_login_read
+      ON abc.worker_login_bindings FOR SELECT TO abc_staging_migrator
+      USING(true);
   END IF;
 END $migrator_read$;
 
@@ -115,8 +118,11 @@ RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,abc
 AS $claim$
 DECLARE j abc.eng19_synthetic_jobs%ROWTYPE;v_lease uuid;v_now timestamptz:=clock_timestamp();
 BEGIN
-  IF session_user<>'abc_pipeline_worker' OR p_seconds NOT BETWEEN 1 AND 120
+  IF session_user='abc_pipeline_worker' OR p_seconds NOT BETWEEN 1 AND 120
      OR p_consumer IS NULL
+     OR NOT EXISTS (SELECT 1 FROM abc.worker_login_bindings w
+       WHERE w.login_name=session_user AND w.worker_role='abc_pipeline_worker'
+         AND w.consumer_id=p_consumer AND w.active)
   THEN RAISE EXCEPTION 'independent synthetic worker required' USING ERRCODE='42501'; END IF;
   -- A crashed worker on its third lease must not strand a perpetual LEASED
   -- row. Mark it DLQ before choosing another ready job, and only for a
@@ -130,11 +136,19 @@ BEGIN
       AND EXISTS(SELECT 1 FROM abc.eng03_worker_bindings b
         WHERE b.consumer_id=expired.consumer_id
           AND b.tenant_id=expired.tenant_id
-          AND b.worker_role=session_user AND b.active);
+          AND b.worker_role='abc_pipeline_worker' AND b.active
+        AND EXISTS(SELECT 1 FROM abc.worker_login_bindings w
+          WHERE w.login_name=session_user
+            AND w.worker_role='abc_pipeline_worker'
+            AND w.consumer_id=b.consumer_id AND w.tenant_id=b.tenant_id
+            AND w.active));
   SELECT job.* INTO j FROM abc.eng19_synthetic_jobs job
     JOIN abc.eng03_worker_bindings b
       ON b.consumer_id=job.consumer_id AND b.tenant_id=job.tenant_id
-        AND b.worker_role=session_user AND b.active
+        AND b.worker_role='abc_pipeline_worker' AND b.active
+    JOIN abc.worker_login_bindings w
+      ON w.login_name=session_user AND w.worker_role='abc_pipeline_worker'
+        AND w.consumer_id=b.consumer_id AND w.tenant_id=b.tenant_id AND w.active
     JOIN abc.sessions s
       ON s.session_id=job.session_id AND s.tenant_id=job.tenant_id
         AND s.branch_id=job.branch_id AND s.state='CREATED'
@@ -169,7 +183,7 @@ CREATE FUNCTION abc.eng19_ack_synthetic(
 AS $ack$
 DECLARE j abc.eng19_synthetic_jobs%ROWTYPE;v_out jsonb;v_sha text;
 BEGIN
- IF session_user<>'abc_pipeline_worker' OR p_lease IS NULL OR p_next IS NULL
+ IF session_user='abc_pipeline_worker' OR p_lease IS NULL OR p_next IS NULL
     OR p_out IS NULL OR octet_length(p_out) NOT BETWEEN 16 AND 32768
  THEN RAISE EXCEPTION 'worker ACK context denied' USING ERRCODE='42501'; END IF;
  SELECT * INTO j FROM abc.eng19_synthetic_jobs WHERE handoff_id=p_handoff FOR UPDATE;
@@ -177,7 +191,12 @@ BEGIN
     OR j.lease_until<=clock_timestamp()
     OR NOT EXISTS(SELECT 1 FROM abc.eng03_worker_bindings b
        WHERE b.consumer_id=j.consumer_id AND b.tenant_id=j.tenant_id
-         AND b.worker_role=session_user AND b.active)
+         AND b.worker_role='abc_pipeline_worker' AND b.active
+         AND EXISTS(SELECT 1 FROM abc.worker_login_bindings w
+            WHERE w.login_name=session_user
+              AND w.worker_role='abc_pipeline_worker'
+              AND w.consumer_id=b.consumer_id AND w.tenant_id=b.tenant_id
+              AND w.active))
  THEN RAISE EXCEPTION 'stale lease or revoked worker denied' USING ERRCODE='42501'; END IF;
  IF NOT EXISTS(
    SELECT 1 FROM abc.sessions s
@@ -218,7 +237,7 @@ RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,abc
 AS $fail$
 DECLARE j abc.eng19_synthetic_jobs%ROWTYPE;v_status text;
 BEGIN
- IF session_user<>'abc_pipeline_worker'
+ IF session_user='abc_pipeline_worker'
     OR p_error IS NULL OR p_error !~ '^CI_[A-Z_]{3,60}$'
  THEN RAISE EXCEPTION 'synthetic worker failure denied' USING ERRCODE='42501'; END IF;
  SELECT * INTO j FROM abc.eng19_synthetic_jobs WHERE handoff_id=p_handoff FOR UPDATE;
@@ -226,7 +245,12 @@ BEGIN
     OR j.lease_until<=clock_timestamp()
     OR NOT EXISTS(SELECT 1 FROM abc.eng03_worker_bindings b
       WHERE b.consumer_id=j.consumer_id AND b.tenant_id=j.tenant_id
-        AND b.worker_role=session_user AND b.active)
+        AND b.worker_role='abc_pipeline_worker' AND b.active
+        AND EXISTS(SELECT 1 FROM abc.worker_login_bindings w
+           WHERE w.login_name=session_user
+             AND w.worker_role='abc_pipeline_worker'
+             AND w.consumer_id=b.consumer_id AND w.tenant_id=b.tenant_id
+             AND w.active))
  THEN RAISE EXCEPTION 'stale worker fail receipt' USING ERRCODE='42501'; END IF;
  v_status:=CASE WHEN j.attempts>=3 THEN 'DLQ' ELSE 'QUEUED' END;
  UPDATE abc.eng19_synthetic_jobs SET status=v_status,

@@ -9,6 +9,7 @@ from .store import DomainError
 
 SESSION_RE = re.compile(r"^/v1/consultations/([a-f0-9-]{36})$")
 COMMAND_RE = re.compile(r"^/_foundation/v0/consultations/([a-f0-9-]{36})/(pause|resume)$")
+MEDIA_RE = re.compile(r"^/v1/consultations/([a-f0-9-]{36})/media$")
 MAX_BODY = 4096
 
 
@@ -95,6 +96,20 @@ def handler_factory(store, signing_secret, identity_verifier=None):
                         actor, match.group(1), match.group(2),
                         self._expected(), self.headers.get("Idempotency-Key"))
                     return self._json(200, result)
+                # This is a deny-first PRECAPTURE CHECK only. No request body
+                # or image bytes are read, retained, or sent to a model.
+                media = MEDIA_RE.fullmatch(self.path)
+                if media:
+                    preflight = getattr(store, "authorize_capture_preflight", None)
+                    if not callable(preflight):
+                        raise DomainError(403, "pre_capture_authority_unavailable")
+                    result = preflight(actor, media.group(1), self._expected())
+                    if (not isinstance(result, dict)
+                            or result.get("consent_checked") is not True
+                            or result.get("capture_authorized") is not False
+                            or result.get("customer_media_accepted") is not False):
+                        raise DomainError(403, "pre_capture_authority_untrusted")
+                    raise DomainError(501, "capability_not_implemented")
                 # No unverified consent, media, business, or model adapters.
                 if self.path.startswith("/v1/"):
                     raise DomainError(501, "capability_not_implemented")

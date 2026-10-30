@@ -55,6 +55,18 @@ DO $acl$ DECLARE t text; BEGIN
   END LOOP;
 END $acl$;
 
+-- In managed staging the SECURITY DEFINER migrator obeys FORCE RLS
+-- on this pre-existing worker-binding table. Give ONLY that migration owner
+-- SELECT visibility for enforcing the physical worker role's active binding.
+-- No application/worker SELECT privilege is added by this policy.
+DO $migrator_read$ BEGIN
+  IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='abc_staging_migrator') THEN
+    CREATE POLICY eng19_migrator_binding_read
+      ON abc.eng03_worker_bindings FOR SELECT TO abc_staging_migrator
+      USING(true);
+  END IF;
+END $migrator_read$;
+
 CREATE FUNCTION abc.eng19_submit_synthetic(
   p_handoff uuid,p_tenant text,p_branch text,p_session uuid,p_version integer,
   p_correlation uuid,p_artifact_sha text,p_message_sha text,p_source bytea,

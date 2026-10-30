@@ -31,13 +31,19 @@ def validate():
         "status='LEASED'",
         "status='ACKED'",
         "'DLQ'",
-        "IF session_user<>'abc_pipeline_worker'",
+        "IF session_user='abc_pipeline_worker'",
+        "w.login_name=session_user",
+        "w.worker_role='abc_pipeline_worker'",
+        "w.consumer_id=b.consumer_id AND w.tenant_id=b.tenant_id",
+        "eng19_migrator_worker_login_read",
         "p_tenant IS DISTINCT FROM 'tenant-test'",
         "p_branch IS DISTINCT FROM 'branch-test'"
     ):
         assert statement in sql,statement
     assert "abc.eng19_synthetic_outbox" in sql
     assert "downstream_dispatched" in py
+    assert py.count("SET LOCAL ROLE abc_pipeline_worker")==3
+    assert "session_user<>'abc_pipeline_worker'" not in sql
     assert "BLOCKED_PENDING_AUTHORITY" in py
     assert '"LOCAL_INTEGRATION_ONLY"' in py
     assert "SyntheticKnowledgeEngine().resolve" in py

@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "adapter_id",
+    "protocol",
+    "source_engine",
+    "target_engine",
+    "projection",
+    "status",
+    "downstream_dispatch_authorized",
+    "customer_release_approved",
+    "source_protocol",
+    "source_request_sha256",
+    "source_response_sha256",
+    "projection_sha256",
+    "tenant_id",
+    "branch_id",
+    "session_id",
+    "state_version",
+    "correlation_id",
+    "professional_validation_complete",
+    "provenance_authority_verified",
+    "service_kind"
+  ],
+  "properties": {
+    "adapter_id": {
+      "enum": [
+        "A04_TO_06_DECISION_INPUT",
+        "A04_TO_07_LOOK_SPEC_INPUT",
+        "A05_TO_06_DECISION_EVIDENCE",
+        "A06_TO_15_PLAN_CANDIDATE",
+        "A04_PIXEL_TO_11_QA_EVIDENCE",
+        "A06_SOURCE_TO_16_REVIEW_EVIDENCE"
+      ]
+    },
+    "protocol": {
+      "const": "abc.bridge.v2-to-19.v0.review"
+    },
+    "source_engine": {
+      "enum": [
+        "ENG-04",
+        "ENG-05",
+        "ENG-06"
+      ]
+    },
+    "target_engine": {
+      "enum": [
+        "ENG-06",
+        "ENG-07",
+        "ENG-11",
+        "ENG-15",
+        "ENG-16"
+      ]
+    },
+    "projection": {
+      "type": "object"
+    },
+    "status": {
+      "const": "REVIEW_ONLY_UNWIRED"
+    },
+    "downstream_dispatch_authorized": {
+      "const": false
+    },
+    "customer_release_approved": {
+      "const": false
+    },
+    "source_protocol": {
+      "const": "abc.internal.engine.v2.draft"
+    },
+    "source_request_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_response_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "projection_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "branch_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "professional_validation_complete": {
+      "const": false
+    },
+    "provenance_authority_verified": {
+      "const": false
+    },
+    "service_kind": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A04_TO_06_DECISION_INPUT"
+            },
+            "source_engine": {
+              "const": "ENG-04"
+            },
+            "target_engine": {
+              "const": "ENG-06"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "candidate_looks",
+                "uncertainty",
+                "visual_qa_status",
+                "independent_decision_verified"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "candidate_looks": {},
+                "uncertainty": {},
+                "visual_qa_status": {},
+                "independent_decision_verified": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A04_TO_07_LOOK_SPEC_INPUT"
+            },
+            "source_engine": {
+              "const": "ENG-04"
+            },
+            "target_engine": {
+              "const": "ENG-07"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "draft_looks",
+                "look_lock_verified",
+                "rendered_visual_exists"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "draft_looks": {},
+                "look_lock_verified": {},
+                "rendered_visual_exists": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A05_TO_06_DECISION_EVIDENCE"
+            },
+            "source_engine": {
+              "const": "ENG-05"
+            },
+            "target_engine": {
+              "const": "ENG-06"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "eligible_look_ids",
+                "excluded_look_ids",
+                "critical_unknowns",
+                "knowledge_source_digests",
+                "signed_policy_verified",
+                "specialist_selection_authorized"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "eligible_look_ids": {},
+                "excluded_look_ids": {},
+                "critical_unknowns": {},
+                "knowledge_source_digests": {},
+                "signed_policy_verified": {},
+                "specialist_selection_authorized": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A06_TO_15_PLAN_CANDIDATE"
+            },
+            "source_engine": {
+              "const": "ENG-06"
+            },
+            "target_engine": {
+              "const": "ENG-15"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "selected_look_id",
+                "plan_template_sha256",
+                "missing_requirements",
+                "sop_and_consent_independently_verified",
+                "specialist_validation_verified",
+                "technical_procedure_authorized"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "selected_look_id": {},
+                "plan_template_sha256": {},
+                "missing_requirements": {},
+                "sop_and_consent_independently_verified": {},
+                "specialist_validation_verified": {},
+                "technical_procedure_authorized": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A04_PIXEL_TO_11_QA_EVIDENCE"
+            },
+            "source_engine": {
+              "const": "ENG-04"
+            },
+            "target_engine": {
+              "const": "ENG-11"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "source_pixel_digest",
+                "candidate_pixel_digest",
+                "changed_outside_edit_mask",
+                "changed_within_protected_face",
+                "edited_within_mask",
+                "face_mask_verified",
+                "identity_verified",
+                "reference_provenance_verified",
+                "independent_visual_review_complete"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "source_pixel_digest": {},
+                "candidate_pixel_digest": {},
+                "changed_outside_edit_mask": {},
+                "changed_within_protected_face": {},
+                "edited_within_mask": {},
+                "face_mask_verified": {},
+                "identity_verified": {},
+                "reference_provenance_verified": {},
+                "independent_visual_review_complete": {}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "adapter_id": {
+              "const": "A06_SOURCE_TO_16_REVIEW_EVIDENCE"
+            },
+            "source_engine": {
+              "const": "ENG-06"
+            },
+            "target_engine": {
+              "const": "ENG-16"
+            },
+            "projection": {
+              "type": "object",
+              "required": [
+                "source_status",
+                "source_ref",
+                "source_record_type",
+                "signed_source_content_verified",
+                "independent_specialist_qualification_verified",
+                "professional_validation_complete"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "source_status": {},
+                "source_ref": {},
+                "source_record_type": {},
+                "signed_source_content_verified": {},
+                "independent_specialist_qualification_verified": {},
+                "professional_validation_complete": {}
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

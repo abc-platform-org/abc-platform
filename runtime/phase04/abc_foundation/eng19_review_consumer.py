@@ -54,23 +54,25 @@ class PostgresReviewInbox:
                             (message["tenant_id"],))
                 con.execute("SELECT set_config('abc.branch',%s,true)",
                             (message["branch_id"],))
-                result=con.execute(
-                    """SELECT abc.eng19_record_review_handoff(
-                      %s,%s,%s,%s,%s,%s,%s,%s,%s,%s) AS receipt""",args).fetchone()
-                if not result or result["receipt"] not in (
-                      "RECORDED_REVIEW_ONLY","ALREADY_RECORDED_REVIEW_ONLY"):
-                    raise DomainError(503,"review_receipt_not_committed")
-                status=result["receipt"]
-                if source_artifact is not None:
-                    response=con.execute("""SELECT abc.eng19_submit_synthetic(
+                if source_artifact is None:
+                    row=con.execute(
+                        """SELECT abc.eng19_record_review_handoff(
+                          %s,%s,%s,%s,%s,%s,%s,%s,%s,%s) AS status""",args).fetchone()
+                else:
+                    # A single DB-owned function atomically validates the
+                    # review receipt, immutable source payload and queued job.
+                    # No partial receipt can survive a failed artifact check.
+                    row=con.execute("""SELECT abc.eng19_submit_synthetic(
                         %s,%s,%s,%s,%s,%s,%s,%s,%s,%s) AS status""",
                         (uuid.UUID(message["handoff_id"]),message["tenant_id"],
                          message["branch_id"],uuid.UUID(message["session_id"]),
                          message["state_version"],uuid.UUID(message["correlation_id"]),
                          message["artifact_sha256"],_canonical_sha(message),
                          source_bytes,consumer_id)).fetchone()
-                    if not response or response["status"]!=status:
-                        raise DomainError(503,"source_and_job_receipt_not_atomic")
+                if not row or row["status"] not in (
+                    "RECORDED_REVIEW_ONLY","ALREADY_RECORDED_REVIEW_ONLY"):
+                    raise DomainError(503,"review_receipt_not_committed")
+                status=row["status"]
         except DomainError:
             raise
         except Exception as exc:

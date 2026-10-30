@@ -8,6 +8,7 @@ independent specialist visual QA. No media is stored or uploaded.
 """
 import hashlib
 import io
+import math
 from dataclasses import dataclass
 
 from PIL import Image, ImageChops, ImageFilter, ImageOps, ImageStat, UnidentifiedImageError
@@ -73,6 +74,34 @@ def _pixel_digest(image):
     return hashlib.sha256(
         image.width.to_bytes(4,"big")+image.height.to_bytes(4,"big")+
         image.tobytes()).hexdigest()
+
+
+def _rgb_to_lab(rgb):
+    """CIE Lab D65 approximation on region means; measured, NOT model inference."""
+    values=[]
+    for channel in rgb:
+        c=channel/255.0
+        values.append(c/12.92 if c<=0.04045 else ((c+0.055)/1.055)**2.4)
+    r,g,b=values
+    x=(0.4124564*r+0.3575761*g+0.1804375*b)/0.95047
+    y=(0.2126729*r+0.7151522*g+0.0721750*b)
+    z=(0.0193339*r+0.1191920*g+0.9503041*b)/1.08883
+    def f(t):
+        return t**(1.0/3.0) if t>0.008856451679 else (7.787037*t+16.0/116.0)
+    X,Y,Z=(f(x),f(y),f(z))
+    return (116*Y-16,500*(X-Y),200*(Y-Z))
+
+
+def _editable_color_features(before,after,editable_mask):
+    before_mean=ImageStat.Stat(before,editable_mask).mean
+    after_mean=ImageStat.Stat(after,editable_mask).mean
+    lab_before=_rgb_to_lab(before_mean)
+    lab_after=_rgb_to_lab(after_mean)
+    delta=math.sqrt(sum((x-y)**2 for x,y in zip(lab_before,lab_after)))
+    return {"before_region_mean_rgb":list(round(v,2) for v in before_mean),
+            "after_region_mean_rgb":list(round(v,2) for v in after_mean),
+            "delta_e_76_region_mean":round(delta,3),
+            "metric_interpretation":"REGION_COLOR_CHANGE_ONLY_NO_HAIR_CLASSIFICATION"}
 
 
 def _image_metrics(image):
@@ -177,6 +206,7 @@ def inspect_visual_fidelity(*,before_bytes,after_bytes,editable_mask_png,
             "protected_face_pixels":protected,
             "changed_within_protected_face":face_changed,
             "changed_outside_fraction":round(locked_changed/n,8),
+            "editable_region_color":_editable_color_features(before,after,edit),
             "before":_image_metrics(before),
             "after":_image_metrics(after)
         },

@@ -151,3 +151,39 @@ class SyntheticEng06ReviewWorker:
         except (DomainError,ValueError,KeyError,TypeError):
             self.fail(claim,error_code="CI_PROCESSING_DENIED")
             raise
+
+
+def main():
+    """Separate OS-process entrypoint for DISPOSABLE CI ONLY.
+
+    No hosted mode, no external worker deployment and no automatic enqueue.
+    """
+    from psycopg.conninfo import conninfo_to_dict
+    from .pg_store import PostgresStore
+
+    SyntheticEng06ReviewWorker._local()
+    dsn=os.environ.get("ABC_TEST_PG_ENG06_LOGIN_DSN","")
+    consumer=os.environ.get("ABC_ENG06_CI_CONSUMER","")
+    try:
+        config=conninfo_to_dict(dsn)
+    except Exception as exc:
+        raise SystemExit("eng06_ci_dsn_invalid") from exc
+    if (config.get("user")!="abc_eng06_ci_login"
+        or config.get("host") not in ("localhost","127.0.0.1","::1")
+        or config.get("dbname")!="abc_phase04_ci"
+        or not 3<=len(consumer)<=64):
+        raise SystemExit("eng06_local_isolation_required")
+    import json
+    result=SyntheticEng06ReviewWorker(
+        store=PostgresStore(dsn),consumer_id=consumer).process_once()
+    # Only minimal status is emitted; never output customer payloads.
+    print(json.dumps({
+        "engine_id":"ENG-06",
+        "status":result["status"] if result else "NO_REVIEW_JOB",
+        "downstream_dispatched":False,
+        "customer_release_approved":False
+    },sort_keys=True))
+
+
+if __name__=="__main__":
+    main()

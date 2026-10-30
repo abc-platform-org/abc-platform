@@ -68,6 +68,15 @@ def validate(registry,graph,handoff,quality):
             module=ROOT/"runtime/phase04/abc_foundation"/e["implementation_module"]
             assert module.is_file(),("missing_impl_evidence",id,module)
 
+    # Keep the historical seven-engine quality registry as a true subset,
+    # not a second competing authority for the target 19 logical owners.
+    previous=json.loads((ROOT/"governance/engine_quality_registry.v1.json").read_text())
+    assert previous["engine_count"]==7
+    previous_ids={e["id"] for e in previous["engines"]}
+    assert previous_ids==FOUNDATION
+    assert all(e["current_state"]=="IN_PROGRESS" and
+               e["completion_claim"] is False and
+               e["real_customer_ready"] is False for e in previous["engines"])
     aliases=registry["legacy_compatibility"]
     assert len(aliases)==6
     assert aliases[0]["policy"]=="IMMUTABLE_NO_IMPLICIT_PROMOTION"

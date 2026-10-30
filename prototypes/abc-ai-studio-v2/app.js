@@ -25,8 +25,8 @@
     $("after-hair").className="hair-shape "+(state.look==="cool"?"":state.look);
     setLabel("look-caption",lookNames[state.look]+" — فقط مدل شماتیک");
     setLabel("canvas-mode",modes[state.mode]+" / Demo");
-    const activeRegions = ["HAIR"];
-    if ($("skin").checked) activeRegions.push("SKIN");
+    const activeRegions = [];
+    if ($("hair").checked) activeRegions.push("HAIR");
     setLabel("region-label", "Editable: "+activeRegions.join(" + ")+" | FACE / BACKGROUND: LOCKED");
     setLabel("lock-status",state.selected
       ? "انتخاب آزمایشی: "+lookNames[state.selected]+
@@ -39,6 +39,7 @@
       (state.selected?"Look فقط در نمونه انتخاب شده؛ ":"هنوز Look انتخاب نشده؛ ")+
       "شواهد، رضایت، SOP و اعتبارسنجی متخصص موجود نیست.");
     $("lock-look").textContent="انتخاب Look در نمونه آزمایشی";
+    $("lock-look").disabled=!$("hair").checked;
     $("check-plan").disabled=false;
   }
   document.querySelectorAll("[data-mode]").forEach(button=>{
@@ -48,6 +49,7 @@
     button.addEventListener("click",()=>{state.look=button.dataset.look;render();});
   });
   $("lock-look").addEventListener("click",()=>{
+    if (!$("hair").checked) return;
     state.selected=state.look;render();
   });
   $("check-plan").addEventListener("click",()=>{
@@ -58,7 +60,7 @@
   $("service").addEventListener("change",()=>{
     state.selected=null;render();
   });
-  ["hair","skin"].forEach(id=>$(id).addEventListener("change",render));
+  $("hair").addEventListener("change",()=>{state.selected=null;render();});
   $("reset").addEventListener("click",()=>{
     state.mode="transform";state.look="cool";state.selected=null;
     $("service").value="HAIR_COLOR";

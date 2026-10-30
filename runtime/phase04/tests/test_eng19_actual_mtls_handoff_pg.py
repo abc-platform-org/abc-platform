@@ -302,3 +302,35 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
                SET state_version=state_version+1
                WHERE session_id=%s""",(self.session,))
         self.assertEqual(self.call()["status"],"REJECTED")
+
+    def test_real_bounded_eng04_synthetic_output_over_authenticated_network(self):
+        from abc_foundation.eng04_analysis import SyntheticBeautyAnalysis,FIELDS
+        from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
+        from abc_foundation.eng19_review_producer import (
+            eng04_synthetic_analysis_candidate)
+        from abc_foundation.eng19_review_consumer import _canonical_sha
+        data=[{"attribute_key":key,"evidence_id":str(uuid.uuid4()),
+               "service_id":SYNTHETIC_SERVICE,"session_id":self.session,
+               "evidence_class":"USER_REPORTED","source_type":"CLIENT_ANSWER",
+               "value":"NO" if key!="goal" else "COOLER_BROWN"}
+              for key in sorted(FIELDS)]
+        analysis=SyntheticBeautyAnalysis().analyse(
+            session_id=self.session,evidence=data)
+        message=eng04_synthetic_analysis_candidate(
+            analysis=analysis,tenant_id="tenant-test",
+            branch_id="branch-test",state_version=2,
+            correlation_id=self.message["correlation_id"],
+            handoff_id=self.message["handoff_id"],
+            policy_proof_ref="synthetic:eng14-policy-proof")
+        self.assertEqual(message["artifact_sha256"],_canonical_sha(analysis))
+        receipt=self.call(message=message)
+        self.assertEqual(receipt["status"],"RECORDED_REVIEW_ONLY")
+        self.assertFalse(receipt["consumer_execution_authorized"])
+        analysis["service_scope"]="REAL_CUSTOMER"
+        with self.assertRaises(DomainError):
+            eng04_synthetic_analysis_candidate(
+                analysis=analysis,tenant_id="tenant-test",
+                branch_id="branch-test",state_version=2,
+                correlation_id=self.message["correlation_id"],
+                handoff_id=str(uuid.uuid4()),
+                policy_proof_ref="synthetic:eng14-policy-proof")

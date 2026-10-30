@@ -282,3 +282,23 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
             deliver_review_with_bounded_retry(token_provider=self.fixture.token,
                 max_attempts=3,transport=deny,**args)
         self.assertEqual(len(calls),1)
+
+    def test_review_inbox_direct_dml_is_not_an_application_capability(self):
+        for statement in (
+           "SELECT * FROM abc.eng19_review_inbox",
+           """DELETE FROM abc.eng19_review_inbox WHERE handoff_id=
+              '11111111-1111-4111-8111-111111111111'"""
+        ):
+            with self.subTest(statement=statement):
+                with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                    with psycopg.connect(self.app) as con:
+                        con.execute(statement)
+
+    def test_database_state_version_fence_rejects_authenticated_stale_handoff(self):
+        with psycopg.connect(self.admin,autocommit=True) as con:
+            # State itself is unchanged; no prohibited state-transition
+            # trigger is bypassed. The snapshot version becomes stale.
+            con.execute("""UPDATE abc.sessions
+               SET state_version=state_version+1
+               WHERE session_id=%s""",(self.session,))
+        self.assertEqual(self.call()["status"],"REJECTED")

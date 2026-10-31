@@ -62,8 +62,18 @@ class PostgresReviewInbox:
                     # A single DB-owned function atomically validates the
                     # review receipt, immutable source payload and queued job.
                     # No partial receipt can survive a failed artifact check.
-                    row=con.execute("""SELECT abc.eng19_submit_synthetic(
-                        %s,%s,%s,%s,%s,%s,%s,%s,%s,%s) AS status""",
+                    # Persisted ENG04 reports have the ENG03 source manifest
+                    # signed into their immutable bytes. The dedicated SQL
+                    # broker crosschecks those exact bytes against an ACKed
+                    # ENG04 job. Legacy tenant-test review fixtures keep their
+                    # frozen historical function; no live routing is opened.
+                    verified_source=(source_artifact.get("source_engine")=="ENG-03"
+                        and isinstance(source_artifact.get("source_manifest_sha256"),str))
+                    function_name=("abc.eng19_submit_verified_eng04"
+                        if verified_source else "abc.eng19_submit_synthetic")
+                    query=("SELECT "+function_name+
+                           "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) AS status")
+                    row=con.execute(query,
                         (uuid.UUID(message["handoff_id"]),message["tenant_id"],
                          message["branch_id"],uuid.UUID(message["session_id"]),
                          message["state_version"],uuid.UUID(message["correlation_id"]),

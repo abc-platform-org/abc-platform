@@ -227,8 +227,9 @@ BEGIN
  IF jsonb_typeof(v_out)<>'object'
    OR v_out->>'ontology_version'<>'synthetic-ontology.1'
    OR v_out->>'service_id'<>'synthetic:hair-color'
-   OR v_out->'retrieval_sources'<>'[]'::jsonb
-   OR NOT (v_out->'unknowns' ? 'SOURCE_UNVERIFIED')
+   OR v_out->'retrieval_sources' IS DISTINCT FROM '[]'::jsonb
+   OR v_out->'grounded_facts' IS DISTINCT FROM '[]'::jsonb
+   OR v_out->'unknowns' IS DISTINCT FROM '["SOURCE_UNVERIFIED"]'::jsonb
  THEN RAISE EXCEPTION 'unapproved or invented knowledge result' USING ERRCODE='42501'; END IF;
  v_sha:=encode(sha256(p_out),'hex');
  INSERT INTO abc.eng19_synthetic_results(

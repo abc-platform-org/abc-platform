@@ -6,7 +6,7 @@
 
 ## Official currentness cross-check
 
-BAuA's official public TRGS register currently lists **TRGS 530 Friseurhandwerk, April 2023, GMBl 2023 S. 627–634, no amendment noted on the specific register entry**, as checked on 31 October 2026:
+BAuA's publicly indexed official register lists **TRGS 530 Friseurhandwerk, April 2023, GMBl 2023 S. 627–634** with no amendment listed on the specific entry in the index snapshot checked on 31 October 2026. The direct BAuA register fetch returned HTTP 403 in the model's browsing environment, so this is **indexed register evidence**, not an independently executed authoritative real-time version API query. An independent professional must still reconfirm the live register:
 
 - https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS
 - Primary file: https://www.baua.de/DE/Angebote/Rechtstexte-und-Technische-Regeln/Regelwerk/TRGS/pdf/TRGS-530.pdf?__blob=publicationFile
@@ -23,6 +23,14 @@ The register’s absence of a displayed amendment is evidence only *as of the da
 If either supplier's network blocks access, the CI report is `NO_VERIFIED_PDF_BYTES` with SHA `null`; no replacement hash of a webpage or JSON summary is permitted. A passing real-byte receipt does not assert that the PDF itself was publisher-signed, that legal reuse is allowed, or that the entire PDF text is suitable as AI model input. **Independent publisher checksum, if available, should be compared outside CI** before treating integrity as publisher-attested.
 
 A GitHub Actions step probes the raw file as **report-only evidence**, and normal PostgreSQL/Python regression runs remain mandatory. Local input verification is supported only for PDF bytes already obtained through an approved channel; no direct ENG05 runtime reference is created.
+
+## Actual PDF bytes verified in GitHub Actions
+
+The first **successful real download** occurred in GitHub Actions [Foundation CI #413](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41233336210) (exact code commit `f7cb9609661ba829cc70b909f8d18d89cb4f5872`). The runner fetched the BGW official file over HTTPS, validated 15 PDF pages and the first-page title/edition and hashed **741,429 actual file bytes**. Technical SHA-256:
+
+`356fc7d7ef4d4dc56ae687c72dfbf00d156b65ae494553f15f0060d7b46b5628`
+
+The PDF itself was **never committed or copied into ABC assets**. A metadata-only immutable receipt is `governance/abc_eng05_trgs530_bgw_pdf_byte_receipt_2026-10-31.v1.review.json`; Migration **0029** stores the technical SHA in a separate FORCE-RLS append-only table. The earlier `0028` intake case remains unchanged as a historical snapshot. No independent publisher **signed** checksum was available for comparison; consequently, source-publisher attestation, commercial use, specialist authorization and ENG06 are all still blocked.
 
 ## Legal reuse boundaries: German `UrhG §5`
 

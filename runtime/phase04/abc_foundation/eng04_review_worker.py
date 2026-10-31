@@ -91,6 +91,11 @@ class SyntheticEng04ReviewWorker:
             or result.get("service_scope")!="SYNTHETIC_NON_MEDIA_ONLY"
             or result.get("evidence_ids")!=sorted(x["evidence_id"] for x in evidence)):
             raise DomainError(403,"eng04_generated_report_invalid")
+        # Bind the exact ENG03 source-manifest to the independently versioned
+        # BEAUTY_ANALYSIS_REPORT. The upstream source is not trusted by name.
+        result["source_manifest_sha256"]=claim["source_manifest_sha256"]
+        result["source_engine"]="ENG-03"
+        result["professional_validation_verified"]=False
         return result
 
     def ack(self,claim,report):

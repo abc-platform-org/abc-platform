@@ -50,6 +50,20 @@ class PureProvenanceTests(unittest.TestCase):
                          self.claim["source_manifest_sha256"])
         self.assertFalse(output["professional_validation_verified"])
 
+    def test_report_schema_rejects_action_authority_and_modified_analysis(self):
+        report=self.worker.analyse(self.claim)
+        report["professional_validation_verified"]=True
+        with self.assertRaises(DomainError):
+            self.worker.ack(self.claim,report)
+        report=self.worker.analyse(self.claim)
+        report["attributes"][0]["value"]="INVENTED"
+        with self.assertRaises(DomainError):
+            self.worker.ack(self.claim,report)
+        report=self.worker.analyse(self.claim)
+        report["customer_release_approved"]=True
+        with self.assertRaises(DomainError):
+            self.worker.ack(self.claim,report)
+
     def test_tamper_record_digest_and_manifest_rejected(self):
         a=self.claim["sources"][0]["evidence"]
         a["value"]="INVENTED"

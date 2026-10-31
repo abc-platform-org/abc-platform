@@ -74,14 +74,14 @@ def validate_discovery_catalog(catalog):
     refs=catalog["references"]
     if not isinstance(refs,list) or not 1<=len(refs)<=12:
         raise SourceGovernanceError("catalog_reference_count_invalid")
-    ids=set()
+    ids=set();urls=set()
     for entry in refs:
         _exact(entry,("reference_id","title","publisher","url","source_class",
           "jurisdiction","scope","discovery_note","legal_effect",
           "raw_document_sha256","license_to_copy_verified",
           "expert_verified","status"),"reference_entry_shape")
         _official_url(entry["url"])
-        if (entry["reference_id"] in ids
+        if (entry["reference_id"] in ids or entry["url"] in urls
             or entry["status"]!="REFERENCE_ONLY"
             or entry["jurisdiction"]!="EU" or entry["scope"]!="HAIR_COLOR"
             or entry["raw_document_sha256"] is not None
@@ -92,12 +92,16 @@ def validate_discovery_catalog(catalog):
                          "discovery_note","legal_effect"))):
             raise SourceGovernanceError("unqualified_reference_claim")
         ids.add(entry["reference_id"])
+        urls.add(entry["url"])
     refs=catalog["professional_credential_authority_refs"]
     if not isinstance(refs,list) or not 1<=len(refs)<=10:
         raise SourceGovernanceError("authority_discovery_invalid")
     for entry in refs:
         _exact(entry,("authority_id","publisher","url","purpose"),"authority_entry")
         _official_url(entry["url"])
+        if any(not isinstance(entry[k],str) or not 3<=len(entry[k])<=200
+               for k in ("authority_id","publisher")):
+            raise SourceGovernanceError("authority_reference_invalid")
         if entry["purpose"] not in ("LOCATE_COMPETENT_AUTHORITY_NOT_VERIFY_PERSON",
                                   "IDENTIFY_STATUTORY_REGISTRATION_BASIS_NOT_VERIFY_PERSON"):
             raise SourceGovernanceError("authority_is_not_an_individual_credential")

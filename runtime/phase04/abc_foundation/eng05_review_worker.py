@@ -36,13 +36,18 @@ class SyntheticEng05ReviewWorker:
         self._local()
         if type(seconds) is not int or not 1<=seconds<=120:
             raise DomainError(422,"invalid_review_lease")
-        with self.store._connect() as con:
-            # The physical per-consumer LOGIN is NOINHERIT; acquire only the
-            # narrow NOLOGIN permission group for this transaction.
-            con.execute("SET LOCAL ROLE abc_eng05_worker")
-            row=con.execute("SELECT abc.eng19_claim_synthetic(%s,%s) AS job",
-                            (self.consumer,seconds)).fetchone()
-        return row["job"] if row else None
+        try:
+            with self.store._connect() as con:
+                # The physical per-consumer LOGIN is NOINHERIT; acquire only
+                # the narrow NOLOGIN group in this one DB transaction.
+                con.execute("SET LOCAL ROLE abc_eng05_worker")
+                row=con.execute("SELECT abc.eng19_claim_synthetic(%s,%s) AS job",
+                                (self.consumer,seconds)).fetchone()
+            return row["job"] if row else None
+        except DomainError:
+            raise
+        except Exception as exc:
+            raise DomainError(403,"eng05_claim_identity_or_source_denied") from exc
 
     def ack(self,claim,output,*,next_handoff_id):
         self._local()

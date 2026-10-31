@@ -1,0 +1,74 @@
+{
+  "contract": "abc.eng05.official-reference-discovery.v1.review",
+  "domain": "HAIR_COLOR",
+  "jurisdiction": "EU",
+  "discovered_on": "2026-10-31",
+  "status": "REFERENCE_DISCOVERED_NOT_PROFESSIONALLY_APPROVED",
+  "usage_policy": "URL_AND_OWN_METADATA_ONLY_NO_SOURCE_DOCUMENT_REPUBLICATION",
+  "external_credential_issuer_connected": false,
+  "professional_rights_cleared": false,
+  "specialist_signatures_collected": 0,
+  "professional_release_authorized": false,
+  "eng05_to_eng06_dispatch_authorized": false,
+  "references": [
+    {
+      "reference_id": "eu-commission-hair-dye-products",
+      "title": "Hair dye products — European Commission",
+      "publisher": "European Commission",
+      "url": "https://single-market-economy.ec.europa.eu/sectors/cosmetics/cosmetic-products-specific-topics/hair-dye-products_en",
+      "source_class": "OFFICIAL_REGULATOR_OVERVIEW",
+      "jurisdiction": "EU",
+      "scope": "HAIR_COLOR",
+      "discovery_note": "Official overview identifies Regulation (EC) 1223/2009 as governing hair dye cosmetic products.",
+      "legal_effect": "INFORMATIONAL_OVERVIEW_ONLY",
+      "raw_document_sha256": null,
+      "license_to_copy_verified": false,
+      "expert_verified": false,
+      "status": "REFERENCE_ONLY"
+    },
+    {
+      "reference_id": "eu-echa-annex-iii-cosmetic-restrictions",
+      "title": "Cosmetic Products Regulation Annex III restricted substances — ECHA",
+      "publisher": "European Chemicals Agency (ECHA)",
+      "url": "https://echa.europa.eu/cosmetics-restricted-substances/-/legislationlist/substance/100.023.232",
+      "source_class": "OFFICIAL_CHEMICAL_RESTRICTION_DATABASE",
+      "jurisdiction": "EU",
+      "scope": "HAIR_COLOR",
+      "discovery_note": "ECHA annex data indexes conditions and restrictions on use of cosmetic ingredients; ingredient-level checks must reference the current entry and product label.",
+      "legal_effect": "RESTRICTION_INDEX_NOT_SUBSTITUTION_FOR_LAW",
+      "raw_document_sha256": null,
+      "license_to_copy_verified": false,
+      "expert_verified": false,
+      "status": "REFERENCE_ONLY"
+    },
+    {
+      "reference_id": "eu-eurlex-cosmetics-regulation",
+      "title": "Regulation (EC) No 1223/2009 — EUR-Lex",
+      "publisher": "Publications Office of the European Union",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02009R1223-20221006",
+      "source_class": "OFFICIAL_LEGAL_TEXT",
+      "jurisdiction": "EU",
+      "scope": "HAIR_COLOR",
+      "discovery_note": "EUR-Lex legislation record provides a dated consolidation; a separate current-version and Official Journal verification is required before regulatory interpretation.",
+      "legal_effect": "DRAFT_DISCOVERY_NOT_LEGAL_ADVICE",
+      "raw_document_sha256": null,
+      "license_to_copy_verified": false,
+      "expert_verified": false,
+      "status": "REFERENCE_ONLY"
+    }
+  ],
+  "professional_credential_authority_refs": [
+    {
+      "authority_id": "eu-regulated-professions-database",
+      "publisher": "European Commission",
+      "url": "https://single-market-economy.ec.europa.eu/single-market/services/free-movement-professionals/database-regulated-professions_en",
+      "purpose": "LOCATE_COMPETENT_AUTHORITY_NOT_VERIFY_PERSON"
+    },
+    {
+      "authority_id": "de-handwerksordnung-hwo",
+      "publisher": "German Federal Ministry of Justice",
+      "url": "https://www.gesetze-im-internet.de/hwo/BJNR014110953.html",
+      "purpose": "IDENTIFY_STATUTORY_REGISTRATION_BASIS_NOT_VERIFY_PERSON"
+    }
+  ]
+}

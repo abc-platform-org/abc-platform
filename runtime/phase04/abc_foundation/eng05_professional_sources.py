@@ -11,6 +11,7 @@ import json
 import re
 from datetime import datetime, timezone
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+from cryptography.hazmat.primitives import serialization
 
 CONTRACT="abc.eng05.professional-source.v1.review"
 REVIEW_CONTRACT="abc.eng05.specialist-review.v1.review"
@@ -144,7 +145,9 @@ def _verify_review(review,doc,anchors,now):
         pub.verify(signature,canonical(payload))
     except Exception as exc:
         raise SourceGovernanceError("specialist_signature_invalid") from exc
-    return True
+    return hashlib.sha256(pub.public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw)).hexdigest()
 
 
 def adjudicate(documents, reviews, *, trusted_credentials=None, now=None):
@@ -171,12 +174,14 @@ def adjudicate(documents, reviews, *, trusted_credentials=None, now=None):
         matched=[r for r in reviews if isinstance(r,dict)
                  and r.get("source_sha256")==facts["document_sha256"]]
         reviewers=set()
+        public_keys=set()
         rejected=False;qualified=[]
         for review in matched:
-            _verify_review(review,doc,anchors,now)
-            if review["reviewer_id"] in reviewers:
+            signing_key_hash=_verify_review(review,doc,anchors,now)
+            if review["reviewer_id"] in reviewers or signing_key_hash in public_keys:
                 raise SourceGovernanceError("reviewer_duplicate_or_replay")
             reviewers.add(review["reviewer_id"])
+            public_keys.add(signing_key_hash)
             if review["decision"]!="APPROVE":
                 rejected=True
             qualified.append(review)

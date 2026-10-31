@@ -343,6 +343,25 @@ class ENG03PipelineTests(unittest.TestCase):
         self.assertEqual(stored[0],"BLOCKED_PENDING_AUTHORITY")
         self.assertEqual(stored[2],claimed["source_manifest_sha256"])
 
+    def test_eng04_actual_separate_os_process_from_verified_eng03_ledger(self):
+        import subprocess
+        import sys
+        worker,job,proof=self._eng04_real_ledger_fixture()
+        proc=subprocess.run(
+            [sys.executable,"-m","abc_foundation.eng04_review_worker"],
+            env={**os.environ,"ABC_ENG04_CI_CONSUMER":self.consumer},
+            capture_output=True,text=True,timeout=15)
+        self.assertEqual(proc.returncode,0,proc.stderr)
+        data=json.loads(proc.stdout)
+        self.assertEqual(data["engine_id"],"ENG-04")
+        self.assertEqual(data["status"],"ACKED_REVIEW_ONLY")
+        self.assertFalse(data["downstream_dispatched"])
+        self.assertIsNone(worker.process_once())
+        exported=worker.review_candidate(job,correlation_id=str(uuid.uuid4()),
+                                        handoff_id=str(uuid.uuid4()))
+        self.assertEqual(exported["message"]["to_engine"],"ENG-05")
+        self.assertFalse(exported["dispatch_authorized"])
+
     def test_eng04_separate_worker_parallel_claim_and_stale_lease_fencing(self):
         worker,job,proof=self._eng04_real_ledger_fixture()
         with ThreadPoolExecutor(max_workers=4) as pool:

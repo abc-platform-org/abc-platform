@@ -23,6 +23,18 @@ Only the **actual downloaded binary bytes** produce a SHA-256 and byte-count rep
 
 If the download fails the report explicitly says BLOCKED_SOURCE_BYTES_UNAVAILABLE and contains no fake document hash. Even a successful byte-hash proof does not prove commercial reuse rights, professional accuracy, a current legal interpretation, specialist credential, individual client's suitability or ENG06 release. The existing review case retains its null PDF digest until a separately accepted evidence version is produced.
 
+## Achieved actual BGW mirror download on 2026-10-31
+
+The isolated [GitHub Actions source acquisition #2](https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41233421217) downloaded the official **BGW-hosted version** with HTTP 200, 741,429 actual bytes and 15 verified PDF pages. First-page checks confirmed TRGS 530, Friseurhandwerk and 20.04.2023.
+
+**SHA-256 of BGW actual PDF bytes:** 356fc7d7ef4d4dc56ae687c72dfbf00d156b65ae494553f15f0060d7b46b5628.
+
+The BAuA CURRENT and LEGACY URLs both returned HTTP 403 from the same runner, so BAuA's binary PDF **has not been proven byte-identical** with the BGW mirror. The source acquisition ZIP artifact (id 13054547656, held seven days) contains only JSON metadata; the durable, non-content audit copy is governance/abc_eng05_trgs530_bgw_raw_pdf_provenance_2026-10-31.v1.review.json.
+
+Subsequent CI runs **pin this observed BGW digest** and refuse silent changes even when a future different PDF has a similar title. The earlier first-source case retains its original NULL raw-file digest, because its provenance was explicitly the BAuA original. This supplementary BGW record must be separately approved if used as a precise document reference.
+
+**Remaining distinction:** a SHA of authentic public PDF bytes proves content integrity against this observed binary, but not redistribution/commercial AI rights, independence or expertise of a specialist, trust-root enrollment, or permission to run ENG05/ENG06. Those remain blocked in Issue #70.
+
 ## External professional/legal messages, NOT SENT
 
 **Independent professional credential and safety reviewer request (German):**

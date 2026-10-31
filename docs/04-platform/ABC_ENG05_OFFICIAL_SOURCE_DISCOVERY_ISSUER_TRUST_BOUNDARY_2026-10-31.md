@@ -11,8 +11,10 @@ The first service is **EU / HAIR_COLOR** because hair-colouring ingredients and 
 | Identifier | Source/publisher | Verification URL | Why | Exact state |
 |---|---|---|---|---|
 | eu-commission-hair-dye-products | European Commission hair dye topic | https://single-market-economy.ec.europa.eu/sectors/cosmetics/cosmetic-products-specific-topics/hair-dye-products_en | Classifies product types and links to relevant EU regulatory materials | REFERENCE_ONLY |
-| eu-echa-annex-iii-cosmetic-restrictions | European Chemicals Agency | https://echa.europa.eu/cosmetics-restricted-substances/-/legislationlist/substance/100.023.232 | Locate Annex III substance restrictions; current entry/label must be validated | REFERENCE_ONLY |
+| eu-echa-annex-iii-cosmetic-restrictions | European Chemicals Agency | https://echa.europa.eu/cosmetics-restricted-substances | Locate Annex III substance restrictions; current entry/label must be validated | REFERENCE_ONLY |
 | eu-eurlex-cosmetics-regulation | EUR-Lex | https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02009R1223-20221006 | Dated EU cosmetics law consolidation requiring current-version cross-check | REFERENCE_ONLY |
+
+**Verification evidence (2026-10-31):** The European Commission hair-dye overview and its link to Regulation 1223/2009 were directly accessible. The ECHA Annex III landing page was identifiable in ECHA's indexed official page, but direct retrieval returned HTTP 403 in the verification environment. Direct EUR-Lex retrieval returned a JavaScript/anti-bot challenge; the URL references a **dated 2022 consolidation**, not a verified current consolidated copy. Neither page's raw legal/substance text was obtained, hashed, licensed, or independently reviewed. The catalog deliberately keeps `raw_document_sha256=null` and all professional clearance flags false.
 
 The technical authenticity of an official **URL** can be checked. It is not proof that the entire document was fetched and hashed, that the cited legal conditions apply to the proposed individual service, or that full text may be redistributed. Accordingly **raw document SHA=NULL, licence=false, reviewer=false, professional facts released=0**. Latest legal updates and the signed current legal text must be rechecked by a reviewer at actual qualification time.
 

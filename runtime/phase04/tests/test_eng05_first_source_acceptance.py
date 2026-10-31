@@ -126,7 +126,8 @@ class FirstSourcePostgresTests(unittest.TestCase):
                 source_metadata_bytes,source_metadata_sha256)
                 VALUES(%s,'DE','HAIR_COLOR',
                 'SALON_EMPLOYEE_OCCUPATIONAL_CHEMICAL_SAFETY',
-                'TRGS 530','2023-04-20',%s,%s,%s)""",
+                'TRGS 530','2023-04-20',%s,%s,%s)
+                ON CONFLICT(case_id) DO NOTHING""",
                 (case_id,SOURCE["primary_url"],raw,hashlib.sha256(raw).hexdigest()))
             status=con.execute("""SELECT review_state,source_document_sha256,
                   redistribution_rights_cleared,individual_specialist_license_verified,

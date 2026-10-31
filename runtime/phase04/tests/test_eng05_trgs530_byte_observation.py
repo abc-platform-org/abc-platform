@@ -142,7 +142,7 @@ class ByteObservationPostgresTests(unittest.TestCase):
           "case_id":self.case,"source":self.url,
           "sha256":self.observed_sha,
           "scope":"CI_INVALID_AS_OFFICIAL_DOCUMENT",
-          "authorized":False})
+          "authorized":False,"synthetic_test_padding":"z"*420})
         key=uuid.uuid4()
         with psycopg.connect(self.admin) as con:
             con.execute("""INSERT INTO abc.eng05_trgs530_byte_observations(

@@ -5,10 +5,12 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 SQL=ROOT/"runtime/phase04/migrations/0020_eng05_synthetic_work_queue.sql"
 PY=ROOT/"runtime/phase04/abc_foundation/eng05_review_worker.py"
+ISOLATION=ROOT/"runtime/phase04/migrations/0022_eng04_eng05_permission_isolation.sql"
 
 def validate():
     sql=SQL.read_text()
     py=PY.read_text()
+    split=ISOLATION.read_text()
     # Fail fast on truncated/duplicated transactional SQL and a broken
     # fail-receipt regex. PostgreSQL CI remains the authoritative SQL parser.
     assert sql.rstrip().endswith("COMMIT;"),"migration_missing_final_commit"
@@ -42,7 +44,23 @@ def validate():
         assert statement in sql,statement
     assert "abc.eng19_synthetic_outbox" in sql
     assert "downstream_dispatched" in py
-    assert py.count("SET LOCAL ROLE abc_pipeline_worker")==3
+    assert py.count("SET LOCAL ROLE abc_eng05_worker")==3
+    assert "SET LOCAL ROLE abc_pipeline_worker" not in py
+    assert split.count("CREATE OR REPLACE FUNCTION abc.eng19_")==4
+    assert split.rstrip().endswith("COMMIT;")
+    assert split.count("\nCOMMIT;")==1
+    assert "CREATE ROLE abc_eng04_worker NOLOGIN NOINHERIT" in split
+    assert "CREATE ROLE abc_eng05_worker NOLOGIN NOINHERIT" in split
+    assert "CREATE TABLE abc.eng05_worker_bindings" in split
+    assert "ALTER TABLE abc.eng05_worker_bindings FORCE ROW LEVEL SECURITY" in split
+    assert "REVOKE ALL ON FUNCTION abc.eng19_claim_synthetic(text,integer)" in split
+    assert "FROM PUBLIC,abc_pipeline_worker,abc_eng04_worker" in split
+    assert "TO abc_eng05_worker" in split
+    assert "GRANT SELECT ON abc.eng19_synthetic_jobs" not in split
+    assert "GRANT INSERT ON abc.eng19_synthetic_jobs" not in split
+    assert "UPDATE abc.eng19_synthetic_outbox SET" not in split
+    for source in ("abc.eng03_worker_bindings","abc.worker_login_bindings"):
+        assert source not in split
     assert "session_user<>'abc_pipeline_worker'" not in sql
     assert "BLOCKED_PENDING_AUTHORITY" in py
     assert '"LOCAL_INTEGRATION_ONLY"' in py
@@ -50,7 +68,7 @@ def validate():
     # The only accepted result cannot claim verified specialist knowledge.
     assert "fixture=None" in py
     assert "release_approved" not in py or "'release_approved':True" not in py
-    return {"independent_worker_db_identity":"abc_pipeline_worker",
+    return {"independent_worker_db_identity":"abc_eng05_worker",
         "source_artifact_kind":"BEAUTY_ANALYSIS_REPORT",
         "result_version":"synthetic-ontology.1",
         "next_engine":"ENG-06","next_outbox":"BLOCKED_PENDING_AUTHORITY",

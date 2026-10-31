@@ -39,7 +39,7 @@ class SyntheticEng05ReviewWorker:
         with self.store._connect() as con:
             # The physical per-consumer LOGIN is NOINHERIT; acquire only the
             # narrow NOLOGIN permission group for this transaction.
-            con.execute("SET LOCAL ROLE abc_pipeline_worker")
+            con.execute("SET LOCAL ROLE abc_eng05_worker")
             row=con.execute("SELECT abc.eng19_claim_synthetic(%s,%s) AS job",
                             (self.consumer,seconds)).fetchone()
         return row["job"] if row else None
@@ -55,7 +55,7 @@ class SyntheticEng05ReviewWorker:
         payload=canonical_bytes(output)
         try:
             with self.store._connect() as con:
-                con.execute("SET LOCAL ROLE abc_pipeline_worker")
+                con.execute("SET LOCAL ROLE abc_eng05_worker")
                 row=con.execute("SELECT abc.eng19_ack_synthetic(%s,%s,%s,%s) AS status",
                     (uuid.UUID(claim["handoff_id"]),uuid.UUID(claim["lease_token"]),
                      payload,uuid.UUID(next_handoff_id))).fetchone()
@@ -82,7 +82,7 @@ class SyntheticEng05ReviewWorker:
             raise DomainError(422,"invalid_worker_claim")
         try:
             with self.store._connect() as con:
-                con.execute("SET LOCAL ROLE abc_pipeline_worker")
+                con.execute("SET LOCAL ROLE abc_eng05_worker")
                 row=con.execute("SELECT abc.eng19_fail_synthetic(%s,%s,%s) AS status",
                     (uuid.UUID(claim["handoff_id"]),
                      uuid.UUID(claim["lease_token"]),error_code)).fetchone()

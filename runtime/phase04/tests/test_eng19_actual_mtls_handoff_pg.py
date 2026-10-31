@@ -366,18 +366,13 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
                 VALUES(%s,'tenant-test','SESSION_CREATED',true)
                 ON CONFLICT(consumer_id) DO UPDATE SET active=true""",
                 (self.fixture.consumer,))
-            con.execute("""INSERT INTO abc.eng03_worker_bindings(
-                worker_role,consumer_id,tenant_id,active)
-                VALUES('abc_pipeline_worker',%s,'tenant-test',true)
-                ON CONFLICT(worker_role,consumer_id,tenant_id)
-                DO UPDATE SET active=true""",(self.fixture.consumer,))
-            con.execute("""INSERT INTO abc.worker_login_bindings(
+            # Dedicated ENG05 physical binding; the legacy ENG04 pipeline
+            # permission group cannot claim or ACK ENG05 review jobs.
+            con.execute("""DELETE FROM abc.eng05_worker_bindings
+                WHERE login_name='abc_eng05_ci_login'""")
+            con.execute("""INSERT INTO abc.eng05_worker_bindings(
                 login_name,worker_role,consumer_id,tenant_id,active)
-                VALUES('abc_eng05_ci_login','abc_pipeline_worker',%s,'tenant-test',true)
-                ON CONFLICT(login_name) DO UPDATE SET
-                  worker_role=EXCLUDED.worker_role,
-                  consumer_id=EXCLUDED.consumer_id,
-                  tenant_id=EXCLUDED.tenant_id,active=true""",
+                VALUES('abc_eng05_ci_login','abc_eng05_worker',%s,'tenant-test',true)""",
                 (self.fixture.consumer,))
         response=send_local_review_handoff(
             port=self.listeners[0].server_address[1],
@@ -389,6 +384,53 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
            store=PostgresStore(os.environ["ABC_TEST_PG_ENG05_LOGIN_DSN"]),
            consumer_id=self.fixture.consumer)
         return worker,source,msg
+
+    def test_eng04_legacy_identity_cannot_assume_eng05_role_or_claim_broker(self):
+        worker,_,_=self._synthetic_job()
+        # Physical identity and DB privilege are separated, not just a
+        # caller-supplied engine_id string.
+        with psycopg.connect(self.admin) as admin:
+            memberships=admin.execute("""SELECT
+              pg_has_role('abc_eng05_ci_login','abc_pipeline_worker','MEMBER'),
+              pg_has_role('abc_eng05_ci_login','abc_eng04_worker','MEMBER'),
+              pg_has_role('abc_eng05_ci_login','abc_eng05_worker','MEMBER')""").fetchone()
+            self.assertEqual(memberships,(False,False,True))
+            f=admin.execute("""SELECT rolcanlogin,rolbypassrls FROM pg_roles
+                  WHERE rolname='abc_eng05_worker'""").fetchone()
+            self.assertEqual(f,(False,False))
+        eng05_dsn=os.environ["ABC_TEST_PG_ENG05_LOGIN_DSN"]
+        with psycopg.connect(eng05_dsn) as con:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SET ROLE abc_pipeline_worker")
+        with psycopg.connect(self.admin) as con:
+            check=con.execute("""SELECT has_function_privilege(
+              'abc_pipeline_worker',
+              'abc.eng19_claim_synthetic(text,integer)','EXECUTE'),
+              has_function_privilege(
+              'abc_eng04_worker',
+              'abc.eng19_ack_synthetic(uuid,uuid,bytea,uuid)','EXECUTE'),
+              has_function_privilege(
+              'abc_eng05_worker',
+              'abc.eng19_claim_synthetic(text,integer)','EXECUTE')""").fetchone()
+            self.assertEqual(check,(False,False,True))
+        with psycopg.connect(os.environ["ABC_TEST_PG_ENG04_LOGIN_DSN"]) as con:
+            con.execute("SET LOCAL ROLE abc_eng04_worker")
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SELECT abc.eng19_claim_synthetic(%s,30)",
+                            (self.fixture.consumer,))
+        self.assertIsNotNone(worker.claim())
+
+    def test_eng05_scoped_role_rejects_unrelated_tenant_and_direct_dml(self):
+        self._synthetic_job()
+        dsn=os.environ["ABC_TEST_PG_ENG05_LOGIN_DSN"]
+        with psycopg.connect(dsn) as con:
+            con.execute("SET LOCAL ROLE abc_eng05_worker")
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SELECT * FROM abc.eng05_worker_bindings")
+        with psycopg.connect(self.admin) as con:
+            row=con.execute("""SELECT relrowsecurity,relforcerowsecurity
+              FROM pg_class WHERE oid='abc.eng05_worker_bindings'::regclass""").fetchone()
+            self.assertEqual(row,(True,True))
 
     def test_eng05_actual_synthetic_worker_claim_ack_result_and_blocked_eng06_handoff(self):
         worker,source,msg=self._synthetic_job()
@@ -487,9 +529,9 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
         claim=worker.claim()
         self.assertIsNotNone(claim)
         with psycopg.connect(self.admin,autocommit=True) as con:
-            con.execute("""UPDATE abc.worker_login_bindings SET active=false
+            con.execute("""UPDATE abc.eng05_worker_bindings SET active=false
                 WHERE login_name='abc_eng05_ci_login'
-                  AND worker_role='abc_pipeline_worker'""")
+                  AND worker_role='abc_eng05_worker'""")
         output=SyntheticKnowledgeEngine().resolve(
             service_id=SYNTHETIC_SERVICE,fixture=None)
         with self.assertRaises(DomainError):
@@ -745,8 +787,8 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
         worker,_,message=self._synthetic_job()
         claim=worker.claim()
         with psycopg.connect(self.admin,autocommit=True) as con:
-            con.execute("""UPDATE abc.eng03_worker_bindings SET active=false
-              WHERE worker_role='abc_pipeline_worker'
+            con.execute("""UPDATE abc.eng05_worker_bindings SET active=false
+              WHERE worker_role='abc_eng05_worker'
                 AND consumer_id=%s AND tenant_id='tenant-test'""",
                 (self.fixture.consumer,))
         output=SyntheticKnowledgeEngine().resolve(

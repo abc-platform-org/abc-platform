@@ -19,7 +19,7 @@ def evaluate_external_authority(documents, reviews, *, registry, revoked, legal_
             raise SourceGovernanceError("credential_not_independently_attested")
         anchors[credential] = anchor
     dossier = adjudicate(documents, reviews, trusted_credentials=anchors, now=now)
-    rights_ok = all(
+    # A credential revoked during signature adjudication must not survive.\n    for credential in anchors:\n        if revoked(credential) is not False:\n            raise SourceGovernanceError("credential_revoked_during_adjudication")\n    rights_ok = all(
         isinstance(legal_receipts.get(digest(doc)), dict)
         and legal_receipts[digest(doc)].get("independent_counsel_verified") is True
         and legal_receipts[digest(doc)].get("commercial_ingestion") is True

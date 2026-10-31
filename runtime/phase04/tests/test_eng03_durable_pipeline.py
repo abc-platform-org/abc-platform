@@ -267,6 +267,101 @@ class ENG03PipelineTests(unittest.TestCase):
         self.assertEqual(row[1]["retrieval_sources"],[])
         self.assertEqual(row[2]["candidates"],[])
 
+    def _eng04_real_ledger_fixture(self):
+        """Actual ENG02→ENG03 event/answer→ledger; no fabricated source."""
+        from abc_foundation.eng04_review_worker import SyntheticEng04ReviewWorker
+        from abc_foundation.pg_store import PostgresStore
+        now=datetime.now(timezone.utc)
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.sessions SET client_id='eng04-synthetic-client'
+                WHERE session_id=%s""",(self.sid,))
+        ids=("synthetic:prior-treatment","synthetic:sensitivity",
+             "synthetic:desired-goal","synthetic:maintenance")
+        vals=("NO","NO","SUBTLE","LOW")
+        for i,(qid,val) in enumerate(zip(ids,vals)):
+            self.arrive(qid,val,i)
+            self.assertEqual(self.worker.run_once(),"ACKED")
+        with psycopg.connect(ADMIN) as con:
+            version=con.execute("SELECT state_version FROM abc.sessions WHERE session_id=%s",
+                                (self.sid,)).fetchone()[0]
+            self.assertEqual(version,4)
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng03_evidence_ledger
+                WHERE session_id=%s AND consumer_id=%s""",
+                (self.sid,self.consumer)).fetchone()[0],4)
+            proof=uuid.uuid4()
+            con.execute("""INSERT INTO abc.consent_evidence(
+                consent_id,tenant_id,branch_id,session_id,client_id,status,
+                purpose,evidence_digest,disclosure_version,retention_policy_id)
+                VALUES(%s,%s,%s,%s,'eng04-synthetic-client','PENDING_VERIFICATION',
+                ARRAY['AI_PROCESSING','INTERNAL_HANDOFF']::text[],%s,
+                'CI-ENG04-NOT_LEGAL','CI-NO_CLIENT')""",
+                (proof,self.tenant,self.branch,self.sid,"c"*64))
+            con.execute("""UPDATE abc.consent_evidence SET status='ACTIVE',
+                verified_at=%s,valid_until=%s WHERE consent_id=%s""",
+                (now,now+__import__("datetime").timedelta(hours=1),proof))
+            con.execute("""INSERT INTO abc.eng04_ci_worker_bindings(
+                login_name,consumer_id,tenant_id,active)
+                VALUES('abc_eng04_ci_login',%s,%s,true)""",
+                (self.consumer,self.tenant))
+            job=uuid.uuid4()
+            con.execute("""INSERT INTO abc.eng04_ci_jobs(
+                job_id,tenant_id,branch_id,session_id,consumer_id,state_version)
+                VALUES(%s,%s,%s,%s,%s,%s)""",
+                (job,self.tenant,self.branch,self.sid,self.consumer,version))
+        worker=SyntheticEng04ReviewWorker(
+            store=PostgresStore(os.environ["ABC_TEST_PG_ENG04_LOGIN_DSN"]),
+            consumer_id=self.consumer)
+        return worker,str(job),str(proof)
+
+    def test_eng04_independent_real_eng03_provenance_ack_and_held_eng05_candidate(self):
+        worker,job,proof=self._eng04_real_ledger_fixture()
+        claimed=worker.claim()
+        self.assertEqual(claimed["job_id"],job)
+        self.assertEqual(len(claimed["sources"]),4)
+        report=worker.analyse(claimed)
+        self.assertEqual(report["source_manifest_sha256"],
+                         claimed["source_manifest_sha256"])
+        receipt=worker.ack(claimed,report)
+        self.assertEqual(receipt["status"],"ACKED_REVIEW_ONLY")
+        self.assertFalse(receipt["downstream_dispatched"])
+        self.assertIsNone(worker.claim())
+        candidate=worker.review_candidate(
+            job,correlation_id=str(uuid.uuid4()),handoff_id=str(uuid.uuid4()))
+        self.assertEqual(candidate["message"]["artifact_kind"],
+                         "BEAUTY_ANALYSIS_REPORT")
+        self.assertEqual(candidate["message"]["from_engine"],"ENG-04")
+        self.assertEqual(candidate["message"]["to_engine"],"ENG-05")
+        self.assertEqual(candidate["source_artifact"],report)
+        self.assertFalse(candidate["dispatch_authorized"])
+        with psycopg.connect(ADMIN) as con:
+            row=con.execute("""SELECT status,attempts FROM abc.eng04_ci_jobs
+                WHERE job_id=%s""",(job,)).fetchone()
+            stored=con.execute("""SELECT status,output_sha256,
+                source_manifest_sha256 FROM abc.eng04_ci_results
+                WHERE job_id=%s""",(job,)).fetchone()
+        self.assertEqual(row,("ACKED",1))
+        self.assertEqual(stored[0],"BLOCKED_PENDING_AUTHORITY")
+        self.assertEqual(stored[2],claimed["source_manifest_sha256"])
+
+    def test_eng04_real_eng03_consent_revocation_prevents_ack_and_export(self):
+        worker,job,proof=self._eng04_real_ledger_fixture()
+        claim=worker.claim()
+        self.assertIsNotNone(claim)
+        report=worker.analyse(claim)
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.consent_evidence
+                SET status='WITHDRAWN',revoked_at=clock_timestamp()
+                WHERE consent_id=%s""",(proof,))
+        with self.assertRaises(DomainError):
+            worker.ack(claim,report)
+        with self.assertRaises(DomainError):
+            worker.review_candidate(
+                job,correlation_id=str(uuid.uuid4()),handoff_id=str(uuid.uuid4()))
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*)
+                FROM abc.eng04_ci_results WHERE job_id=%s""",
+                (job,)).fetchone()[0],0)
+
     def test_full_four_answer_pipeline_conditional_fixture_only(self):
         ids=("synthetic:prior-treatment","synthetic:sensitivity",
              "synthetic:desired-goal","synthetic:maintenance")

@@ -67,8 +67,14 @@ class PostgresReviewInbox:
                     # broker crosschecks those exact bytes against an ACKed
                     # ENG04 job. Legacy tenant-test review fixtures keep their
                     # frozen historical function; no live routing is opened.
+                    has_lineage=("source_engine" in source_artifact
+                        or "source_manifest_sha256" in source_artifact
+                        or "professional_validation_verified" in source_artifact)
                     verified_source=(source_artifact.get("source_engine")=="ENG-03"
-                        and isinstance(source_artifact.get("source_manifest_sha256"),str))
+                        and isinstance(source_artifact.get("source_manifest_sha256"),str)
+                        and source_artifact.get("professional_validation_verified") is False)
+                    if has_lineage and not verified_source:
+                        raise DomainError(403,"eng04_incomplete_source_lineage")
                     function_name=("abc.eng19_submit_verified_eng04"
                         if verified_source else "abc.eng19_submit_synthetic")
                     query=("SELECT "+function_name+

@@ -106,6 +106,19 @@ class ProfessionalSourceContractTests(unittest.TestCase):
         self.assertEqual(ready["review_gate"],"REVIEWED_NON_EXECUTABLE")
         self.assertFalse(ready["eng05_to_eng06_dispatch_authorized"])
 
+    def test_two_reviewer_ids_sharing_one_signing_key_never_count_as_two(self):
+        from cryptography.hazmat.primitives import serialization
+        self.doc["claims"][0]["safety_critical"]=True
+        a=self.approve(self.doc,"ci-reviewer-one")
+        b=self.approve(self.doc,"ci-reviewer-two")
+        self.trust[b["credential_id"]]["public_key"]=self.keys[
+            "ci-reviewer-one"].public_key()
+        signed={k:v for k,v in b.items() if k!="signature_b64"}
+        b["signature_b64"]=base64.b64encode(self.keys[
+            "ci-reviewer-one"].sign(canonical(signed))).decode()
+        with self.assertRaises(SourceGovernanceError):
+            adjudicate([self.doc],[a,b],trusted_credentials=self.trust,now=NOW)
+
     def test_signed_approval_does_not_cover_modified_document(self):
         review=self.approve(self.doc,"ci-reviewer-one")
         tampered=copy.deepcopy(self.doc)
@@ -266,6 +279,37 @@ class ProfessionalSourcePostgresTests(unittest.TestCase):
                     FROM pg_class WHERE oid=%s::regclass""",
                     ("abc."+table,)).fetchone()
                 self.assertEqual(result,(True,True))
+
+    def test_conflict_dossier_is_immutable_and_never_dispatchable(self):
+        import psycopg
+        from psycopg import errors
+        a=ProfessionalSourceContractTests.document(
+            ident="ci.fake-publisher/source-x",value="CI_ASSERTION_A")
+        b=ProfessionalSourceContractTests.document(
+            ident="ci.other-publisher/source-y",value="CI_CONTRADICTORY_B",critical=True)
+        dossier=adjudicate([a,b],[],now=NOW)
+        self.assertEqual(dossier["review_gate"],"BLOCKED_CONFLICT")
+        data=canonical(dossier)
+        source_set=digest(sorted([digest(a),digest(b)]))
+        key=str(uuid.uuid4())
+        with psycopg.connect(self.admin) as con:
+            con.execute("""INSERT INTO abc.eng05_professional_conflict_dossiers(
+                 dossier_id,source_set_sha256,dossier_bytes,dossier_sha256,status)
+                 VALUES(%s,%s,%s,%s,%s)""",(
+                  key,source_set,data,hashlib.sha256(data).hexdigest(),
+                  dossier["review_gate"]))
+            row=con.execute("""SELECT status,eng06_release_authorized
+                FROM abc.eng05_professional_conflict_dossiers
+                WHERE dossier_id=%s""",(key,)).fetchone()
+            self.assertEqual(row,("BLOCKED_CONFLICT",False))
+            with self.assertRaises(errors.InsufficientPrivilege):
+                with con.transaction():
+                    con.execute("""UPDATE abc.eng05_professional_conflict_dossiers
+                      SET status='REVIEWED_NON_EXECUTABLE' WHERE dossier_id=%s""",(key,))
+            with self.assertRaises(errors.InsufficientPrivilege):
+                with con.transaction():
+                    con.execute("""DELETE FROM abc.eng05_professional_conflict_dossiers
+                      WHERE dossier_id=%s""",(key,))
 
     def test_wrong_digest_and_attempt_to_promote_are_denied(self):
         import psycopg

@@ -1,0 +1,140 @@
+{
+  "contract": "abc.eng05.trgs530.external-evidence-reconciliation.v1.review",
+  "case_id": "eng05-de-hair-color-worker-safety-trgs530-20230420",
+  "checked_at_utc": "2026-10-31T19:00:00Z",
+  "jurisdiction": "DE",
+  "scope": "SALON_EMPLOYEE_OCCUPATIONAL_CHEMICAL_SAFETY",
+  "official_current_edition": {
+    "evidence_state": "PUBLIC_REGISTER_OBSERVED_NOT_EXTERNALLY_SIGNED",
+    "publication_edition": "2023-04-20",
+    "source": "BAUA_OFFICIAL_TRGS_REGISTER",
+    "source_url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS",
+    "register_listing": "TRGS 530 | (April 2023) | Friseurhandwerk | GMBl 2023 S. 627–634 Nr. 30 vom 20.04.2023",
+    "new_amendment_in_inspected_register": false,
+    "independent_human_version_signoff": false,
+    "note": "The public register displayed the April 2023 entry without a newer TRGS 530 amendment in the inspected results. It is not an independent signed current-version acceptance."
+  },
+  "primary_pdf": {
+    "source_url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/pdf/TRGS-530.pdf?__blob=publicationFile",
+    "official_mime_declared": "application/pdf",
+    "published_page_count": 15,
+    "observed_title": "TRGS 530 Friseurhandwerk (Fassung 20.04.2023)",
+    "web_extracted_text_accessible": true,
+    "verified_raw_file_bytes": false,
+    "execution_download_attempts": [
+      {
+        "method": "container_requests",
+        "result": "NETWORK_DNS_UNAVAILABLE",
+        "content_sha256": null
+      },
+      {
+        "method": "container_download",
+        "result": "DOWNLOAD_FAILED",
+        "content_sha256": null
+      },
+      {
+        "method": "web_pdf_screenshot",
+        "result": "HTTP_403_ON_DIRECT_RENDER",
+        "content_sha256": null
+      }
+    ],
+    "document_sha256": null,
+    "response_headers_sha256": null,
+    "independent_checksum_publication_found": false,
+    "document_reuse_permitted": false
+  },
+  "legal_rights": {
+    "state": "LEGAL_OPINION_AND_PERMISSION_REQUIRED",
+    "statutory_candidates": [
+      {
+        "url": "https://www.gesetze-im-internet.de/urhg/__5.html",
+        "topic": "UrhG Section 5: copyright status of official works"
+      },
+      {
+        "url": "https://www.gesetze-im-internet.de/urhg/__62.html",
+        "topic": "UrhG Section 62: restrictions on modifications"
+      },
+      {
+        "url": "https://www.gesetze-im-internet.de/urhg/__63.html",
+        "topic": "UrhG Section 63: source attribution"
+      }
+    ],
+    "publisher_terms": {
+      "url": "https://www.baua.de/DE/Services/Impressum",
+      "disclosed_constraint": "Publisher site terms reserve exploitation rights and generally restrict use without prior consent to private, non-commercial viewing/download/storage.",
+      "actual_scope_of_copyright_exception": "NOT_DETERMINED",
+      "request_permission_from_publisher": true
+    },
+    "questions_for_counsel": [
+      "Does official TRGS 530 and this exact published PDF fall under UrhG 5(1), 5(2), neither, or contain separately protected elements?",
+      "Does the general BAuA website rights statement alter the legal ability to commercially store, transform, index or display the specific official technical rule?",
+      "Does database ingestion/RAG for commercial SaaS, copying full PDF, text extraction, paraphrasing, embedding generation or third-party cloud processing require permissions or specific conditions?",
+      "What source attribution, integrity/change-notice and provenance obligations apply under UrhG 62 and 63?",
+      "Are there separate restrictions on logos, diagrams, images, third-party standards or supplementary manufacturer instructions?"
+    ],
+    "written_professional_legal_opinion_received": false,
+    "rights_holder_explicit_permission_received": false,
+    "approved_use_modes": []
+  },
+  "professional_credential": {
+    "state": "NO_IDENTIFIED_OR_VERIFIED_REVIEWER",
+    "verified_personnel_count": 0,
+    "qualifying_domains": [
+      "GERMAN_HAIRDRESSING_MASTER_OR_EQUIVALENT_FOR_SALON_PRACTICE",
+      "OCCUPATIONAL_SAFETY_FACHKRAFT_OR_FACHKUNDIGE_PERSON_FOR_WORKER_CHEMICAL_HAZARDS"
+    ],
+    "competent_authority_discovery": [
+      {
+        "name": "HANDWERKSKAMMER_REGIONALLY_COMPETENT",
+        "url": "https://www.service-bw.de/zufi/leistungen/503?fl=1792211923",
+        "note": "Business register inquiries depend on geographic jurisdiction and legitimate purpose; registration does not attest each safety claim."
+      },
+      {
+        "name": "BAUA_AGS",
+        "url": "https://www.baua.de/DE/Die-BAuA/Aufgaben/Geschaeftsfuehrung-von-Ausschuessen/AGS",
+        "note": "Official AGS secretariat; authoritative technical-rule contact, not individual practitioner credential issuer."
+      }
+    ],
+    "independent_signer_pinned": false,
+    "accepted_signatures": 0,
+    "safety_critical_reviewers_required": 2,
+    "human_conflict_resolution_completed": false
+  },
+  "contact_channels": [
+    {
+      "party": "BAuA",
+      "purpose": "Official rule exact PDF, amended version, rights and AI-based commercial use clarification",
+      "email": "poststelle@baua.bund.de",
+      "source_url": "https://www.baua.de/DE/Services/Impressum",
+      "message_status": "DRAFT_NOT_SENT"
+    },
+    {
+      "party": "HANDWERKSKAMMER_COMPETENT_TO_PROPOSED_REVIEWER",
+      "purpose": "Confirm named prospective reviewer's Friseurmeister certificate or specific business registration, subject to lawful purpose/consent",
+      "email": null,
+      "source_url": "https://www.service-bw.de/zufi/leistungen/503?fl=1792211923",
+      "message_status": "AWAITING_REVIEWER_AND_JURISDICTION"
+    },
+    {
+      "party": "INDEPENDENT_WORKPLACE_SAFETY_SPECIALIST",
+      "purpose": "Verify occupational chemical safety applicability and safety-critical interpretation",
+      "email": null,
+      "source_url": "https://www.baua.de/DE/Die-BAuA/Aufgaben/Geschaeftsfuehrung-von-Ausschuessen/AGS",
+      "message_status": "AWAITING_IDENTIFIED_PROFESSIONAL"
+    }
+  ],
+  "approval_ledger": {
+    "SOURCE_BYTES": "BLOCKED_ORIGINAL_PDF_SHA256_MISSING",
+    "CURRENT_VERSION": "REGISTER_OBSERVED_HUMAN_SIGNATURE_REQUIRED",
+    "LEGAL_RIGHTS": "BLOCKED_WRITTEN_RIGHTS_REVIEW_REQUIRED",
+    "SPECIALIST_CREDENTIAL": "BLOCKED_NO_SPECIFIC_PERSON_VERIFIED",
+    "INDEPENDENT_CLAIM_REVIEW": "BLOCKED_NO_QUALIFIED_SIGNATURE",
+    "SAFETY_CONFLICT_ADJUDICATION": "BLOCKED_NO_INDEPENDENT_ADJUDICATION"
+  },
+  "signature_evidence": [],
+  "professionally_released_facts": [],
+  "professional_runtime_authorized": false,
+  "eng05_to_eng06_dispatch_authorized": false,
+  "customer_release_approved": false,
+  "external_messages_sent": false
+}

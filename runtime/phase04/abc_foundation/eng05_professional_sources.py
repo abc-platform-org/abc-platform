@@ -164,6 +164,12 @@ def adjudicate(documents, reviews, *, trusted_credentials=None, now=None):
     if now.tzinfo is None or now.utcoffset() is None:
         raise SourceGovernanceError("now_must_be_aware")
     anchors=trusted_credentials or {}
+    # Never discard signed attestation objects whose source bytes changed,
+    # whose original version was omitted or whose digest is forged.
+    all_source_hashes={digest(d) for d in documents}
+    if any(not isinstance(r,dict)
+           or r.get("source_sha256") not in all_source_hashes for r in reviews):
+        raise SourceGovernanceError("orphan_specialist_signature_or_source_tamper")
     versions=set();statuses=[];unknowns=set();index={};accepted_claims=[]
     for doc in documents:
         facts=validate_document(doc,now=now)

@@ -32,6 +32,20 @@ class ByteObservationTests(unittest.TestCase):
           retrieved_at=kwargs.get("retrieved_at",NOW.isoformat()),
           now=kwargs.get("now",NOW))
 
+    def test_official_register_check_and_statutory_rights_stay_distinct(self):
+        from pathlib import Path
+        doc=json.loads((Path(__file__).resolve().parents[3]/
+           "governance/abc_eng05_trgs530_official_version_rights_and_specialist_precheck.v1.review.json").read_text())
+        self.assertEqual(doc["version_check"]["source_edition"],"2023-04-20")
+        self.assertFalse(doc["version_check"]["later_amendment_listed_on_current_official_register"])
+        self.assertTrue(doc["version_check"]["next_check_required_before_approval"])
+        self.assertFalse(doc["legal_precheck"]["formal_legal_opinion_received"])
+        self.assertFalse(doc["legal_precheck"]["permission_for_full_text_commercial_ingestion"])
+        self.assertFalse(doc["occupational_reviewer_requirements"]["independent_credential_issuer_pin_enrolled"])
+        self.assertEqual(doc["occupational_reviewer_requirements"]["real_reviewers_appointed"],0)
+        self.assertIsNone(doc["retrieval"]["actual_full_pdf_sha256"])
+        self.assertFalse(doc["acceptance"]["eng05_to_eng06_dispatch_authorized"])
+
     def test_actual_local_bytes_are_hashed_not_url_or_summary(self):
         obs=self.inspect()
         self.assertEqual(obs["raw_document_sha256"],hashlib.sha256(FAKE_PDF).hexdigest())

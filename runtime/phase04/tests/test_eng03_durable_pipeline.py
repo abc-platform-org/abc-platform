@@ -313,6 +313,231 @@ class ENG03PipelineTests(unittest.TestCase):
             consumer_id=self.consumer)
         return worker,str(job),str(proof)
 
+    def _eng04_same_artifact_authenticated_receiver(self):
+        """Only synthetic, loopback identity issuer + independent DB gates.
+
+        Starts with four actual ENG03 ACKed evidence rows. No fake SQL source
+        ledger or patched consent/version records are injected downstream.
+        """
+        import threading
+        from abc_foundation.distributed_replay import PostgresReplayLedger
+        from abc_foundation.eng19_review_consumer import (
+            AuthenticatedReviewConsumer,PostgresReviewInbox)
+        from abc_foundation.eng19_review_transport import start_local_review_consumer
+        from abc_foundation.pg_store import PostgresStore
+        from test_private_engine_mtls import ManagedWorkloadMTLSTests
+
+        worker,job,consent=self._eng04_real_ledger_fixture()
+        processed=worker.process_once()
+        self.assertEqual(processed["status"],"ACKED_REVIEW_ONLY")
+        original=worker.review_candidate(job,
+            correlation_id=str(uuid.uuid4()),handoff_id=str(uuid.uuid4()))
+        with psycopg.connect(ADMIN) as con:
+            stored=con.execute("""SELECT output_bytes,output_sha256,
+              source_manifest_sha256 FROM abc.eng04_ci_results
+              WHERE job_id=%s""",(job,)).fetchone()
+        self.assertEqual(stored[0],__import__("abc_foundation.eng05_review_worker",
+            fromlist=["canonical_bytes"]).canonical_bytes(original["source_artifact"]))
+        self.assertEqual(stored[1],original["message"]["artifact_sha256"])
+        self.assertEqual(stored[2],original["source_manifest_sha256"])
+
+        fixture=ManagedWorkloadMTLSTests("test_real_tls13_mutual_certificate_and_bound_jwt")
+        fixture.consumer_override=self.consumer
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        class ScopedAuthority:
+            def __init__(authority,outer):
+                authority.outer=outer
+                authority.allowed=True
+            def verify(authority,**claims):
+                o=authority.outer
+                return (authority.allowed and
+                    claims.get("tenant_id")==o.tenant and
+                    claims.get("branch_id")==o.branch and
+                    claims.get("session_id")==o.sid and
+                    claims.get("state_version")==4 and
+                    claims.get("from_engine")=="ENG-04" and
+                    claims.get("to_engine")=="ENG-05" and
+                    claims.get("consumer_id")==o.consumer and
+                    claims.get("artifact_kind")=="BEAUTY_ANALYSIS_REPORT" and
+                    claims.get("certificate_sha256") is not None and
+                    claims.get("policy_proof_ref")=="synthetic:eng14-policy-proof" and
+                    (claims.get("purposes") is None or
+                     claims.get("purposes")==("AI_PROCESSING","INTERNAL_HANDOFF")))
+        session=ScopedAuthority(self)
+        consent_gate=ScopedAuthority(self)
+        policy=ScopedAuthority(self)
+        app_store=PostgresStore(APP)
+        receiver=AuthenticatedReviewConsumer(
+            identity_verifier=fixture.verifier,
+            session_authority=session,consent_authority=consent_gate,
+            eng14_authority=policy,
+            replay_ledger=PostgresReplayLedger(app_store),
+            inbox=PostgresReviewInbox(app_store),
+            caller_engine="ENG-04",target_engine="ENG-05",
+            consumer_id=self.consumer)
+        server=start_local_review_consumer(
+            consumer=receiver,certfile=fixture.server_cert,
+            keyfile=fixture.server_key,ca_file=fixture.ca_path)
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        thread=threading.Thread(target=server.serve_forever,daemon=True)
+        thread.start()
+        return {
+            "fixture":fixture,"server":server,"candidate":original,
+            "worker":worker,"job":job,"consent_id":consent,
+            "policy":policy,"session":session,"consent_gate":consent_gate
+        }
+
+    def _deliver_saved_eng04(self,link,*,token=None,message=None,source=None):
+        from abc_foundation.eng19_review_transport import send_local_review_handoff
+        fixture=link["fixture"]
+        candidate=link["candidate"]
+        return send_local_review_handoff(
+            port=link["server"].server_address[1],
+            token=fixture.token() if token is None else token,
+            message=candidate["message"] if message is None else message,
+            source_artifact=candidate["source_artifact"] if source is None else source,
+            client_cert=fixture.client_cert,client_key=fixture.client_key,
+            server_ca=fixture.ca_path)
+
+    def test_eng04_actual_persisted_bytes_to_eng05_tls13_jwt_and_durable_receipt(self):
+        link=self._eng04_same_artifact_authenticated_receiver()
+        first=self._deliver_saved_eng04(link)
+        self.assertEqual(first["status"],"RECORDED_REVIEW_ONLY")
+        self.assertTrue(first["durable_review_receipt"])
+        self.assertFalse(first["consumer_execution_authorized"])
+        again=self._deliver_saved_eng04(link)
+        self.assertEqual(again["status"],"ALREADY_RECORDED_REVIEW_ONLY")
+        with psycopg.connect(ADMIN) as con:
+            r=con.execute("""SELECT i.from_engine,i.to_engine,i.artifact_kind,
+                j.source_bytes,j.source_sha256,j.status
+                FROM abc.eng19_review_inbox i
+                JOIN abc.eng19_synthetic_jobs j ON j.handoff_id=i.handoff_id
+                WHERE i.handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()
+            original=con.execute("""SELECT output_bytes,output_sha256
+                FROM abc.eng04_ci_results WHERE job_id=%s""",
+                (link["job"],)).fetchone()
+            copies=con.execute("""SELECT count(*) FROM abc.eng19_synthetic_jobs
+                WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0]
+        self.assertEqual(r[:3],("ENG-04","ENG-05","BEAUTY_ANALYSIS_REPORT"))
+        self.assertEqual((r[3],r[4]),original)
+        self.assertEqual(r[5],"QUEUED")
+        self.assertEqual(copies,1)
+        # Receiving an envelope does NOT execute professional ENG05 or 06.
+        self.assertFalse(first["customer_release_approved"])
+
+    def test_eng04_saved_artifact_jwt_replay_wrong_identity_and_tamper_denied(self):
+        link=self._eng04_same_artifact_authenticated_receiver()
+        token=link["fixture"].token()
+        self.assertEqual(self._deliver_saved_eng04(link,token=token)["status"],
+                         "RECORDED_REVIEW_ONLY")
+        replay=self._deliver_saved_eng04(link,token=token)
+        self.assertEqual(replay["status"],"REJECTED")
+        wrong=link["fixture"].token(engine="ENG-05")
+        self.assertEqual(self._deliver_saved_eng04(link,token=wrong)["status"],
+                         "REJECTED")
+        other=link["fixture"].token(consumer="ci-foreign-consumer")
+        self.assertEqual(self._deliver_saved_eng04(link,token=other)["status"],
+                         "REJECTED")
+        source=json.loads(json.dumps(link["candidate"]["source_artifact"]))
+        source["attributes"][0]["value"]="FORGED"
+        self.assertEqual(self._deliver_saved_eng04(link,source=source)["status"],
+                         "REJECTED")
+        conflict=json.loads(json.dumps(link["candidate"]["message"]))
+        conflict["correlation_id"]=str(uuid.uuid4())
+        self.assertEqual(self._deliver_saved_eng04(link,message=conflict)["status"],
+                         "REJECTED")
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*)
+                FROM abc.eng19_synthetic_jobs WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],1)
+
+    def test_eng04_dest_denies_revoked_consent_or_independent_policy(self):
+        link=self._eng04_same_artifact_authenticated_receiver()
+        link["policy"].allowed=False
+        self.assertEqual(self._deliver_saved_eng04(link)["status"],"REJECTED")
+        link["policy"].allowed=True
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.consent_evidence
+                SET status='WITHDRAWN',revoked_at=clock_timestamp()
+                WHERE consent_id=%s""",(link["consent_id"],))
+        self.assertEqual(self._deliver_saved_eng04(link)["status"],"REJECTED")
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*)
+                FROM abc.eng19_review_inbox WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
+            self.assertEqual(con.execute("""SELECT count(*)
+                FROM abc.eng19_synthetic_jobs WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
+
+    def test_eng04_revoked_source_workload_binding_blocks_destination_receipt(self):
+        link=self._eng04_same_artifact_authenticated_receiver()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.eng04_ci_worker_bindings SET active=false
+                WHERE consumer_id=%s AND tenant_id=%s
+                  AND login_name='abc_eng04_ci_login'""",
+                (self.consumer,self.tenant))
+        self.assertEqual(self._deliver_saved_eng04(link)["status"],"REJECTED")
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng19_review_inbox
+                WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng19_synthetic_jobs
+                WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
+
+    def test_eng04_terminal_network_outage_never_writes_partial_receipt(self):
+        from abc_foundation.eng19_review_transport import deliver_review_with_bounded_retry
+        link=self._eng04_same_artifact_authenticated_receiver()
+        def disconnected(**kwargs):
+            raise OSError("simulated_permanent_loopback_unavailable")
+        fixture=link["fixture"]
+        with self.assertRaises(DomainError) as exc:
+            deliver_review_with_bounded_retry(
+                transport=disconnected,token_provider=fixture.token,max_attempts=2,
+                port=link["server"].server_address[1],
+                message=link["candidate"]["message"],
+                source_artifact=link["candidate"]["source_artifact"],
+                client_cert=fixture.client_cert,client_key=fixture.client_key,
+                server_ca=fixture.ca_path)
+        self.assertEqual(exc.exception.status,503)
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng19_review_inbox
+                WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
+        self.assertEqual(self._deliver_saved_eng04(link)["status"],
+                         "RECORDED_REVIEW_ONLY")
+
+    def test_eng04_network_outage_retry_fresh_jwt_no_duplicate_receipt(self):
+        from abc_foundation.eng19_review_transport import (
+            deliver_review_with_bounded_retry,send_local_review_handoff)
+        link=self._eng04_same_artifact_authenticated_receiver()
+        fixture=link["fixture"]
+        hits=[]
+        def flaky(**kwargs):
+            hits.append(1)
+            if len(hits)==1:
+                raise OSError("simulated_loopback_outage")
+            return send_local_review_handoff(**kwargs)
+        receipt=deliver_review_with_bounded_retry(
+            transport=flaky,token_provider=fixture.token,max_attempts=2,
+            port=link["server"].server_address[1],
+            message=link["candidate"]["message"],
+            source_artifact=link["candidate"]["source_artifact"],
+            client_cert=fixture.client_cert,client_key=fixture.client_key,
+            server_ca=fixture.ca_path)
+        self.assertEqual(receipt["status"],"RECORDED_REVIEW_ONLY")
+        self.assertEqual(len(hits),2)
+        self.assertEqual(self._deliver_saved_eng04(link)["status"],
+                         "ALREADY_RECORDED_REVIEW_ONLY")
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*)
+                FROM abc.eng19_synthetic_jobs WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],1)
+
     def test_eng04_independent_real_eng03_provenance_ack_and_held_eng05_candidate(self):
         worker,job,proof=self._eng04_real_ledger_fixture()
         claimed=worker.claim()

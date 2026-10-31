@@ -36,6 +36,7 @@ FILENAMES = (
     "0021_eng06_synthetic_review_worker.sql",
     "0022_eng04_eng05_permission_isolation.sql",
     "0023_eng04_independent_evidence_worker.sql",
+    "0024_eng04_eng05_same_artifact_review.sql",
 )
 
 

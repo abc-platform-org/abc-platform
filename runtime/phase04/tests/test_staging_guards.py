@@ -22,8 +22,8 @@ class StagingGuardTests(unittest.TestCase):
     def test_migration_manifest_complete_and_sha256(self):
         plan=planned_migrations()
         self.assertEqual(tuple(x[0] for x in plan),FILENAMES)
-        self.assertEqual(len(plan),24)
-        self.assertEqual(plan[-1][0],"0024_eng04_eng05_same_artifact_review.sql")
+        self.assertEqual(len(plan),25)
+        self.assertEqual(plan[-1][0],"0025_eng05_verified_provenance_consumer.sql")
         self.assertTrue(all(len(digest)==64 for _,digest in plan))
 
     def test_staging_dsn_rejects_admin_or_missing_tls(self):

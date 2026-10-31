@@ -6,6 +6,7 @@ SQL=(ROOT/"runtime/phase04/migrations/0023_eng04_independent_evidence_worker.sql
 WORKER=(ROOT/"runtime/phase04/abc_foundation/eng04_review_worker.py").read_text()
 PLAN=(ROOT/"runtime/phase04/abc_foundation/staging_migrate.py").read_text()
 GATES=json.loads((ROOT/"governance/abc_w1w2_private_runtime_evidence.v0.review.json").read_text())
+SCHEMA=json.loads((ROOT/"governance/abc_eng04_beauty_analysis_report.v0.review.schema.json").read_text())
 WORKFLOW=json.loads((ROOT/"governance/abc_workflow_19.v0.review.json").read_text())
 
 def check():
@@ -44,6 +45,14 @@ def check():
         '"dispatch_authorized":False',
         '"downstream_dispatched":False',
     ))
+    assert SCHEMA["additionalProperties"] is False
+    assert SCHEMA["properties"]["service_scope"]["const"]=="SYNTHETIC_NON_MEDIA_ONLY"
+    assert SCHEMA["properties"]["engine_version"]["const"]=="eng04.synthetic-evidence.1"
+    assert SCHEMA["properties"]["source_engine"]["const"]=="ENG-03"
+    assert SCHEMA["properties"]["professional_validation_verified"]["const"] is False
+    assert SCHEMA["properties"]["evidence_ids"]["minItems"]==4
+    assert "source_manifest_sha256" in SCHEMA["required"]
+    assert "eng04_unverified_report_mutation" in WORKER
     assert "send_local_review_handoff(" not in WORKER
     assert "0023_eng04_independent_evidence_worker.sql" in PLAN
     assert GATES["eng05_to_eng06_dispatch_enabled"] is False

@@ -50,7 +50,7 @@ BEGIN
    AND r.engine_version='eng04.synthetic-evidence.1'
    AND r.output_sha256=p_artifact_sha AND r.output_bytes=p_source
    AND r.source_manifest_sha256=v_src->>'source_manifest_sha256'
- LIMIT 1 FOR SHARE OF j,r;
+ LIMIT 1 FOR SHARE OF j,r,b;
  IF NOT FOUND THEN
    RAISE EXCEPTION 'ENG04 durable source or binding missing' USING ERRCODE='42501';
  END IF;

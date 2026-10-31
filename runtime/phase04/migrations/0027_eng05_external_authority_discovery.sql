@@ -7,7 +7,8 @@ CREATE TABLE abc.eng05_official_reference_discovery (
  scope text NOT NULL CHECK(scope='HAIR_COLOR'),
  jurisdiction text NOT NULL CHECK(jurisdiction='EU'),
  publisher text NOT NULL CHECK(length(publisher) BETWEEN 3 AND 200),
- source_url text NOT NULL CHECK(source_url ~ '^https://'),
+ source_url text NOT NULL CHECK(source_url ~
+    '^https://(single-market-economy[.]ec[.]europa[.]eu|echa[.]europa[.]eu|eur-lex[.]europa[.]eu)/'),
  reference_sha256 text NOT NULL CHECK(reference_sha256 ~ '^[0-9a-f]{64}$'),
  reference_bytes bytea NOT NULL CHECK(octet_length(reference_bytes) BETWEEN 128 AND 8192),
  documentation_state text NOT NULL DEFAULT 'REFERENCE_ONLY'

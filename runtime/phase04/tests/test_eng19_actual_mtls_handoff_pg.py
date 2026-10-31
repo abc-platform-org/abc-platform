@@ -413,6 +413,11 @@ class RealReviewConsumerE2ETests(unittest.TestCase):
               'abc_eng05_worker',
               'abc.eng19_claim_synthetic(text,integer)','EXECUTE')""").fetchone()
             self.assertEqual(check,(False,False,True))
+        with psycopg.connect(os.environ["ABC_TEST_PG_ENG04_LOGIN_DSN"]) as con:
+            con.execute("SET LOCAL ROLE abc_eng04_worker")
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SELECT abc.eng19_claim_synthetic(%s,30)",
+                            (self.fixture.consumer,))
         self.assertIsNotNone(worker.claim())
 
     def test_eng05_scoped_role_rejects_unrelated_tenant_and_direct_dml(self):

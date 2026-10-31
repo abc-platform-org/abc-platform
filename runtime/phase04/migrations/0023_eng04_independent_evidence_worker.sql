@@ -137,7 +137,8 @@ CREATE FUNCTION abc.eng04_ci_ack(p_job uuid,p_lease uuid,p_manifest text,p_outpu
 RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,abc
 AS $ack$
 DECLARE j abc.eng04_ci_jobs%ROWTYPE;v jsonb;
- v_hash text;v_ids jsonb;v_count integer;v_now timestamptz:=clock_timestamp();
+ v_hash text;v_ids jsonb;v_count integer;v_match integer;v_unique integer;
+ v_now timestamptz:=clock_timestamp();
 BEGIN
  IF session_user='abc_eng04_worker' OR p_job IS NULL OR p_lease IS NULL
     OR p_output IS NULL OR octet_length(p_output) NOT BETWEEN 32 AND 32768
@@ -182,8 +183,29 @@ BEGIN
     OR v->>'source_manifest_sha256' IS DISTINCT FROM p_manifest
     OR v->>'professional_validation_verified' IS DISTINCT FROM 'false'
     OR v->'evidence_ids' IS DISTINCT FROM v_ids
+    OR jsonb_typeof(v->'attributes') IS DISTINCT FROM 'array'
+    OR jsonb_array_length(v->'attributes') IS DISTINCT FROM 4
     OR v->>'customer_release_approved' IS NOT NULL
  THEN RAISE EXCEPTION 'ENG04 output contract invalid' USING ERRCODE='42501';END IF;
+ -- Recompute the four reported values against the trusted ENG03 ledger inside
+ -- the same ACK transaction. A valid source manifest alone cannot launder
+ -- invented or swapped analysis attributes into an accepted report.
+ SELECT count(*),count(DISTINCT e.evidence_id)
+   INTO v_match,v_unique
+   FROM jsonb_array_elements(v->'attributes') AS attr(item)
+   JOIN abc.eng03_evidence_ledger e ON
+     e.evidence_id::text=attr.item->>'source_evidence_id'
+     AND e.consumer_id=j.consumer_id AND e.tenant_id=j.tenant_id
+     AND e.branch_id=j.branch_id AND e.session_id=j.session_id
+     AND e.aggregate_version<=j.state_version
+     AND attr.item->>'key' IS NOT DISTINCT FROM e.evidence_json->>'attribute_key'
+     AND attr.item->'value' IS NOT DISTINCT FROM e.evidence_json->'value'
+     AND attr.item->>'evidence_class'
+         IS NOT DISTINCT FROM e.evidence_json->>'evidence_class';
+ IF v_match IS DISTINCT FROM 4 OR v_unique IS DISTINCT FROM 4 THEN
+   RAISE EXCEPTION 'ENG04 reported attributes not derived from ENG03'
+     USING ERRCODE='42501';
+ END IF;
  INSERT INTO abc.eng04_ci_results(job_id,engine_id,engine_version,
      worker_lease,source_manifest_sha256,output_sha256,output_bytes,
      artifact_kind,status)

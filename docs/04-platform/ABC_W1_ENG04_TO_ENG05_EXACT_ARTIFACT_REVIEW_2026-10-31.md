@@ -23,6 +23,8 @@ The producer constructs the existing canonical review envelope and sends the *pe
 - Same handoff ID, **new** valid one-time JWT is idempotent; replay of the *same* JWT is denied.
 - Modified attribute, conflicting same-handoff message, wrong engine and wrong consumer JWT are denied.
 - Independent policy denial and revoked consent deny the destination; no partial Inbox/Job is recorded.
+- Revoking the ENG04 physical workload binding after its ACK but before destination receipt also denies the same bytes (no partial persisted effect).
+- A complete network outage across all bounded attempts returns an error with no Inbox/Job effect; later authorized retransmission can recover.
 - Simulated connection outage retries only with fresh one-time JWT; recovery persists one receipt.
 - Pre-existing ENG04 physical role, stale lease and tampering tests remain active; 24 append-only migrations, checksum/DRIFT, FORCE RLS and nonroot CI must pass.
 

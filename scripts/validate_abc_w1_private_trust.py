@@ -104,13 +104,19 @@ def inspect(trust,infra,registry,ratification):
     workloads=trust["workloads"]
     fail([w["engine_id"] for w in workloads]==list(ENGINES),"missing_engine")
     fail(len({w["proposed_spiffe_id"] for w in workloads})==7
-         and len({w["runtime_boundary"] for w in workloads})==7,
-         "duplicate_physical_identity")
+         and len({w["runtime_boundary"] for w in workloads})==7
+         and len({w["target_private_permission_group"] for w in workloads})==7,
+         "duplicate_physical_identity_or_permission_group")
     for w in workloads:
         engine=w["engine_id"]
         fail(w["proposed_spiffe_id"]==
              "spiffe://abc.internal/staging/"+engine.lower(),
              "identity_path_"+engine)
+        fail(w["target_private_permission_group"]==
+              "abc_"+engine.lower().replace("-","")+"_private_group"
+             and w["target_private_group_provisioned"] is False
+             and w["legacy_shared_group_split_required"]==
+                (engine in ("ENG-04","ENG-05")), "db_role_separation_"+engine)
         fail(w["physical_db_login"]=="UNPROVISIONED_DISTINCT_PER_ENGINE"
              and w["certificate_issuer"]=="EXTERNAL_MANAGED_ISSUER_REQUIRED"
              and w["service_account_issuer"]=="EXTERNAL_MANAGED_ISSUER_REQUIRED"
@@ -155,6 +161,7 @@ def self_test(data):
         (0,lambda x:x.update(independent_security_signoff=True)),
         (0,lambda x:x["workloads"][0].update(workload_deployed=True)),
         (0,lambda x:x["workloads"][1].update(proposed_spiffe_id=x["workloads"][0]["proposed_spiffe_id"])),
+        (0,lambda x:x["workloads"][4].update(target_private_permission_group=x["workloads"][3]["target_private_permission_group"])),
         (0,lambda x:x["candidate_routes"][5].update(approved_for_transport=True)),
         (0,lambda x:x["candidate_routes"][5].update(audience="abc-engine:ENG-05")),
         (0,lambda x:x["candidate_routes"][5].update(mtls_required=False)),

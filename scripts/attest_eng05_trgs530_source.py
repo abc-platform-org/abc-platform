@@ -17,6 +17,7 @@ SOURCES=(
  ("BGW_OFFICIAL","https://www.bgw-online.de/resource/blob/20628/29cbf999ca5c2d91e741fa6964c6c619/trgs530-gefahrstoffe-friseurhandwerk-data.pdf"))
 HOSTS={"www.baua.de","www.bgw-online.de"}
 MAX_SIZE=5_000_000
+BGW_FIRST_VERIFIED_SHA256="356fc7d7ef4d4dc56ae687c72dfbf00d156b65ae494553f15f0060d7b46b5628"
 
 def check_url(uri):
     try:
@@ -79,6 +80,9 @@ def acquire(name,uri):
         if int(res.headers.get("Content-Length","0"))>MAX_SIZE:
             raise ValueError("declared_pdf_too_large")
         details=inspect_pdf(res.read(MAX_SIZE+1))
+        if (name=="BGW_OFFICIAL" and
+            details["sha256_actual_pdf_bytes"]!=BGW_FIRST_VERIFIED_SHA256):
+            raise ValueError("official_mirror_bytes_changed_requires_new_review")
         return {"source_id":name,"request_url":uri,"effective_url":res.geturl(),
                 "http_status":res.getcode(),"content_type":res.headers.get("Content-Type"),
                 **details,"status":"PDF_BYTES_HASHED_AND_EDITION_CHECKED"}

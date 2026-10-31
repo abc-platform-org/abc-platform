@@ -111,7 +111,8 @@ class ReconciliationDatabaseTests(unittest.TestCase):
               source_metadata_bytes,source_metadata_sha256)
               VALUES(%s,'DE','HAIR_COLOR',
               'SALON_EMPLOYEE_OCCUPATIONAL_CHEMICAL_SAFETY',
-              'TRGS 530','2023-04-20',%s,%s,%s)""",
+              'TRGS 530','2023-04-20',%s,%s,%s)
+              ON CONFLICT(case_id) DO NOTHING""",
               (case["candidate_id"],case["primary_url"],
                raw_case,hashlib.sha256(raw_case).hexdigest()))
             con.execute("""INSERT INTO abc.eng05_external_evidence_reconciliations(

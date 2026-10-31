@@ -1,0 +1,54 @@
+{
+  "contract": "abc.eng05.trgs530.current-edition-research.v1.review",
+  "case_id": "eng05-de-hair-color-worker-safety-trgs530-20230420",
+  "checked_on": "2026-10-31",
+  "reference_register": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS",
+  "current_register_entry": {
+    "number": "TRGS 530",
+    "name": "Friseurhandwerk",
+    "published_version": "April 2023",
+    "promulgation": "GMBl 2023 S. 627-634 Nr. 30 20.04.2023",
+    "observation": "Official current BAuA TRGS listing still displayed April 2023 as of checking",
+    "status": "CURRENT_OFFICIAL_REGISTER_LISTING_OBSERVED"
+  },
+  "secondary_public_confirmation": {
+    "url": "https://www.bgw-online.de/bgw-online-de/service/medien-arbeitshilfen/medien-center/technische-regeln-fuer-gefahrstoffe-friseurhandwerk-20628",
+    "edition": "2023-04-20",
+    "status": "PUBLISHER_SECONDARY_METADATA_MATCHED"
+  },
+  "original_pdf": {
+    "direct_byte_fetch": "FAILED_NETWORK_RESTRICTION_IN_THIS_EXECUTION_ENVIRONMENT",
+    "sha256": null,
+    "original_pdf_byte_count": null,
+    "raw_pdf_redistributed": false,
+    "verification_path": "Standalone GitHub Actions workflow uploads hashes-only evidence artifact on permitted fetch"
+  },
+  "german_copyright_legal_precedents": [
+    {
+      "reference": "UrhG §5 Amtliche Werke",
+      "official_url": "https://www.gesetze-im-internet.de/urhg/__5.html",
+      "observation": "Some official works may not enjoy copyright; §5(2) includes source attribution and non-alteration rules",
+      "applicability_to_trgs530_and_commercial_AI": "LEGAL_COUNSEL_REQUIRED"
+    },
+    {
+      "reference": "UrhG §§62–63",
+      "official_url": "https://www.gesetze-im-internet.de/urhg/__63.html",
+      "observation": "Attribution and modification conditions must be assessed where §5(2) applies",
+      "applicability_to_trgs530_and_commercial_AI": "LEGAL_COUNSEL_REQUIRED"
+    }
+  ],
+  "competent_authority_person_verification": {
+    "assigned_reviewer": null,
+    "individual_license_evidence": null,
+    "independent_credential_root_enrolled": false,
+    "status": "NOT_VERIFIED"
+  },
+  "disposition": {
+    "current_version_register_check": "OBSERVED_NOT_LEGAL_ATTESTATION",
+    "pdf_raw_bytes": "PENDING_ACTUAL_DOCUMENT_DOWNLOAD",
+    "redistribution_and_AI_licence": "PENDING_ACTUAL_LEGAL_ADVICE",
+    "specialist_signatures": 0,
+    "professional_ingestion_allowed": false,
+    "eng05_to_eng06_dispatch_allowed": false
+  }
+}

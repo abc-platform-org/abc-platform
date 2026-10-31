@@ -45,6 +45,10 @@ class PureProvenanceTests(unittest.TestCase):
         self.assertEqual(output["engine_version"],"eng04.synthetic-evidence.1")
         self.assertEqual(output["service_scope"],"SYNTHETIC_NON_MEDIA_ONLY")
         self.assertEqual(len(output["evidence_ids"]),4)
+        self.assertEqual(output["source_engine"],"ENG-03")
+        self.assertEqual(output["source_manifest_sha256"],
+                         self.claim["source_manifest_sha256"])
+        self.assertFalse(output["professional_validation_verified"])
 
     def test_tamper_record_digest_and_manifest_rejected(self):
         a=self.claim["sources"][0]["evidence"]

@@ -1,0 +1,47 @@
+{
+  "contract": "abc.eng05.actual-source-byte-receipt.v1.review",
+  "case_id": "eng05-de-hair-color-worker-safety-trgs530-20230420",
+  "issuer": "BGW - Berufsgenossenschaft fuer Gesundheitsdienst und Wohlfahrtspflege",
+  "canonical_source": "TRGS 530 Friseurhandwerk — Fassung 20.04.2023",
+  "source_url": "https://www.bgw-online.de/resource/blob/20628/29cbf999ca5c2d91e741fa6964c6c619/trgs530-gefahrstoffe-friseurhandwerk-data.pdf",
+  "raw_pdf_bytes_sha256": "356fc7d7ef4d4dc56ae687c72dfbf00d156b65ae494553f15f0060d7b46b5628",
+  "raw_pdf_byte_count": 741429,
+  "pdf_page_count": 15,
+  "parsed_first_page_identifiers": [
+    "TRGS 530",
+    "Friseurhandwerk",
+    "20.04.2023"
+  ],
+  "requested_and_resolved_url_equal": true,
+  "retrieval_status": "ACTUAL_SOURCE_BYTES_VERIFIED_BY_EPHEMERAL_CI",
+  "retrieved_at_utc": "2026-10-31T19:15:50Z",
+  "provenance": {
+    "workflow": "ABC Phase 04 local foundation CI",
+    "workflow_run_id": 41233336210,
+    "workflow_run_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41233336210",
+    "exact_code_commit_sha": "f7cb9609661ba829cc70b909f8d18d89cb4f5872",
+    "python_tests_passed": 555,
+    "source_pdf_committed_to_repository": false,
+    "independently_publisher_signed_checksum": false,
+    "legal_currentness_register_separately_checked": true
+  },
+  "evidence_caveats": {
+    "raw_bytes_verified": true,
+    "independently_publisher_signed_file_hash_verified": false,
+    "licensing_and_commercial_ingestion_rights_cleared": false,
+    "actual_credential_issuer_verified": false,
+    "independently_qualified_specialist_reviewers": 0,
+    "legally_signed_reviewers": 0,
+    "professional_claims_accepted": 0,
+    "prior_candidate_snapshot_unmodified": true
+  },
+  "acceptance": {
+    "evidence_level": "REPRODUCIBLE_DOWNLOADED_BYTES_CI",
+    "source_rights": "AWAITING_EXTERNAL_LEGAL_REVIEW",
+    "specialist_identity": "AWAITING_ISSUER_AND_HUMAN_SIGNATURES",
+    "knowledge_admission": "BLOCKED_PENDING_AUTHORITY",
+    "eng05_review_worker_connected": false,
+    "eng05_to_eng06_dispatch_authorized": false,
+    "customer_release_approved": false
+  }
+}

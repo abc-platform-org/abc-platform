@@ -384,6 +384,25 @@ class ENG03PipelineTests(unittest.TestCase):
                 WHERE job_id=%s""",(job,)).fetchone()[0]
         self.assertEqual(count,1)
 
+    def test_eng04_db_broker_denies_forged_attribute_with_valid_manifest(self):
+        from abc_foundation.eng05_review_worker import canonical_bytes
+        worker,job,proof=self._eng04_real_ledger_fixture()
+        claim=worker.claim()
+        report=worker.analyse(claim)
+        tampered=json.loads(json.dumps(report))
+        tampered["attributes"][0]["value"]="FABRICATED"
+        with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+            with psycopg.connect(os.environ["ABC_TEST_PG_ENG04_LOGIN_DSN"]) as con:
+                con.execute("SET LOCAL ROLE abc_eng04_worker")
+                con.execute("""SELECT abc.eng04_ci_ack(%s,%s,%s,%s)""",
+                    (job,claim["lease_token"],claim["source_manifest_sha256"],
+                     canonical_bytes(tampered)))
+        self.assertEqual(worker.ack(claim,report)["status"],
+                         "ACKED_REVIEW_ONLY")
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng04_ci_results
+                WHERE job_id=%s""",(job,)).fetchone()[0],1)
+
     def test_eng04_independent_binding_revocation_blocks_ack(self):
         worker,job,proof=self._eng04_real_ledger_fixture()
         claim=worker.claim()

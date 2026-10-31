@@ -107,12 +107,26 @@ class SyntheticEng05ReviewWorker:
                 or source.get("service_scope")!="SYNTHETIC_NON_MEDIA_ONLY"
                 or source.get("session_id")!=claim["session_id"]):
                 raise DomainError(403,"untrusted_synthetic_source")
+            lineage=claim.get("eng04_verified_lineage")
+            if "source_engine" in source or "source_manifest_sha256" in source:
+                if (not isinstance(lineage,dict)
+                    or lineage.get("source_identity_verified") is not True
+                    or lineage.get("professional_validation_verified") is not False
+                    or lineage.get("eng05_to_eng06_release_approved") is not False
+                    or lineage.get("eng04_artifact_sha256")!=claim["source_sha256"]
+                    or lineage.get("eng03_manifest_sha256")!=
+                       source.get("source_manifest_sha256")
+                    or not isinstance(lineage.get("eng04_job_id"),str)):
+                    raise DomainError(403,"eng05_verified_eng04_lineage_missing")
+            elif lineage is not None:
+                raise DomainError(403,"eng05_unexpected_lineage_claim")
             knowledge=SyntheticKnowledgeEngine().resolve(
                 service_id=SYNTHETIC_SERVICE,fixture=None)
             # No professional source can be present in this limited worker.
             if (knowledge.get("ontology_version")!="synthetic-ontology.1"
                 or knowledge.get("retrieval_sources")!=[]
-                or "SOURCE_UNVERIFIED" not in knowledge.get("unknowns",[])):
+                or knowledge.get("grounded_facts")!=[]
+                or knowledge.get("unknowns")!=["SOURCE_UNVERIFIED"]):
                 raise DomainError(403,"unapproved_professional_knowledge")
             next_id=str(uuid.uuid5(uuid.NAMESPACE_URL,
                       "abc-review-eng05-to-eng06:"+claim["handoff_id"]))
@@ -120,3 +134,33 @@ class SyntheticEng05ReviewWorker:
         except (DomainError,ValueError,TypeError,KeyError):
             self.fail(claim,error_code="CI_PROCESSING_DENIED")
             raise
+
+
+def main():
+    """Run a single synthetic ENG05 review job as a separate OS process."""
+    from psycopg.conninfo import conninfo_to_dict
+    from .pg_store import PostgresStore
+    SyntheticEng05ReviewWorker._local()
+    dsn=os.environ.get("ABC_TEST_PG_ENG05_LOGIN_DSN","")
+    consumer=os.environ.get("ABC_ENG05_CI_CONSUMER","")
+    try:
+        cfg=conninfo_to_dict(dsn)
+    except Exception as exc:
+        raise SystemExit("eng05_ci_dsn_invalid") from exc
+    if (cfg.get("user")!="abc_eng05_ci_login"
+        or cfg.get("host") not in ("127.0.0.1","localhost","::1")
+        or cfg.get("dbname")!="abc_phase04_ci"
+        or not isinstance(consumer,str) or not 3<=len(consumer)<=64):
+        raise SystemExit("eng05_local_identity_isolation_required")
+    receipt=SyntheticEng05ReviewWorker(
+        store=PostgresStore(dsn),consumer_id=consumer).process_once()
+    print(json.dumps({
+      "engine_id":"ENG-05",
+      "status":receipt["status"] if receipt else "NO_REVIEW_JOB",
+      "professional_validation_verified":False,
+      "eng05_to_eng06_dispatched":False,
+      "customer_release_approved":False},sort_keys=True))
+
+
+if __name__=="__main__":
+    main()

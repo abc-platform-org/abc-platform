@@ -401,6 +401,189 @@ class ENG03PipelineTests(unittest.TestCase):
             client_cert=fixture.client_cert,client_key=fixture.client_key,
             server_ca=fixture.ca_path)
 
+    def _verified_eng05_queue(self):
+        from abc_foundation.eng05_review_worker import SyntheticEng05ReviewWorker
+        from abc_foundation.pg_store import PostgresStore
+        link=self._eng04_same_artifact_authenticated_receiver()
+        admitted=self._deliver_saved_eng04(link)
+        self.assertEqual(admitted["status"],"RECORDED_REVIEW_ONLY")
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""INSERT INTO abc.eng05_worker_bindings(
+              login_name,worker_role,consumer_id,tenant_id,active)
+              VALUES('abc_eng05_ci_login','abc_eng05_worker',%s,%s,true)""",
+              (self.consumer,self.tenant))
+        worker=SyntheticEng05ReviewWorker(
+            store=PostgresStore(os.environ["ABC_TEST_PG_ENG05_LOGIN_DSN"]),
+            consumer_id=self.consumer)
+        return link,worker
+
+    def test_verified_eng05_processes_real_eng04_source_in_separate_os_process(self):
+        import subprocess
+        import sys
+        link,worker=self._verified_eng05_queue()
+        proc=subprocess.run(
+          [sys.executable,"-m","abc_foundation.eng05_review_worker"],
+          env={**os.environ,"ABC_ENG05_CI_CONSUMER":self.consumer},
+          capture_output=True,text=True,timeout=20)
+        self.assertEqual(proc.returncode,0,proc.stderr)
+        receipt=json.loads(proc.stdout)
+        self.assertEqual(receipt["engine_id"],"ENG-05")
+        self.assertEqual(receipt["status"],"ACKED_REVIEW_ONLY")
+        self.assertFalse(receipt["professional_validation_verified"])
+        self.assertFalse(receipt["eng05_to_eng06_dispatched"])
+        self.assertIsNone(worker.process_once())
+        with psycopg.connect(ADMIN) as con:
+            handoff=link["candidate"]["message"]["handoff_id"]
+            res=con.execute("""SELECT j.status,j.attempts,j.source_sha256,
+              r.source_sha256,r.output_bytes,r.output_sha256
+              FROM abc.eng19_synthetic_jobs j
+              JOIN abc.eng19_synthetic_results r USING(handoff_id)
+              WHERE handoff_id=%s""",(handoff,)).fetchone()
+            lineage=con.execute("""SELECT eng04_job_id,eng04_artifact_sha256,
+              eng03_manifest_sha256,eng05_result_sha256,status
+              FROM abc.eng05_ci_source_receipts WHERE handoff_id=%s""",
+              (handoff,)).fetchone()
+            out=con.execute("""SELECT status FROM abc.eng19_synthetic_outbox
+              WHERE handoff_id=%s""",(handoff,)).fetchone()
+            source=con.execute("""SELECT output_sha256,source_manifest_sha256
+              FROM abc.eng04_ci_results WHERE job_id=%s""",
+              (link["job"],)).fetchone()
+        self.assertEqual(res[0:2],("ACKED",1))
+        self.assertEqual(res[2],res[3])
+        self.assertEqual(str(lineage[0]),link["job"])
+        self.assertEqual((lineage[1],lineage[2]),source)
+        self.assertEqual(lineage[3],res[5])
+        self.assertEqual(lineage[4],"BLOCKED_PENDING_AUTHORITY")
+        self.assertEqual(out[0],"BLOCKED_PENDING_AUTHORITY")
+        output=json.loads(res[4])
+        self.assertEqual(output["retrieval_sources"],[])
+        self.assertEqual(output["grounded_facts"],[])
+        self.assertEqual(output["unknowns"],["SOURCE_UNVERIFIED"])
+
+    def test_eng05_verified_queue_parallel_claim_and_stale_ack_fencing(self):
+        from abc_foundation.eng05_knowledge import SyntheticKnowledgeEngine
+        from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
+        link,worker=self._verified_eng05_queue()
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            claimed=list(pool.map(lambda _:worker.claim(),range(4)))
+        leases=[r for r in claimed if r is not None]
+        self.assertEqual(len(leases),1)
+        old=leases[0]
+        self.assertTrue(old["eng04_verified_lineage"]["source_identity_verified"])
+        self.assertEqual(old["eng04_verified_lineage"]["eng03_manifest_sha256"],
+                         link["candidate"]["source_manifest_sha256"])
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.eng19_synthetic_jobs
+              SET lease_until=clock_timestamp()-interval '1 second'
+              WHERE handoff_id=%s""",(old["handoff_id"],))
+        fresh=worker.claim()
+        self.assertNotEqual(old["lease_token"],fresh["lease_token"])
+        knowledge=SyntheticKnowledgeEngine().resolve(
+            service_id=SYNTHETIC_SERVICE,fixture=None)
+        with self.assertRaises(DomainError):
+            worker.ack(old,knowledge,next_handoff_id=str(uuid.uuid4()))
+        self.assertEqual(worker.ack(fresh,knowledge,
+            next_handoff_id=str(uuid.uuid4()))["status"],"ACKED_REVIEW_ONLY")
+        with psycopg.connect(ADMIN) as con:
+            n=con.execute("""SELECT count(*) FROM abc.eng05_ci_source_receipts
+                WHERE handoff_id=%s""",(fresh["handoff_id"],)).fetchone()[0]
+        self.assertEqual(n,1)
+
+    def test_eng05_verified_source_revoke_eng04_identity_blocks_claim_and_ack(self):
+        from abc_foundation.eng05_knowledge import SyntheticKnowledgeEngine
+        from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
+        link,worker=self._verified_eng05_queue()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.eng04_ci_worker_bindings SET active=false
+                WHERE login_name='abc_eng04_ci_login' AND
+                      consumer_id=%s AND tenant_id=%s""",
+                (self.consumer,self.tenant))
+        with self.assertRaises(DomainError):
+            worker.claim()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.eng04_ci_worker_bindings SET active=true
+                WHERE login_name='abc_eng04_ci_login' AND
+                      consumer_id=%s AND tenant_id=%s""",
+                (self.consumer,self.tenant))
+        claim=worker.claim()
+        self.assertIsNotNone(claim)
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.eng04_ci_worker_bindings SET active=false
+                WHERE login_name='abc_eng04_ci_login' AND
+                      consumer_id=%s AND tenant_id=%s""",
+                (self.consumer,self.tenant))
+        knowledge=SyntheticKnowledgeEngine().resolve(
+            service_id=SYNTHETIC_SERVICE,fixture=None)
+        with self.assertRaises(DomainError):
+            worker.ack(claim,knowledge,next_handoff_id=str(uuid.uuid4()))
+        with psycopg.connect(ADMIN) as con:
+            n=con.execute("""SELECT count(*) FROM abc.eng19_synthetic_results
+              WHERE handoff_id=%s""",(claim["handoff_id"],)).fetchone()[0]
+        self.assertEqual(n,0)
+
+    def test_eng05_verified_source_consent_revoked_after_claim_denies_ack(self):
+        from abc_foundation.eng05_knowledge import SyntheticKnowledgeEngine
+        from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
+        link,worker=self._verified_eng05_queue()
+        claim=worker.claim()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.consent_evidence
+              SET status='WITHDRAWN',revoked_at=clock_timestamp()
+              WHERE consent_id=%s""",(link["consent_id"],))
+        knowledge=SyntheticKnowledgeEngine().resolve(
+            service_id=SYNTHETIC_SERVICE,fixture=None)
+        with self.assertRaises(DomainError):
+            worker.ack(claim,knowledge,next_handoff_id=str(uuid.uuid4()))
+        with psycopg.connect(ADMIN) as con:
+            n=con.execute("""SELECT count(*) FROM abc.eng05_ci_source_receipts
+              WHERE handoff_id=%s""",(claim["handoff_id"],)).fetchone()[0]
+        self.assertEqual(n,0)
+
+    def test_eng05_verified_queue_retries_then_dlq_and_no_eng06_outbox(self):
+        link,worker=self._verified_eng05_queue()
+        for i in range(3):
+            claim=worker.claim()
+            self.assertIsNotNone(claim)
+            self.assertEqual(claim["attempt"],i+1)
+            result=worker.fail(claim,error_code="CI_VERIFIED_RETRY_TEST")
+            self.assertEqual(result,"DLQ" if i==2 else "QUEUED")
+            if i<2:
+                with psycopg.connect(ADMIN) as con:
+                    con.execute("""UPDATE abc.eng19_synthetic_jobs
+                      SET available_at=clock_timestamp()-interval '1 second'
+                      WHERE handoff_id=%s""",(claim["handoff_id"],))
+        self.assertIsNone(worker.claim())
+        with psycopg.connect(ADMIN) as con:
+            row=con.execute("""SELECT status,attempts FROM abc.eng19_synthetic_jobs
+                WHERE handoff_id=%s""",(claim["handoff_id"],)).fetchone()
+            n=con.execute("""SELECT count(*) FROM abc.eng19_synthetic_outbox
+                WHERE handoff_id=%s""",(claim["handoff_id"],)).fetchone()[0]
+        self.assertEqual(row,("DLQ",3))
+        self.assertEqual(n,0)
+
+    def test_eng05_verified_queue_denies_forged_professional_output_and_cross_role(self):
+        from abc_foundation.eng05_knowledge import SyntheticKnowledgeEngine
+        from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
+        link,worker=self._verified_eng05_queue()
+        claim=worker.claim()
+        output=SyntheticKnowledgeEngine().resolve(
+          service_id=SYNTHETIC_SERVICE,fixture=None)
+        output["grounded_facts"]=[{"claim":"invented salon recommendation"}]
+        with self.assertRaises(DomainError):
+            worker.ack(claim,output,next_handoff_id=str(uuid.uuid4()))
+        with psycopg.connect(os.environ["ABC_TEST_PG_ENG04_LOGIN_DSN"]) as con:
+            con.execute("SET LOCAL ROLE abc_eng04_worker")
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                con.execute("SELECT abc.eng19_claim_synthetic(%s,30)",
+                            (self.consumer,))
+        with psycopg.connect(ADMIN) as con:
+            n=con.execute("""SELECT count(*) FROM abc.eng05_ci_source_receipts
+                WHERE handoff_id=%s""",(claim["handoff_id"],)).fetchone()[0]
+            self.assertEqual(n,0)
+            perms=con.execute("""SELECT relrowsecurity,relforcerowsecurity
+              FROM pg_class WHERE oid='abc.eng05_ci_source_receipts'::regclass""").fetchone()
+            self.assertEqual(perms,(True,True))
+
     def test_eng04_actual_persisted_bytes_to_eng05_tls13_jwt_and_durable_receipt(self):
         link=self._eng04_same_artifact_authenticated_receiver()
         first=self._deliver_saved_eng04(link)

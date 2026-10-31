@@ -20,6 +20,14 @@ def validate():
     assert "permissions:" in WORKFLOW and "contents: read" in WORKFLOW
     assert "actions/upload-artifact@v4" in WORKFLOW
     assert "eng05-trgs530-source-attestation.json" in WORKFLOW
+    EVIDENCE=json.loads((P/"governance/abc_eng05_trgs530_bgw_raw_pdf_provenance_2026-10-31.v1.review.json").read_text())
+    assert EVIDENCE["sha256_of_actual_bgw_pdf_bytes"] in RUN
+    assert EVIDENCE["downloaded_bytes"]==741429
+    assert EVIDENCE["pdf_pages"]==15
+    assert EVIDENCE["cross_host_pdf_byte_identity_proven"] is False
+    assert EVIDENCE["rights_assessment"]=="NOT_INDEPENDENTLY_APPROVED"
+    assert EVIDENCE["professional_source_release_authorized"] is False
+    assert EVIDENCE["eng05_to_eng06_dispatch_authorized"] is False
     assert SOURCE["source_pdf_sha256"] is None
     assert SOURCE["source_content_ingested"] is False
     assert REGISTER["original_pdf"]["sha256"] is None

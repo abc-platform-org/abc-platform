@@ -213,6 +213,40 @@ BEGIN
     updated_at=clock_timestamp() WHERE job_id=p_job;
  RETURN v;
 END;$fail$;
+CREATE FUNCTION abc.eng04_ci_result_for_review(p_job uuid)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,abc
+AS $export$
+DECLARE j abc.eng04_ci_jobs%ROWTYPE;r abc.eng04_ci_results%ROWTYPE;
+BEGIN
+ IF session_user='abc_eng04_worker' THEN
+  RAISE EXCEPTION 'ENG04 physical login required' USING ERRCODE='42501';END IF;
+ SELECT * INTO j FROM abc.eng04_ci_jobs WHERE job_id=p_job;
+ SELECT * INTO r FROM abc.eng04_ci_results WHERE job_id=p_job;
+ IF NOT FOUND OR j.status IS DISTINCT FROM 'ACKED'
+  OR r.status IS DISTINCT FROM 'BLOCKED_PENDING_AUTHORITY'
+  OR NOT EXISTS(SELECT 1 FROM abc.eng04_ci_worker_bindings b
+    WHERE b.login_name=session_user AND b.consumer_id=j.consumer_id
+      AND b.tenant_id=j.tenant_id AND b.active)
+  OR NOT EXISTS(SELECT 1 FROM abc.sessions s JOIN abc.consent_evidence ce
+     ON ce.session_id=s.session_id AND ce.tenant_id=s.tenant_id
+       AND ce.branch_id=s.branch_id AND ce.client_id=s.client_id
+     WHERE s.session_id=j.session_id AND s.tenant_id=j.tenant_id
+       AND s.branch_id=j.branch_id AND s.state='CREATED'
+       AND s.state_version=j.state_version AND ce.status='ACTIVE'
+       AND ce.verified_at IS NOT NULL AND ce.revoked_at IS NULL
+       AND ce.valid_until>clock_timestamp()
+       AND ce.purpose @> ARRAY['AI_PROCESSING','INTERNAL_HANDOFF']::text[])
+  OR encode(sha256(r.output_bytes),'hex') IS DISTINCT FROM r.output_sha256
+ THEN RAISE EXCEPTION 'ENG04 review export denied' USING ERRCODE='42501';END IF;
+ RETURN jsonb_build_object('analysis',convert_from(r.output_bytes,'UTF8')::jsonb,
+    'analysis_sha256',r.output_sha256,'source_manifest_sha256',
+     r.source_manifest_sha256,'tenant_id',j.tenant_id,
+     'branch_id',j.branch_id,'session_id',j.session_id,
+     'state_version',j.state_version,'consumer_id',j.consumer_id,
+     'status','BLOCKED_PENDING_AUTHORITY');
+END;$export$;
+REVOKE ALL ON FUNCTION abc.eng04_ci_result_for_review(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION abc.eng04_ci_result_for_review(uuid) TO abc_eng04_worker;
 REVOKE ALL ON FUNCTION abc.eng04_ci_claim(text,integer) FROM PUBLIC;
 REVOKE ALL ON FUNCTION abc.eng04_ci_ack(uuid,uuid,text,bytea) FROM PUBLIC;
 REVOKE ALL ON FUNCTION abc.eng04_ci_fail(uuid,uuid,text) FROM PUBLIC;

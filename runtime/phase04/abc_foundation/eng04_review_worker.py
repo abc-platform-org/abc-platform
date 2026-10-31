@@ -165,3 +165,33 @@ class SyntheticEng04ReviewWorker:
         return {"message":message,"source_artifact":export["analysis"],
                 "source_manifest_sha256":export["source_manifest_sha256"],
                 "dispatch_authorized":False,"customer_release_approved":False}
+
+
+def main():
+    """One isolated, disposable ENG04 worker process. Never a hosted service."""
+    from psycopg.conninfo import conninfo_to_dict
+    from .pg_store import PostgresStore
+    SyntheticEng04ReviewWorker._local()
+    dsn=os.environ.get("ABC_TEST_PG_ENG04_LOGIN_DSN","")
+    consumer=os.environ.get("ABC_ENG04_CI_CONSUMER","")
+    try:
+        cfg=conninfo_to_dict(dsn)
+    except Exception as exc:
+        raise SystemExit("eng04_ci_dsn_invalid") from exc
+    if (cfg.get("user")!="abc_eng04_ci_login"
+        or cfg.get("host") not in ("127.0.0.1","localhost","::1")
+        or cfg.get("dbname")!="abc_phase04_ci"
+        or not isinstance(consumer,str) or not 3<=len(consumer)<=64):
+        raise SystemExit("eng04_local_isolation_required")
+    receipt=SyntheticEng04ReviewWorker(
+        store=PostgresStore(dsn),consumer_id=consumer).process_once()
+    print(json.dumps({
+        "engine_id":"ENG-04",
+        "status":receipt["status"] if receipt else "NO_REVIEW_JOB",
+        "downstream_dispatched":False,
+        "customer_release_approved":False
+    },sort_keys=True))
+
+
+if __name__=="__main__":
+    main()

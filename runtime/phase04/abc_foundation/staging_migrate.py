@@ -42,6 +42,7 @@ FILENAMES = (
     "0027_eng05_external_authority_discovery.sql",
     "0028_eng05_external_document_acceptance_cases.sql",
     "0029_eng05_official_pdf_byte_receipts.sql",
+    "0030_eng05_trgs530_byte_observations.sql",
 )
 
 

@@ -1,0 +1,74 @@
+{
+  "contract": "abc.eng05.trgs530-source-version-and-rights-precheck.v1.review",
+  "observed_at": "2026-10-31",
+  "source_case_id": "eng05-de-hair-color-worker-safety-trgs530-20230420",
+  "version_check": {
+    "official_register_url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS",
+    "official_register_label": "TRGS 530 | (April 2023) Friseurhandwerk — GMBl 2023 S.627-634 Nr.30",
+    "source_edition": "2023-04-20",
+    "later_amendment_listed_on_current_official_register": false,
+    "observation_state": "REGISTER_CURRENT_VERSION_MATCH_WEB_OBSERVED",
+    "raw_register_html_sha256": null,
+    "independently_archived_register_snapshot": false,
+    "legal_currentness_opinion_verified": false,
+    "next_check_required_before_approval": true
+  },
+  "legal_precheck": {
+    "reference_law": "German UrhG",
+    "official_law_urls": {
+      "section_5": "https://www.gesetze-im-internet.de/urhg/__5.html",
+      "section_62": "https://www.gesetze-im-internet.de/urhg/__62.html",
+      "section_63": "https://www.gesetze-im-internet.de/urhg/__63.html"
+    },
+    "potential_exception": "Official works and announcements under §5 UrhG may be excluded from copyright subject to statutory prerequisites; §5(2) refers to §§62-63 constraints.",
+    "unresolved_questions": [
+      "Is this exact AGS/BMAS TRGS 530 PDF an official work under §5(1) or §5(2) for the intended use?",
+      "Are BAuA/BGW layouts, ancillary graphics, or embedded third-party works separately protected?",
+      "Which source citation, attribution, no-modification and translation obligations apply?",
+      "Does ingestion into a commercial retrieval database or text/model pipeline remain permissible within approved limits?",
+      "Do non-copyright contractual website download restrictions or third-party rights apply?"
+    ],
+    "formal_legal_opinion_received": false,
+    "rights_holder_grant_received": false,
+    "permission_for_full_text_commercial_ingestion": false,
+    "permission_for_republication": false,
+    "permission_for_model_training": false,
+    "state": "PRELIMINARY_LEGAL_ISSUE_SPOTTING_ONLY_NOT_CLEARANCE"
+  },
+  "occupational_reviewer_requirements": {
+    "official_source_scope": "hazard assessment and worker protection for German hairdressers",
+    "section_3_1_pointer": "TRGS 530 section 3.1 states employer responsibility and requires competent hazard assessment; occupational safety specialist or occupational physician can be appropriate experts.",
+    "preferred_primary_professional_roles": [
+      "qualified German Fachkraft fuer Arbeitssicherheit with salon chemical exposure expertise",
+      "qualified German Betriebsarzt or equivalent occupational medicine professional where health-risk claims require review"
+    ],
+    "hairdresser_meister_alone_is_not_an_automatic_chemical_safety_qualification": true,
+    "independent_credential_issuer_pin_enrolled": false,
+    "real_reviewers_appointed": 0,
+    "actual_signed_claim_reviews": 0,
+    "state": "EXTERNAL_SPECIALIST_QUALIFICATION_PENDING"
+  },
+  "retrieval": {
+    "official_bgw_pdf": "https://www.bgw-online.de/resource/blob/20628/29cbf999ca5c2d91e741fa6964c6c619/trgs530-gefahrstoffe-friseurhandwerk-data.pdf",
+    "official_baua_pdf": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/pdf/TRGS-530.pdf?__blob=publicationFile",
+    "pdf_visual_pages_inspected": [
+      1,
+      3,
+      6
+    ],
+    "actual_pdf_bytes_downloaded_into_runtime": false,
+    "actual_full_pdf_sha256": null,
+    "web_rendered_pdf_is_not_a_raw_byte_digest": true,
+    "archived_raw_pdf_in_repository": false,
+    "next_step": "Operator obtains raw official PDF through approved channel; run offline byte observation CLI and independently verify retrieved original."
+  },
+  "acceptance": {
+    "official_version_web_observation_complete": true,
+    "actual_pdf_sha256_complete": false,
+    "legal_use_approved": false,
+    "independent_specialist_signed_review_complete": false,
+    "eng05_professional_knowledge_release": false,
+    "eng05_to_eng06_dispatch_authorized": false,
+    "customer_release_approved": false
+  }
+}

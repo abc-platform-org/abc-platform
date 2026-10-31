@@ -41,6 +41,7 @@ FILENAMES = (
     "0026_eng05_professional_evidence_governance.sql",
     "0027_eng05_external_authority_discovery.sql",
     "0028_eng05_external_document_acceptance_cases.sql",
+    "0029_eng05_trgs530_byte_observations.sql",
 )
 
 

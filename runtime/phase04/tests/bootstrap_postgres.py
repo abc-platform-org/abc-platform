@@ -29,6 +29,16 @@ with psycopg.connect(dsn,autocommit=True) as con:
     for migration in sorted((Path(__file__).resolve().parents[1]/"migrations").glob("*.sql")):
         con.execute(migration.read_text())
         print("Applied", migration.name)
+    # ENG04 receives its own physical, NOINHERIT synthetic reviewer identity;
+    # it cannot SET ROLE ENG05 or use ENG05's review broker.
+    con.execute("""CREATE ROLE abc_eng04_ci_login LOGIN NOINHERIT
+        NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS
+        PASSWORD 'integration-only-eng04-review-login'""")
+    con.execute("GRANT abc_eng04_worker TO abc_eng04_ci_login")
+    assert con.execute("""SELECT rolcanlogin,rolsuper,rolbypassrls,rolinherit
+        FROM pg_roles WHERE rolname='abc_eng04_ci_login'""").fetchone()==(True,False,False,False)
+    assert con.execute("""SELECT pg_has_role('abc_eng04_ci_login',
+        'abc_eng05_worker','MEMBER')""").fetchone()==(False,)
     # CI-only dedicated NOINHERIT physical LOGIN; the permission group itself
     # remains NOLOGIN as required by migration 0013. No hosted principal issued.
     con.execute("""CREATE ROLE abc_eng05_ci_login LOGIN NOINHERIT

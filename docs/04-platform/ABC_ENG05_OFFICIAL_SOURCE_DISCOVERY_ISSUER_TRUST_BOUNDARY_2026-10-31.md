@@ -22,6 +22,7 @@ The technical authenticity of an official **URL** can be checked. It is not proo
 
 New frozen contract: `governance/abc_eng05_external_issuer_manifest.v1.review.schema.json` / `abc.eng05.external-credential-issuer.v1.review`. The `eng05_external_authority.py` verifier:
 - Requires Ed25519 roster signature tied to a **separately provisioned root key and fingerprint**. No trust root is imported from claimant payload, a repository secret, a random ChatGPT-generated key or the public references.
+- Independently provisioned **expected issuer ID** must match the signed roster; the SRE-maintained monotonic **minimum accepted roster timestamp** prevents rollback to an earlier signed but now-revoked list. Without external operator control of these values, a test signature proves only cryptographic consistency.
 - Checks roster validity, jurisdiction EU, named practitioner, service-specific HAIR_COLOR scope, expiry and revocation list, distinct credential IDs, mandatory verification links, signer public keys.
 - Produces ephemeral review-only key anchors for the previously implemented `eng05_professional_sources.adjudicate` signature, conflict and uncertainty evaluator.
 - Keeps `professionally_released_facts=[]`, `professional_runtime_authorized=false`, `eng05_to_eng06_dispatch_authorized=false` independently of any cryptographic test result.

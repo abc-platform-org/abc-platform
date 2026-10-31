@@ -1,7 +1,6 @@
 {
   "contract": "abc.eng05.trgs530.external-evidence-reconciliation.v1.review",
   "case_id": "eng05-de-hair-color-worker-safety-trgs530-20230420",
-  "checked_at_utc": "2026-10-31T19:00:00Z",
   "jurisdiction": "DE",
   "scope": "SALON_EMPLOYEE_OCCUPATIONAL_CHEMICAL_SAFETY",
   "official_current_edition": {
@@ -136,5 +135,6 @@
   "professional_runtime_authorized": false,
   "eng05_to_eng06_dispatch_authorized": false,
   "customer_release_approved": false,
-  "external_messages_sent": false
+  "external_messages_sent": false,
+  "checked_on_utc": "2026-10-31"
 }

@@ -473,6 +473,44 @@ class ENG03PipelineTests(unittest.TestCase):
                 FROM abc.eng19_synthetic_jobs WHERE handoff_id=%s""",
                 (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
 
+    def test_eng04_revoked_source_workload_binding_blocks_destination_receipt(self):
+        link=self._eng04_same_artifact_authenticated_receiver()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.eng04_ci_worker_bindings SET active=false
+                WHERE consumer_id=%s AND tenant_id=%s
+                  AND login_name='abc_eng04_ci_login'""",
+                (self.consumer,self.tenant))
+        self.assertEqual(self._deliver_saved_eng04(link)["status"],"REJECTED")
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng19_review_inbox
+                WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng19_synthetic_jobs
+                WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
+
+    def test_eng04_terminal_network_outage_never_writes_partial_receipt(self):
+        from abc_foundation.eng19_review_transport import deliver_review_with_bounded_retry
+        link=self._eng04_same_artifact_authenticated_receiver()
+        def disconnected(**kwargs):
+            raise OSError("simulated_permanent_loopback_unavailable")
+        fixture=link["fixture"]
+        with self.assertRaises(DomainError) as exc:
+            deliver_review_with_bounded_retry(
+                transport=disconnected,token_provider=fixture.token,max_attempts=2,
+                port=link["server"].server_address[1],
+                message=link["candidate"]["message"],
+                source_artifact=link["candidate"]["source_artifact"],
+                client_cert=fixture.client_cert,client_key=fixture.client_key,
+                server_ca=fixture.ca_path)
+        self.assertEqual(exc.exception.status,503)
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng19_review_inbox
+                WHERE handoff_id=%s""",
+                (link["candidate"]["message"]["handoff_id"],)).fetchone()[0],0)
+        self.assertEqual(self._deliver_saved_eng04(link)["status"],
+                         "RECORDED_REVIEW_ONLY")
+
     def test_eng04_network_outage_retry_fresh_jwt_no_duplicate_receipt(self):
         from abc_foundation.eng19_review_transport import (
             deliver_review_with_bounded_retry,send_local_review_handoff)

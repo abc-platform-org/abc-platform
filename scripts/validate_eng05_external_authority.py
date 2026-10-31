@@ -32,6 +32,9 @@ def check():
     assert "from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey" in MODULE
     assert "independently_pinned_root_sha256" in MODULE
     assert "issuer_signature_invalid" in MODULE
+    assert "expected_issuer_id" in MODULE
+    assert "out_of_band_issuer_identity_mismatch" in MODULE
+    assert "issuer_roster_rollback_denied" in MODULE
     assert "unknown_credential_revocation_id" in MODULE
     assert '"eng05_to_eng06_dispatch_authorized":False' in MODULE
     assert "eng05_external_authority" not in WORKER

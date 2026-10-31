@@ -53,6 +53,10 @@ def check():
     assert SCHEMA["properties"]["evidence_ids"]["minItems"]==4
     assert "source_manifest_sha256" in SCHEMA["required"]
     assert "eng04_unverified_report_mutation" in WORKER
+    assert "eng04_local_isolation_required" in WORKER
+    assert 'if __name__=="__main__":' in WORKER
+    assert "ABC_ENG04_CI_CONSUMER" in WORKER
+    assert "127.0.0.1" in WORKER
     assert "send_local_review_handoff(" not in WORKER
     assert "0023_eng04_independent_evidence_worker.sql" in PLAN
     assert GATES["eng05_to_eng06_dispatch_enabled"] is False

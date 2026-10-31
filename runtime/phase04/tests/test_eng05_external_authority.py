@@ -242,7 +242,7 @@ class ExternalRegistryPostgresTests(unittest.TestCase):
         import psycopg
         from psycopg import errors
         content=canonical({"issuer_id":"ci-not-real","status":"PENDING",
-                          "public_source":"EU_DISCOVERY_ONLY"})
+                          "public_source":"EU_DISCOVERY_ONLY","untrusted_padding":"x"*250})
         with psycopg.connect(self.admin) as con:
             con.execute("""INSERT INTO abc.eng05_external_issuer_review_packets(
                 packet_id,issuer_id,issuer_manifest_sha256,issuer_manifest_bytes,

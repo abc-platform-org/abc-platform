@@ -1,0 +1,134 @@
+{
+  "contract": "abc.eng05.first-professional-source-intake.v1.review",
+  "candidate_id": "eng05-de-hair-color-worker-safety-trgs530-20230420",
+  "title": "TRGS 530 Friseurhandwerk",
+  "primary_url": "https://www.baua.de/DE/Angebote/Rechtstexte-und-Technische-Regeln/Regelwerk/TRGS/pdf/TRGS-530.pdf?__blob=publicationFile",
+  "verification_url": "https://www.bgw-online.de/bgw-online-de/service/medien-arbeitshilfen/medien-center/technische-regeln-fuer-gefahrstoffe-friseurhandwerk-20628",
+  "official_register_url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS",
+  "issuer": "German Ausschuss fuer Gefahrstoffe (AGS), promulgated by Bundesministerium fuer Arbeit und Soziales",
+  "publication_reference": "GMBl 2023 S. 627-634 Nr. 30, 20.04.2023",
+  "edition_date": "2023-04-20",
+  "discovery_date": "2026-10-31",
+  "jurisdiction": "DE",
+  "service_scope": "HAIR_COLOR",
+  "professional_domain": "SALON_EMPLOYEE_OCCUPATIONAL_CHEMICAL_SAFETY",
+  "applicability": [
+    "hazard_assessment",
+    "worker_exposure",
+    "hair_dye_chemical_handling",
+    "employee_hand_protection",
+    "salon_safety_training"
+  ],
+  "excluded_use": [
+    "individual_client_allergy_diagnosis",
+    "customer_treatment_decision",
+    "dye_mix_formula_or_ratio",
+    "brand_specific_oxidant_selection",
+    "chemical_product_regulatory_clearance",
+    "eng06_professional_decision"
+  ],
+  "source_version_status": "OFFICIAL_2023_EDITION_IDENTIFIED_CURRENT_AMENDMENT_CHECK_PENDING",
+  "source_byte_access": "PUBLIC_PDF_VIEWED_BY_OFFICIAL_RENDERER_DOWNLOAD_FAILED",
+  "source_pdf_sha256": null,
+  "source_content_ingested": false,
+  "provenance_evidence": [
+    {
+      "section": "title/front matter",
+      "pdf_page": 1,
+      "verification": "Official source shows 20 April 2023 edition, 15 pages and AGS/BMAS provenance",
+      "status": "VISUALLY_CHECKED"
+    },
+    {
+      "section": "1 Anwendungsbereich",
+      "pdf_page": 2,
+      "verification": "Scope covers salon activities, including products with irritant or sensitising risks and wet work",
+      "status": "TEXT_REVIEWED"
+    },
+    {
+      "section": "3.2 Vorgehensweise",
+      "pdf_page": 3,
+      "verification": "Risk-assessment information may depend on manufacturer safety information and product instructions",
+      "status": "TEXT_REVIEWED"
+    },
+    {
+      "section": "3.6 Dermale Gefaehrdungen",
+      "pdf_page": 6,
+      "verification": "Hair-dye/bleaching materials are covered by worker skin-exposure assessment",
+      "status": "TEXT_REVIEWED"
+    },
+    {
+      "section": "4 Schutzmassnahmen",
+      "pdf_page": 7,
+      "verification": "Employer and employee protection controls are described, not personalised customer hair colour formulas",
+      "status": "TEXT_REVIEWED"
+    }
+  ],
+  "review_prompts_not_professional_claims": [
+    {
+      "id": "TRGS530-P01",
+      "section": "1",
+      "question": "Is this text correctly limited to employee occupational safety and DE jurisdiction?",
+      "risk": "SCOPE_MISAPPLICATION"
+    },
+    {
+      "id": "TRGS530-P02",
+      "section": "3.2",
+      "question": "Are manufacturer-specific safety data and product use instructions required for actual implementation?",
+      "risk": "MISSING_PRODUCT_EVIDENCE"
+    },
+    {
+      "id": "TRGS530-P03",
+      "section": "3.6",
+      "question": "Which worker-exposure hazards need specialist evidence before any product-level instructions?",
+      "risk": "SENSITIZATION_AND_SKIN_RISK"
+    },
+    {
+      "id": "TRGS530-P04",
+      "section": "4",
+      "question": "Can a salon safety professional approve any curated interpretation without conferring customer treatment authority?",
+      "risk": "PROFESSIONAL_REVIEW_REQUIRED"
+    }
+  ],
+  "rights_provenance": {
+    "work_rights_jurisdiction": "DE",
+    "legal_publication_status": "OFFICIAL_TECHNICAL_RULE",
+    "commercial_reuse_cleared": false,
+    "machine_ingestion_rights_cleared": false,
+    "redistribution_rights_cleared": false,
+    "quoted_material_copied": false,
+    "rights_basis_evidence": null,
+    "rights_reviewer_attestation": null,
+    "status": "LEGAL_REVIEW_REQUIRED"
+  },
+  "independent_professional_review": {
+    "issuer_discovery_reference": "https://single-market-economy.ec.europa.eu/single-market/services/free-movement-professionals/database-regulated-professions_en",
+    "germany_trade_law_reference": "https://www.gesetze-im-internet.de/hwo/BJNR014110953.html",
+    "reviewer_identity": null,
+    "verifying_competent_authority": null,
+    "credential_evidence_sha256": null,
+    "independent_pinned_signing_root_sha256": null,
+    "individual_license_verified": false,
+    "specialist_signed_claims": [],
+    "safety_critical_requires_distinct_reviewers": 2,
+    "verification_state": "AWAITING_ACTUAL_SPECIALIST_AND_ISSUER"
+  },
+  "independent_legal_review": {
+    "rights_counsel_identity": null,
+    "license_or_exemption_evidence_sha256": null,
+    "jurisdiction_specific_opinion": null,
+    "status": "AWAITING_LEGAL_RIGHTS_OPINION"
+  },
+  "acceptance": {
+    "externally_provenanced_document_sha256": null,
+    "source_evidence_gate": "BLOCKED_BYTES_NOT_VERIFIED",
+    "rights_gate": "BLOCKED_RIGHTS_UNCLEARED",
+    "specialist_gate": "BLOCKED_CREDENTIAL_AND_SIGNATURES_ABSENT",
+    "jurisdiction_gate": "DE_SCOPE_ONLY_NEEDS_EXPERT",
+    "clinical_diagnosis_gate": "NOT_ALLOWED",
+    "professional_claim_release_authorized": false,
+    "eng05_review_worker_connected": false,
+    "eng05_to_eng06_dispatch_authorized": false,
+    "customer_release_approved": false,
+    "overall_status": "CANDIDATE_ONLY_NOT_PROFESSIONALLY_APPROVED"
+  }
+}

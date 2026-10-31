@@ -96,6 +96,22 @@ class ReconciliationDatabaseTests(unittest.TestCase):
         cls.eng05=os.environ.get("ABC_TEST_PG_ENG05_LOGIN_DSN")
         if not cls.admin or not cls.eng05 or os.environ.get("ABC_ENV")!="LOCAL_INTEGRATION_ONLY":
             raise unittest.SkipTest("isolated local PostgreSQL only")
+        # A distinct test method may execute first; ensure the immutable
+        # parent source-case exists before any FK/constraint negative tests.
+        import psycopg
+        case=json.loads((ROOT/"governance/abc_eng05_trgs530_first_professional_source_intake.v1.review.json").read_text())
+        content=canonical(case)
+        with psycopg.connect(cls.admin) as con:
+            con.execute("""INSERT INTO abc.eng05_external_document_acceptance_cases(
+              case_id,jurisdiction,service_scope,technical_domain,
+              normative_reference,official_edition,official_url,
+              source_metadata_bytes,source_metadata_sha256)
+              VALUES(%s,'DE','HAIR_COLOR',
+                'SALON_EMPLOYEE_OCCUPATIONAL_CHEMICAL_SAFETY',
+                'TRGS 530','2023-04-20',%s,%s,%s)
+              ON CONFLICT(case_id) DO NOTHING""",
+              (case["candidate_id"],case["primary_url"],content,
+               hashlib.sha256(content).hexdigest()))
 
     def test_immutable_provenance_sha_and_worker_denied(self):
         import psycopg

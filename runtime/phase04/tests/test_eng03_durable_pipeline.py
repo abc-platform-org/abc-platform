@@ -343,6 +343,63 @@ class ENG03PipelineTests(unittest.TestCase):
         self.assertEqual(stored[0],"BLOCKED_PENDING_AUTHORITY")
         self.assertEqual(stored[2],claimed["source_manifest_sha256"])
 
+    def test_eng04_separate_worker_parallel_claim_and_stale_lease_fencing(self):
+        worker,job,proof=self._eng04_real_ledger_fixture()
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            leases=list(pool.map(lambda _:worker.claim(),range(4)))
+        claims=[x for x in leases if x is not None]
+        self.assertEqual(len(claims),1)
+        stale=claims[0]
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.eng04_ci_jobs SET
+                lease_until=clock_timestamp()-interval '1 second'
+                WHERE job_id=%s""",(job,))
+        latest=worker.claim()
+        self.assertNotEqual(stale["lease_token"],latest["lease_token"])
+        with self.assertRaises(DomainError):
+            worker.ack(stale,worker.analyse(stale))
+        self.assertEqual(worker.ack(latest,worker.analyse(latest))["status"],
+                         "ACKED_REVIEW_ONLY")
+        with psycopg.connect(ADMIN) as con:
+            count=con.execute("""SELECT count(*) FROM abc.eng04_ci_results
+                WHERE job_id=%s""",(job,)).fetchone()[0]
+        self.assertEqual(count,1)
+
+    def test_eng04_independent_binding_revocation_blocks_ack(self):
+        worker,job,proof=self._eng04_real_ledger_fixture()
+        claim=worker.claim()
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.eng04_ci_worker_bindings SET active=false
+                WHERE consumer_id=%s AND tenant_id=%s
+                  AND login_name='abc_eng04_ci_login'""",
+                (self.consumer,self.tenant))
+        with self.assertRaises(DomainError):
+            worker.ack(claim,worker.analyse(claim))
+        with psycopg.connect(ADMIN) as con:
+            self.assertEqual(con.execute("""SELECT count(*) FROM abc.eng04_ci_results
+                WHERE job_id=%s""",(job,)).fetchone()[0],0)
+
+    def test_eng04_worker_retry_then_terminal_dlq_without_handoff(self):
+        worker,job,proof=self._eng04_real_ledger_fixture()
+        for index in range(3):
+            claim=worker.claim()
+            self.assertEqual(claim["attempt"],index+1)
+            self.assertEqual(worker.fail(claim,"CI_INJECTED_FAILURE"),
+                "DLQ" if index==2 else "QUEUED")
+            if index<2:
+                with psycopg.connect(ADMIN) as con:
+                    con.execute("""UPDATE abc.eng04_ci_jobs
+                      SET available_at=clock_timestamp()-interval '1 second'
+                      WHERE job_id=%s""",(job,))
+        self.assertIsNone(worker.claim())
+        with psycopg.connect(ADMIN) as con:
+            status=con.execute("""SELECT status,attempts FROM abc.eng04_ci_jobs
+                WHERE job_id=%s""",(job,)).fetchone()
+            count=con.execute("""SELECT count(*) FROM abc.eng04_ci_results
+                WHERE job_id=%s""",(job,)).fetchone()[0]
+        self.assertEqual(status,("DLQ",3))
+        self.assertEqual(count,0)
+
     def test_eng04_real_eng03_consent_revocation_prevents_ack_and_export(self):
         worker,job,proof=self._eng04_real_ledger_fixture()
         claim=worker.claim()

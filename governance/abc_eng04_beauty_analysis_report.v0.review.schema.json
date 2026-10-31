@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ABC ENG-04 BEAUTY_ANALYSIS_REPORT synthetic review contract",
+  "description": "Review-only data; never consent, specialist qualification, or action authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "analysis_id",
+    "session_id",
+    "service_id",
+    "engine_version",
+    "evidence_ids",
+    "attributes",
+    "unknowns",
+    "safety_notes",
+    "created_at",
+    "service_scope",
+    "source_manifest_sha256",
+    "source_engine",
+    "professional_validation_verified"
+  ],
+  "properties": {
+    "analysis_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "service_id": {
+      "const": "synthetic:hair-color"
+    },
+    "engine_version": {
+      "const": "eng04.synthetic-evidence.1"
+    },
+    "evidence_ids": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "attributes": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "value",
+          "evidence_class",
+          "source_evidence_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "enum": [
+              "prior_treatment",
+              "sensitivity_flag",
+              "goal",
+              "maintenance"
+            ]
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "evidence_class": {
+            "enum": [
+              "USER_REPORTED",
+              "UNKNOWN"
+            ]
+          },
+          "source_evidence_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "prior_treatment",
+          "sensitivity_flag",
+          "goal",
+          "maintenance"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "safety_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "service_scope": {
+      "const": "SYNTHETIC_NON_MEDIA_ONLY"
+    },
+    "source_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_engine": {
+      "const": "ENG-03"
+    },
+    "professional_validation_verified": {
+      "const": false
+    }
+  }
+}

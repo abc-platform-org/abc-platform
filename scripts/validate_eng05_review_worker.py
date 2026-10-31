@@ -48,7 +48,7 @@ def validate():
     assert "SET LOCAL ROLE abc_pipeline_worker" not in py
     assert split.count("CREATE OR REPLACE FUNCTION abc.eng19_")==4
     assert split.rstrip().endswith("COMMIT;")
-    assert split.count("\\nCOMMIT;")==1
+    assert split.count("\nCOMMIT;")==1
     assert "CREATE ROLE abc_eng04_worker NOLOGIN NOINHERIT" in split
     assert "CREATE ROLE abc_eng05_worker NOLOGIN NOINHERIT" in split
     assert "CREATE TABLE abc.eng05_worker_bindings" in split

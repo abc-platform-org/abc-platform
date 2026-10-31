@@ -58,6 +58,38 @@ class RemoteSourceAttestationTests(unittest.TestCase):
         self.assertEqual(report["page_count"],15)
         self.assertTrue(report["first_page_edition_verified"])
 
+    def test_observed_bgw_hash_is_a_specific_real_file_not_a_generic_approval(self):
+        import json
+        root=Path(__file__).resolve().parents[3]
+        record=json.loads((root/"governance/abc_eng05_trgs530_bgw_raw_pdf_provenance_2026-10-31.v1.review.json").read_text())
+        sha=record["sha256_of_actual_bgw_pdf_bytes"]
+        self.assertEqual(sha,mod.BGW_FIRST_VERIFIED_SHA256)
+        self.assertEqual(record["downloaded_bytes"],741429)
+        self.assertEqual(record["pdf_pages"],15)
+        self.assertFalse(record["cross_host_pdf_byte_identity_proven"])
+        self.assertFalse(record["professional_source_release_authorized"])
+        self.assertFalse(record["eng05_to_eng06_dispatch_authorized"])
+        self.assertFalse(record["individual_credential_verified"])
+        self.assertIsNone(record["alternate_urls"][0]["binary_sha256"])
+
+    def test_changed_bgw_mirror_bytes_are_rejected_even_if_title_matches(self):
+        class Response:
+            headers={"Content-Length":"11000","Content-Type":"application/pdf"}
+            def __enter__(self): return self
+            def __exit__(self,*args): return False
+            def geturl(self): return mod.SOURCES[2][1]
+            def getcode(self): return 200
+            def read(self,n): return b"%PDF-1.7\n"+b"x"*12000+b"%%EOF"
+        class FakeOpener:
+            def open(self,*args,**kwargs): return Response()
+        with patch.object(mod.urllib.request,"build_opener",return_value=FakeOpener()):
+            with patch.object(mod,"inspect_pdf",return_value={
+               "sha256_actual_pdf_bytes":"0"*64,
+               "byte_count":12014,"page_count":15,
+               "first_page_edition_verified":True}):
+                with self.assertRaisesRegex(ValueError,"bytes_changed"):
+                    mod.acquire("BGW_OFFICIAL",mod.SOURCES[2][1])
+
     def test_missing_network_never_creates_fake_hash_or_authority(self):
         with patch.object(mod,"acquire",side_effect=OSError("CI test offline")):
             r=mod.run()

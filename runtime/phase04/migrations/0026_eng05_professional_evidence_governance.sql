@@ -33,7 +33,7 @@ CREATE TABLE abc.eng05_professional_review_attestations (
   reviewed_source_sha256 text NOT NULL CHECK(reviewed_source_sha256 ~ '^[0-9a-f]{64}$'),
   decision text NOT NULL CHECK(decision IN ('APPROVE','REJECT','REQUEST_REVISION')),
   detached_signature_sha256 text NOT NULL CHECK(detached_signature_sha256 ~ '^[0-9a-f]{64}$'),
-  attestation bytes NOT NULL,
+  attestation bytea NOT NULL CHECK(octet_length(attestation) BETWEEN 128 AND 8192),
   verification_state text NOT NULL DEFAULT 'AWAITING_EXTERNAL_CREDENTIAL_ISSUER'
     CHECK(verification_state='AWAITING_EXTERNAL_CREDENTIAL_ISSUER'),
   authority_released boolean NOT NULL DEFAULT false CHECK(authority_released=false),

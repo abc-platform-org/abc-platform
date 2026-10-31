@@ -178,6 +178,9 @@ BEGIN
     OR v->>'service_scope' IS DISTINCT FROM 'SYNTHETIC_NON_MEDIA_ONLY'
     OR v->>'session_id' IS DISTINCT FROM j.session_id::text
     OR v->>'service_id' IS DISTINCT FROM 'synthetic:hair-color'
+    OR v->>'source_engine' IS DISTINCT FROM 'ENG-03'
+    OR v->>'source_manifest_sha256' IS DISTINCT FROM p_manifest
+    OR v->>'professional_validation_verified' IS DISTINCT FROM 'false'
     OR v->'evidence_ids' IS DISTINCT FROM v_ids
     OR v->>'customer_release_approved' IS NOT NULL
  THEN RAISE EXCEPTION 'ENG04 output contract invalid' USING ERRCODE='42501';END IF;

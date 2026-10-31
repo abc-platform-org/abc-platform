@@ -65,6 +65,8 @@ class ExternalAuthoritySignatureTests(unittest.TestCase):
         return verify_external_credential_manifest(packet,
             trusted_root_key_b64=kwargs.get("root",self.root_b64),
             independently_pinned_root_sha256=kwargs.get("pin",self.pin),
+            expected_issuer_id=kwargs.get("issuer","ci-fake-external-credential-issuer"),
+            minimum_accepted_issued_at=kwargs.get("min_issued",None),
             now=kwargs.get("now",NOW))
 
     def test_curated_real_eu_urls_are_only_unverified_discovery(self):
@@ -116,6 +118,15 @@ class ExternalAuthoritySignatureTests(unittest.TestCase):
         with self.assertRaises(SourceGovernanceError):
             self.verify(packet,root=base64.b64encode(raw).decode())
 
+    def test_external_issuer_name_and_roster_rollback_must_match_operator_pin(self):
+        packet=self._packet()
+        with self.assertRaises(SourceGovernanceError):
+            self.verify(packet,issuer="ci-different-issuer")
+        with self.assertRaises(SourceGovernanceError):
+            self.verify(packet,min_issued=(NOW+timedelta(seconds=1)).isoformat())
+        self.assertEqual(self.verify(packet,min_issued=NOW.isoformat())[
+            "qualifying_user_records_count"],1)
+
     def test_injected_credential_or_tampered_signature_denied(self):
         packet=self._packet()
         tampered=copy.deepcopy(packet)
@@ -165,7 +176,8 @@ class ExternalAuthoritySignatureTests(unittest.TestCase):
         dossier=review_only_external_dossier(
             [doc],[review],packet,
             trusted_root_key_b64=self.root_b64,
-            independently_pinned_root_sha256=self.pin,now=NOW)
+            independently_pinned_root_sha256=self.pin,
+            expected_issuer_id="ci-fake-external-credential-issuer",now=NOW)
         self.assertEqual(dossier["review_gate"],"REVIEWED_NON_EXECUTABLE")
         self.assertEqual(dossier["professionally_released_facts"],[])
         self.assertFalse(dossier["eng05_to_eng06_dispatch_authorized"])

@@ -14,7 +14,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 CONTRACT="abc.eng05.professional-source.v1.review"
 REVIEW_CONTRACT="abc.eng05.specialist-review.v1.review"
-VERSION_RE=re.compile(r"^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$")
+VERSION_RE=re.compile(r"^[1-9][0-9]*\.[0-9]+\.[0-9]+$")
 SHA_RE=re.compile(r"^[0-9a-f]{64}$")
 SCOPE={"HAIRCUT","HAIR_COLOR","BEARD","SKIN_BEAUTY","MAKEUP","NAILS","EXTENSIONS","BRIDAL"}
 KIND={"PEER_REVIEWED_RESEARCH","MANUFACTURER_PROTOCOL","PROFESSIONAL_GUIDELINE",

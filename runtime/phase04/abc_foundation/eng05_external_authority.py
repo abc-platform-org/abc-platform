@@ -123,7 +123,8 @@ def _b64(raw,length,label):
 
 
 def verify_external_credential_manifest(signed,*,trusted_root_key_b64,
-          independently_pinned_root_sha256,now=None):
+          independently_pinned_root_sha256,expected_issuer_id,
+          minimum_accepted_issued_at=None,now=None):
     """Test an issuer-signed roster against an OUT-OF-BAND trusted key pin.
 
     Importantly the pinned root is not read from the submitted manifest,
@@ -138,6 +139,9 @@ def verify_external_credential_manifest(signed,*,trusted_root_key_b64,
         or signed["signature_alg"]!="Ed25519" or signed["jurisdiction"]!="EU"
         or not isinstance(signed["issuer_id"],str) or not 5<=len(signed["issuer_id"])<=200):
         raise SourceGovernanceError("issuer_contract_or_jurisdiction_invalid")
+    if (not isinstance(expected_issuer_id,str)
+        or signed["issuer_id"]!=expected_issuer_id):
+        raise SourceGovernanceError("out_of_band_issuer_identity_mismatch")
     root=_b64(trusted_root_key_b64,32,"independent_root")
     if (not isinstance(independently_pinned_root_sha256,str)
         or len(independently_pinned_root_sha256)!=64
@@ -152,6 +156,9 @@ def verify_external_credential_manifest(signed,*,trusted_root_key_b64,
     instant=_time(now) if isinstance(now,str) else (now or datetime.now(timezone.utc))
     if instant.tzinfo is None or instant.utcoffset() is None:
         raise SourceGovernanceError("issuer_time_ambiguous")
+    if (minimum_accepted_issued_at is not None
+        and _time(signed["issued_at"])<_time(minimum_accepted_issued_at)):
+        raise SourceGovernanceError("issuer_roster_rollback_denied")
     if not _time(signed["issued_at"])<=instant<_time(signed["expires_at"]):
         raise SourceGovernanceError("issuer_roster_expired_or_future")
     entries=signed["credential_records"]
@@ -203,10 +210,13 @@ def verify_external_credential_manifest(signed,*,trusted_root_key_b64,
 
 
 def review_only_external_dossier(documents,reviews,issuer_packet,*,trusted_root_key_b64,
-                                independently_pinned_root_sha256,now=None):
+                                independently_pinned_root_sha256,expected_issuer_id,
+                                minimum_accepted_issued_at=None,now=None):
     roster=verify_external_credential_manifest(issuer_packet,
       trusted_root_key_b64=trusted_root_key_b64,
-      independently_pinned_root_sha256=independently_pinned_root_sha256,now=now)
+      independently_pinned_root_sha256=independently_pinned_root_sha256,
+      expected_issuer_id=expected_issuer_id,
+      minimum_accepted_issued_at=minimum_accepted_issued_at,now=now)
     decision=adjudicate(documents,reviews,
       trusted_credentials=roster["qualified_review_anchors"],now=now)
     return {**decision,"external_issuer_manifest_sha256":roster["issuer_manifest_sha256"],

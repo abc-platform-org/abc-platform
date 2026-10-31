@@ -103,6 +103,14 @@ class SyntheticEng04ReviewWorker:
         self._verify(claim)
         if not isinstance(report,dict):
             raise DomainError(422,"eng04_report_required")
+        # A worker caller may not replace evidence-grounded attributes or
+        # invent professional assurance while retaining a valid manifest.
+        expected=self.analyse(claim)
+        fields=set(expected)
+        if set(report)!=fields or any(
+            report[key]!=expected[key] for key in fields if key!="created_at"
+        ) or not isinstance(report.get("created_at"),str):
+            raise DomainError(403,"eng04_unverified_report_mutation")
         result=self._broker(
             "SELECT abc.eng04_ci_ack(%s,%s,%s,%s) AS result",
             (uuid.UUID(claim["job_id"]),uuid.UUID(claim["lease_token"]),

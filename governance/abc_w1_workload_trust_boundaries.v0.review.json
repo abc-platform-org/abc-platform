@@ -129,7 +129,10 @@
       "verified_attestation": false,
       "workload_deployed": false,
       "tenant_authority": "SCOPED_TO_VERIFIED_SESSION",
-      "user_media_allowed": false
+      "user_media_allowed": false,
+      "target_private_permission_group": "abc_eng01_private_group",
+      "target_private_group_provisioned": false,
+      "legacy_shared_group_split_required": false
     },
     {
       "engine_id": "ENG-02",
@@ -144,7 +147,10 @@
       "verified_attestation": false,
       "workload_deployed": false,
       "tenant_authority": "SCOPED_TO_VERIFIED_SESSION",
-      "user_media_allowed": false
+      "user_media_allowed": false,
+      "target_private_permission_group": "abc_eng02_private_group",
+      "target_private_group_provisioned": false,
+      "legacy_shared_group_split_required": false
     },
     {
       "engine_id": "ENG-03",
@@ -159,7 +165,10 @@
       "verified_attestation": false,
       "workload_deployed": false,
       "tenant_authority": "SCOPED_TO_VERIFIED_SESSION",
-      "user_media_allowed": false
+      "user_media_allowed": false,
+      "target_private_permission_group": "abc_eng03_private_group",
+      "target_private_group_provisioned": false,
+      "legacy_shared_group_split_required": false
     },
     {
       "engine_id": "ENG-04",
@@ -174,7 +183,10 @@
       "verified_attestation": false,
       "workload_deployed": false,
       "tenant_authority": "SCOPED_TO_VERIFIED_SESSION",
-      "user_media_allowed": false
+      "user_media_allowed": false,
+      "target_private_permission_group": "abc_eng04_private_group",
+      "target_private_group_provisioned": false,
+      "legacy_shared_group_split_required": true
     },
     {
       "engine_id": "ENG-05",
@@ -189,7 +201,10 @@
       "verified_attestation": false,
       "workload_deployed": false,
       "tenant_authority": "SCOPED_TO_VERIFIED_SESSION",
-      "user_media_allowed": false
+      "user_media_allowed": false,
+      "target_private_permission_group": "abc_eng05_private_group",
+      "target_private_group_provisioned": false,
+      "legacy_shared_group_split_required": true
     },
     {
       "engine_id": "ENG-06",
@@ -204,7 +219,10 @@
       "verified_attestation": false,
       "workload_deployed": false,
       "tenant_authority": "SCOPED_TO_VERIFIED_SESSION",
-      "user_media_allowed": false
+      "user_media_allowed": false,
+      "target_private_permission_group": "abc_eng06_private_group",
+      "target_private_group_provisioned": false,
+      "legacy_shared_group_split_required": false
     },
     {
       "engine_id": "ENG-14",
@@ -219,7 +237,10 @@
       "verified_attestation": false,
       "workload_deployed": false,
       "tenant_authority": "SCOPED_TO_VERIFIED_SESSION",
-      "user_media_allowed": false
+      "user_media_allowed": false,
+      "target_private_permission_group": "abc_eng14_private_group",
+      "target_private_group_provisioned": false,
+      "legacy_shared_group_split_required": false
     }
   ],
   "candidate_routes": [

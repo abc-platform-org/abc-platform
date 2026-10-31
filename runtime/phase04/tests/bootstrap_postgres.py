@@ -34,12 +34,19 @@ with psycopg.connect(dsn,autocommit=True) as con:
     con.execute("""CREATE ROLE abc_eng05_ci_login LOGIN NOINHERIT
         NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS
         PASSWORD 'integration-only-eng05-physical-login'""")
-    con.execute("GRANT abc_pipeline_worker TO abc_eng05_ci_login")
+    # Isolation: ENG05 no longer receives the ENG04 legacy pipeline group.
+    con.execute("GRANT abc_eng05_worker TO abc_eng05_ci_login")
     flags=con.execute("""SELECT rolcanlogin,rolsuper,rolbypassrls,rolinherit
        FROM pg_roles WHERE rolname='abc_eng05_ci_login'""").fetchone()
     assert flags==(True,False,False,False),flags
     group=con.execute("SELECT rolcanlogin FROM pg_roles WHERE rolname='abc_pipeline_worker'").fetchone()
     assert group==(False,),group
+    assert con.execute("SELECT rolcanlogin FROM pg_roles WHERE rolname='abc_eng04_worker'").fetchone()==(False,)
+    assert con.execute("SELECT rolcanlogin FROM pg_roles WHERE rolname='abc_eng05_worker'").fetchone()==(False,)
+    assert con.execute("""SELECT pg_has_role('abc_eng05_ci_login',
+                    'abc_pipeline_worker','MEMBER')""").fetchone()==(False,)
+    assert con.execute("""SELECT pg_has_role('abc_eng05_ci_login',
+                    'abc_eng05_worker','MEMBER')""").fetchone()==(True,)
     # A second physical identity is deliberately independent of ENG05.
     # No production issuer, service endpoint or managed credential is created.
     con.execute("""CREATE ROLE abc_eng06_ci_login LOGIN NOINHERIT

@@ -18,8 +18,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify host PDF metadata utilities available
+      - name: Install isolated PDF validators (never process a customer upload)
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
           command -v pdfinfo
           command -v pdftotext
       - name: Attempt exact official PDF download and compute real SHA256

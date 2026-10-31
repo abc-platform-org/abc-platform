@@ -1,0 +1,38 @@
+name: ENG05 TRGS530 raw-document acquisition evidence (review only)
+on:
+  pull_request:
+    paths:
+      - 'scripts/attest_eng05_trgs530_source.py'
+      - 'runtime/phase04/tests/test_eng05_remote_attestation.py'
+      - 'docs/04-platform/ABC_ENG05_TRGS530_SOURCE_ACQUISITION_2026-10-31.md'
+      - '.github/workflows/eng05-trgs530-source-attestation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  official-pdf-bytes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated PDF validators (never process a customer upload)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
+          command -v pdfinfo
+          command -v pdftotext
+      - name: Attempt exact official PDF download and compute real SHA256
+        run: |
+          python scripts/attest_eng05_trgs530_source.py \
+            --output eng05-trgs530-source-attestation.json
+          python -c 'import json; d=json.load(open("eng05-trgs530-source-attestation.json")); assert d["eng05_to_eng06_dispatch_authorized"] is False; assert d["legal_reuse_clearance"] is False; print("Fail-closed professional release guard: PASS")'
+      - name: Upload evidence manifest ONLY (never official PDF content)
+        uses: actions/upload-artifact@v4
+        with:
+          name: eng05-trgs530-official-byte-attestation
+          path: eng05-trgs530-source-attestation.json
+          if-no-files-found: error
+          retention-days: 7

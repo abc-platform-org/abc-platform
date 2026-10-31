@@ -1,0 +1,53 @@
+{
+  "contract": "abc.eng05.trgs530.secondary-source-byte-proof.v1.review",
+  "case_id": "eng05-de-hair-color-worker-safety-trgs530-20230420",
+  "evidence_date": "2026-10-31",
+  "evidence_class": "ACTUAL_HOSTED_BINARY_SHA256_GITHUB_ACTIONS",
+  "provider": "BGW — Berufsgenossenschaft für Gesundheitsdienst und Wohlfahrtspflege",
+  "source_id": "BGW_OFFICIAL",
+  "original_pdf_source_url": "https://www.bgw-online.de/resource/blob/20628/29cbf999ca5c2d91e741fa6964c6c619/trgs530-gefahrstoffe-friseurhandwerk-data.pdf",
+  "http_status": 200,
+  "content_type": "application/pdf",
+  "downloaded_bytes": 741429,
+  "pdf_pages": 15,
+  "edition_verified_from_first_page": "TRGS 530 Friseurhandwerk (Fassung 20.04.2023)",
+  "sha256_of_actual_bgw_pdf_bytes": "356fc7d7ef4d4dc56ae687c72dfbf00d156b65ae494553f15f0060d7b46b5628",
+  "provenance": {
+    "github_run_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41233421217",
+    "github_run_id": 41233421217,
+    "github_head_commit": "18c808bcffbf0e4d07ad3eb4251b1c2bde7e8dae",
+    "github_job_id": 124632127601,
+    "artifact_id": 13054547656,
+    "artifact_name": "eng05-trgs530-official-byte-attestation",
+    "artifact_zip_sha256": "fa6ce340977539261e450475ef3f13c3ec60c1dcd04b6b55aa5173df6edce18c",
+    "artifact_expiry": "2026-11-07T19:16:44Z",
+    "pdf_header_eof_checked": true,
+    "pdfinfo_pages_checked": true,
+    "pdftotext_first_page_edition_checked": true
+  },
+  "alternate_urls": [
+    {
+      "source_id": "BAUA_CURRENT",
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/pdf/TRGS-530.pdf?__blob=publicationFile",
+      "result": "HTTP_403",
+      "binary_sha256": null
+    },
+    {
+      "source_id": "BAUA_LEGACY",
+      "url": "https://www.baua.de/DE/Angebote/Rechtstexte-und-Technische-Regeln/Regelwerk/TRGS/pdf/TRGS-530.pdf?__blob=publicationFile",
+      "result": "HTTP_403",
+      "binary_sha256": null
+    }
+  ],
+  "cross_host_pdf_byte_identity_proven": false,
+  "rights_assessment": "NOT_INDEPENDENTLY_APPROVED",
+  "current_version_registered_on_baua": "APRIL_2023_OBSERVED_2026-10-31",
+  "source_pdf_committed_to_repository": false,
+  "source_full_text_ingested_by_ENG05": false,
+  "specialist_signature_count": 0,
+  "individual_credential_verified": false,
+  "professional_source_release_authorized": false,
+  "eng05_to_eng06_dispatch_authorized": false,
+  "customer_release_approved": false,
+  "overall_state": "VERIFIED_BGW_MIRROR_BYTES_ONLY_PROFESSIONAL_GATE_BLOCKED"
+}

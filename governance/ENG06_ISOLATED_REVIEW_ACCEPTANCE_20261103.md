@@ -27,3 +27,8 @@ Until all evidence is independently authenticated, retain:
 `customer_release_authorized=false`.
 
 A successful CI run does **not** change those authorization decisions.
+
+## Verification update
+- Commit `8d2f3f7e493f1a72a5ee625635ed2efc881655d9`: foundation run `41643275468` **SUCCESS**; documentation run `41643275469` **SUCCESS**. Includes real PostgreSQL negative-path tests and deployed function contract assertions.
+- Commit `bbbc51e19d86d693600e0e056aac95b955f845a9`: worker receipt regression added; CI status pending at time of this entry.
+- These checks do **not** prove positive PostgreSQL ENG05 fixture → ENG06 Claim/Lease/ACK or concurrency, reclaim, replay and consent-revocation race. The technical acceptance gate stays **OPEN / NOT PASSED** until those execute with traceable logs.

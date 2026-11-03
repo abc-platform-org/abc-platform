@@ -38,3 +38,9 @@ A successful CI run does **not** change those authorization decisions.
 - New real PostgreSQL suite `runtime/phase04/tests/test_eng06_pg_positive_e2e.py` exercises manually seeded, synthetic-only ENG05 blocked artifact → independent ENG06 Claim → blocked decision → durable ACK, then denies replay. Additional cases cover expired lease reclaim and stale ACK fencing, concurrent claim exclusivity, and withdrawal of consent between Claim and ACK.
 - This evidence demonstrates CI synthetic execution only. It does not verify actual independently authorized professional knowledge, managed production identities, or customer release. It does not imply approval to wire ENG05 outbox to ENG06 or ENG06 to ENG07.
 - **Technical CI gate: PASS for isolated synthetic review scope only.** **External professional/legal/governance release gate: NOT APPROVED.** Preserve all authorization flags as false.
+
+## Engineering continuation without external authority (2026-11-03)
+- Decision: **CONTINUE_SYNTHETIC_ENGINEERING / DENY_OPERATIONAL_RELEASE**. See `governance/ENG06_PARALLEL_DEVELOPMENT_AND_DEFERRED_RELEASE.md`.
+- External approvals are a tracked, non-waivable **release** dependency in GitHub Issue #79: https://github.com/saleheebrahimi2029-hub/abc-platform/issues/79 . They do not block fictional, local-only engine/contract/resilience engineering.
+- Regression suite: `runtime/phase04/tests/test_eng06_deferred_release_policy.py` (hosted execution denied before DB I/O; unverified source yields zero candidates). CI evidence for this new suite must be verified separately.
+- This decision does **not** authorize professional-source ingestion, customer-facing results, ENG-07 dispatch, or production deployment. All release flags remain false.

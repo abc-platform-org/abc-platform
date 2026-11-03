@@ -35,7 +35,7 @@ class Eng06PositivePostgresTests(unittest.TestCase):
             "session_id":str(self.sid),"service_id":"synthetic:hair-color",
             "service_scope":"SYNTHETIC_NON_MEDIA_ONLY",
             "engine_version":"eng04.synthetic-evidence.1",
-            "evidence_ids":["ci:prior","ci:sensitivity","ci:goal","ci:maintenance"],
+            "evidence_ids":["ci:prior_treatment","ci:sensitivity_flag","ci:goal","ci:maintenance"],
             "attributes":[
                 {"key":key,"value":value,"evidence_class":"USER_REPORTED",
                  "source_evidence_id":"ci:"+key}

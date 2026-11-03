@@ -9,6 +9,7 @@ on:
       - 'scripts/validate_engine_quality.py'
       - 'scripts/validate_abc_v2_architecture.py'
       - 'scripts/validate_abc_19_engine_architecture.py'
+      - 'scripts/validate_abc_engine_completion_audit.py'
       - 'scripts/validate_abc_w0_ratification_candidate.py'
       - 'scripts/validate_abc_w1w2_private_candidate.py'
       - 'scripts/validate_abc_w1_private_trust.py'
@@ -89,6 +90,8 @@ jobs:
         run: python scripts/validate_abc_v2_architecture.py
       - name: Validate 19 canonical logical owners, versioned handoffs and seven non-bypassable policy gates
         run: python scripts/validate_abc_19_engine_architecture.py
+      - name: Enforce canonical ownership, legacy namespace and audit completion invariants
+        run: python scripts/validate_abc_engine_completion_audit.py
       - name: W0 ratification candidate integrity and ten fail-closed mutation tests
         run: python scripts/validate_abc_w0_ratification_candidate.py
       - name: Verify W1 W2 private readiness remains blocked with eight negative tests

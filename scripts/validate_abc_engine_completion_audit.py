@@ -53,6 +53,25 @@ def validate():
                a["source_engine"]=="ENG-06" and a["target_engine"]=="ENG-15"
                for a in adapters["adapters"])
     # ENG19 is a canonical automation owner, never a synonym for the review transport.
+    mapping=json.loads((GOV/"abc_legacy_namespace_reconciliation.v1.json").read_text(encoding="utf-8"))
+    assert mapping["status"]=="AUDIT_MAPPED_NOT_MIGRATED"
+    assert mapping["canonical_dispatch_enabled"] is False
+    assert mapping["customer_release_approved"] is False
+    assert mapping["canonical_protocol"]==VERSION
+    assert len(mapping["entries"])==len(LEGACY)
+    assert {x["module"] for x in mapping["entries"]}==set(LEGACY)
+    adapter_ids={x["adapter_id"] for x in adapters["adapters"]}
+    for item in mapping["entries"]:
+        assert (SRC/item["module"]).is_file()
+        if item["historical_role"]=="REVIEW_TRANSPORT":
+            assert item["canonical_owner"] is None
+            assert item["adapter"] is None
+            assert item["migration_status"]=="LEGACY_TRANSPORT_ONLY"
+        else:
+            assert item["canonical_owner"] in engines
+            assert item["adapter"] in adapter_ids
+            assert item["migration_status"]=="UNMIGRATED"
+    assert next(x for x in mapping["entries"] if x["module"]=="eng06_technical_plan_v2.py")["canonical_owner"]=="ENG-15"
     assert engines["ENG-19"]["implementation_module"] is None
     assert engines["ENG-07"]["implementation_module"] is None
     return {"canonical_engines":19,"workflow_stages":17,

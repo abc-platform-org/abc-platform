@@ -1,0 +1,66 @@
+{
+  "schema_version": "abc.legacy-namespace-reconciliation.v1",
+  "status": "AUDIT_MAPPED_NOT_MIGRATED",
+  "canonical_protocol": "abc.internal.capability.v3.review",
+  "canonical_dispatch_enabled": false,
+  "customer_release_approved": false,
+  "entries": [
+    {
+      "module": "eng04_recommendation_v2.py",
+      "historical_engine": "ENG-04",
+      "historical_role": "RECOMMENDATION_INTELLIGENCE",
+      "canonical_owner": "ENG-06",
+      "adapter": "A04_TO_06_DECISION_INPUT",
+      "migration_status": "UNMIGRATED"
+    },
+    {
+      "module": "eng05_decision_v2.py",
+      "historical_engine": "ENG-05",
+      "historical_role": "DECISION_INTELLIGENCE",
+      "canonical_owner": "ENG-06",
+      "adapter": "A05_TO_06_DECISION_EVIDENCE",
+      "migration_status": "UNMIGRATED"
+    },
+    {
+      "module": "eng06_technical_plan_v2.py",
+      "historical_engine": "ENG-06",
+      "historical_role": "TECHNICAL_PLANNING_INTELLIGENCE",
+      "canonical_owner": "ENG-15",
+      "adapter": "A06_TO_15_PLAN_CANDIDATE",
+      "migration_status": "UNMIGRATED"
+    },
+    {
+      "module": "eng04_visual_qa.py",
+      "historical_engine": "ENG-04",
+      "historical_role": "EMBEDDED_PIXEL_QA",
+      "canonical_owner": "ENG-11",
+      "adapter": "A04_PIXEL_TO_11_QA_EVIDENCE",
+      "migration_status": "UNMIGRATED"
+    },
+    {
+      "module": "eng19_review_consumer.py",
+      "historical_engine": "ENG-19",
+      "historical_role": "REVIEW_TRANSPORT",
+      "canonical_owner": null,
+      "adapter": null,
+      "migration_status": "LEGACY_TRANSPORT_ONLY"
+    },
+    {
+      "module": "eng19_review_producer.py",
+      "historical_engine": "ENG-19",
+      "historical_role": "REVIEW_TRANSPORT",
+      "canonical_owner": null,
+      "adapter": null,
+      "migration_status": "LEGACY_TRANSPORT_ONLY"
+    },
+    {
+      "module": "eng19_review_transport.py",
+      "historical_engine": "ENG-19",
+      "historical_role": "REVIEW_TRANSPORT",
+      "canonical_owner": null,
+      "adapter": null,
+      "migration_status": "LEGACY_TRANSPORT_ONLY"
+    }
+  ],
+  "notes": "Historical prefixes are compatibility namespaces, never canonical service principals. Rename only through versioned contracts, DB queue migration, replay and dual-read tests; no implicit v2->v3 dispatch."
+}

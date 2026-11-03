@@ -162,7 +162,7 @@ class Eng06PositivePostgresTests(unittest.TestCase):
         result=self.worker.decide_blocked(claim)
         with psycopg.connect(ADMIN) as con:
             con.execute("""UPDATE abc.consent_evidence
-                SET status='REVOKED',revoked_at=clock_timestamp()
+                SET status='WITHDRAWN',revoked_at=clock_timestamp()
                 WHERE consent_id=%s""",(self.consent,))
         with self.assertRaises(Exception):
             self.worker.ack(claim,result)

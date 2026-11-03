@@ -11,6 +11,9 @@ SRC=ROOT/"runtime/phase04/abc_foundation"
 VERSION="abc.internal.capability.v3.review"
 LEGACY={
     "eng06_technical_plan_v2.py":("ENG-06","ENG-15","TECHNICAL_PLANNING_INTELLIGENCE"),
+    "eng04_recommendation_v2.py":("ENG-04","ENG-06","RECOMMENDATION_INTELLIGENCE"),
+    "eng05_decision_v2.py":("ENG-05","ENG-06","DECISION_INTELLIGENCE"),
+    "eng04_visual_qa.py":("ENG-04","ENG-11","EMBEDDED_PIXEL_QA"),
     "eng19_review_consumer.py":("ENG-19",None,"REVIEW_TRANSPORT_NOT_CANONICAL_AUTOMATION"),
     "eng19_review_producer.py":("ENG-19",None,"REVIEW_TRANSPORT_NOT_CANONICAL_AUTOMATION"),
     "eng19_review_transport.py":("ENG-19",None,"REVIEW_TRANSPORT_NOT_CANONICAL_AUTOMATION"),

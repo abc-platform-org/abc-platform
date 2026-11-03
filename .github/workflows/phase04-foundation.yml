@@ -10,6 +10,7 @@ on:
       - 'scripts/validate_abc_v2_architecture.py'
       - 'scripts/validate_abc_19_engine_architecture.py'
       - 'scripts/validate_abc_engine_completion_audit.py'
+      - 'scripts/build_abc_engine_evidence_inventory.py'
       - 'scripts/validate_abc_w0_ratification_candidate.py'
       - 'scripts/validate_abc_w1w2_private_candidate.py'
       - 'scripts/validate_abc_w1_private_trust.py'
@@ -92,6 +93,19 @@ jobs:
         run: python scripts/validate_abc_19_engine_architecture.py
       - name: Enforce canonical ownership, legacy namespace and audit completion invariants
         run: python scripts/validate_abc_engine_completion_audit.py
+      - name: Build reproducible 19-engine evidence inventory and enforce no false completion
+        run: |
+          python scripts/build_abc_engine_evidence_inventory.py > /tmp/abc-engine-audit-inventory.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('/tmp/abc-engine-audit-inventory.json').read_text())
+          assert p['engine_count']==19 and p['open_gate_count']==190
+          assert p['release_authorized'] is False
+          assert len(p['legacy_namespace_collisions'])==7
+          assert all(not e['operational_completion_claim'] for e in p['engines'])
+          print('PASS: audit inventory and 190 unsigned gates remain explicit')
+          PY
       - name: W0 ratification candidate integrity and ten fail-closed mutation tests
         run: python scripts/validate_abc_w0_ratification_candidate.py
       - name: Verify W1 W2 private readiness remains blocked with eight negative tests

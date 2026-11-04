@@ -162,6 +162,20 @@ jobs:
         working-directory: runtime/phase04
         run: |
           python -m unittest discover -s tests -p 'test_a1_*.py' -v
+      - name: A1 prepare committed synthetic bridge rows for PostgreSQL service restart
+        run: python runtime/phase04/tests/a1_postgres_restart_probe.py prepare
+      - name: A1 restart disposable PostgreSQL service container
+        run: |
+          docker restart "${{ job.services.postgres.id }}"
+          for i in $(seq 1 40); do
+            if pg_isready -h 127.0.0.1 -p 5432 -U postgres -d abc_phase04_ci; then break; fi
+            sleep 2
+          done
+          pg_isready -h 127.0.0.1 -p 5432 -U postgres -d abc_phase04_ci
+      - name: A1 verify durable bridge and denied release after server restart
+        run: |
+          python runtime/phase04/tests/a1_postgres_restart_probe.py verify
+          python runtime/phase04/tests/a1_postgres_restart_probe.py cleanup
       - name: Verify dedicated staging migrator against isolated ephemeral PostgreSQL
         working-directory: runtime/phase04
         run: python tests/verify_staging_migration_ci.py

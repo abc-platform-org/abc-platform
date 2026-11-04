@@ -43,3 +43,21 @@
 
 ## Change control
 For each step update this plan with: status, commit SHA, CI link, verified tests, open blockers, accountable reviewer, and explicit acceptance. No step is DONE based only on file creation.
+
+## A1 technical evidence update — 2026-11-04
+Reviewed migration inventory 0001–0030, canonical registry, adapter registry, legacy map, CI workflow and PostgreSQL migration 0019/0021. This is a source audit, not an independently ratified deployment migration.
+
+### Verified physical compatibility boundaries
+- Migration 0019 declares historical abc.eng19_review_edges and abc.eng19_review_inbox. It has a consent- and session-state-guarded review receipt function. Historical table prefix is not canonical ENG-19 automation ownership.
+- Migration 0021 declares abc.eng06_ci_worker_bindings, abc.eng06_ci_jobs and abc.eng06_ci_results. It enforces CI-only blocked output and uses abc.eng19_synthetic_outbox and results as upstream artifacts.
+- ENG-06 CI ACK validates source SHA256, consent, lease token, engine version, blocked professional source, no customer release and no downstream dispatch.
+- Six adapters remain UNMIGRATED and runtime disabled. No v3 canonical dispatch is authorized.
+- Prior Foundation CI success: https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41718998187. Passing existing tests does not prove new v2-v3 migration or independent ADR approval.
+
+### A1 closure blockers — must not be silently waived
+1. Complete static extraction of all 30 migration DDL objects, grants, identities, foreign keys, queue producers/consumers and wire versions; verify database catalog after migration.
+2. Specify and implement each of six versioned compatibility adapters with strict tenant/branch/session/provenance/consent checks, negative contract tests and explicit no-release decisions.
+3. Prove reversible migration with disposable PostgreSQL, dual-read/backfill, replay, crash/restart, idempotency, schema rollback and no destructive rename.
+4. Obtain explicit architecture-owner approval of canonical roles and ADR-ENG-003/004; separate technical test evidence from independent signoff.
+
+**A1 status remains IN_PROGRESS; A2–A7 remain OPEN.** This update does not authorize ENG-07, customer decisions or professional execution.

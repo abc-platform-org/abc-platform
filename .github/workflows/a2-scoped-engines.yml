@@ -244,3 +244,27 @@ jobs:
           path: a2/performance/
           if-no-files-found: error
           retention-days: 30
+
+  process-boundary-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify synthetic process crash containment
+        run: |
+          mkdir -p a2/process-boundary
+          python -m unittest discover -s runtime/phase04/tests -p test_a2_process_boundary.py -v 2>&1 | tee a2/process-boundary/unittest.log
+          grep -Eq '^Ran 1 test in' a2/process-boundary/unittest.log
+          grep -Eq '^OK$' a2/process-boundary/unittest.log
+          sha256sum a2/process-boundary/unittest.log > a2/process-boundary/sha256.txt
+      - name: Upload narrow process-boundary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-process-boundary-${{ github.run_id }}
+          path: a2/process-boundary/
+          if-no-files-found: error
+          retention-days: 30

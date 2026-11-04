@@ -71,6 +71,30 @@ class A1BridgePostgresTests(unittest.TestCase):
                     cur.execute("SELECT count(*) FROM abc."+table+" WHERE tenant_id=%s",(tenant,))
                     self.assertEqual(cur.fetchone()[0],0)
 
+    def test_uncommitted_bridge_write_disappears_on_connection_loss(self):
+        """Simulate abrupt client disappearance before COMMIT; PostgreSQL must roll back."""
+        tenant="a1-synthetic-disconnect-rollback"
+        writer=psycopg.connect(self.dsn)
+        try:
+            with writer.cursor() as cur:
+                cur.execute("""INSERT INTO abc.a1_bridge_legacy(
+                    adapter_id,tenant_id,branch_id,session_id,artifact_id,
+                    source_sha256,consent_decision_id,policy_decision_id,
+                    source_version,payload)
+                    VALUES(%s,%s,'test-branch','test-session','disconnect',
+                    %s,'consent-test','policy-test',
+                    'abc.internal.engine.v2.draft',%s::jsonb)""",
+                    (IDS[0],tenant,"0"*64,json.dumps({"synthetic":True})))
+                cur.execute("SELECT count(*) FROM abc.a1_bridge_legacy WHERE tenant_id=%s",(tenant,))
+                self.assertEqual(cur.fetchone()[0],1)
+            # Close without COMMIT to emulate connection loss before durable acknowledgement.
+        finally:
+            writer.close()
+        with psycopg.connect(self.dsn,autocommit=True) as reader:
+            with reader.cursor() as cur:
+                cur.execute("SELECT count(*) FROM abc.a1_bridge_legacy WHERE tenant_id=%s",(tenant,))
+                self.assertEqual(cur.fetchone()[0],0)
+
     def test_runtime_roles_have_no_bridge_table_access(self):
         with psycopg.connect(self.dsn, autocommit=True) as con:
             with con.cursor() as cur:

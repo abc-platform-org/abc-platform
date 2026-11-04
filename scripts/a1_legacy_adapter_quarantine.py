@@ -35,3 +35,30 @@ def inspect_legacy_envelope(adapter_id,envelope):
 
 def dispatch(*_args,**_kwargs):
     raise AdapterRejected("canonical_v3_dispatch_not_authorized")
+
+def build_review_only_canonical_envelope(adapter_id,envelope):
+    """Deterministic v2-to-v3 review projection, never operational dispatch.
+
+    The source is retained verbatim, with no inferred professional authority.
+    """
+    inspect_legacy_envelope(adapter_id,envelope)
+    adapter=next(a for a in ADAPTERS["adapters"] if a["adapter_id"]==adapter_id)
+    if adapter["runtime_enabled"] or adapter["customer_release_approved"]:
+        raise AdapterRejected("adapter_registry_must_remain_disabled")
+    return {
+        "adapter_id":adapter_id,
+        "target_engine":adapter["target_engine"],
+        "source_version":envelope["artifact_version"],
+        "target_version":ADAPTERS["target_protocol"],
+        "tenant_id":envelope["tenant_id"],
+        "branch_id":envelope["branch_id"],
+        "session_id":envelope["session_id"],
+        "source_sha256":envelope["source_sha256"],
+        "consent_decision_id":envelope["consent_decision_id"],
+        "policy_decision_id":envelope["policy_decision_id"],
+        "source_artifact":envelope["artifact"],
+        "authority":"UNVERIFIED_REVIEW_ONLY",
+        "migration_status":"SHADOW_PROJECTION_ONLY",
+        "dispatch_authorized":False,
+        "customer_release_approved":False,
+    }

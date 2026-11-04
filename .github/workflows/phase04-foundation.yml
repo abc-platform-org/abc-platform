@@ -115,6 +115,8 @@ jobs:
           assert all(not e['operational_completion_claim'] for e in p['engines'])
           print('PASS: audit inventory and 190 unsigned gates remain explicit')
           PY
+      - name: A1 capture fail-closed physical producer-consumer binding evidence
+        run: python scripts/a1_verify_adapter_runtime_bindings.py > /tmp/abc-a1-adapter-runtime-bindings.json
       - name: A1 verify 30 migrations and six quarantined compatibility contracts
         run: |
           python scripts/a1_inventory_physical_namespaces.py > /tmp/abc-a1-physical-inventory.json

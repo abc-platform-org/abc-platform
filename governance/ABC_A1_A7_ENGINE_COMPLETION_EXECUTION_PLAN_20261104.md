@@ -80,3 +80,9 @@ Reviewed migration inventory 0001–0030, canonical registry, adapter registry, 
 - **A1.6** architecture owner UNASSIGNED/NOT SIGNED; ADR-ENG-003/004 PENDING; independent security approval not evidenced.
 - Detailed evidence and required approval actions: `governance/ABC_A1_EVIDENCE_RECONCILIATION_20261104.md`.
 - **Controlling stage decision: A1 OPEN / BLOCKED ON INDEPENDENT APPROVALS AND DEPLOYED EVIDENCE.** A2–A7 remain OPEN. A green CI does not authorize ENG07, professional decisions, production migration or customer release.
+
+
+## A1 scope decision — GitHub-only / pre-deployment (2026-11-04)
+Owner confirmed no operational deployment or persistent PostgreSQL environment exists. A1 engineering closure is assessed with source-controlled contracts, isolated CI/disposable PostgreSQL and independently attributable architecture/security decisions. A production catalog cannot be inspected before deployment; it remains a **deferred deployment-readiness gate**, not a fabricated A1 failure or a completed check. Full operational migration, managed workload identity, real mTLS and customer release remain prohibited until independently verified at deployment.
+
+A1 is **OPEN** until the remaining source/contract/rollback evidence and independent owner/security/ADR approvals are complete. CI #475 success alone is not closure; no operational ENG07 dispatch is authorized.

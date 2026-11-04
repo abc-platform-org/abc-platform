@@ -174,6 +174,30 @@ jobs:
             ! grep -Eq 'skipped=[1-9]|FAILED ' "a2/reliability/$file.log"
           done
           sha256sum a2/reliability/*.log > a2/reliability/sha256.txt
+      - name: Verify negative and recovery test results with structured manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, pathlib, re
+          for kind in ("security","reliability"):
+              folder=pathlib.Path("a2")/kind
+              cases=[]
+              for path in sorted(folder.glob("test_*.py.log")):
+                  raw=path.read_text()
+                  summaries=[int(x) for x in re.findall(r"Ran (\d+) tests? in",raw)]
+                  names=re.findall(r"^(test[^ ]+) \(([^)]+)\)(?: \.\.\.)?",raw,re.M)
+                  if len(summaries)!=1 or len(names)!=summaries[0] or re.search(r"FAILED |skipped=[1-9]|^ERROR:|^FAIL:",raw,re.M) or not re.search(r"^OK$",raw,re.M):
+                      raise SystemExit(f"Invalid test evidence: {path}: names={len(names)} totals={summaries}")
+                  cases.extend({"id":klass+"."+name,"result":"PASS","source_log":path.name} for name,klass in names)
+              if not cases:
+                  raise SystemExit(f"No {kind} cases")
+              digest={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(folder.glob("*.log"))}
+              report={"schema":"abc.a2.negative-evidence.v1","category":kind,"sha":os.environ.get("GITHUB_SHA"),"run_id":os.environ.get("GITHUB_RUN_ID"),"case_count":len(cases),"cases":cases,"log_sha256":digest,"independent_approval":False,"gate_status":"OPEN"}
+              name="negative-results.json" if kind=="security" else "fault-results.json"
+              (folder/name).write_text(json.dumps(report,indent=2)+"\\n")
+              print(kind,len(cases))
+          PY
       - name: Upload security and reliability evidence
         if: always()
         uses: actions/upload-artifact@v4

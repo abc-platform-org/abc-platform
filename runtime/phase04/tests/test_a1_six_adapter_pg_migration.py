@@ -21,7 +21,7 @@ class A1BridgePostgresTests(unittest.TestCase):
 
     def test_six_adapters_backfill_dual_read_idempotency_and_rollback(self):
         tenant="a1-synthetic-test-only"
-        with psycopg.connect(self.dsn) as con:
+        with psycopg.connect(self.dsn, autocommit=True) as con:
             with con.cursor() as cur:
                 cur.execute("SELECT adapter_id,enabled,customer_release_approved FROM abc.a1_bridge_registry")
                 rows=cur.fetchall()
@@ -72,7 +72,7 @@ class A1BridgePostgresTests(unittest.TestCase):
                     self.assertEqual(cur.fetchone()[0],0)
 
     def test_runtime_roles_have_no_bridge_table_access(self):
-        with psycopg.connect(self.dsn) as con:
+        with psycopg.connect(self.dsn, autocommit=True) as con:
             with con.cursor() as cur:
                 for role in ("abc_eng04_worker","abc_eng05_worker","abc_eng06_review_worker"):
                     cur.execute("""SELECT has_table_privilege(%s,'abc.a1_bridge_shadow','SELECT'),

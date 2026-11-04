@@ -66,3 +66,15 @@ No production migration, live release, external approval, or ENG07 customer disp
 5. Once independent approvals and required environment evidence are attached, record an explicit A1 engineering closure decision; keep production/customer release and ENG-07 dispatch gated separately.
 
 **Decision:** A1 remains **OPEN / EXTERNAL REVIEW AND DEPLOYED-EVIDENCE BLOCKED**. A2–A7 remain OPEN. No customer release, professional decision, ENG-07 operational handoff, or production migration is authorized.
+
+
+## Deployment-scope clarification — owner statement, 2026-11-04
+The project owner confirms ABC is currently **GitHub-only**, without a deployed application or persistent operational PostgreSQL environment. This is a scope statement, not a runtime observation or a security approval.
+
+**A1 engineering-closure assessment shall be pre-deployment and evidence-gated:** require current immutable commit CI; disposable PostgreSQL migration catalog/roles/RLS/grants and six-adapter rollback/dual-read proof; documented static producer/consumer/identity/version inventory; explicit independent architecture/ADR-ENG-003/004 and security decisions. Do not demand production catalog evidence from an environment that does not exist, and do not represent disposable PostgreSQL as production.
+
+**Deferred to deployment readiness:** real deployment catalog and service principal verification, network mTLS/JWT runtime attestation, production recovery/PITR, actual production rollback, customer load and release readiness. These must remain OPEN and explicitly block operational release, but are not automatically grounds to misstate the pre-deployment engineering tests as failed.
+
+**Outstanding engineering gaps:** source inventory does not independently prove all producer/consumer/wire-version routes; current rollback test demonstrates transaction rollback, not full schema downgrade or crash/restart recovery; six adapters remain intentionally quarantined and unmigrated; independent architecture and security approvals are missing.
+
+**Decision unchanged: A1 OPEN / PRE-DEPLOYMENT ENGINEERING CLOSURE PENDING.** No approval or closure is inferred from the owner's environment statement.

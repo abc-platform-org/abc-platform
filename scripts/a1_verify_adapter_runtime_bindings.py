@@ -38,6 +38,14 @@ def build():
                         "wire_schema":"UNVERIFIED",
                         "live_route":False})
     assert len(records)==6 and len({r["adapter_id"] for r in records})==6
+    # Quarantine storage is never proof of live engine routes.
+    bridge_sql=(MIGRATIONS/"0031_a1_six_adapter_bridge_quarantine.sql").read_text()
+    for table in ("a1_bridge_registry","a1_bridge_legacy","a1_bridge_shadow"):
+        assert "CREATE TABLE IF NOT EXISTS abc."+table in bridge_sql
+    for forbidden in ("enabled boolean NOT NULL DEFAULT true",
+                      "dispatch_authorized boolean NOT NULL DEFAULT true",
+                      "customer_release_approved boolean NOT NULL DEFAULT true"):
+        assert forbidden not in bridge_sql
     # Bridge tables are quarantine storage, never evidence of live engine routes.
     bridge_sql=(MIGRATIONS/"0031_a1_six_adapter_bridge_quarantine.sql").read_text()
     for table in ("a1_bridge_registry","a1_bridge_legacy","a1_bridge_shadow"):

@@ -92,7 +92,7 @@ jobs:
               data=pathlib.Path(path).read_text()
               # unittest can emit warnings between the testcase header and its final status.
               # Parse each testcase block, not only one-line "test ... ok" records.
-              starts=list(re.finditer(r"^(test[^ ]+) \(([^)]+)\) \.\.\.",data,re.M))
+              starts=list(re.finditer(r"^(test[^ ]+) \(([^)]+)\)(?=\s|$)",data,re.M))
               matches=[]
               for idx,match in enumerate(starts):
                   tail=data[match.end():starts[idx+1].start() if idx+1<len(starts) else len(data)]

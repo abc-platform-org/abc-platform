@@ -9,7 +9,17 @@ assert ledger["production_ready"] is False
 assert ledger["customer_release_approved"] is False
 expected={"ENG-01","ENG-02","ENG-03","ENG-04","ENG-05","ENG-06","ENG-14","LEGACY_REVIEW_TRANSPORT"}
 assert {s["scope_id"] for s in ledger["scopes"]}==expected
+migration_dir=ROOT/"runtime/phase04/migrations"
 for scope in ledger["scopes"]:
+    candidates=scope["source_candidates"]
+    for module in candidates["modules"]:
+        assert (ROOT/"runtime/phase04/abc_foundation"/module).is_file(), module
+    for test in candidates["tests"]:
+        assert (ROOT/"runtime/phase04/tests"/test).is_file(), test
+    for prefix in candidates["migrations"]:
+        matches=list(migration_dir.glob(prefix+"_*.sql"))
+        assert len(matches)==1, (scope["scope_id"],prefix)
+
     assert scope["implementation_status"] in {"IMPLEMENTED","PARTIAL","MISSING"}
     assert scope["independent_deployment_verified"] is False
     assert set(scope["gate_results"])=={f"G{i:02d}" for i in range(1,11)}

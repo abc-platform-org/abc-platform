@@ -15,52 +15,52 @@
       "implementation_status": "PARTIAL",
       "independent_deployment_verified": false,
       "gate_results": {
-        "G01": {
+        "G01_ARCHITECTURE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G02": {
+        "G02_DOMAIN_CAPABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G03": {
+        "G03_CONTRACTS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G04": {
+        "G04_INDEPENDENCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G05": {
+        "G05_SECURITY_PRIVACY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G06": {
+        "G06_RELIABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G07": {
+        "G07_PERFORMANCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G08": {
+        "G08_PROFESSIONAL_VALIDATION": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G09": {
+        "G09_OBSERVABILITY_OPERATIONS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G10": {
+        "G10_INDEPENDENT_SIGNOFF": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
@@ -94,52 +94,52 @@
       "implementation_status": "PARTIAL",
       "independent_deployment_verified": false,
       "gate_results": {
-        "G01": {
+        "G01_ARCHITECTURE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G02": {
+        "G02_DOMAIN_CAPABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G03": {
+        "G03_CONTRACTS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G04": {
+        "G04_INDEPENDENCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G05": {
+        "G05_SECURITY_PRIVACY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G06": {
+        "G06_RELIABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G07": {
+        "G07_PERFORMANCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G08": {
+        "G08_PROFESSIONAL_VALIDATION": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G09": {
+        "G09_OBSERVABILITY_OPERATIONS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G10": {
+        "G10_INDEPENDENT_SIGNOFF": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
@@ -172,52 +172,52 @@
       "implementation_status": "PARTIAL",
       "independent_deployment_verified": false,
       "gate_results": {
-        "G01": {
+        "G01_ARCHITECTURE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G02": {
+        "G02_DOMAIN_CAPABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G03": {
+        "G03_CONTRACTS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G04": {
+        "G04_INDEPENDENCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G05": {
+        "G05_SECURITY_PRIVACY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G06": {
+        "G06_RELIABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G07": {
+        "G07_PERFORMANCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G08": {
+        "G08_PROFESSIONAL_VALIDATION": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G09": {
+        "G09_OBSERVABILITY_OPERATIONS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G10": {
+        "G10_INDEPENDENT_SIGNOFF": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
@@ -248,52 +248,52 @@
       "implementation_status": "PARTIAL",
       "independent_deployment_verified": false,
       "gate_results": {
-        "G01": {
+        "G01_ARCHITECTURE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G02": {
+        "G02_DOMAIN_CAPABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G03": {
+        "G03_CONTRACTS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G04": {
+        "G04_INDEPENDENCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G05": {
+        "G05_SECURITY_PRIVACY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G06": {
+        "G06_RELIABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G07": {
+        "G07_PERFORMANCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G08": {
+        "G08_PROFESSIONAL_VALIDATION": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G09": {
+        "G09_OBSERVABILITY_OPERATIONS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G10": {
+        "G10_INDEPENDENT_SIGNOFF": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
@@ -325,52 +325,52 @@
       "implementation_status": "PARTIAL",
       "independent_deployment_verified": false,
       "gate_results": {
-        "G01": {
+        "G01_ARCHITECTURE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G02": {
+        "G02_DOMAIN_CAPABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G03": {
+        "G03_CONTRACTS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G04": {
+        "G04_INDEPENDENCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G05": {
+        "G05_SECURITY_PRIVACY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G06": {
+        "G06_RELIABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G07": {
+        "G07_PERFORMANCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G08": {
+        "G08_PROFESSIONAL_VALIDATION": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G09": {
+        "G09_OBSERVABILITY_OPERATIONS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G10": {
+        "G10_INDEPENDENT_SIGNOFF": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
@@ -407,52 +407,52 @@
       "implementation_status": "PARTIAL",
       "independent_deployment_verified": false,
       "gate_results": {
-        "G01": {
+        "G01_ARCHITECTURE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G02": {
+        "G02_DOMAIN_CAPABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G03": {
+        "G03_CONTRACTS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G04": {
+        "G04_INDEPENDENCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G05": {
+        "G05_SECURITY_PRIVACY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G06": {
+        "G06_RELIABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G07": {
+        "G07_PERFORMANCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G08": {
+        "G08_PROFESSIONAL_VALIDATION": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G09": {
+        "G09_OBSERVABILITY_OPERATIONS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G10": {
+        "G10_INDEPENDENT_SIGNOFF": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
@@ -482,52 +482,52 @@
       "implementation_status": "PARTIAL",
       "independent_deployment_verified": false,
       "gate_results": {
-        "G01": {
+        "G01_ARCHITECTURE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G02": {
+        "G02_DOMAIN_CAPABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G03": {
+        "G03_CONTRACTS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G04": {
+        "G04_INDEPENDENCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G05": {
+        "G05_SECURITY_PRIVACY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G06": {
+        "G06_RELIABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G07": {
+        "G07_PERFORMANCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G08": {
+        "G08_PROFESSIONAL_VALIDATION": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G09": {
+        "G09_OBSERVABILITY_OPERATIONS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G10": {
+        "G10_INDEPENDENT_SIGNOFF": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
@@ -562,52 +562,52 @@
       "implementation_status": "PARTIAL",
       "independent_deployment_verified": false,
       "gate_results": {
-        "G01": {
+        "G01_ARCHITECTURE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G02": {
+        "G02_DOMAIN_CAPABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G03": {
+        "G03_CONTRACTS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G04": {
+        "G04_INDEPENDENCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G05": {
+        "G05_SECURITY_PRIVACY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G06": {
+        "G06_RELIABILITY": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G07": {
+        "G07_PERFORMANCE": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G08": {
+        "G08_PROFESSIONAL_VALIDATION": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G09": {
+        "G09_OBSERVABILITY_OPERATIONS": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
         },
-        "G10": {
+        "G10_INDEPENDENT_SIGNOFF": {
           "status": "OPEN",
           "evidence": [],
           "reviewer": null
@@ -629,5 +629,19 @@
       },
       "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     }
-  ]
+  ],
+  "canonical_gate_policy": "governance/abc_engine_quality_19.v0.review.json",
+  "canonical_required_gates": [
+    "G01_ARCHITECTURE",
+    "G02_DOMAIN_CAPABILITY",
+    "G03_CONTRACTS",
+    "G04_INDEPENDENCE",
+    "G05_SECURITY_PRIVACY",
+    "G06_RELIABILITY",
+    "G07_PERFORMANCE",
+    "G08_PROFESSIONAL_VALIDATION",
+    "G09_OBSERVABILITY_OPERATIONS",
+    "G10_INDEPENDENT_SIGNOFF"
+  ],
+  "correction_note": "Canonical G01-G10 meanings come from the 19-engine quality registry, not the provisional test-category descriptions in earlier narrative audit notes."
 }

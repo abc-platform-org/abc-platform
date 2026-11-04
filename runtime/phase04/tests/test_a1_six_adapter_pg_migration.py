@@ -95,6 +95,22 @@ class A1BridgePostgresTests(unittest.TestCase):
                 cur.execute("SELECT count(*) FROM abc.a1_bridge_legacy WHERE tenant_id=%s",(tenant,))
                 self.assertEqual(cur.fetchone()[0],0)
 
+    def test_bridge_schema_guards_reject_release_and_unknown_versions(self):
+        """Exercise real PostgreSQL constraints; savepoints isolate expected failures."""
+        with psycopg.connect(self.dsn) as con:
+            with con.cursor() as cur:
+                for sql,params in (
+                    ("UPDATE abc.a1_bridge_registry SET enabled=true WHERE adapter_id=%s",(IDS[0],)),
+                    ("UPDATE abc.a1_bridge_registry SET customer_release_approved=true WHERE adapter_id=%s",(IDS[0],)),
+                    ("UPDATE abc.a1_bridge_registry SET target_protocol=%s WHERE adapter_id=%s",
+                     ("abc.internal.capability.v4.unknown",IDS[0])),
+                ):
+                    with self.assertRaises(psycopg.errors.CheckViolation):
+                        with con.transaction():
+                            cur.execute(sql,params)
+                cur.execute("SELECT enabled,customer_release_approved,target_protocol FROM abc.a1_bridge_registry WHERE adapter_id=%s",(IDS[0],))
+                self.assertEqual(cur.fetchone(),(False,False,"abc.internal.capability.v3.review"))
+
     def test_runtime_roles_have_no_bridge_table_access(self):
         with psycopg.connect(self.dsn, autocommit=True) as con:
             with con.cursor() as cur:

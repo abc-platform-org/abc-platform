@@ -37,3 +37,9 @@ Production/deployed catalog reconciliation, managed service identities, private-
 
 ## Decision
 **A1 remains OPEN.** This packet is a request for independently attributable review, not an approval, not a customer release, and not an authorization to enable the six adapters, ENG-06, or ENG-07.
+
+
+## CI acceptance addendum — 2026-11-04
+Current tested head: `7917cf6faf41dbf7d1d47a38b9a893aae48a1000`, Run #477 https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41828511154, `completed/success`, single foundation job `success`. This includes expanded bridge RLS/worker CRUD regression, A1 PostgreSQL acceptance without skips, 31-migration staging verification, integration/replay tests, and release-denial guards. The earlier pending current-head CI checklist item is **SATISFIED for that immutable SHA**. Subsequent documentation commits are not changes to the tested runtime code.
+
+Independent architecture owner, ADR-ENG-003/004 reviewers and security reviewer remain **UNASSIGNED / NOT SIGNED**. No independence can be inferred from CI or this addendum. The mapping and rollback evidence limitations remain open; review may explicitly reject or require corrective action. **Closure decision remains BLOCKED.**

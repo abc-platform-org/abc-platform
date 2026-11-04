@@ -102,6 +102,12 @@ jobs:
           suite.set("tests",str(total))
           ET.ElementTree(suite).write(out/"junit.xml",encoding="utf-8",xml_declaration=True)
           print(f"Captured {total} scoped test cases")
+          import hashlib, json, platform
+          records=[{"id":e.get("classname","")+"."+e.get("name",""),"result":"PASS" if not list(e) else "FAIL"} for e in suite.findall("testcase")]
+          manifest={"schema":"abc.a2.test-manifest.v1","scope":scope,"sha":os.environ.get("GITHUB_SHA"),"run_id":os.environ.get("GITHUB_RUN_ID"),"job":os.environ.get("GITHUB_JOB"),"python":platform.python_version(),"tests":records,"test_count":total,"failures":sum(v["result"]!="PASS" for v in records),"reviewer_attestation":None,"gate_approval":False}
+          (out/"test-manifest.json").write_text(json.dumps(manifest,indent=2)+"\\n")
+          hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(out.iterdir()) if p.is_file()}
+          (out/"evidence-index.json").write_text(json.dumps({"scope":scope,"run_id":os.environ.get("GITHUB_RUN_ID"),"sha256":hashes,"gate_disposition":"OPEN"},indent=2)+"\\n")
           PY
       - name: Upload test evidence
         if: always()

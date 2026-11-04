@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 MIGRATIONS=ROOT/"runtime/phase04/migrations"
 RUNTIME=ROOT/"runtime/phase04/abc_foundation"
-EXPECTED=tuple(f"{n:04d}" for n in range(1,31))
+EXPECTED=tuple(f"{n:04d}" for n in range(1,32))
 DDL={
  "tables":r"\bCREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?abc\.([a-z][a-z0-9_]*)",
  "functions":r"\bCREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+abc\.([a-z][a-z0-9_]*)",
@@ -20,7 +20,7 @@ DDL={
 REF=re.compile(r"\babc\.(eng(?:0[1-9]|1[0-9])_[a-z0-9_]+)\b",re.I)
 def build():
     files=sorted(MIGRATIONS.glob("*.sql"))
-    assert len(files)==30 and tuple(p.name[:4] for p in files)==EXPECTED, "migration_sequence_drift"
+    assert len(files)==31 and tuple(p.name[:4] for p in files)==EXPECTED, "migration_sequence_drift"
     entries=[]
     declared=set()
     for p in files:

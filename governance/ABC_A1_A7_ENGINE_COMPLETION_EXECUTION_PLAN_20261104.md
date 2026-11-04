@@ -61,3 +61,11 @@ Reviewed migration inventory 0001–0030, canonical registry, adapter registry, 
 4. Obtain explicit architecture-owner approval of canonical roles and ADR-ENG-003/004; separate technical test evidence from independent signoff.
 
 **A1 status remains IN_PROGRESS; A2–A7 remain OPEN.** This update does not authorize ENG-07, customer decisions or professional execution.
+
+## A1 implementation checkpoint — 2026-11-04
+- Added additive migration `0031_a1_six_adapter_bridge_quarantine.sql`: six disabled adapter registry rows; source and v3 review shadow tables; RLS FORCE; no runtime grants or destructive legacy changes.
+- Added `build_review_only_canonical_envelope`: deterministic six-adapter v2→v3 review projection with SHA256 verification, tenant/branch/session and consent/policy provenance, no dispatch or customer release.
+- Added `test_a1_six_adapter_pg_migration.py`: PostgreSQL six-adapter synthetic backfill, repeated idempotent insert, source/shadow dual-read comparison and transaction rollback; and denied worker table privileges.
+- Added `ABC_A1_ARCHITECTURE_APPROVAL_CANDIDATE.md`: independent architecture and ADR-ENG-003/004 decision requested, not approved.
+- Updated static migration inventory to 31 files (0001–0031). No live production catalog was queried.
+- **Evidence status:** GitHub Actions for these commits not yet observed; no verified same-SHA green CI. `A1 = IN_PROGRESS`. The PostgreSQL bridge is staging-only, not a production cutover. No owner signature.

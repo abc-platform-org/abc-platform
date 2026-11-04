@@ -98,7 +98,7 @@ jobs:
                   tail=data[match.end():starts[idx+1].start() if idx+1<len(starts) else len(data)]
                   tail=tail.split("----------------------------------------------------------------------",1)[0]
                   statuses=re.findall(r"(?:^|\n)\s*(ok|FAIL|ERROR|skipped .*|expected failure|unexpected success)\s*(?=\n|$)",tail)
-                  if len(statuses)!=1:
+                  # Warnings may be emitted after the test prefix on the same line; unittest then prints the final "ok" without a fresh line.\n                  if not statuses and tail.rstrip().endswith("ok"):\n                      statuses=["ok"]\n                  if len(statuses)!=1:
                       raise SystemExit(f"Ambiguous testcase outcome in {path}: {match.group(1)}")
                   matches.append((match.group(1),match.group(2),statuses[0]))
               if not re.search(r"^OK$",data,re.M) or re.search(r"^FAILED |^ERROR:|^FAIL:|^OK \(skipped=",data,re.M):

@@ -1,7 +1,7 @@
 {
   "schema": "abc.a2.evidence-ledger.v0",
   "stage": "A2",
-  "status": "SOURCE_INVENTORY_MAPPED_EVIDENCE_PENDING",
+  "status": "CI_STRUCTURE_VERIFIED_GATE_ATTESTATIONS_PENDING",
   "source_audit": "governance/ABC_ENGINE_WORKFLOW_COMPLETION_AUDIT_20261103.md",
   "tracker": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/81",
   "evidence_policy": "No PASS without exact test, immutable SHA, reviewer and scope; OPEN is not FAIL.",
@@ -85,7 +85,113 @@
           "test_eng_service_identity.py"
         ]
       },
-      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified.",
+      "gate_evidence_candidates": {
+        "G01_ARCHITECTURE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "runtime/phase04/abc_foundation/eng01_service_identity.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G02_DOMAIN_CAPABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "runtime/phase04/abc_foundation/eng01_service_identity.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G03_CONTRACTS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "runtime/phase04/abc_foundation/eng01_service_identity.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G04_INDEPENDENCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0007_*.sql",
+            "runtime/phase04/migrations/0016_*.sql",
+            "runtime/phase04/migrations/0017_*.sql",
+            "runtime/phase04/migrations/0018_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G05_SECURITY_PRIVACY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0007_*.sql",
+            "runtime/phase04/migrations/0016_*.sql",
+            "runtime/phase04/migrations/0017_*.sql",
+            "runtime/phase04/migrations/0018_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G06_RELIABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng01.py",
+            "runtime/phase04/tests/test_eng01_pg_command.py",
+            "runtime/phase04/tests/test_eng_service_identity.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G07_PERFORMANCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng01.py",
+            "runtime/phase04/tests/test_eng01_pg_command.py",
+            "runtime/phase04/tests/test_eng_service_identity.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G08_PROFESSIONAL_VALIDATION": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G09_OBSERVABILITY_OPERATIONS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng01.py",
+            "runtime/phase04/tests/test_eng01_pg_command.py",
+            "runtime/phase04/tests/test_eng_service_identity.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G10_INDEPENDENT_SIGNOFF": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        }
+      }
     },
     {
       "scope_id": "ENG-02",
@@ -163,7 +269,111 @@
           "test_pg_outbox.py"
         ]
       },
-      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified.",
+      "gate_evidence_candidates": {
+        "G01_ARCHITECTURE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/eng02_pg_outbox.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G02_DOMAIN_CAPABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/eng02_pg_outbox.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G03_CONTRACTS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/eng02_pg_outbox.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G04_INDEPENDENCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0008_*.sql",
+            "runtime/phase04/migrations/0009_*.sql",
+            "runtime/phase04/migrations/0015_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G05_SECURITY_PRIVACY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0008_*.sql",
+            "runtime/phase04/migrations/0009_*.sql",
+            "runtime/phase04/migrations/0015_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G06_RELIABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng02_consultation.py",
+            "runtime/phase04/tests/test_eng02_signed_pg.py",
+            "runtime/phase04/tests/test_eng02_precapture_http.py",
+            "runtime/phase04/tests/test_pg_outbox.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G07_PERFORMANCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng02_consultation.py",
+            "runtime/phase04/tests/test_eng02_signed_pg.py",
+            "runtime/phase04/tests/test_eng02_precapture_http.py",
+            "runtime/phase04/tests/test_pg_outbox.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G08_PROFESSIONAL_VALIDATION": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G09_OBSERVABILITY_OPERATIONS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng02_consultation.py",
+            "runtime/phase04/tests/test_eng02_signed_pg.py",
+            "runtime/phase04/tests/test_eng02_precapture_http.py",
+            "runtime/phase04/tests/test_pg_outbox.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G10_INDEPENDENT_SIGNOFF": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        }
+      }
     },
     {
       "scope_id": "ENG-03",
@@ -239,7 +449,105 @@
           "test_eng03_06_pipeline.py"
         ]
       },
-      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified.",
+      "gate_evidence_candidates": {
+        "G01_ARCHITECTURE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G02_DOMAIN_CAPABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G03_CONTRACTS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G04_INDEPENDENCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0010_*.sql",
+            "runtime/phase04/migrations/0012_*.sql",
+            "runtime/phase04/migrations/0013_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G05_SECURITY_PRIVACY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0010_*.sql",
+            "runtime/phase04/migrations/0012_*.sql",
+            "runtime/phase04/migrations/0013_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G06_RELIABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+            "runtime/phase04/tests/test_eng03_06_pipeline.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G07_PERFORMANCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+            "runtime/phase04/tests/test_eng03_06_pipeline.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G08_PROFESSIONAL_VALIDATION": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G09_OBSERVABILITY_OPERATIONS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+            "runtime/phase04/tests/test_eng03_06_pipeline.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G10_INDEPENDENT_SIGNOFF": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        }
+      }
     },
     {
       "scope_id": "ENG-04",
@@ -316,7 +624,108 @@
           "test_eng04_visual_qa_real_pixels.py"
         ]
       },
-      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified.",
+      "gate_evidence_candidates": {
+        "G01_ARCHITECTURE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G02_DOMAIN_CAPABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G03_CONTRACTS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G04_INDEPENDENCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0022_*.sql",
+            "runtime/phase04/migrations/0023_*.sql",
+            "runtime/phase04/migrations/0024_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G05_SECURITY_PRIVACY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0022_*.sql",
+            "runtime/phase04/migrations/0023_*.sql",
+            "runtime/phase04/migrations/0024_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G06_RELIABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng04_isolated_worker.py",
+            "runtime/phase04/tests/test_eng04_scoped_real_visual.py",
+            "runtime/phase04/tests/test_eng04_visual_qa_real_pixels.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G07_PERFORMANCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng04_isolated_worker.py",
+            "runtime/phase04/tests/test_eng04_scoped_real_visual.py",
+            "runtime/phase04/tests/test_eng04_visual_qa_real_pixels.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G08_PROFESSIONAL_VALIDATION": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G09_OBSERVABILITY_OPERATIONS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng04_isolated_worker.py",
+            "runtime/phase04/tests/test_eng04_scoped_real_visual.py",
+            "runtime/phase04/tests/test_eng04_visual_qa_real_pixels.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G10_INDEPENDENT_SIGNOFF": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        }
+      }
     },
     {
       "scope_id": "ENG-05",
@@ -398,7 +807,119 @@
           "test_eng05_revocation_race.py"
         ]
       },
-      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified.",
+      "gate_evidence_candidates": {
+        "G01_ARCHITECTURE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_review_worker.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G02_DOMAIN_CAPABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_review_worker.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G03_CONTRACTS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_review_worker.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G04_INDEPENDENCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0020_*.sql",
+            "runtime/phase04/migrations/0025_*.sql",
+            "runtime/phase04/migrations/0026_*.sql",
+            "runtime/phase04/migrations/0027_*.sql",
+            "runtime/phase04/migrations/0028_*.sql",
+            "runtime/phase04/migrations/0029_*.sql",
+            "runtime/phase04/migrations/0030_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G05_SECURITY_PRIVACY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0020_*.sql",
+            "runtime/phase04/migrations/0025_*.sql",
+            "runtime/phase04/migrations/0026_*.sql",
+            "runtime/phase04/migrations/0027_*.sql",
+            "runtime/phase04/migrations/0028_*.sql",
+            "runtime/phase04/migrations/0029_*.sql",
+            "runtime/phase04/migrations/0030_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G06_RELIABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng05_professional_sources.py",
+            "runtime/phase04/tests/test_eng05_external_authority_pg_integration.py",
+            "runtime/phase04/tests/test_eng05_revocation_race.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G07_PERFORMANCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng05_professional_sources.py",
+            "runtime/phase04/tests/test_eng05_external_authority_pg_integration.py",
+            "runtime/phase04/tests/test_eng05_revocation_race.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G08_PROFESSIONAL_VALIDATION": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G09_OBSERVABILITY_OPERATIONS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng05_professional_sources.py",
+            "runtime/phase04/tests/test_eng05_external_authority_pg_integration.py",
+            "runtime/phase04/tests/test_eng05_revocation_race.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G10_INDEPENDENT_SIGNOFF": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        }
+      }
     },
     {
       "scope_id": "ENG-06",
@@ -473,7 +994,104 @@
           "test_eng06_pg_isolation_negative.py"
         ]
       },
-      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified.",
+      "gate_evidence_candidates": {
+        "G01_ARCHITECTURE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G02_DOMAIN_CAPABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G03_CONTRACTS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G04_INDEPENDENCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0021_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G05_SECURITY_PRIVACY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0021_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G06_RELIABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng06_pg_deployed_contract.py",
+            "runtime/phase04/tests/test_eng06_fault_injection_acceptance.py",
+            "runtime/phase04/tests/test_eng06_pg_isolation_negative.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G07_PERFORMANCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng06_pg_deployed_contract.py",
+            "runtime/phase04/tests/test_eng06_fault_injection_acceptance.py",
+            "runtime/phase04/tests/test_eng06_pg_isolation_negative.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G08_PROFESSIONAL_VALIDATION": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G09_OBSERVABILITY_OPERATIONS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng06_pg_deployed_contract.py",
+            "runtime/phase04/tests/test_eng06_fault_injection_acceptance.py",
+            "runtime/phase04/tests/test_eng06_pg_isolation_negative.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G10_INDEPENDENT_SIGNOFF": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        }
+      }
     },
     {
       "scope_id": "ENG-14",
@@ -553,7 +1171,115 @@
           "test_answer_consumer_eng14.py"
         ]
       },
-      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified.",
+      "gate_evidence_candidates": {
+        "G01_ARCHITECTURE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_professional_gate.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G02_DOMAIN_CAPABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_professional_gate.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G03_CONTRACTS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_professional_gate.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G04_INDEPENDENCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0009_*.sql",
+            "runtime/phase04/migrations/0011_*.sql",
+            "runtime/phase04/migrations/0014_*.sql",
+            "runtime/phase04/migrations/0015_*.sql",
+            "runtime/phase04/migrations/0018_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G05_SECURITY_PRIVACY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0009_*.sql",
+            "runtime/phase04/migrations/0011_*.sql",
+            "runtime/phase04/migrations/0014_*.sql",
+            "runtime/phase04/migrations/0015_*.sql",
+            "runtime/phase04/migrations/0018_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G06_RELIABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng14_professional_gate.py",
+            "runtime/phase04/tests/test_eng14_transition_gate.py",
+            "runtime/phase04/tests/test_answer_consumer_eng14.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G07_PERFORMANCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng14_professional_gate.py",
+            "runtime/phase04/tests/test_eng14_transition_gate.py",
+            "runtime/phase04/tests/test_answer_consumer_eng14.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G08_PROFESSIONAL_VALIDATION": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G09_OBSERVABILITY_OPERATIONS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng14_professional_gate.py",
+            "runtime/phase04/tests/test_eng14_transition_gate.py",
+            "runtime/phase04/tests/test_answer_consumer_eng14.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G10_INDEPENDENT_SIGNOFF": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        }
+      }
     },
     {
       "scope_id": "LEGACY_REVIEW_TRANSPORT",
@@ -627,7 +1353,101 @@
           "test_eng19_actual_mtls_handoff_pg.py"
         ]
       },
-      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified.",
+      "gate_evidence_candidates": {
+        "G01_ARCHITECTURE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "runtime/phase04/abc_foundation/eng19_review_producer.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G02_DOMAIN_CAPABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "runtime/phase04/abc_foundation/eng19_review_producer.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G03_CONTRACTS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "runtime/phase04/abc_foundation/eng19_review_producer.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G04_INDEPENDENCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0019_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G05_SECURITY_PRIVACY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/migrations/0019_*.sql"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G06_RELIABILITY": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G07_PERFORMANCE": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G08_PROFESSIONAL_VALIDATION": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G09_OBSERVABILITY_OPERATIONS": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [
+            "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py"
+          ],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        },
+        "G10_INDEPENDENT_SIGNOFF": {
+          "review_status": "NOT_ATTESTED",
+          "candidate_paths": [],
+          "ci_run": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+          "ci_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+          "missing": "Independent per-gate reproduction, scoped assertion/result, qualified reviewer and signed attestation; professional/operational evidence where applicable"
+        }
+      }
     }
   ],
   "canonical_gate_policy": "governance/abc_engine_quality_19.v0.review.json",
@@ -643,5 +1463,21 @@
     "G09_OBSERVABILITY_OPERATIONS",
     "G10_INDEPENDENT_SIGNOFF"
   ],
-  "correction_note": "Canonical G01-G10 meanings come from the 19-engine quality registry, not the provisional test-category descriptions in earlier narrative audit notes."
+  "correction_note": "Canonical G01-G10 meanings come from the 19-engine quality registry, not the provisional test-category descriptions in earlier narrative audit notes.",
+  "ci_validation_evidence": {
+    "run_id": 41872391094,
+    "run_number": 498,
+    "job_id": 126722710427,
+    "commit_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069",
+    "url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41872391094",
+    "conclusion": "success",
+    "scope": "FOUNDATION_INTEGRATION_AND_LEDGER_STRUCTURE_ONLY",
+    "does_not_prove": "independent deployment, professional signoff, production readiness, or per-engine gate PASS"
+  },
+  "gate_evidence_assessment": {
+    "method": "Source candidates are leads, not independently reviewed gate evidence; CI #498 validates foundation and ledger structure, not every gate independently.",
+    "reviewer_authority": "NOT_PROVISIONED",
+    "required_independent_signoffs": "PENDING",
+    "source_snapshot_sha": "58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069"
+  }
 }

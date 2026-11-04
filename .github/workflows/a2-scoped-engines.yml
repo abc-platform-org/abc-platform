@@ -5,12 +5,10 @@ on:
       - implementation/w1-eng05-external-approval-gate-20261101
     paths:
       - 'runtime/phase04/**'
-      - 'scripts/run_a2_scoped_tests.py'
       - '.github/workflows/a2-scoped-engines.yml'
   pull_request:
     paths:
       - 'runtime/phase04/**'
-      - 'scripts/run_a2_scoped_tests.py'
       - '.github/workflows/a2-scoped-engines.yml'
   workflow_dispatch:
 permissions:
@@ -56,8 +54,33 @@ jobs:
         run: python -m pip install -r runtime/phase04/requirements.txt
       - name: Bootstrap disposable PostgreSQL
         run: python runtime/phase04/tests/bootstrap_postgres.py
-      - name: Execute scope and export evidence
-        run: python scripts/run_a2_scoped_tests.py --scope "${{ matrix.scope }}" --output "a2/${{ matrix.scope }}"
+      - name: Execute scoped test files and retain exact logs
+        shell: bash
+        env:
+          A2_SCOPE: ${{ matrix.scope }}
+        run: |
+          set -euo pipefail
+          mkdir -p "a2/$A2_SCOPE"
+          case "$A2_SCOPE" in
+            ENG-01) files="test_eng01.py test_eng01_pg_command.py test_eng_service_identity.py" ;;
+            ENG-02) files="test_eng02_consultation.py test_eng02_signed_pg.py test_eng02_precapture_http.py test_pg_outbox.py" ;;
+            ENG-03) files="test_eng03_durable_pipeline.py test_eng03_06_pipeline.py" ;;
+            ENG-04) files="test_eng04_isolated_worker.py test_eng04_scoped_real_visual.py test_eng04_visual_qa_real_pixels.py" ;;
+            ENG-05) files="test_eng05_professional_sources.py test_eng05_external_authority_pg_integration.py test_eng05_revocation_race.py" ;;
+            ENG-06) files="test_eng06_pg_deployed_contract.py test_eng06_fault_injection_acceptance.py test_eng06_pg_isolation_negative.py" ;;
+            ENG-14) files="test_eng14_professional_gate.py test_eng14_transition_gate.py test_answer_consumer_eng14.py" ;;
+            LEGACY_REVIEW_TRANSPORT) files="test_eng19_actual_mtls_handoff_pg.py" ;;
+            *) exit 2 ;;
+          esac
+          printf 'scope=%s\nsha=%s\nrun_id=%s\njob=%s\nindependent_attestation=NONE\n' "$A2_SCOPE" "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_JOB" > "a2/$A2_SCOPE/provenance.txt"
+          for file in $files; do
+            test -f "runtime/phase04/tests/$file"
+            echo "Running $file"
+            (cd runtime/phase04 && python -m unittest discover -s tests -p "$file" -v) 2>&1 | tee "a2/$A2_SCOPE/$file.log"
+            grep -Eq 'Ran [1-9][0-9]* tests? in' "a2/$A2_SCOPE/$file.log"
+            if grep -Eq 'skipped=[1-9]|FAILED ' "a2/$A2_SCOPE/$file.log"; then exit 1; fi
+          done
+          sha256sum "a2/$A2_SCOPE/"*.log > "a2/$A2_SCOPE/log-sha256.txt"
       - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -176,6 +176,8 @@ jobs:
         run: |
           python runtime/phase04/tests/a1_postgres_restart_probe.py verify
           python runtime/phase04/tests/a1_postgres_restart_probe.py cleanup
+      - name: Validate A2 eight-scope evidence ledger
+        run: python scripts/validate_a2_evidence_ledger.py
       - name: Verify dedicated staging migrator against isolated ephemeral PostgreSQL
         working-directory: runtime/phase04
         run: python tests/verify_staging_migration_ci.py

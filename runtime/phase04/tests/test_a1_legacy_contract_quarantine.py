@@ -14,7 +14,7 @@ class A1Tests(unittest.TestCase):
             customer_release_approved=False,downstream_dispatch_authorized=False)
     def test_inventory(self):
         x=build()
-        self.assertEqual(x["migration_count"],30)
+        self.assertEqual(x["migration_count"],31)
         self.assertGreater(x["declared_table_count"],20)
         self.assertFalse(x["production_catalog_verified"])
     def test_six_adapters(self):

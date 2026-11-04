@@ -177,3 +177,39 @@ jobs:
             a2/reliability/
           if-no-files-found: error
           retention-days: 30
+
+  performance-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Measure deterministic local-only JSON serialization baseline
+        run: |
+          mkdir -p a2/performance
+          python - <<'PY'
+          import json, os, platform, statistics, time
+          from pathlib import Path
+          payload={"scope":"A2_SYNTHETIC_SERIALIZATION_ONLY","engine":"ENG-01","evidence":[{"id":i,"status":"SYNTHETIC"} for i in range(20)]}
+          samples=[]
+          for _ in range(1200):
+              start=time.perf_counter_ns()
+              json.loads(json.dumps(payload,sort_keys=True))
+              samples.append((time.perf_counter_ns()-start)/1_000_000)
+          samples.sort()
+          def percentile(p):
+              return samples[min(len(samples)-1, int((len(samples)-1)*p))]
+          report={"workload":"Python JSON encode/decode microbenchmark ONLY","samples":len(samples),"p50_ms":percentile(.5),"p95_ms":percentile(.95),"p99_ms":percentile(.99),"max_ms":max(samples),"runner":os.getenv("RUNNER_NAME"),"python":platform.python_version(),"sha":os.getenv("GITHUB_SHA"),"run_id":os.getenv("GITHUB_RUN_ID"),"production_slo_valid":False,"engine_end_to_end_performance_verified":False,"threshold_status":"NOT_DEFINED"}
+          Path("a2/performance/benchmark.json").write_text(json.dumps(report,indent=2)+"\n")
+          print(json.dumps(report))
+          PY
+      - name: Upload performance baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-performance-baseline-${{ github.run_id }}
+          path: a2/performance/
+          if-no-files-found: error
+          retention-days: 30

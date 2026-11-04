@@ -16,7 +16,7 @@ class SixAdapterShadowTests(unittest.TestCase):
         self.assertEqual(os.environ.get("ABC_ENV"), "LOCAL_INTEGRATION_ONLY")
         dsn = os.environ["ABC_TEST_PG_ADMIN_DSN"]
         import psycopg
-        with psycopg.connect(dsn) as conn:
+        with psycopg.connect(dsn, autocommit=True) as conn:
             with conn.transaction():
                 with conn.cursor() as cur:
                     cur.execute("""CREATE TEMP TABLE a1_adapter_shadow (

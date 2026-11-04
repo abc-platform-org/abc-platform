@@ -12,6 +12,12 @@ assert ledger["canonical_required_gates"]==quality["required_gates"]
 expected={"ENG-01","ENG-02","ENG-03","ENG-04","ENG-05","ENG-06","ENG-14","LEGACY_REVIEW_TRANSPORT"}
 assert len(ledger["scopes"])==len(expected)
 assert {s["scope_id"] for s in ledger["scopes"]}==expected
+ci=ledger["ci_validation_evidence"]
+assert ci["conclusion"]=="success"
+assert ci["run_number"]==498
+assert ci["commit_sha"]=="58d45503c5f94bb5fbcf1545a8e7a7ad69dd8069"
+assert ci["scope"]=="FOUNDATION_INTEGRATION_AND_LEDGER_STRUCTURE_ONLY"
+assert ledger["gate_evidence_assessment"]["reviewer_authority"]=="NOT_PROVISIONED"
 migration_dir=ROOT/"runtime/phase04/migrations"
 for scope in ledger["scopes"]:
     candidates=scope["source_candidates"]
@@ -27,6 +33,16 @@ for scope in ledger["scopes"]:
     assert scope["implementation_status"] in {"IMPLEMENTED","PARTIAL","MISSING"}
     assert scope["independent_deployment_verified"] is False
     assert set(scope["gate_results"])==set(ledger["canonical_required_gates"])
+    assert set(scope["gate_evidence_candidates"])==set(ledger["canonical_required_gates"])
+    for gate_id,candidate in scope["gate_evidence_candidates"].items():
+        assert candidate["review_status"]=="NOT_ATTESTED", gate_id
+        assert candidate["ci_sha"]==ci["commit_sha"], gate_id
+        assert candidate["ci_run"]==ci["url"], gate_id
+        for path in candidate["candidate_paths"]:
+            if path.endswith("_*.sql"):
+                assert len(list(ROOT.glob(path)))==1, path
+            else:
+                assert (ROOT/path).is_file(), path
     for gate in scope["gate_results"].values():
         assert gate["status"] in {"PASS","OPEN","FAIL"}
         if gate["status"]=="PASS":

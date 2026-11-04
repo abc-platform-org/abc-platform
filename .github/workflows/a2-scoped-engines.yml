@@ -92,12 +92,12 @@ jobs:
               data=pathlib.Path(path).read_text()
               # unittest can emit warnings between the testcase header and its final status.
               # Parse each testcase block, not only one-line "test ... ok" records.
-              starts=list(re.finditer(r"^(test[^ ]+) \\(([^)]+)\\) \\.\\.\\.",data,re.M))
+              starts=list(re.finditer(r"^(test[^ ]+) \(([^)]+)\) \.\.\.",data,re.M))
               matches=[]
               for idx,match in enumerate(starts):
                   tail=data[match.end():starts[idx+1].start() if idx+1<len(starts) else len(data)]
                   tail=tail.split("----------------------------------------------------------------------",1)[0]
-                  statuses=re.findall(r"(?:^|\\n)\\s*(ok|FAIL|ERROR|skipped .*|expected failure|unexpected success)\\s*(?=\\n|$)",tail)
+                  statuses=re.findall(r"(?:^|\n)\s*(ok|FAIL|ERROR|skipped .*|expected failure|unexpected success)\s*(?=\n|$)",tail)
                   if len(statuses)!=1:
                       raise SystemExit(f"Ambiguous testcase outcome in {path}: {match.group(1)}")
                   matches.append((match.group(1),match.group(2),statuses[0]))

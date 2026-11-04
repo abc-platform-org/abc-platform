@@ -11,13 +11,13 @@ MIGRATIONS=ROOT/"runtime/phase04/migrations"
 RUNTIME=ROOT/"runtime/phase04/abc_foundation"
 EXPECTED=tuple(f"{n:04d}" for n in range(1,31))
 DDL={
- "tables":r"\\bCREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?abc\\.([a-z][a-z0-9_]*)",
- "functions":r"\\bCREATE\\s+(?:OR\\s+REPLACE\\s+)?FUNCTION\\s+abc\\.([a-z][a-z0-9_]*)",
- "roles":r"\\bCREATE\\s+ROLE\\s+([a-z][a-z0-9_]*)",
- "policies":r"\\bCREATE\\s+POLICY\\s+([a-z][a-z0-9_]*)",
- "triggers":r"\\bCREATE\\s+TRIGGER\\s+([a-z][a-z0-9_]*)",
+ "tables":r"\bCREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?abc\.([a-z][a-z0-9_]*)",
+ "functions":r"\bCREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+abc\.([a-z][a-z0-9_]*)",
+ "roles":r"\bCREATE\s+ROLE\s+([a-z][a-z0-9_]*)",
+ "policies":r"\bCREATE\s+POLICY\s+([a-z][a-z0-9_]*)",
+ "triggers":r"\bCREATE\s+TRIGGER\s+([a-z][a-z0-9_]*)",
 }
-REF=re.compile(r"\\babc\\.(eng(?:0[1-9]|1[0-9])_[a-z0-9_]+)\\b",re.I)
+REF=re.compile(r"\babc\.(eng(?:0[1-9]|1[0-9])_[a-z0-9_]+)\b",re.I)
 def build():
     files=sorted(MIGRATIONS.glob("*.sql"))
     assert len(files)==30 and tuple(p.name[:4] for p in files)==EXPECTED, "migration_sequence_drift"

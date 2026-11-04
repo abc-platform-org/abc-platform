@@ -152,7 +152,7 @@ jobs:
       - name: A1 six-adapter PostgreSQL acceptance must execute without skips
         working-directory: runtime/phase04
         run: |
-          python -m unittest -v tests.test_a1_legacy_contract_quarantine tests.test_a1_six_adapter_pg_migration tests.test_a1_physical_catalog_and_shadow_rollback
+          python -m unittest discover -s tests -p 'test_a1_*.py' -v
       - name: Verify dedicated staging migrator against isolated ephemeral PostgreSQL
         working-directory: runtime/phase04
         run: python tests/verify_staging_migration_ci.py

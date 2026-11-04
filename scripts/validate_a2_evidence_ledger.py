@@ -10,6 +10,7 @@ assert ledger["customer_release_approved"] is False
 quality=json.loads((ROOT/"governance/abc_engine_quality_19.v0.review.json").read_text())
 assert ledger["canonical_required_gates"]==quality["required_gates"]
 expected={"ENG-01","ENG-02","ENG-03","ENG-04","ENG-05","ENG-06","ENG-14","LEGACY_REVIEW_TRANSPORT"}
+assert len(ledger["scopes"])==len(expected)
 assert {s["scope_id"] for s in ledger["scopes"]}==expected
 migration_dir=ROOT/"runtime/phase04/migrations"
 for scope in ledger["scopes"]:
@@ -22,6 +23,7 @@ for scope in ledger["scopes"]:
         matches=list(migration_dir.glob(prefix+"_*.sql"))
         assert len(matches)==1, (scope["scope_id"],prefix)
 
+    assert scope["scope_id"]!="LEGACY_REVIEW_TRANSPORT" or scope["capability"]=="legacy_transport"
     assert scope["implementation_status"] in {"IMPLEMENTED","PARTIAL","MISSING"}
     assert scope["independent_deployment_verified"] is False
     assert set(scope["gate_results"])==set(ledger["canonical_required_gates"])

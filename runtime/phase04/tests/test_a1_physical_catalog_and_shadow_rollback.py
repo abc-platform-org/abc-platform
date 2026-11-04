@@ -11,7 +11,7 @@ class A1PhysicalCatalogTests(unittest.TestCase):
     def setUpClass(cls):
         if os.getenv("ABC_ENV")!="LOCAL_INTEGRATION_ONLY" or not os.getenv("ABC_TEST_PG_ADMIN_DSN"):
             raise unittest.SkipTest("disposable PostgreSQL CI only")
-        cls.con=psycopg.connect(os.environ["ABC_TEST_PG_ADMIN_DSN"])
+        cls.con=psycopg.connect(os.environ["ABC_TEST_PG_ADMIN_DSN"], autocommit=True)
     @classmethod
     def tearDownClass(cls):
         cls.con.close()

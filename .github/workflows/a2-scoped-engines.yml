@@ -90,7 +90,13 @@ jobs:
           total=0
           for path in sorted(glob.glob(str(out/"test_*.py.log"))):
               data=pathlib.Path(path).read_text()
-              matches=[(name,klass,"ok") for name,klass in re.findall(r"^(test[^ ]+) \(([^)]+)\)(?: \.\.\.)?",data,re.M)]
+              matches=re.findall(r"^(test[^ ]+) \(([^)]+)\) \.\.\. (ok|FAIL|ERROR|skipped .*|expected failure|unexpected success)$",data,re.M)
+              if not re.search(r"^OK$",data,re.M) or re.search(r"^FAILED |^ERROR:|^FAIL:|^OK \(skipped=",data,re.M):
+                  raise SystemExit(f"Unclean unittest outcome: {path}")
+              if any(status!="ok" for _,_,status in matches):
+                  raise SystemExit(f"Non-PASS test outcome: {path}")
+              if len({(name,klass) for name,klass,_ in matches})!=len(matches):
+                  raise SystemExit(f"Duplicate testcase identifiers: {path}")
               for name,klass,status in matches:
                   case=ET.SubElement(suite,"testcase",name=name,classname=klass)
                   if status!="ok":

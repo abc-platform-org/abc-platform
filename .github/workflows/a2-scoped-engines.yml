@@ -6,6 +6,7 @@ on:
     paths:
       - 'runtime/phase04/**'
       - '.github/workflows/a2-scoped-engines.yml'
+      - 'governance/ABC_A2_SCOPED_CI_EXECUTION_EVIDENCE_20261104.md'
   pull_request:
     paths:
       - 'runtime/phase04/**'
@@ -81,6 +82,27 @@ jobs:
             if grep -Eq 'skipped=[1-9]|FAILED ' "a2/$A2_SCOPE/$file.log"; then exit 1; fi
           done
           sha256sum "a2/$A2_SCOPE/"*.log > "a2/$A2_SCOPE/log-sha256.txt"
+          python -m pip install junit-xml==1.9
+          A2_SCOPE="$A2_SCOPE" python - <<'PY'
+          import glob, os, pathlib, re, xml.etree.ElementTree as ET
+          scope=os.environ["A2_SCOPE"]
+          out=pathlib.Path("a2")/scope
+          suite=ET.Element("testsuite",name=scope)
+          total=0
+          for path in sorted(glob.glob(str(out/"test_*.py.log"))):
+              data=pathlib.Path(path).read_text()
+              matches=re.findall(r"^(test[^ ]+) \(([^)]+)\) \.\.\. (ok|FAIL|ERROR|skipped .*)$",data,re.M)
+              for name,klass,status in matches:
+                  case=ET.SubElement(suite,"testcase",name=name,classname=klass)
+                  if status!="ok":
+                      ET.SubElement(case,"failure",message=status)
+                  total+=1
+          if not total:
+              raise SystemExit("No individual test cases parsed")
+          suite.set("tests",str(total))
+          ET.ElementTree(suite).write(out/"junit.xml",encoding="utf-8",xml_declaration=True)
+          print(f"Captured {total} scoped test cases")
+          PY
       - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@v4

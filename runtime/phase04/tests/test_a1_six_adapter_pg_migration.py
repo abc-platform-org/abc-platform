@@ -75,9 +75,20 @@ class A1BridgePostgresTests(unittest.TestCase):
         with psycopg.connect(self.dsn, autocommit=True) as con:
             with con.cursor() as cur:
                 for role in ("abc_eng04_worker","abc_eng05_worker","abc_eng06_review_worker"):
-                    cur.execute("""SELECT has_table_privilege(%s,'abc.a1_bridge_shadow','SELECT'),
-                        has_table_privilege(%s,'abc.a1_bridge_shadow','INSERT')""",(role,role))
-                    self.assertEqual(cur.fetchone(),(False,False))
+                    for table in ("a1_bridge_registry","a1_bridge_legacy","a1_bridge_shadow"):
+                        qualified="abc."+table
+                        cur.execute("""SELECT has_table_privilege(%s,%s,'SELECT'),
+                            has_table_privilege(%s,%s,'INSERT'),
+                            has_table_privilege(%s,%s,'UPDATE'),
+                            has_table_privilege(%s,%s,'DELETE')""",
+                            (role,qualified,role,qualified,role,qualified,role,qualified))
+                        self.assertEqual(cur.fetchone(),(False,False,False,False),
+                                         (role,table,"unexpected bridge privilege"))
+                for table in ("a1_bridge_registry","a1_bridge_legacy","a1_bridge_shadow"):
+                    cur.execute("""SELECT c.relrowsecurity,c.relforcerowsecurity
+                        FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+                        WHERE n.nspname='abc' AND c.relname=%s""",(table,))
+                    self.assertEqual(cur.fetchone(),(True,True),(table,"RLS not forced"))
 
 if __name__=="__main__":
     unittest.main()

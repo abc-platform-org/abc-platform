@@ -82,7 +82,6 @@ jobs:
             if grep -Eq 'skipped=[1-9]|FAILED ' "a2/$A2_SCOPE/$file.log"; then exit 1; fi
           done
           sha256sum "a2/$A2_SCOPE/"*.log > "a2/$A2_SCOPE/log-sha256.txt"
-          python -m pip install junit-xml==1.9
           A2_SCOPE="$A2_SCOPE" python - <<'PY'
           import glob, os, pathlib, re, xml.etree.ElementTree as ET
           scope=os.environ["A2_SCOPE"]

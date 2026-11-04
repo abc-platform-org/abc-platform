@@ -1,5 +1,6 @@
 -- A1 versioned six-adapter bridge. Additive and disabled for operational dispatch.
 -- No existing ENG19/ENG06 tables are renamed, dropped, or rewritten.
+BEGIN;
 CREATE TABLE IF NOT EXISTS abc.a1_bridge_registry (
  adapter_id text PRIMARY KEY CHECK (adapter_id IN (
  'A04_TO_06_DECISION_INPUT','A04_TO_07_LOOK_SPEC_INPUT',
@@ -56,3 +57,4 @@ ALTER TABLE abc.a1_bridge_shadow ENABLE ROW LEVEL SECURITY;
 ALTER TABLE abc.a1_bridge_shadow FORCE ROW LEVEL SECURITY;
 REVOKE ALL ON abc.a1_bridge_registry,abc.a1_bridge_legacy,abc.a1_bridge_shadow FROM PUBLIC;
 -- No runtime role is granted access. Migration test runs with ephemeral admin.
+COMMIT;

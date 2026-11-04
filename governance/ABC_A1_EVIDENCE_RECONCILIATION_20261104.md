@@ -78,3 +78,13 @@ The project owner confirms ABC is currently **GitHub-only**, without a deployed 
 **Outstanding engineering gaps:** source inventory does not independently prove all producer/consumer/wire-version routes; current rollback test demonstrates transaction rollback, not full schema downgrade or crash/restart recovery; six adapters remain intentionally quarantined and unmigrated; independent architecture and security approvals are missing.
 
 **Decision unchanged: A1 OPEN / PRE-DEPLOYMENT ENGINEERING CLOSURE PENDING.** No approval or closure is inferred from the owner's environment statement.
+
+
+## Immutable CI acceptance — Run #477 (2026-11-04)
+- Run: https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41828511154
+- Exact tested SHA: `7917cf6faf41dbf7d1d47a38b9a893aae48a1000`.
+- GitHub reports `completed/success`; the single `foundation` job completed successfully.
+- Explicitly successful steps include A1 six-adapter PostgreSQL acceptance without skips, staging migrator against isolated ephemeral PostgreSQL, integration/isolation/replay/persistence tests, canonical 19-owner inventory, adapter quarantine, PostgreSQL client certificate test, and nonroot container checks.
+- The strengthened three-table CRUD privilege / FORCE RLS test is included in tested SHA via `ab1846120649e01a20a8174e84a883d8c7c07e16`.
+- This supersedes the earlier 'new-head CI pending' notation. **Technical CI gate PASSED at SHA above**; this does not independently sign architecture or security, validate a deployed service, or close the source-route and full rollback evidence gaps.
+- **A1 OPEN** pending attributable independent architecture, ADR-ENG-003/004, and security decisions, plus resolution/acceptance of remaining A1 source-route and rollback scope.

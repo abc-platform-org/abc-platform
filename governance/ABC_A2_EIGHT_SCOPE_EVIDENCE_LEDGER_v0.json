@@ -1,7 +1,7 @@
 {
   "schema": "abc.a2.evidence-ledger.v0",
   "stage": "A2",
-  "status": "BASELINE_IN_PROGRESS",
+  "status": "SOURCE_INVENTORY_MAPPED_EVIDENCE_PENDING",
   "source_audit": "governance/ABC_ENGINE_WORKFLOW_COMPLETION_AUDIT_20261103.md",
   "tracker": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/81",
   "evidence_policy": "No PASS without exact test, immutable SHA, reviewer and scope; OPEN is not FAIL.",
@@ -66,7 +66,26 @@
           "reviewer": null
         }
       },
-      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate.",
+      "source_candidates": {
+        "modules": [
+          "eng01_orchestrator.py",
+          "eng01_pg.py",
+          "eng01_service_identity.py"
+        ],
+        "migrations": [
+          "0007",
+          "0016",
+          "0017",
+          "0018"
+        ],
+        "tests": [
+          "test_eng01.py",
+          "test_eng01_pg_command.py",
+          "test_eng_service_identity.py"
+        ]
+      },
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     },
     {
       "scope_id": "ENG-02",
@@ -126,7 +145,25 @@
           "reviewer": null
         }
       },
-      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate.",
+      "source_candidates": {
+        "modules": [
+          "eng02_consultation.py",
+          "eng02_pg_outbox.py"
+        ],
+        "migrations": [
+          "0008",
+          "0009",
+          "0015"
+        ],
+        "tests": [
+          "test_eng02_consultation.py",
+          "test_eng02_signed_pg.py",
+          "test_eng02_precapture_http.py",
+          "test_pg_outbox.py"
+        ]
+      },
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     },
     {
       "scope_id": "ENG-03",
@@ -186,7 +223,23 @@
           "reviewer": null
         }
       },
-      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate.",
+      "source_candidates": {
+        "modules": [
+          "eng03_evidence.py",
+          "eng03_executor.py"
+        ],
+        "migrations": [
+          "0010",
+          "0012",
+          "0013"
+        ],
+        "tests": [
+          "test_eng03_durable_pipeline.py",
+          "test_eng03_06_pipeline.py"
+        ]
+      },
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     },
     {
       "scope_id": "ENG-04",
@@ -246,7 +299,24 @@
           "reviewer": null
         }
       },
-      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate.",
+      "source_candidates": {
+        "modules": [
+          "eng04_analysis.py",
+          "eng04_review_worker.py"
+        ],
+        "migrations": [
+          "0022",
+          "0023",
+          "0024"
+        ],
+        "tests": [
+          "test_eng04_isolated_worker.py",
+          "test_eng04_scoped_real_visual.py",
+          "test_eng04_visual_qa_real_pixels.py"
+        ]
+      },
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     },
     {
       "scope_id": "ENG-05",
@@ -306,7 +376,29 @@
           "reviewer": null
         }
       },
-      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate.",
+      "source_candidates": {
+        "modules": [
+          "eng05_knowledge.py",
+          "eng05_review_worker.py",
+          "eng05_professional_sources.py"
+        ],
+        "migrations": [
+          "0020",
+          "0025",
+          "0026",
+          "0027",
+          "0028",
+          "0029",
+          "0030"
+        ],
+        "tests": [
+          "test_eng05_professional_sources.py",
+          "test_eng05_external_authority_pg_integration.py",
+          "test_eng05_revocation_race.py"
+        ]
+      },
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     },
     {
       "scope_id": "ENG-06",
@@ -366,7 +458,22 @@
           "reviewer": null
         }
       },
-      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate.",
+      "source_candidates": {
+        "modules": [
+          "eng06_decision.py",
+          "eng06_review_worker.py"
+        ],
+        "migrations": [
+          "0021"
+        ],
+        "tests": [
+          "test_eng06_pg_deployed_contract.py",
+          "test_eng06_fault_injection_acceptance.py",
+          "test_eng06_pg_isolation_negative.py"
+        ]
+      },
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     },
     {
       "scope_id": "ENG-14",
@@ -426,7 +533,27 @@
           "reviewer": null
         }
       },
-      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate.",
+      "source_candidates": {
+        "modules": [
+          "eng14_policy.py",
+          "eng14_professional_gate.py",
+          "eng14_transition_policy.py"
+        ],
+        "migrations": [
+          "0009",
+          "0011",
+          "0014",
+          "0015",
+          "0018"
+        ],
+        "tests": [
+          "test_eng14_professional_gate.py",
+          "test_eng14_transition_gate.py",
+          "test_answer_consumer_eng14.py"
+        ]
+      },
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     },
     {
       "scope_id": "LEGACY_REVIEW_TRANSPORT",
@@ -486,7 +613,21 @@
           "reviewer": null
         }
       },
-      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate.",
+      "source_candidates": {
+        "modules": [
+          "eng19_review_transport.py",
+          "eng19_review_consumer.py",
+          "eng19_review_producer.py"
+        ],
+        "migrations": [
+          "0019"
+        ],
+        "tests": [
+          "test_eng19_actual_mtls_handoff_pg.py"
+        ]
+      },
+      "source_candidates_note": "Paths are candidate associations from repository inventory; migration contents, test outcomes and role grants not yet individually verified."
     }
   ]
 }

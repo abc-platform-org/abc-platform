@@ -1,0 +1,204 @@
+name: ABC Phase 04 local foundation CI
+on:
+  pull_request:
+    paths:
+      - 'runtime/phase04/**'
+      - 'infra/render/**'
+      - 'docs/04-platform/**'
+      - 'governance/**'
+      - 'scripts/validate_engine_quality.py'
+      - 'scripts/validate_abc_v2_architecture.py'
+      - 'scripts/validate_abc_19_engine_architecture.py'
+      - 'scripts/validate_abc_engine_completion_audit.py'
+      - 'scripts/build_abc_engine_evidence_inventory.py'
+      - 'scripts/a1_inventory_physical_namespaces.py'
+      - 'scripts/a1_legacy_adapter_quarantine.py'
+      - 'scripts/validate_abc_w0_ratification_candidate.py'
+      - 'scripts/validate_abc_w1w2_private_candidate.py'
+      - 'scripts/validate_abc_w1_private_trust.py'
+      - 'scripts/validate_eng06_isolated_review.py'
+      - 'scripts/validate_eng04_independent_review.py'
+      - 'scripts/validate_eng04_eng05_same_artifact.py'
+      - 'scripts/validate_eng05_verified_queue.py'
+      - 'scripts/validate_eng05_professional_sources.py'
+      - 'scripts/validate_eng05_external_authority.py'
+      - 'scripts/validate_eng05_first_source_intake.py'
+      - 'scripts/eng05_trgs530_pdf_byte_probe.py'
+      - 'scripts/validate_eng05_trgs530_pdf_receipt.py'
+      - 'scripts/validate_abc_v2_19_adapters.py'
+      - 'scripts/validate_eng19_review_inbox.py'
+      - 'scripts/validate_eng05_review_worker.py'
+      - 'contracts/review/**'
+      - 'scripts/validate_phase04_readiness.py'
+      - 'scripts/validate_p04_provider_fit.py'
+      - 'prototypes/abc-ai-studio-v2/**'
+      - '.github/workflows/phase04-foundation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_TEST_PG_ADMIN_DSN: postgresql://postgres:abc-integration-only-password@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_DSN: postgresql://abc_app:integration-only-abc-app@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_WORKER_DSN: postgresql://abc_worker:integration-only-abc-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ORCHESTRATOR_DSN: postgresql://abc_orchestrator:integration-only-abc-orchestrator@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ANSWER_WORKER_DSN: postgresql://abc_answer_worker:integration-only-abc-answer-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG03_DSN: postgresql://abc_eng03_worker:integration-only-eng03-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_PIPELINE_DSN: postgresql://abc_pipeline_worker:integration-only-pipeline-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG04_LOGIN_DSN: postgresql://abc_eng04_ci_login:integration-only-eng04-review-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG06_LOGIN_DSN: postgresql://abc_eng06_ci_login:integration-only-eng06-review-login@127.0.0.1:5432/abc_phase04_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preflight ENG05 migration SQL structure before database bootstrap
+        run: python scripts/validate_eng05_review_worker.py
+      - name: Install trusted JWT and PostgreSQL client libraries
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Install strict disposable PDF byte verifier for ENG05 official source provenance
+        run: python -m pip install pypdf==5.9.0
+      - name: Apply PostgreSQL migration with least-privilege runtime role
+        run: python runtime/phase04/tests/bootstrap_postgres.py
+      - name: Install audited Blueprint YAML parser
+        run: python -m pip install PyYAML==6.0.2
+      - name: Enforce private Render staging topology
+        run: python scripts/validate_phase04_staging.py
+      - name: Reject incompatible provider, public service, billing and unsupported database in P04 candidate
+        run: python scripts/validate_p04_provider_fit.py
+      - name: Validate 41-operation Phase-02/04 traceability
+        run: python scripts/validate_phase04.py
+      - name: ENG-01 canonical workflow state graph integrity
+        run: python scripts/validate_eng01.py
+      - name: Enforce seven-engine completion evidence gates (no false COMPLETE)
+        run: python scripts/validate_engine_quality.py
+      - name: Verify v2 ownership, frozen v1 and protected offline AI Studio
+        run: python scripts/validate_abc_v2_architecture.py
+      - name: Validate 19 canonical logical owners, versioned handoffs and seven non-bypassable policy gates
+        run: python scripts/validate_abc_19_engine_architecture.py
+      - name: Enforce canonical ownership, legacy namespace and audit completion invariants
+        run: python scripts/validate_abc_engine_completion_audit.py
+      - name: Build reproducible 19-engine evidence inventory and enforce no false completion
+        run: |
+          python scripts/build_abc_engine_evidence_inventory.py > /tmp/abc-engine-audit-inventory.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('/tmp/abc-engine-audit-inventory.json').read_text())
+          assert p['engine_count']==19 and p['open_gate_count']==190
+          assert p['release_authorized'] is False
+          assert len(p['legacy_namespace_collisions'])==7
+          assert all(not e['operational_completion_claim'] for e in p['engines'])
+          print('PASS: audit inventory and 190 unsigned gates remain explicit')
+          PY
+      - name: A1 verify 30 migrations and six quarantined compatibility contracts
+        run: |
+          python scripts/a1_inventory_physical_namespaces.py > /tmp/abc-a1-physical-inventory.json
+          python -m compileall -q scripts/a1_legacy_adapter_quarantine.py
+      - name: W0 ratification candidate integrity and ten fail-closed mutation tests
+        run: python scripts/validate_abc_w0_ratification_candidate.py
+      - name: Verify W1 W2 private readiness remains blocked with eight negative tests
+        run: python scripts/validate_abc_w1w2_private_candidate.py
+      - name: Assert official BGW SHA receipt cannot promote unsigned professional sources
+        run: python scripts/validate_eng05_trgs530_pdf_receipt.py
+      - name: Verify TRGS530 real-source external approval gates stay blocked
+        run: python scripts/validate_eng05_first_source_intake.py
+      - name: Ensure official ENG05 source discovery and external issuer never authorize customer decisions
+        run: python scripts/validate_eng05_external_authority.py
+      - name: Deny unverified ENG05 professional sources and unsanctioned specialist signoff
+        run: python scripts/validate_eng05_professional_sources.py
+      - name: Validate ENG05 verified queue provenance and deny professional-release claims
+        run: python scripts/validate_eng05_verified_queue.py
+      - name: Enforce ENG04 persisted bytes verification at ENG05 review-only inbox
+        run: python scripts/validate_eng04_eng05_same_artifact.py
+      - name: Validate independent ENG04 source ledger worker and held review output
+        run: python scripts/validate_eng04_independent_review.py
+      - name: Reject any ENG06 live release, weak lease, or unverified decision output
+        run: python scripts/validate_eng06_isolated_review.py
+      - name: Enforce seven W1 independent workload identities and unsigned private trust boundaries
+        run: python scripts/validate_abc_w1_private_trust.py
+      - name: Enforce six review-only and unmigrated v2-to-19 source adapters
+        run: python scripts/validate_abc_v2_19_adapters.py
+      - name: Verify review inbox DB edges equal the canonical 19-engine graph
+        run: python scripts/validate_eng19_review_inbox.py
+      - name: Reject unsafe ENG05 worker identity, stale lease and automatic ENG06 release
+        run: python scripts/validate_eng05_review_worker.py
+      - name: Phase04 externally evidenced release gate remains closed
+        run: python scripts/validate_phase04_readiness.py
+      - name: Compile local-only runtime
+        run: python -m compileall -q runtime/phase04/abc_foundation
+      - name: Probe actual BAuA/BGW TRGS530 PDF bytes without archiving copyrighted full text
+        run: python scripts/eng05_trgs530_pdf_byte_probe.py --probe --output /tmp/abc-eng05-trgs530-verification.json
+      - name: Execute integration, isolation, replay and persistence tests
+        working-directory: runtime/phase04
+        run: python -m unittest discover -s tests -v
+      - name: A1 six-adapter PostgreSQL acceptance must execute without skips
+        working-directory: runtime/phase04
+        run: |
+          python -m unittest discover -s tests -p 'test_a1_*.py' -v
+      - name: Verify dedicated staging migrator against isolated ephemeral PostgreSQL
+        working-directory: runtime/phase04
+        run: python tests/verify_staging_migration_ci.py
+      - name: Execute synthetic-only consultation to decision offline walkthrough
+        working-directory: runtime/phase04
+        env:
+          ABC_DEMO_SYNTHETIC: "yes"
+        run: |
+          python demo_offline_engines.py > /tmp/abc-synthetic-demo.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('/tmp/abc-synthetic-demo.json').read_text())
+          assert p["simulation"] == "SYNTHETIC_INTERNAL_ONLY"
+          assert p["released_to_customers"] is False
+          assert p["paid_API_calls"] == 0
+          assert p["question_count"] == 4
+          assert p["human_validation"] == "REQUIRED_BEFORE_REAL_USE"
+          assert p["conditionally_listed_test_candidates"] == ["synthetic:style-a"]
+          print("PASS: no-API controlled ENG02→03→04+05→06 synthetic demo")
+          PY
+      - name: Verify actual isolated PostgreSQL client certificate authentication
+        run: python runtime/phase04/tests/verify_real_pg_mtls_ci.py
+      - name: Build nonroot staging container from exact PR code
+        run: docker build -f runtime/phase04/Dockerfile -t abc-phase04-staging:ci runtime/phase04
+      - name: Verify image runs as dedicated unprivileged UID
+        run: |
+          test "$(docker image inspect abc-phase04-staging:ci --format '{{.Config.User}}')" = "10001:10001"
+          echo "PASS: nonroot runtime user"
+      - name: Verify container refuses unconfigured staging startup
+        run: |
+          if docker run --rm abc-phase04-staging:ci python -m abc_foundation.staging_api; then
+            echo "FAIL: staging container started without credentials and private environment" >&2
+            exit 1
+          fi
+          echo "PASS: no implicit staging credentials or public start"
+      - name: Check strict source constraints
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('runtime/phase04/abc_foundation')
+          server=(root/'server.py').read_text()
+          api=(root/'http_api.py').read_text()
+          assert 'ABC_ENV' in server and 'LOCAL_INTEGRATION_ONLY' in server
+          assert 'if host not in ("127.0.0.1", "::1")' in api
+          assert 'capability_not_implemented' in api
+          assert 'verify_bearer' in api
+          print('PASS: explicit loopback/local-only and fail-closed stubs')
+          PY

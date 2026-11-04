@@ -10,6 +10,25 @@ class BridgeReconnectTests(unittest.TestCase):
             raise unittest.SkipTest("disposable PostgreSQL only")
         cls.dsn = os.environ["ABC_TEST_PG_ADMIN_DSN"]
 
+    def test_schema_downgrade_dry_run_rolls_back_without_losing_registry(self):
+        """Transactional DDL rollback proof; NOT a full 0031 downgrade or PITR test."""
+        with psycopg.connect(self.dsn) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT count(*) FROM abc.a1_bridge_registry")
+                baseline = cur.fetchone()[0]
+                self.assertEqual(baseline, 6)
+                with conn.transaction():
+                    cur.execute("SAVEPOINT a1_downgrade_probe")
+                    cur.execute("DROP TABLE abc.a1_bridge_shadow")
+                    cur.execute("SELECT to_regclass('abc.a1_bridge_shadow')")
+                    self.assertIsNone(cur.fetchone()[0])
+                    cur.execute("ROLLBACK TO SAVEPOINT a1_downgrade_probe")
+                    cur.execute("RELEASE SAVEPOINT a1_downgrade_probe")
+                cur.execute("SELECT to_regclass('abc.a1_bridge_shadow')")
+                self.assertIsNotNone(cur.fetchone()[0])
+                cur.execute("SELECT count(*) FROM abc.a1_bridge_registry")
+                self.assertEqual(cur.fetchone()[0], baseline)
+
     def test_committed_row_reconnect_and_idempotent_shadow_backfill(self):
         tenant = "a1-synthetic-reconnect"
         adapter = "A04_TO_06_DECISION_INPUT"

@@ -26,11 +26,11 @@
 ## Reviewer decision fields (must be completed by real authorized reviewers)
 | Gate | Reviewer identity | Date | Commit SHA | Decision | Evidence URL |
 |---|---|---|---|---|---|
-| Architecture / canonical 19-engine ownership | UNASSIGNED | — | — | PENDING | — |
-| ADR-ENG-003 | UNASSIGNED | — | — | PENDING | — |
-| ADR-ENG-004 | UNASSIGNED | — | — | PENDING | — |
-| Security pre-deployment review | UNASSIGNED | — | — | PENDING | — |
-| A1 closure decision | UNASSIGNED | — | — | BLOCKED | — |
+| Architecture / canonical 19-engine ownership | saleheebrahimi2029-hub (owner / assigned decision authority; not independent) | — | — | PENDING | — |
+| ADR-ENG-003 | saleheebrahimi2029-hub (owner / assigned decision authority; not independent) | — | — | PENDING | — |
+| ADR-ENG-004 | saleheebrahimi2029-hub (owner / assigned decision authority; not independent) | — | — | PENDING | — |
+| Security pre-deployment review | saleheebrahimi2029-hub (owner / assigned decision authority; not independent) | — | — | PENDING | — |
+| A1 closure decision | saleheebrahimi2029-hub (owner / final closure authority) | — | — | BLOCKED | — |
 
 ## Explicitly deferred deployment gates
 Production/deployed catalog reconciliation, managed service identities, private-network mTLS/JWT verification, deployed rollback and disaster recovery, monitoring/SLOs, independent professional/legal source validation and separate release approval. They are not waived or treated as passed.
@@ -43,3 +43,6 @@ Production/deployed catalog reconciliation, managed service identities, private-
 Current tested head: `7917cf6faf41dbf7d1d47a38b9a893aae48a1000`, Run #477 https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/41828511154, `completed/success`, single foundation job `success`. This includes expanded bridge RLS/worker CRUD regression, A1 PostgreSQL acceptance without skips, 31-migration staging verification, integration/replay tests, and release-denial guards. The earlier pending current-head CI checklist item is **SATISFIED for that immutable SHA**. Subsequent documentation commits are not changes to the tested runtime code.
 
 Independent architecture owner, ADR-ENG-003/004 reviewers and security reviewer remain **UNASSIGNED / NOT SIGNED**. No independence can be inferred from CI or this addendum. The mapping and rollback evidence limitations remain open; review may explicitly reject or require corrective action. **Closure decision remains BLOCKED.**
+
+## Temporary approval responsibility assignment — 2026-11-04
+Per project owner's instruction, all four approval tracks (architecture, ADR-ENG-003, ADR-ENG-004, security) and final A1 closure decision are assigned for coordination and owner decision to GitHub user `saleheebrahimi2029-hub`. **Assignment is not an approval or a completed independent review.** The independent-review requirement is not waived, and the owner cannot self-certify independence. All decisions remain PENDING/BLOCKED until documented evidence and applicable independent reviewers exist. No release authorization.

@@ -1,5 +1,12 @@
 name: ABC Phase 04 local foundation CI
 on:
+  push:
+    branches:
+      - 'implementation/w1-eng05-external-approval-gate-20261101'
+    paths:
+      - 'runtime/phase04/**'
+      - 'governance/**'
+      - '.github/workflows/phase04-foundation.yml'
   pull_request:
     paths:
       - 'runtime/phase04/**'

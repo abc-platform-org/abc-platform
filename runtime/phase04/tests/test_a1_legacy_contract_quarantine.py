@@ -2,7 +2,7 @@ import hashlib,json,sys,unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/"scripts"))
 from a1_inventory_physical_namespaces import build
-from a1_legacy_adapter_quarantine import IDS,AdapterRejected,dispatch,inspect_legacy_envelope
+from a1_legacy_adapter_quarantine import IDS,AdapterRejected,dispatch,inspect_legacy_envelope,build_review_only_canonical_envelope
 
 class A1Tests(unittest.TestCase):
     def sample(self):
@@ -21,6 +21,16 @@ class A1Tests(unittest.TestCase):
         self.assertEqual(len(IDS),6)
         for key in IDS:
             self.assertFalse(inspect_legacy_envelope(key,self.sample())["runtime_dispatch"])
+    def test_all_six_v3_review_projections_preserve_provenance(self):
+        for key in IDS:
+            src=self.sample()
+            out=build_review_only_canonical_envelope(key,src)
+            self.assertEqual(out["target_version"],"abc.internal.capability.v3.review")
+            self.assertEqual(out["source_sha256"],src["source_sha256"])
+            self.assertEqual(out["source_artifact"],src["artifact"])
+            self.assertEqual(out["authority"],"UNVERIFIED_REVIEW_ONLY")
+            self.assertFalse(out["dispatch_authorized"])
+            self.assertFalse(out["customer_release_approved"])
     def test_missing_evidence(self):
         for key in ("tenant_id","branch_id","session_id","source_sha256",
                     "consent_decision_id","policy_decision_id"):

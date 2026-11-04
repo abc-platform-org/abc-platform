@@ -6,6 +6,7 @@ on:
     paths:
       - 'runtime/phase04/**'
       - 'governance/**'
+      - 'scripts/validate_a2_evidence_ledger.py'
       - '.github/workflows/phase04-foundation.yml'
   pull_request:
     paths:

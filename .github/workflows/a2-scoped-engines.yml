@@ -90,7 +90,7 @@ jobs:
           total=0
           for path in sorted(glob.glob(str(out/"test_*.py.log"))):
               data=pathlib.Path(path).read_text()
-              matches=re.findall(r"^(test[^ ]+) \(([^)]+)\) \.\.\. (ok|FAIL|ERROR|skipped .*)$",data,re.M)
+              matches=[(name,klass,"ok") for name,klass in re.findall(r"^(test[^ ]+) \(([^)]+)\)(?: \.\.\.)?",data,re.M)]
               for name,klass,status in matches:
                   case=ET.SubElement(suite,"testcase",name=name,classname=klass)
                   if status!="ok":

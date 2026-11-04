@@ -1,0 +1,492 @@
+{
+  "schema": "abc.a2.evidence-ledger.v0",
+  "stage": "A2",
+  "status": "BASELINE_IN_PROGRESS",
+  "source_audit": "governance/ABC_ENGINE_WORKFLOW_COMPLETION_AUDIT_20261103.md",
+  "tracker": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/81",
+  "evidence_policy": "No PASS without exact test, immutable SHA, reviewer and scope; OPEN is not FAIL.",
+  "production_ready": false,
+  "customer_release_approved": false,
+  "scopes": [
+    {
+      "scope_id": "ENG-01",
+      "capability": "orchestration",
+      "baseline_observed_implementation": "gateway/orchestrator/PG state/ingress",
+      "implementation_status": "PARTIAL",
+      "independent_deployment_verified": false,
+      "gate_results": {
+        "G01": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G02": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G03": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G04": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G05": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G06": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G07": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G08": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G09": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G10": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        }
+      },
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+    },
+    {
+      "scope_id": "ENG-02",
+      "capability": "consultation",
+      "baseline_observed_implementation": "consultation/PG outbox",
+      "implementation_status": "PARTIAL",
+      "independent_deployment_verified": false,
+      "gate_results": {
+        "G01": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G02": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G03": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G04": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G05": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G06": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G07": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G08": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G09": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G10": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        }
+      },
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+    },
+    {
+      "scope_id": "ENG-03",
+      "capability": "evidence",
+      "baseline_observed_implementation": "evidence/durable executor",
+      "implementation_status": "PARTIAL",
+      "independent_deployment_verified": false,
+      "gate_results": {
+        "G01": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G02": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G03": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G04": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G05": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G06": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G07": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G08": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G09": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G10": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        }
+      },
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+    },
+    {
+      "scope_id": "ENG-04",
+      "capability": "analysis",
+      "baseline_observed_implementation": "analysis/isolated worker/pixel QA helper",
+      "implementation_status": "PARTIAL",
+      "independent_deployment_verified": false,
+      "gate_results": {
+        "G01": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G02": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G03": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G04": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G05": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G06": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G07": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G08": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G09": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G10": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        }
+      },
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+    },
+    {
+      "scope_id": "ENG-05",
+      "capability": "knowledge",
+      "baseline_observed_implementation": "professional knowledge/review worker/authority gates",
+      "implementation_status": "PARTIAL",
+      "independent_deployment_verified": false,
+      "gate_results": {
+        "G01": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G02": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G03": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G04": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G05": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G06": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G07": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G08": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G09": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G10": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        }
+      },
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+    },
+    {
+      "scope_id": "ENG-06",
+      "capability": "decision",
+      "baseline_observed_implementation": "synthetic blocked decision/PG review worker; legacy technical plan ownership collision",
+      "implementation_status": "PARTIAL",
+      "independent_deployment_verified": false,
+      "gate_results": {
+        "G01": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G02": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G03": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G04": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G05": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G06": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G07": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G08": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G09": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G10": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        }
+      },
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+    },
+    {
+      "scope_id": "ENG-14",
+      "capability": "policy",
+      "baseline_observed_implementation": "policy and transition modules/PG guards",
+      "implementation_status": "PARTIAL",
+      "independent_deployment_verified": false,
+      "gate_results": {
+        "G01": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G02": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G03": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G04": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G05": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G06": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G07": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G08": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G09": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G10": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        }
+      },
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+    },
+    {
+      "scope_id": "LEGACY_REVIEW_TRANSPORT",
+      "capability": "legacy_transport",
+      "baseline_observed_implementation": "eng19_review_* modules; not canonical ENG-19",
+      "implementation_status": "PARTIAL",
+      "independent_deployment_verified": false,
+      "gate_results": {
+        "G01": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G02": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G03": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G04": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G05": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G06": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G07": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G08": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G09": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        },
+        "G10": {
+          "status": "OPEN",
+          "evidence": [],
+          "reviewer": null
+        }
+      },
+      "next_action": "Map runtime module, migration, contract, worker identity and exact CI test to each applicable gate."
+    }
+  ]
+}

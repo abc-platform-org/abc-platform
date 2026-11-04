@@ -96,8 +96,9 @@ jobs:
                   if status!="ok":
                       ET.SubElement(case,"failure",message=status)
                   total+=1
-          if not total:
-              raise SystemExit("No individual test cases parsed")
+          expected=sum(int(v) for path in glob.glob(str(out/"test_*.py.log")) for v in re.findall(r"Ran (\\d+) tests? in",pathlib.Path(path).read_text()))
+          if not total or total != expected:
+              raise SystemExit(f"JUnit case count mismatch: parsed={total}, unittest={expected}")
           suite.set("tests",str(total))
           ET.ElementTree(suite).write(out/"junit.xml",encoding="utf-8",xml_declaration=True)
           print(f"Captured {total} scoped test cases")

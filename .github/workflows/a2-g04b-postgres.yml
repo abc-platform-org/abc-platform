@@ -135,6 +135,27 @@ jobs:
             test "$code" -eq 3
             python -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["release_approved"] is False and r["error"]=="invalid_engine_service_contract"' "a2/g04c/actual-engine-$engine.json"
           done
+          python - <<'PY'
+          import json,uuid
+          request={"request_id":str(uuid.uuid4()),"engine_id":"ENG-05",
+                   "contract_version":"abc.internal.engine.synthetic.v1",
+                   "consumer_id":"g04c-ci-only","session_id":str(uuid.uuid4()),
+                   "payload":{"service_id":"synthetic:hair-color","fixture":None}}
+          with open("a2/g04c/eng05-valid-input.json","w") as f:
+              json.dump(request,f)
+          PY
+          docker run -i --rm --network none abc-g04c-engine:ci python -m abc_foundation.isolated_engine_service ENG-05 < a2/g04c/eng05-valid-input.json > a2/g04c/eng05-valid-output.json
+          python - <<'PY'
+          import json
+          request=json.load(open("a2/g04c/eng05-valid-input.json"))
+          response=json.load(open("a2/g04c/eng05-valid-output.json"))
+          assert response["engine_id"]=="ENG-05"
+          assert response["request_id"]==request["request_id"]
+          assert response["session_id"]==request["session_id"]
+          assert response["consumer_id"]==request["consumer_id"]
+          assert response["release_approved"] is False
+          assert response["result"]["unknowns"]==["SOURCE_UNVERIFIED"]
+          PY
           printf 'actual_engine_code=PASS\ncontainer_network=NONE\nrelease_approved=false\n' > a2/g04c/actual-engine-boundary.txt
       - name: Upload G04-C local-only evidence
         if: always()

@@ -44,6 +44,8 @@ FILENAMES = (
     "0029_eng05_official_pdf_byte_receipts.sql",
     "0030_eng05_trgs530_byte_observations.sql",
     "0031_a1_six_adapter_bridge_quarantine.sql",
+    "0032_a2_g05_atomic_consent_replay_gate.sql",
+    "0033_a2_g05_synthetic_certificate_revocation.sql",
 )
 
 

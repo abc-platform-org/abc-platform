@@ -21,7 +21,8 @@ class SchemaLineageTests(unittest.TestCase):
         self.assertEqual(len(planned_migrations()),len(FILENAMES))
         self.assertEqual(FILENAMES[30],"0031_a1_six_adapter_bridge_quarantine.sql")
         self.assertEqual(FILENAMES[31:],("0032_a2_g05_atomic_consent_replay_gate.sql",
-                                         "0033_a2_g05_synthetic_certificate_revocation.sql"))
+                                         "0033_a2_g05_synthetic_certificate_revocation.sql",
+                                         "0034_a2_private_spiffe_atomic_ingress.sql"))
         self.assertEqual(RECEIPT["raw_pdf_bytes_sha256"],
           "356fc7d7ef4d4dc56ae687c72dfbf00d156b65ae494553f15f0060d7b46b5628")
         self.assertFalse(RECEIPT["acceptance"]["eng05_to_eng06_dispatch_authorized"])

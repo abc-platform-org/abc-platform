@@ -30,6 +30,13 @@ class PrivateEngineBlueprintTests(unittest.TestCase):
                 self.assertEqual(service["autoDeployTrigger"],"off")
                 env={x["key"]:x for x in service["envVars"]}
                 self.assertEqual(env["ABC_ENGINE_ID"]["value"],f"ENG-{i:02d}")
+                # Explicitly reject old ENG-03→ENG-05/06 shortcuts.
+                self.assertEqual(env["ABC_CALLER_ENGINE_ID"]["value"],
+                                 f"ENG-{i-1:02d}")
+                self.assertEqual(env["ABC_STAGING_PURPOSE"]["value"],
+                                 "SYNTHETIC_NO_CLIENT_DATA")
+                self.assertEqual(env["ABC_ENV"]["value"],"STAGING_PRIVATE")
+
                 self.assertEqual(env["ABC_NETWORK_BOUNDARY"]["value"],
                                  "RENDER_PRIVATE_SERVICE")
                 self.assertEqual(env["ABC_ENGINE_SYNTHETIC_ONLY"]["value"],"true")

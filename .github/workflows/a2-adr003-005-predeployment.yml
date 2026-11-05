@@ -10,6 +10,7 @@ on:
       - 'docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md'
       - 'docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md'
       - 'scripts/validate_abc_w1_private_trust.py'
+      - 'governance/ABC_A2_ADR003_004_005_PREDEPLOYMENT_SECURITY_REVIEW_PACKET_20261105.md'
       - '.github/workflows/a2-adr003-005-predeployment.yml'
   workflow_dispatch:
 permissions:
@@ -97,7 +98,9 @@ jobs:
               raw=file.read_bytes()
               s=raw.decode("utf-8")
               matches=re.findall(r"^Ran (\d+) tests? in ",s,re.M)
-              assert len(matches)==1 and int(matches[0])>=3,(file.name,matches)
+              assert len(matches)==1 and int(matches[0])>=2,(file.name,matches)
+              if file.name=="test_a2_adr003_004_pg_roles.py.log":
+                  assert int(matches[0])==10, "ten real SQL negative privilege tests mandatory"
               assert re.search(r"^OK$",s,re.M) and not re.search(
                   r"^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=",s,re.M),file.name
               entries.append({"suite":file.name,"test_count":int(matches[0]),

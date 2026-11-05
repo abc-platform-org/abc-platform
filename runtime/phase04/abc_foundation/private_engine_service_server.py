@@ -10,7 +10,7 @@ from .private_engine_transport import private_engine_server
 from .service_mesh_identity import BoundEngineIdentity
 
 
-def configure_private_engine_service(env=None):
+def configure_private_engine_service(env=None, *, distributed_replay_reserver=None):
     env=os.environ if env is None else env
     local=(env.get("ABC_ENV")=="LOCAL_INTEGRATION_ONLY"
            and env.get("ABC_NETWORK_BOUNDARY")=="LOOPBACK_ONLY")
@@ -26,6 +26,12 @@ def configure_private_engine_service(env=None):
     consumer=env.get("ABC_ENGINE_CONSUMER_ID")
     if engine not in ENGINES or caller not in (*ENGINES,"ENG-03") or caller==engine:
         raise ValueError("distinct_engine_mtls_roles_required")
+    if managed_private and (caller,engine) not in {
+        ("ENG-03","ENG-04"), ("ENG-04","ENG-05"), ("ENG-05","ENG-06")
+    }:
+        raise ValueError("canonical_managed_private_engine_route_required")
+    if managed_private and not callable(distributed_replay_reserver):
+        raise ValueError("managed_staging_requires_independent_durable_replay_admission")
     if not isinstance(consumer,str) or not 3<=len(consumer)<=96:
         raise ValueError("consumer_binding_required")
     try: port=int(env.get("ABC_ENGINE_PORT","0"))
@@ -40,7 +46,9 @@ def configure_private_engine_service(env=None):
        audience="abc-engine:"+engine,jwks_uri=env["ABC_WORKLOAD_JWKS_URL"])
     return private_engine_server(
        host="0.0.0.0" if managed_private else "127.0.0.1",
-       managed_private=managed_private,port=port,target_engine=engine,
+       managed_private=managed_private,
+       distributed_replay_reserver=distributed_replay_reserver,
+       port=port,target_engine=engine,
        caller_engine=caller,consumer_id=consumer,
        certfile=env["ABC_TLS_CERT_FILE"],keyfile=env["ABC_TLS_KEY_FILE"],
        ca_file=env["ABC_TLS_CA_FILE"],verifier=verifier)

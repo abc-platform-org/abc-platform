@@ -18,7 +18,7 @@ from jwt import PyJWKClient
 from .store import DomainError
 
 _ENGINES=frozenset(f"ENG-{i:02d}" for i in range(1,20))
-_SUB=re.compile(r"^spiffe://abc\\.internal/staging/eng-(?:0[1-9]|1[0-9])$")
+_SUB=re.compile(r"^spiffe://abc\.internal/staging/eng-(?:0[1-9]|1[0-9])$")
 
 
 def canonical_spiffe_id(engine_id):

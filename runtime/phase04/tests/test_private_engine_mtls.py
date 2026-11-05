@@ -260,15 +260,14 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
         reserver=lambda identity,message: True  # disposable test stub only
         with patch("abc_foundation.private_engine_service_server.private_engine_server",
                    return_value=Mock()) as builder:
-            with self.assertRaisesRegex(ValueError,"durable_replay"):
+            with self.assertRaisesRegex(ValueError,"staging_owner_cost_and_external_identity_hold"):
                 configure_private_engine_service(env)
+            # Even a malicious/inert replay callback can NEVER turn this
+            # zero-cost CI code into a staging service under the owner's hold.
+            with self.assertRaisesRegex(ValueError,"staging_owner_cost_and_external_identity_hold"):
+                configure_private_engine_service(env,
+                     distributed_replay_reserver=reserver)
             builder.assert_not_called()
-            configure_private_engine_service(env,
-                 distributed_replay_reserver=reserver)
-            self.assertEqual(builder.call_args.kwargs["host"],"0.0.0.0")
-            self.assertTrue(builder.call_args.kwargs["managed_private"])
-            self.assertIs(builder.call_args.kwargs["distributed_replay_reserver"],
-                          reserver)
         for tamper in ({"ABC_RENDER_SERVICE_KIND":"WEB"},
                        {"ABC_NETWORK_BOUNDARY":"PUBLIC_HTTP"},
                        {"ABC_TLS_KEY_FILE":""},

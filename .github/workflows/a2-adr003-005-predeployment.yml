@@ -1,0 +1,128 @@
+name: ABC A2 ADR003/004/005 predeployment security evidence (no deploy)
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'runtime/phase04/**'
+      - 'governance/abc_w1_workload_trust_boundaries.v0.review.json'
+      - 'docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md'
+      - 'docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md'
+      - 'docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md'
+      - 'scripts/validate_abc_w1_private_trust.py'
+      - '.github/workflows/a2-adr003-005-predeployment.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  predeployment-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_TEST_PG_ADMIN_DSN: postgresql://postgres:abc-integration-only-password@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_DSN: postgresql://abc_app:integration-only-abc-app@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_WORKER_DSN: postgresql://abc_worker:integration-only-abc-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ORCHESTRATOR_DSN: postgresql://abc_orchestrator:integration-only-abc-orchestrator@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ANSWER_WORKER_DSN: postgresql://abc_answer_worker:integration-only-abc-answer-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG03_DSN: postgresql://abc_eng03_worker:integration-only-eng03-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_PIPELINE_DSN: postgresql://abc_pipeline_worker:integration-only-pipeline-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG04_LOGIN_DSN: postgresql://abc_eng04_ci_login:integration-only-eng04-review-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG06_LOGIN_DSN: postgresql://abc_eng06_ci_login:integration-only-eng06-review-login@127.0.0.1:5432/abc_phase04_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned offline dependencies
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Bootstrap disposable PostgreSQL16 role and RLS schema
+        run: python runtime/phase04/tests/bootstrap_postgres.py
+      - name: Check ADR traceability, unique identity principals and explicit deployment hold
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/adr-security
+          python scripts/validate_abc_w1_private_trust.py | tee a2/adr-security/w1-identity-source-check.txt
+          python - <<'PY'
+          from pathlib import Path
+          base=Path("docs/04-platform")
+          old=(base/"ADR_ENG_004_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_W0_2026-10-31.md").read_text()
+          new=(base/"ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md").read_text()
+          adapt=(base/"ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md").read_text()
+          assert "HISTORICAL SECURITY ANNEX" in old
+          assert "ADR-ENG-004" in adapt
+          assert "ADR-ENG-005" in new
+          assert "NOT RATIFIED" in new
+          assert "A2 = OPEN" in new
+          assert "ENG-06 RELEASE = BLOCKED" in new
+          PY
+      - name: Run negative JWT/mTLS, ENG14, managed DSN and real PostgreSQL role/consent suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test_file in \
+            test_a2_adr003_004_pg_roles.py \
+            test_private_engine_mtls.py \
+            test_eng14_transition_gate.py \
+            test_managed_db_identity.py \
+            test_a2_g05_atomic_authorization.py; do
+            (cd runtime/phase04 && python -m unittest discover -s tests -p "$test_file" -v) \
+              2>&1 | tee "a2/adr-security/$test_file.log"
+          done
+      - name: Fail if mandatory security tests skipped or tainted, emit immutable manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,pathlib,re
+          d=pathlib.Path("a2/adr-security")
+          files=sorted(d.glob("test_*.py.log"))
+          assert len(files)==5, "missing mandatory security test suites"
+          entries=[]
+          for file in files:
+              raw=file.read_bytes()
+              s=raw.decode("utf-8")
+              matches=re.findall(r"^Ran (\d+) tests? in ",s,re.M)
+              assert len(matches)==1 and int(matches[0])>=3,(file.name,matches)
+              assert re.search(r"^OK$",s,re.M) and not re.search(
+                  r"^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=",s,re.M),file.name
+              entries.append({"suite":file.name,"test_count":int(matches[0]),
+                              "log_sha256":hashlib.sha256(raw).hexdigest()})
+          manifest={
+              "scope":"ADR_003_004_005_SECURITY_PREDEPLOYMENT_CI_ONLY",
+              "exact_head":os.environ["GITHUB_SHA"],
+              "run_id":os.environ["GITHUB_RUN_ID"],
+              "suites":entries,"test_count":sum(x["test_count"] for x in entries),
+              "managed_workload_issuer_attested":False,
+              "private_staging_deployed":False,
+              "external_postgres_client_certificate_verified":False,
+              "reviewer_security_sre_professional_signoffs":"NONE",
+              "adr_independently_ratified":False,
+              "owner_cost_approval":False,
+              "eng06_release_approved":False,"a2_closed":False}
+          (d/"manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
+          print(json.dumps(manifest,sort_keys=True))
+          PY
+          sha256sum a2/adr-security/*.log a2/adr-security/w1-identity-source-check.txt a2/adr-security/manifest.json > a2/adr-security/SHA256SUMS
+      - name: Upload predeployment review evidence even when test fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-adr-security-${{ github.run_id }}
+          path: a2/adr-security/
+          if-no-files-found: warn
+          retention-days: 30

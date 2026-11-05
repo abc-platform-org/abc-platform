@@ -184,6 +184,41 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
                          "engine_request_rejected")
         self.assertEqual(self.call(token=self.token(expires=-30))["error"],
                          "engine_request_rejected")
+
+    def _reissue_with_claims(self, changes, headers=None):
+        original=jwt.decode(self.token(),options={"verify_signature":False})
+        original.update(changes)
+        return jwt.encode(original,self.signer,algorithm="RS256",
+                          headers={"kid":"ci-rotation-1",**(headers or {})})
+
+    def test_deny_multi_audience_token_even_if_expected_audience_included(self):
+        altered=self._reissue_with_claims(
+            {"aud":["abc-engine:"+self.target_engine,"abc-engine:ENG-19"]})
+        self.assertEqual(self.call(token=altered)["error"],"engine_request_rejected")
+
+    def test_deny_malformed_or_non_uuid4_jti(self):
+        for jti in (str(uuid.uuid1()),"not-a-uuid",str(uuid.uuid4()).upper()):
+            with self.subTest(jti=jti):
+                altered=self._reissue_with_claims({"jti":jti})
+                self.assertEqual(self.call(token=altered)["error"],
+                                 "engine_request_rejected")
+
+    def test_deny_untrusted_token_header_key_locations(self):
+        for extra in ({"jku":"https://untrusted.example/jwks"},
+                      {"x5u":"https://untrusted.example/cert"},
+                      {"jwk":{"kty":"RSA"}},{"crit":["jku"],"jku":"https://untrusted.example/jwks"}):
+            with self.subTest(extra=list(extra)):
+                altered=self._reissue_with_claims({},extra)
+                self.assertEqual(self.call(token=altered)["error"],
+                                 "engine_request_rejected")
+
+    def test_deny_ambiguous_cnf_claims(self):
+        old=jwt.decode(self.token(),options={"verify_signature":False})
+        old["cnf"]["extra_untrusted_binding"]=True
+        altered=jwt.encode(old,self.signer,algorithm="RS256",
+                           headers={"kid":"ci-rotation-1"})
+        self.assertEqual(self.call(token=altered)["error"],"engine_request_rejected")
+
     def test_three_independent_servers_cannot_start_without_managed_material(self):
         config={"ABC_ENV":"LOCAL_INTEGRATION_ONLY",
                 "ABC_NETWORK_BOUNDARY":"LOOPBACK_ONLY",

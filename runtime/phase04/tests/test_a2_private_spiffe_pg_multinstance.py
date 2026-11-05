@@ -7,6 +7,8 @@ staging approval is asserted. All records are synthetic.
 import copy
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import hashlib
+import json
+from pathlib import Path
 import multiprocessing
 import os
 import threading
@@ -22,6 +24,7 @@ from abc_foundation.private_engine_transport import (
     private_engine_server,send_private_engine_message)
 from abc_foundation.private_pg_atomic_admission import PgAtomicPrivateAdmission
 from abc_foundation.store import DomainError
+from abc_foundation.service_mesh_identity import canonical_spiffe_id
 from test_private_engine_mtls import ManagedWorkloadMTLSTests
 
 
@@ -229,6 +232,13 @@ class PrivateAtomicPostgresMultiInstanceTests(unittest.TestCase):
         self.assertEqual(self.audit_count(),0)
 
     def test_11_bare_application_role_has_no_private_admission_privilege(self):
+        registry=Path(__file__).resolve().parents[3] / "governance" / "abc_w1_workload_trust_boundaries.v0.review.json"
+        inventory=json.loads(registry.read_text())
+        self.assertEqual(len(inventory["workloads"]),7)
+        for item in inventory["workloads"]:
+            with self.subTest(engine=item["engine_id"]):
+                self.assertEqual(item["proposed_spiffe_id"],
+                                 canonical_spiffe_id(item["engine_id"]))
         sig=("abc.a2_private_atomic_admit(text,text,uuid,integer,"
              "text,text,text,text,text,text,text,text,text,uuid,"
              "timestamptz,uuid,text)")

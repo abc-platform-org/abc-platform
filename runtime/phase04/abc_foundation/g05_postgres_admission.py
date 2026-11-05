@@ -83,8 +83,8 @@ class G05PostgresAdmission:
                 ):
                     conn.execute("SELECT set_config(%s,%s,true)", (key, val))
                 receipt = conn.execute(
-                    """SELECT abc.eng14_g05_admit_and_claim(
-                          %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s
+                    """SELECT abc.eng14_g05_cert_bound_admit_and_claim(
+                          %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s
                         ) AS admitted""",
                     (
                         message["tenant_id"], message["branch_id"], sid,
@@ -93,6 +93,7 @@ class G05PostgresAdmission:
                         self._human_issuer, self._specialist,
                         identity["issuer"], identity["audience"],
                         token_id, identity["expires_at"],
+                        identity["cert_sha256"],
                     ),
                 ).fetchone()
                 if receipt is None or receipt["admitted"] is not True:

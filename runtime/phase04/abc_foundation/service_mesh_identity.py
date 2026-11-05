@@ -18,7 +18,15 @@ from jwt import PyJWKClient
 from .store import DomainError
 
 _ENGINES=frozenset(f"ENG-{i:02d}" for i in range(1,20))
-_SUB=re.compile(r"^spiffe://abc\.internal/(eng(?:0[1-9]|1[0-9]))/([a-zA-Z0-9-]{3,96})$")
+_SUB=re.compile(r"^spiffe://abc\\.internal/staging/eng-(?:0[1-9]|1[0-9])$")
+
+
+def canonical_spiffe_id(engine_id):
+    """The only v1 predeployment workload URI; consumer is NOT a cert principal."""
+    if engine_id not in _ENGINES:
+        raise ValueError("unregistered_canonical_engine")
+    return "spiffe://abc.internal/staging/"+engine_id.lower()
+
 _KID=re.compile(r"^[A-Za-z0-9._-]{3,128}$")
 class BoundEngineIdentity:
     def __init__(self,*,issuer,audience,jwks_uri,jwks_client=None,clock=None):
@@ -49,7 +57,7 @@ class BoundEngineIdentity:
             cert=x509.load_der_x509_certificate(peer_der)
             uris=cert.extensions.get_extension_for_oid(
                 ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value.get_values_for_type(x509.UniformResourceIdentifier)
-            expected_uri=f"spiffe://abc.internal/{expected_engine.lower().replace('-','')}/{expected_consumer}"
+            expected_uri=canonical_spiffe_id(expected_engine)
             if uris!=[expected_uri] or _SUB.fullmatch(expected_uri) is None:
                 raise ValueError("unexpected_certificate_identity")
             now=self.clock()

@@ -5,6 +5,7 @@ and initially PENDING consent, activated through the existing state machine.
 No real customer information, externally issued identity, or engine release.
 """
 import copy
+import hashlib
 import os
 import socket
 import ssl
@@ -50,6 +51,8 @@ class G05TransactionalWorkloadTests(unittest.TestCase):
             "test_real_tls13_mutual_certificate_and_bound_jwt"
         )
         self.fixture.setUp()
+        self.cert_sha256 = hashlib.sha256(self.fixture.client.public_bytes(
+            serialization.Encoding.DER)).hexdigest()
         self.addCleanup(self.fixture.doCleanups)
         self._provision()
         self.listeners = []
@@ -98,6 +101,12 @@ class G05TransactionalWorkloadTests(unittest.TestCase):
                   SET status='ACTIVE',verified_at=%s,valid_until=%s
                   WHERE consent_id=%s""",
                         (now, now + timedelta(minutes=15), uuid.UUID(self.consent)))
+            con.execute("""INSERT INTO abc.g05_synthetic_cert_grants(
+                  tenant_id,caller_engine,target_engine,consumer_id,
+                  client_cert_sha256,active,valid_until
+                ) VALUES (%s,'ENG-04','ENG-05',%s,%s,true,%s)""",
+                        (self.tenant, self.fixture.consumer, self.cert_sha256,
+                         now + timedelta(minutes=15)))
 
     def _ingress(self):
         admission = G05PostgresAdmission(
@@ -215,6 +224,28 @@ class G05TransactionalWorkloadTests(unittest.TestCase):
             self.call()["error"], "v2_authenticated_request_rejected"
         )
 
+    def test_certificate_grant_can_be_revoked_without_changing_jwt_or_ca(self):
+        # Same valid cryptographic identity is denied by the operator's
+        # database certificate authorization policy.
+        with psycopg.connect(self.admin, autocommit=True) as con:
+            con.execute("""UPDATE abc.g05_synthetic_cert_grants
+                  SET active=false,revoked_at=clock_timestamp()
+                  WHERE tenant_id=%s AND client_cert_sha256=%s""",
+                        (self.tenant, self.cert_sha256))
+        self.assertEqual(
+            self.call()["error"], "v2_authenticated_request_rejected"
+        )
+
+    def test_correct_cert_wrong_consumer_grant_denied(self):
+        with psycopg.connect(self.admin, autocommit=True) as con:
+            con.execute("""UPDATE abc.g05_synthetic_cert_grants
+                  SET consumer_id='different-ci-consumer'
+                  WHERE tenant_id=%s AND client_cert_sha256=%s""",
+                        (self.tenant, self.cert_sha256))
+        self.assertEqual(
+            self.call()["error"], "v2_authenticated_request_rejected"
+        )
+
     def test_pending_consent_is_not_equivalent_to_active(self):
         with psycopg.connect(self.admin, autocommit=True) as con:
             con.execute("""UPDATE abc.consent_evidence SET
@@ -314,6 +345,10 @@ class G05TransactionalWorkloadTests(unittest.TestCase):
 
     def test_runtime_worker_cannot_call_privileged_g05_broker(self):
         signature = (
+            "abc.eng14_g05_cert_bound_admit_and_claim(text,text,uuid,integer,"
+            "text,text,text,text,text,text,text,uuid,timestamptz,text)"
+        )
+        old_signature = (
             "abc.eng14_g05_admit_and_claim(text,text,uuid,integer,text,text,"
             "text,text,text,text,text,uuid,timestamptz)"
         )
@@ -328,6 +363,11 @@ class G05TransactionalWorkloadTests(unittest.TestCase):
                      'abc_app',%s,'EXECUTE')""",
                 (signature,),
             ).fetchone(), (True,))
+            # The previous unbound entrypoint MUST be revoked even from abc_app.
+            self.assertEqual(con.execute(
+                """SELECT has_function_privilege('abc_app',%s,'EXECUTE')""",
+                (old_signature,),
+            ).fetchone(), (False,))
 
     def test_missing_transactional_gate_never_claims_g05(self):
         with self.assertRaisesRegex(

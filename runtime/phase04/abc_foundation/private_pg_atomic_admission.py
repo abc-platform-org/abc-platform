@@ -109,7 +109,7 @@ class PgAtomicPrivateAdmission:
                      identity["issuer"],identity["audience"],jti,
                      expiration,request_id,message_digest)
                 ).fetchone()
-                if receipt is None or receipt["admitted"] is not True:
+                if receipt is None or receipt[0] is not True:
                     raise DomainError(403,"private_ingress_atomic_eng14_denied")
                 # Session/membership/consent/binding are FOR SHARE-locked until
                 # bounded dispatch returns and the result is checked.

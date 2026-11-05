@@ -1,3 +1,9 @@
+# HISTORICAL SECURITY ANNEX — MISLABELLED ADR-ENG-004 (2026-10-31)
+
+**Do not ratify this historical file as ADR-ENG-004.** The authoritative ADR-ENG-004 candidate covers v2-to-19 read-only adapters. The workload identity decision is now proposed as **ADR-ENG-005** in `docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md`. This source snapshot is retained for audit traceability; its legacy heading below is historical and conveys NO approval. Renumbering is a technical design proposal, pending independent architecture/security ratification.
+
+---
+
 # ADR-ENG-004 — Private workload identity and cross-engine trust boundaries (W0 candidate)
 
 **Date:** 2026-10-31

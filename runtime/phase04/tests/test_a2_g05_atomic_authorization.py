@@ -263,6 +263,28 @@ class G05TransactionalWorkloadTests(unittest.TestCase):
             self.call()["error"], "v2_authenticated_request_rejected"
         )
 
+    def test_consent_for_different_purpose_cannot_authorize_ai_preview(self):
+        with psycopg.connect(self.admin, autocommit=True) as con:
+            con.execute("""UPDATE abc.consent_evidence SET
+                  status='WITHDRAWN',revoked_at=clock_timestamp()
+                  WHERE consent_id=%s""", (uuid.UUID(self.consent),))
+            other = uuid.uuid4()
+            con.execute("""INSERT INTO abc.consent_evidence(
+                consent_id,tenant_id,branch_id,session_id,client_id,status,
+                purpose,evidence_digest,disclosure_version,retention_policy_id
+                ) VALUES (%s,%s,%s,%s,'g05-synthetic-client',
+                 'PENDING_VERIFICATION',%s,%s,'g05-ci-disclosure-1',
+                 'g05-ci-retention')""",
+                (other, self.tenant, self.branch, uuid.UUID(self.session),
+                 ["UNRELATED_TEST_PURPOSE"], "c" * 64))
+            con.execute("""UPDATE abc.consent_evidence
+                  SET status='ACTIVE',verified_at=clock_timestamp(),
+                      valid_until=clock_timestamp()+interval '15 minutes'
+                  WHERE consent_id=%s""", (other,))
+        self.assertEqual(
+            self.call()["error"], "v2_authenticated_request_rejected"
+        )
+
     def test_managed_tenant_requires_physical_clientcert_db_login(self):
         with psycopg.connect(self.admin, autocommit=True) as con:
             con.execute("""INSERT INTO abc.eng14_tenant_workload_mode(

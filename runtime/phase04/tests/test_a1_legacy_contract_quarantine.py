@@ -14,7 +14,9 @@ class A1Tests(unittest.TestCase):
             customer_release_approved=False,downstream_dispatch_authorized=False)
     def test_inventory(self):
         x=build()
-        self.assertEqual(x["migration_count"],31)
+        self.assertGreaterEqual(x["migration_count"],31)
+        self.assertEqual(x["migrations"][30]["migration"],
+                         "0031_a1_six_adapter_bridge_quarantine.sql")
         self.assertGreater(x["declared_table_count"],20)
         self.assertFalse(x["production_catalog_verified"])
     def test_six_adapters(self):

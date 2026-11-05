@@ -63,7 +63,7 @@ jobs:
           set -euo pipefail
           (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_private_spiffe_pg_multinstance.py' -v) \
              2>&1 | tee a2/spiffe-atomic/multi-instance.log
-      - name: Additional canonical identity real TLS regression (18 cases)
+      - name: Additional canonical identity real TLS regression (19 cases)
         shell: bash
         run: |
           set -euo pipefail
@@ -77,7 +77,7 @@ jobs:
           import hashlib,json,os,pathlib,re
           d=pathlib.Path("a2/spiffe-atomic")
           records=[]
-          for filename,count in (("multi-instance.log",16),("private-mtls.log",18)):
+          for filename,count in (("multi-instance.log",16),("private-mtls.log",19)):
               p=d/filename
               data=p.read_bytes()
               log=data.decode()
@@ -91,7 +91,7 @@ jobs:
               "gate":"A2_CANONICAL_SPIFFE_ATOMIC_POSTGRES_MULTI_INSTANCE_CI",
               "head_sha":os.environ["GITHUB_SHA"],
               "github_run_id":os.environ["GITHUB_RUN_ID"],
-              "tested_suites":records,"tested_count":34,
+              "tested_suites":records,"tested_count":35,
               "independent_tls_listeners":3,
               "independent_processes":8,
               "postgres_service":"DISPOSABLE_CI_POSTGRES16",

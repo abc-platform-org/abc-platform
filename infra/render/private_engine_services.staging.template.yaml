@@ -2,6 +2,9 @@
 # Render private service topology only; never replace with public web services.
 # External operator must provision certificate/key/CA secret mounts and
 # managed workload issuer, approve billing and prove private-only routing.
+# BLOCKED: runtime refuses managed staging until an independently reviewed
+# durable PostgreSQL-backed replay/consent admission provider is wired. Do NOT
+# deploy this template directly; never use its single-process JTI fallback.
 # RootDir/Dockerfile and Render Blueprint syntax require provider preflight.
 services:
   - type: pserv
@@ -63,7 +66,7 @@ services:
       - key: ABC_ENGINE_ID
         value: ENG-05
       - key: ABC_CALLER_ENGINE_ID
-        value: ENG-03
+        value: ENG-04
       - key: ABC_ENGINE_PORT
         value: "11005"
       - key: ABC_ENGINE_CONSUMER_ID
@@ -100,7 +103,7 @@ services:
       - key: ABC_ENGINE_ID
         value: ENG-06
       - key: ABC_CALLER_ENGINE_ID
-        value: ENG-03
+        value: ENG-05
       - key: ABC_ENGINE_PORT
         value: "11006"
       - key: ABC_ENGINE_CONSUMER_ID

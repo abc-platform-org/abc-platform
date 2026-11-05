@@ -31,6 +31,7 @@ if not ADMIN or not WORKER or conninfo_to_dict(ADMIN).get("dbname")!="abc_phase0
 if len(sys.argv)!=2 or sys.argv[1] not in ("prepare","verify"):
     raise SystemExit("usage: prepare|verify")
 
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from test_eng06_pg_positive_e2e import Eng06PositivePostgresTests
 from abc_foundation.eng06_review_worker import SyntheticEng06ReviewWorker

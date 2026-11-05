@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 from cryptography.hazmat.primitives import serialization
 
-from abc_foundation.private_engine_transport import private_engine_server
+from abc_foundation.private_engine_transport import private_engine_server, _LocalReplayWindow
 from abc_foundation.service_mesh_identity import BoundEngineIdentity
 
 
@@ -49,6 +49,12 @@ def main():
         jwks_uri=issuer + "/.well-known/jwks.json",
         jwks_client=OfflineTestJWKS(key),
     )
+    # CI Docker bridge transport only; deliberately NOT real managed staging.
+    # Test-local replay simulates a checked admission callback but is not shared
+    # across replicas or durable, and is never imported by the runtime launcher.
+    replay = _LocalReplayWindow()
+    def ci_only_replay(identity, message):
+        return replay.reserve(identity["token_id"])
     server = private_engine_server(
         host="0.0.0.0",
         port=int(os.environ["ABC_ENGINE_PORT"]),
@@ -60,6 +66,7 @@ def main():
         ca_file="/run/trust/ca.pem",
         verifier=verifier,
         managed_private=True,
+        distributed_replay_reserver=ci_only_replay,
     )
     try:
         print("ABC_CI_MTLS_READY:" + engine, flush=True)

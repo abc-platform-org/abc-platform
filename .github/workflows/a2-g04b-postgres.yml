@@ -232,6 +232,40 @@ jobs:
           if grep -Eq '^FAILED|^ERROR:|^FAIL:|skipped=' a2/g04c/engine-image-mtls.log; then exit 1; fi
           echo 'scope=local-container-mtls; intercontainer=not-proven; managed-identity=not-proven' > a2/g04c/mTLS-scope.txt
           sha256sum a2/g04c/engine-image-mtls.log > a2/g04c/engine-image-mtls.sha256
+      - name: A2-G05 real PostgreSQL consent, mTLS authorization, revocation and durable replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g05
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g05_atomic_authorization.py' -v) 2>&1 | tee a2/g05/g05-atomic-authorization.log
+          python - <<'PY'
+          import hashlib,json,os,pathlib,re
+          out=pathlib.Path("a2/g05")
+          raw=(out/"g05-atomic-authorization.log").read_bytes()
+          data=raw.decode()
+          count=re.findall(r"^Ran (\d+) tests? in ",data,re.M)
+          if len(count)!=1 or int(count[0])<10 or not re.search(r"^OK$",data,re.M):
+              raise SystemExit("G05 required tests missing or failed")
+          if re.search(r"^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=",data,re.M):
+              raise SystemExit("G05 skips or negative suites are not accepted")
+          manifest={"gate":"A2-G05","status":"PASS","scope":"CI_ONLY_DISPOSABLE_PG16_LOCAL_MTLS",
+             "commit_sha":os.environ["GITHUB_SHA"],"run_id":os.environ["GITHUB_RUN_ID"],
+             "test_count":int(count[0]),"log_sha256":hashlib.sha256(raw).hexdigest(),
+             "operator_managed_identity_proven":False,
+             "independent_human_oidc_attestation_proven":False,
+             "managed_pg_clientcert_proven":False,
+             "production_release_approved":False,"eng06_professional_release":False}
+          (out/"manifest.json").write_text(json.dumps(manifest,sort_keys=True,indent=2)+"\n")
+          print(json.dumps(manifest,sort_keys=True))
+          PY
+      - name: Upload G05 synthetic-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-g05-${{ github.run_id }}
+          path: a2/g05/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Upload G04-C local-only evidence
         if: always()
         uses: actions/upload-artifact@v4

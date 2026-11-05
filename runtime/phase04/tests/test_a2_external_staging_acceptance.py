@@ -12,7 +12,7 @@ import unittest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0,str(Path(__file__).resolve().parents[3]))
 from scripts.a2_external_staging_acceptance import (
     ENGINES,EVIDENCE,ROLES,SCHEMA,canonical,digest,verify)
 

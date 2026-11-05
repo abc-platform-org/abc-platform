@@ -15,6 +15,8 @@ import threading
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from types import SimpleNamespace
 
 import psycopg
 from cryptography.hazmat.primitives import serialization
@@ -24,13 +26,54 @@ from abc_foundation.private_engine_transport import (
     private_engine_server,send_private_engine_message)
 from abc_foundation.private_pg_atomic_admission import PgAtomicPrivateAdmission
 from abc_foundation.store import DomainError
-from abc_foundation.service_mesh_identity import canonical_spiffe_id
+from abc_foundation.service_mesh_identity import canonical_spiffe_id, BoundEngineIdentity
 from test_private_engine_mtls import ManagedWorkloadMTLSTests
 
 
 def _process_tls_probe(args):
     # Executed by a new Python interpreter and a distinct SQL/TLS session.
     return send_private_engine_message(**args)
+
+
+class _StaticPublicJwks:
+    def __init__(self, public_key):
+        self.public_key=public_key
+    def get_signing_key_from_jwt(self, unused_token):
+        return SimpleNamespace(key=self.public_key)
+
+
+def _receive_in_separate_process(send_pipe, config):
+    """True independent receiver process, socket and PostgreSQL connection."""
+    server=None
+    try:
+        key=serialization.load_pem_public_key(Path(config["public_key"]).read_bytes())
+        verifier=BoundEngineIdentity(
+            issuer="https://issuer.abc-ci.example",
+            audience="abc-engine:ENG-05",
+            jwks_uri="https://issuer.abc-ci.example/.well-known/jwks.json",
+            jwks_client=_StaticPublicJwks(key))
+        admission=PgAtomicPrivateAdmission(
+            dsn=config["dsn"],tenant_id=config["tenant_id"],
+            branch_id=config["branch_id"],human_issuer=config["human_issuer"],
+            specialist_subject=config["specialist_subject"],
+            caller_engine="ENG-04",target_engine="ENG-05",
+            consumer_id=config["consumer_id"],state_version=0)
+        server=private_engine_server(
+            host="127.0.0.1",port=0,target_engine="ENG-05",
+            caller_engine="ENG-04",consumer_id=config["consumer_id"],
+            certfile=config["server_cert"],keyfile=config["server_key"],
+            ca_file=config["ca_file"],verifier=verifier,
+            atomic_admission=admission)
+        send_pipe.send({"port":server.server_address[1]})
+        server.serve_forever(poll_interval=0.05)
+    except BaseException as exc:
+        try:send_pipe.send({"error":type(exc).__name__+":"+str(exc)})
+        except (EOFError,OSError):pass
+    finally:
+        send_pipe.close()
+        if server is not None:
+            server.server_close()
+
 
 
 class PrivateAtomicPostgresMultiInstanceTests(unittest.TestCase):
@@ -158,16 +201,58 @@ class PrivateAtomicPostgresMultiInstanceTests(unittest.TestCase):
         self.assertEqual(sum(v.get("error")=="engine_request_rejected" for v in responses),1)
         self.assertEqual(self.audit_count(),1)
 
-    def test_03_eight_real_processes_multiple_tls_listeners_one_db_jti(self):
-        ports=[self.port,self._start(),self._start()]
-        token=self.fixture.token()
-        requests=[self._args(token=token,port=ports[i%len(ports)]) for i in range(8)]
-        with ProcessPoolExecutor(max_workers=8,
-            mp_context=multiprocessing.get_context("spawn")) as pool:
-            responses=list(pool.map(_process_tls_probe,requests))
-        self.assertEqual(sum(r.get("engine_id")=="ENG-05" for r in responses),1,responses)
-        self.assertEqual(sum(r.get("error")=="engine_request_rejected" for r in responses),7)
-        self.assertEqual(self.audit_count(),1)
+    def test_03_eight_client_processes_three_receiver_processes_one_db_jti(self):
+        # This is a real cross-process receiver test, not three threads in
+        # one Python process. All three independent PostgreSQL sessions use
+        # the same operator binding, shared JTI uniqueness and qualified
+        # human/consent/version checks; no paid/staging resources are created.
+        root=self.fixture.root
+        pub=root/"a2-private-issuer-public.pem"
+        pub.write_bytes(self.fixture.signer.public_key().public_bytes(
+            serialization.Encoding.PEM,
+            serialization.PublicFormat.SubjectPublicKeyInfo))
+        cfg={
+            "public_key":str(pub),"dsn":self.eng05,"tenant_id":self.tenant,
+            "branch_id":self.branch,"human_issuer":self.human_issuer,
+            "specialist_subject":self.subject,"consumer_id":self.fixture.consumer,
+            "server_cert":self.fixture.server_cert,
+            "server_key":self.fixture.server_key,"ca_file":self.fixture.ca_path}
+        ctx=multiprocessing.get_context("spawn")
+        children=[]
+        try:
+            ports=[]
+            for i in range(3):
+                recv,send=ctx.Pipe(duplex=False)
+                proc=ctx.Process(target=_receive_in_separate_process,
+                                 args=(send,cfg),name="a2-independent-receiver-"+str(i))
+                proc.start()
+                send.close()
+                try:
+                    if not recv.poll(16):
+                        self.fail("independent receiver failed to start")
+                    startup=recv.recv()
+                finally:
+                    recv.close()
+                self.assertIn("port",startup,startup)
+                children.append(proc)
+                ports.append(startup["port"])
+            token=self.fixture.token()
+            requests=[self._args(token=token,port=ports[i%3])
+                      for i in range(8)]
+            with ProcessPoolExecutor(max_workers=8,mp_context=ctx) as pool:
+                responses=list(pool.map(_process_tls_probe,requests))
+            self.assertEqual(sum(x.get("engine_id")=="ENG-05" for x in responses),
+                             1,responses)
+            self.assertEqual(sum(x.get("error")=="engine_request_rejected"
+                                 for x in responses),7)
+            self.assertEqual(self.audit_count(),1)
+        finally:
+            for child in children:
+                child.terminate()
+                child.join(timeout=4)
+                if child.is_alive():
+                    child.kill()
+                    child.join(timeout=2)
 
     def test_04_no_consent_denies_no_jti_or_audit_consumption(self):
         t=self.fixture.token()

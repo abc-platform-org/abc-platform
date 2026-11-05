@@ -122,6 +122,20 @@ jobs:
           docker start abc-g04c-05 >/dev/null
           docker exec abc-g04c-04 python -c "import urllib.request; assert urllib.request.urlopen('http://engine-05:8765',timeout=5).status==200"
           printf 'container_network_isolation=PASS\npeer_failure_containment=PASS\npeer_restart=PASS\nmanaged_identity=NOT_TESTED\nreal_engine_deployment=NOT_TESTED\n' > a2/g04c/container-network.txt
+      - name: G04-C actual engine code in separate network-disabled containers
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f runtime/phase04/Dockerfile -t abc-g04c-engine:ci runtime/phase04
+          for engine in 04 05 06; do
+            set +e
+            printf '%s' '{"engine_id":"ENG-99"}' | docker run -i --rm --network none abc-g04c-engine:ci python -m abc_foundation.isolated_engine_service "ENG-$engine" > "a2/g04c/actual-engine-$engine.json"
+            code=$?
+            set -e
+            test "$code" -eq 3
+            python -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["release_approved"] is False and r["error"]=="invalid_engine_service_contract"' "a2/g04c/actual-engine-$engine.json"
+          done
+          printf 'actual_engine_code=PASS\ncontainer_network=NONE\nrelease_approved=false\n' > a2/g04c/actual-engine-boundary.txt
       - name: Upload G04-C local-only evidence
         if: always()
         uses: actions/upload-artifact@v4

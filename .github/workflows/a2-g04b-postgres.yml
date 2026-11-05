@@ -157,6 +157,34 @@ jobs:
           assert response["result"]["unknowns"]==["SOURCE_UNVERIFIED"]
           PY
           printf 'actual_engine_code=PASS\ncontainer_network=NONE\nrelease_approved=false\n' > a2/g04c/actual-engine-boundary.txt
+      - name: G04-C real engine processes container lifecycle and fail-closed checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04c
+          docker network create abc-g04c-real-private
+          docker network create abc-g04c-real-outsider
+          cleanup() { docker rm -f abc-real-04 abc-real-05 abc-real-06 abc-real-outsider >/dev/null 2>&1 || true; docker network rm abc-g04c-real-private abc-g04c-real-outsider >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          for engine in 04 05 06; do
+            docker run -d --name "abc-real-$engine" --network abc-g04c-real-private --network-alias "abc-real-$engine" abc-g04c-engine:ci sleep 180 >/dev/null
+          done
+          docker run -d --name abc-real-outsider --network abc-g04c-real-outsider abc-g04c-engine:ci sleep 180 >/dev/null
+          docker exec abc-real-outsider python -c "import socket; socket.getaddrinfo('abc-real-05',80)" && { echo 'outsider resolved private engine'; exit 1; } || echo 'outsider blocked'
+          for engine in 04 05 06; do
+            set +e
+            printf '%s' '{"engine_id":"ENG-99"}' | docker exec -i "abc-real-$engine" python -m abc_foundation.isolated_engine_service "ENG-$engine" > "a2/g04c/lifecycle-$engine.json"
+            status=$?
+            set -e
+            test "$status" -eq 3
+            python -c 'import json,sys; x=json.load(open(sys.argv[1])); assert x=={"error":"invalid_engine_service_contract","release_approved":False}' "a2/g04c/lifecycle-$engine.json"
+          done
+          docker kill abc-real-05 >/dev/null
+          docker exec abc-real-04 python -c 'import abc_foundation.isolated_engine_service as e; assert "ENG-04" in e.ENGINES'
+          docker exec abc-real-06 python -c 'import abc_foundation.isolated_engine_service as e; assert "ENG-06" in e.ENGINES'
+          docker start abc-real-05 >/dev/null
+          docker exec abc-real-05 python -c 'import abc_foundation.isolated_engine_service as e; assert "ENG-05" in e.ENGINES'
+          printf 'real_engine_images=PASS\ncontainer_crash_containment=PASS\ncontainer_restart=PASS\nprivate_dns_isolation=PASS\nintercontainer_mtls=NOT_PROVEN\nmanaged_identity=NOT_PROVEN\n' > a2/g04c/real-engine-lifecycle.txt
       - name: Upload G04-C local-only evidence
         if: always()
         uses: actions/upload-artifact@v4

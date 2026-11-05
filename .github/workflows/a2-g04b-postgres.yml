@@ -1,0 +1,93 @@
+name: ABC A2 G04-B PostgreSQL independence and recovery
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'runtime/phase04/**'
+      - '.github/workflows/a2-g04b-postgres.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g04b-real-postgres-fault-injection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_TEST_PG_ADMIN_DSN: postgresql://postgres:abc-integration-only-password@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_DSN: postgresql://abc_app:integration-only-abc-app@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_WORKER_DSN: postgresql://abc_worker:integration-only-abc-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ORCHESTRATOR_DSN: postgresql://abc_orchestrator:integration-only-abc-orchestrator@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ANSWER_WORKER_DSN: postgresql://abc_answer_worker:integration-only-abc-answer-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG03_DSN: postgresql://abc_eng03_worker:integration-only-eng03-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_PIPELINE_DSN: postgresql://abc_pipeline_worker:integration-only-pipeline-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG04_LOGIN_DSN: postgresql://abc_eng04_ci_login:integration-only-eng04-review-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG06_LOGIN_DSN: postgresql://abc_eng06_ci_login:integration-only-eng06-review-login@127.0.0.1:5432/abc_phase04_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned project dependencies
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Bootstrap disposable PostgreSQL 16 and scoped roles
+        run: python runtime/phase04/tests/bootstrap_postgres.py
+      - name: Run real durable worker isolation, crash, lease, consent and role tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04b
+          for test_file in test_eng03_durable_pipeline.py test_eng06_fault_injection_acceptance.py; do
+            (cd runtime/phase04 && python -m unittest discover -s tests -p "$test_file" -v) 2>&1 | tee "a2/g04b/$test_file.log"
+          done
+      - name: Fail closed on missing or skipped tests and generate evidence manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, pathlib, re
+          root=pathlib.Path("a2/g04b")
+          files=sorted(root.glob("test_*.py.log"))
+          if len(files)!=2:
+              raise SystemExit("G04-B missing required suite")
+          records=[]
+          for file in files:
+              raw=file.read_bytes()
+              log=raw.decode("utf-8")
+              counts=re.findall(r"^Ran (\d+) tests? in ",log,re.M)
+              if len(counts)!=1 or int(counts[0])<4:
+                  raise SystemExit("G04-B insufficient or ambiguous tests: "+file.name)
+              if not re.search(r"^OK$",log,re.M) or re.search(r"^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=",log,re.M):
+                  raise SystemExit("G04-B failure/skip/unclean suite: "+file.name)
+              records.append({"suite":file.name,"tests":int(counts[0]),"sha256":hashlib.sha256(raw).hexdigest()})
+          if sum(x["tests"] for x in records)<45:
+              raise SystemExit("G04-B required test coverage missing")
+          manifest={"gate":"G04-B","environment":"disposable PostgreSQL16; synthetic only",
+                    "github_sha":os.environ["GITHUB_SHA"],"github_run_id":os.environ["GITHUB_RUN_ID"],
+                    "independent_deployment_proven":False,"independent_attestation":"NONE",
+                    "eng06_production_release_approved":False,"suites":records}
+          (root/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
+          print(json.dumps(manifest,indent=2))
+          PY
+      - name: Upload G04-B evidence including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-g04b-${{ github.run_id }}
+          path: a2/g04b/
+          if-no-files-found: warn
+          retention-days: 30

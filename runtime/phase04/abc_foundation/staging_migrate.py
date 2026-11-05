@@ -46,6 +46,7 @@ FILENAMES = (
     "0031_a1_six_adapter_bridge_quarantine.sql",
     "0032_a2_g05_atomic_consent_replay_gate.sql",
     "0033_a2_g05_synthetic_certificate_revocation.sql",
+    "0034_a2_private_spiffe_atomic_ingress.sql",
 )
 
 

@@ -64,7 +64,7 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
         self.target_engine=getattr(self,"target_engine_override","ENG-05")
         if (self.source_engine,self.target_engine) not in (("ENG-04","ENG-05"),("ENG-05","ENG-06")):
             raise ValueError("unapproved_ci_engine_pair")
-        self.client_uri="spiffe://abc.internal/"+self.source_engine.lower().replace("-","")+"/"+self.consumer
+        self.client_uri="spiffe://abc.internal/staging/"+self.source_engine.lower()
         def issue(common,san,is_server):
             private=key()
             subject=x509.Name([x509.NameAttribute(NameOID.COMMON_NAME,common)])

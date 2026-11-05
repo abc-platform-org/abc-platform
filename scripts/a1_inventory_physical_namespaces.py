@@ -20,7 +20,9 @@ DDL={
 REF=re.compile(r"\babc\.(eng(?:0[1-9]|1[0-9])_[a-z0-9_]+)\b",re.I)
 def build():
     files=sorted(MIGRATIONS.glob("*.sql"))
-    assert len(files)==31 and tuple(p.name[:4] for p in files)==EXPECTED, "migration_sequence_drift"
+    numbers=tuple(p.name[:4] for p in files)
+    assert len(files)>=len(EXPECTED) and numbers[:len(EXPECTED)]==EXPECTED, "a1_migration_baseline_drift"
+    assert numbers==tuple(f"{n:04d}" for n in range(1,len(files)+1)), "migration_sequence_drift"
     entries=[]
     declared=set()
     for p in files:

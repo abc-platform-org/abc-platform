@@ -1,0 +1,138 @@
+name: ABC A2-G06 durable queue resilience and PostgreSQL restart
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'runtime/phase04/**'
+      - '.github/workflows/a2-g06-resilience.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g06-durable-resilience:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_TEST_PG_ADMIN_DSN: postgresql://postgres:abc-integration-only-password@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_DSN: postgresql://abc_app:integration-only-abc-app@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG04_LOGIN_DSN: postgresql://abc_eng04_ci_login:integration-only-eng04-review-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG06_LOGIN_DSN: postgresql://abc_eng06_ci_login:integration-only-eng06-review-login@127.0.0.1:5432/abc_phase04_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install version-pinned local dependencies
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Bootstrap synthetic scoped PostgreSQL 16 and latest schema
+        run: python runtime/phase04/tests/bootstrap_postgres.py
+      - name: G06-01 through G06-06 actual worker crash, lease fencing, retry and revocation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g06
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g06_durable_resilience.py' -v) 2>&1 | tee a2/g06/g06-resilience.log
+      - name: G06-08 verify bounded independent engine process chain and signed private review handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_three_process_v2_bounded_e2e.py' -v) 2>&1 | tee a2/g06/v2-process-chain.log
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v) 2>&1 | tee a2/g06/review-mtls-pg.log
+      - name: G06-07 prepare committed and leased work for real PostgreSQL restart
+        shell: bash
+        run: |
+          set -euo pipefail
+          python runtime/phase04/tests/g06_postgres_restart_probe.py prepare
+      - name: G06-07 restart the actual PostgreSQL16 CI service container
+        shell: bash
+        run: |
+          set -euo pipefail
+          db="$(docker ps --filter ancestor=postgres:16 --format '{{.ID}}')"
+          test -n "$db"
+          test "$(printf '%s\n' "$db" | wc -l)" -eq 1
+          docker restart --time 2 "$db"
+          echo 'real_pg16_service_restart=performed' | tee a2/g06/restart-execution.txt
+      - name: G06-07 verify committed output survives reboot, reclaim stranded lease and prevent replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          python runtime/phase04/tests/g06_postgres_restart_probe.py verify
+      - name: G06-09 strict zero-skip acceptance and immutable evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,pathlib,re
+          root=pathlib.Path('a2/g06')
+          requirements={'g06-resilience.log':12,
+                        'v2-process-chain.log':3}
+          records=[]
+          for name,expected in requirements.items():
+              raw=(root/name).read_bytes()
+              body=raw.decode('utf-8')
+              counts=re.findall(r'^Ran (\d+) tests? in ',body,re.M)
+              if len(counts)!=1 or int(counts[0])!=expected:
+                  raise SystemExit(f'{name}: expected {expected} distinct tests')
+              if (not re.search(r'^OK$',body,re.M)
+                  or re.search(r'^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=',body,re.M)):
+                  raise SystemExit(f'{name}: failed/skipped/unapproved coverage')
+              records.append({'suite':name,'count':expected,
+                              'sha256':hashlib.sha256(raw).hexdigest()})
+          name='review-mtls-pg.log'
+          raw=(root/name).read_bytes()
+          body=raw.decode('utf-8')
+          counts=re.findall(r'^Ran (\d+) tests? in ',body,re.M)
+          if len(counts)!=1 or int(counts[0])<10 or not re.search(r'^OK$',body,re.M):
+              raise SystemExit('G06 mTLS private handoff integration suite missing')
+          if re.search(r'^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=',body,re.M):
+              raise SystemExit('G06 private handoff suite failed/skipped')
+          records.append({'suite':name,'count':int(counts[0]),
+                          'sha256':hashlib.sha256(raw).hexdigest()})
+          restart=json.loads((root/'postgres-restart-state.json').read_text())
+          required=('postgres_service_restart_recovery',
+                    'committed_sha256_preserved','inflight_lease_survived_restart',
+                    'stale_pre_restart_ack_rejected',
+                    'post_restart_reclaim_and_ack_once')
+          if restart['status']!='PASS' or not all(restart.get(k) is True for k in required):
+              raise SystemExit('G06 real PostgreSQL restart or lease recovery unproven')
+          if restart['eng06_release_approved'] is not False:
+              raise SystemExit('ENG06 release must remain impossible')
+          evidence={'gate':'A2-G06','status':'PASS',
+                    'scope':'DISPOSABLE_CI_PG16_AND_LOCAL_SYNTHETIC_ENGINES',
+                    'head_sha':os.environ['GITHUB_SHA'],
+                    'run_id':os.environ['GITHUB_RUN_ID'],'suites':records,
+                    'postgres_restart_sha256':hashlib.sha256(
+                       (root/'postgres-restart-state.json').read_bytes()).hexdigest(),
+                    'managed_identities_proven':False,
+                    'managed_network_staging_proven':False,
+                    'canonical_eng03_to_eng06_runtime_continuity_proven':False,
+                    'full_g06_operational_closure_proven':False,
+                    'eng06_production_release_approved':False,
+                    'a2_overall_closed':False}
+          (root/'manifest.json').write_text(json.dumps(evidence,sort_keys=True,indent=2)+'\n')
+          print(json.dumps(evidence,sort_keys=True))
+          PY
+          sha256sum a2/g06/*.log a2/g06/postgres-restart-state.json a2/g06/manifest.json > a2/g06/SHA256SUMS
+      - name: Upload G06 evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-g06-${{ github.run_id }}
+          path: a2/g06/
+          if-no-files-found: warn
+          retention-days: 30

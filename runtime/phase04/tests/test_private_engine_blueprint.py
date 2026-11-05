@@ -1,5 +1,6 @@
 """Static no-deploy three-engine private topology contract."""
 import pathlib
+import json
 import unittest
 import yaml
 
@@ -8,6 +9,13 @@ class PrivateEngineBlueprintTests(unittest.TestCase):
     def test_independent_private_services_and_disabled_automatic_rollout(self):
         path=pathlib.Path(__file__).resolve().parents[3] / "infra" / "render" / "private_engine_services.staging.template.yaml"
         body=yaml.safe_load(path.read_text())
+        # Owner's deployment and billing hold is a separate mandatory gate;
+        # a private template is not approval to provision any service.
+        decision=json.loads((pathlib.Path(__file__).resolve().parents[3] /
+                             "governance" /
+                             "phase04_infrastructure_selection.v1.json").read_text())
+        self.assertIs(decision["deployment_authorized"],False)
+        self.assertIs(decision["billing_authorized"],False)
         services=body["services"]
         self.assertEqual(len(services),3)
         self.assertEqual(len({s["name"] for s in services}),3)

@@ -59,7 +59,11 @@ def inspect(trust,infra,registry,ratification):
          "ratification_ref")
     fail(trust["infrastructure_selection"]==str(INFRA.relative_to(ROOT)),
          "infrastructure_ref")
-    fail(trust["source_adr"]==["ADR-ENG-003","ADR-ENG-004"], "adr_refs")
+    fail(trust["source_adr"]==["ADR-ENG-003","ADR-ENG-004","ADR-ENG-005"], "adr_refs")
+    fail(trust.get("identity_adr")=="ADR-ENG-005", "identity_adr_is_distinct_from_004_adapter")
+    fail(trust.get("identity_uri_normalization")=="UNRESOLVED_EXTERNAL_IDP_REVIEW_REQUIRED", "no_unverified_spiffe_mapping")
+    fail(trust.get("external_managed_replay_adapter_approved") is False, "no_fake_distributed_replay")
+    fail(trust.get("adr_renumbering_independently_ratified") is False, "no_fabricated_adr_ratification")
     fail(trust["action_on_missing_evidence"]=="DENY_AND_DO_NOT_DEPLOY",
          "operator_denial")
     fail(trust["quality_gate_policy"]=="ALL_G01_G10_OPEN", "false_quality_pass")

@@ -125,12 +125,12 @@ def make_pki(root):
         clients[ident] = issue(
             root / "client" / ident, "abc-ci-caller-" + ident,
             x509.UniformResourceIdentifier(
-                "spiffe://abc.internal/eng" + ident + "/" + CONSUMER
+                "spiffe://abc.internal/staging/eng-" + ident
             ), False,
         )
     issue(
         root / "client" / "bad", "abc-ci-untrusted-identity",
-        x509.UniformResourceIdentifier("spiffe://abc.internal/eng06/" + CONSUMER),
+        x509.UniformResourceIdentifier("spiffe://abc.internal/staging/eng-06"),
         False,
     )
     for ident in TARGETS:
@@ -151,7 +151,7 @@ def signed_token(signer, clients, caller, target, *, audience=None):
     moment = int(datetime.now(timezone.utc).timestamp())
     claims = {
         "iss": ISSUER, "aud": audience or "abc-engine:ENG-" + target,
-        "sub": "spiffe://abc.internal/eng" + caller + "/" + CONSUMER,
+        "sub": "spiffe://abc.internal/staging/eng-" + caller,
         "engine_id": "ENG-" + caller, "consumer_id": CONSUMER,
         "token_use": "service", "iat": moment, "nbf": moment, "exp": moment + 60,
         "jti": str(uuid.uuid4()), "cnf": {"x5t#S256": thumb},

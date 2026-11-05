@@ -102,6 +102,26 @@ jobs:
           grep -Eq '^OK$' a2/g04c/private-engine.log
           if grep -Eq 'skipped=|FAILED |^ERROR:|^FAIL:' a2/g04c/private-engine.log; then exit 1; fi
           sha256sum a2/g04c/private-engine.log > a2/g04c/sha256.txt
+      - name: G04-C isolated container network fault and recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04c
+          docker network create abc-g04c-private
+          docker network create abc-g04c-outside
+          cleanup() { docker rm -f abc-g04c-04 abc-g04c-05 abc-g04c-06 abc-g04c-outsider >/dev/null 2>&1 || true; docker network rm abc-g04c-private abc-g04c-outside >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          for engine in 04 05 06; do
+            docker run -d --name "abc-g04c-$engine" --network abc-g04c-private --network-alias "engine-$engine" python:3.12-alpine python -u -m http.server 8765 --bind 0.0.0.0 >/dev/null
+          done
+          docker run -d --name abc-g04c-outsider --network abc-g04c-outside python:3.12-alpine sleep 120 >/dev/null
+          docker exec abc-g04c-04 python -c "import urllib.request; assert urllib.request.urlopen('http://engine-05:8765',timeout=5).status==200"
+          docker exec abc-g04c-outsider python -c "import socket; assert socket.getaddrinfo('engine-05',8765)" && exit 1 || true
+          docker kill abc-g04c-05 >/dev/null
+          docker exec abc-g04c-04 python -c "import urllib.request; assert urllib.request.urlopen('http://engine-06:8765',timeout=5).status==200"
+          docker start abc-g04c-05 >/dev/null
+          docker exec abc-g04c-04 python -c "import urllib.request; assert urllib.request.urlopen('http://engine-05:8765',timeout=5).status==200"
+          printf 'container_network_isolation=PASS\npeer_failure_containment=PASS\npeer_restart=PASS\nmanaged_identity=NOT_TESTED\nreal_engine_deployment=NOT_TESTED\n' > a2/g04c/container-network.txt
       - name: Upload G04-C local-only evidence
         if: always()
         uses: actions/upload-artifact@v4

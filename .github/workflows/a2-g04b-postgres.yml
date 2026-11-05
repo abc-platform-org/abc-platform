@@ -115,8 +115,8 @@ jobs:
             docker run -d --name "abc-g04c-$engine" --network abc-g04c-private --network-alias "engine-$engine" python:3.12-alpine python -u -m http.server 8765 --bind 0.0.0.0 >/dev/null
           done
           docker run -d --name abc-g04c-outsider --network abc-g04c-outside python:3.12-alpine sleep 120 >/dev/null
-          docker exec abc-g04c-04 python -c "import urllib.request; assert urllib.request.urlopen('http://engine-05:8765',timeout=5).status==200"
-          docker exec abc-g04c-outsider python -c "import socket; assert socket.getaddrinfo('engine-05',8765)" && exit 1 || true
+          docker exec abc-g04c-04 python -c "import urllib.request,time; [(time.sleep(1) if not _ else None) for _ in []]; assert urllib.request.urlopen('http://engine-05:8765',timeout=5).status==200"
+          docker exec abc-g04c-outsider python -c "import socket; socket.getaddrinfo('engine-05',8765)" && { echo 'network isolation violated'; exit 1; } || echo 'outside DNS blocked'
           docker kill abc-g04c-05 >/dev/null
           docker exec abc-g04c-04 python -c "import urllib.request; assert urllib.request.urlopen('http://engine-06:8765',timeout=5).status==200"
           docker start abc-g04c-05 >/dev/null

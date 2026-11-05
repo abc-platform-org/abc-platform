@@ -185,27 +185,16 @@ jobs:
           docker start abc-real-05 >/dev/null
           docker exec abc-real-05 python -c 'import abc_foundation.isolated_engine_service as e; assert "ENG-05" in e.ENGINES'
           printf 'real_engine_images=PASS\ncontainer_crash_containment=PASS\ncontainer_restart=PASS\nprivate_dns_isolation=PASS\nintercontainer_mtls=NOT_PROVEN\nmanaged_identity=NOT_PROVEN\n' > a2/g04c/real-engine-lifecycle.txt
-      - name: G04-C real mTLS protocol regression inside production engine image
+      - name: G04-C TLS protocol suite in real engine container
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p a2/g04c
-          docker create --name abc-g04c-mtls-image --network none abc-g04c-engine:ci >/dev/null
-          docker cp runtime/phase04/tests/test_private_engine_mtls.py abc-g04c-mtls-image:/srv/abc/test_private_engine_mtls.py
-          docker rm abc-g04c-mtls-image >/dev/null
           docker run --rm --network none -v "$PWD/runtime/phase04/tests/test_private_engine_mtls.py:/srv/abc/test_private_engine_mtls.py:ro" abc-g04c-engine:ci python -m unittest -v test_private_engine_mtls 2>&1 | tee a2/g04c/engine-image-mtls.log
           grep -Eq '^Ran [1-9][0-9]* tests in' a2/g04c/engine-image-mtls.log
-          grep -Eq '^OK
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: a2-g04c-local-${{ github.run_id }}
-          path: a2/g04c/
-          if-no-files-found: warn
-          retention-days: 30
- a2/g04c/engine-image-mtls.log
+          grep -Eq '^OK$' a2/g04c/engine-image-mtls.log
           if grep -Eq '^FAILED|^ERROR:|^FAIL:|skipped=' a2/g04c/engine-image-mtls.log; then exit 1; fi
-          printf 'tls13_mtls_jwt_real_engine_image=TESTED\nintercontainer_mtls=NOT_PROVEN\nmanaged_identity=NOT_PROVEN\n' > a2/g04c/mTLS-scope.txt
+          printf 'tls13_mtls_jwt_real_engine_image=TESTED\\nintercontainer_mtls=NOT_PROVEN\\nmanaged_identity=NOT_PROVEN\\n' > a2/g04c/mTLS-scope.txt
           sha256sum a2/g04c/engine-image-mtls.log > a2/g04c/engine-image-mtls.sha256
       - name: Upload G04-C local-only evidence
         if: always()

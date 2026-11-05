@@ -61,7 +61,15 @@ def inspect(trust,infra,registry,ratification):
          "infrastructure_ref")
     fail(trust["source_adr"]==["ADR-ENG-003","ADR-ENG-004","ADR-ENG-005"], "adr_refs")
     fail(trust.get("identity_adr")=="ADR-ENG-005", "identity_adr_is_distinct_from_004_adapter")
-    fail(trust.get("identity_uri_normalization")=="UNRESOLVED_EXTERNAL_IDP_REVIEW_REQUIRED", "no_unverified_spiffe_mapping")
+    fail(trust.get("identity_uri_normalization")=="CANONICAL_PER_ENGINE_STAGING_URI_CI_VERIFIED_REVIEW_PENDING", "spiffe_ci_only_pending_approval")
+    fail(trust.get("canonical_spiffe_uri_template")=="spiffe://abc.internal/staging/eng-XX"
+         and trust.get("consumer_id_is_distinct_jwt_scope") is True,
+         "certificate_subject_must_be_engine_only")
+    fail(trust.get("private_ingress_atomic_pg_transaction")=="LOCAL_DISPOSABLE_CI_ONLY"
+         and trust.get("private_ingress_migration")==
+           "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+         and trust.get("managed_postgres_physical_cert_binding_proven") is False,
+         "no_false_hosted_pg_identity")
     fail(trust.get("external_managed_replay_adapter_approved") is False, "no_fake_distributed_replay")
     fail(trust.get("adr_renumbering_independently_ratified") is False, "no_fabricated_adr_ratification")
     fail(trust["action_on_missing_evidence"]=="DENY_AND_DO_NOT_DEPLOY",

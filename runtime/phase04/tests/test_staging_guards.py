@@ -28,6 +28,7 @@ class StagingGuardTests(unittest.TestCase):
         self.assertEqual(plan[30][0],"0031_a1_six_adapter_bridge_quarantine.sql")
         self.assertEqual(plan[31][0],"0032_a2_g05_atomic_consent_replay_gate.sql")
         self.assertEqual(plan[32][0],"0033_a2_g05_synthetic_certificate_revocation.sql")
+        self.assertEqual(plan[33][0],"0034_a2_private_spiffe_atomic_ingress.sql")
         self.assertTrue(all(len(digest)==64 for _,digest in plan))
 
     def test_staging_dsn_rejects_admin_or_missing_tls(self):

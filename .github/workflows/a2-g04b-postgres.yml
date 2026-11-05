@@ -91,3 +91,22 @@ jobs:
           path: a2/g04b/
           if-no-files-found: warn
           retention-days: 30
+
+      - name: G04-C local TLS and JWT negative security tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04c
+          (cd runtime/phase04 && python -m unittest discover -s tests -p test_private_engine_mtls.py -v) 2>&1 | tee a2/g04c/private-engine.log
+          grep -Eq '^Ran [1-9][0-9]* tests in' a2/g04c/private-engine.log
+          grep -Eq '^OK$' a2/g04c/private-engine.log
+          if grep -Eq 'skipped=|FAILED |^ERROR:|^FAIL:' a2/g04c/private-engine.log; then exit 1; fi
+          sha256sum a2/g04c/private-engine.log > a2/g04c/sha256.txt
+      - name: Upload G04-C local-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-g04c-local-${{ github.run_id }}
+          path: a2/g04c/
+          if-no-files-found: warn
+          retention-days: 30

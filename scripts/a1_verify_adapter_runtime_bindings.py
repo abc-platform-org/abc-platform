@@ -14,7 +14,7 @@ RUNTIME=ROOT/"runtime/phase04/abc_foundation"
 def build():
     registry=json.loads(REGISTRY.read_text())
     sql_files=sorted(MIGRATIONS.glob("*.sql"))
-    assert len(sql_files)==31
+    # Original A1 baseline is immutable: future numbered migrations are append-only.\n    # Detect gaps, duplicate numbers or historical renumbering without pinning\n    # the whole project to an obsolete exact migration count.\n    numbers=[int(f.name.split('_',1)[0]) for f in sql_files]\n    assert len(sql_files)>=31 and numbers==list(range(1,len(sql_files)+1))
     sources=[*sql_files,*sorted(RUNTIME.rglob("*.py"))]
     records=[]
     for adapter in registry["adapters"]:

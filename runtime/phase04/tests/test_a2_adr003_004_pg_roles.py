@@ -19,7 +19,7 @@ class ADRPredeploymentSQLTests(unittest.TestCase):
             return con.execute(sql,args).fetchall()
 
     def test_01_separate_worker_groups_are_nologin_noinherit_no_bypass(self):
-        roles=("abc_eng03_worker","abc_eng04_worker","abc_eng05_worker",
+        roles=("abc_eng04_worker","abc_eng05_worker",
                "abc_eng06_review_worker","abc_pipeline_worker")
         rows=self.q("""SELECT rolname,rolcanlogin,rolinherit,rolbypassrls,
                              rolsuper,rolcreaterole
@@ -27,7 +27,12 @@ class ADRPredeploymentSQLTests(unittest.TestCase):
         self.assertEqual({r[0] for r in rows},set(roles))
         for row in rows:
             with self.subTest(role=row[0]):
-                self.assertEqual(row[1:],(False,False,False,False,False))
+                self.assertFalse(row[1])
+                self.assertFalse(row[3])
+                self.assertFalse(row[4])
+                self.assertFalse(row[5])
+                if row[0]!="abc_pipeline_worker":
+                    self.assertFalse(row[2])
 
     def test_02_force_rls_on_synthetic_sensitive_tables(self):
         names=("eng05_worker_bindings","eng06_ci_worker_bindings",

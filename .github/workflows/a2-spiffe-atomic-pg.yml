@@ -11,6 +11,10 @@ on:
       - 'runtime/phase04/tests/test_a2_private_spiffe_pg_multinstance.py'
       - 'runtime/phase04/tests/bootstrap_postgres.py'
       - 'governance/abc_w1_workload_trust_boundaries.v0.review.json'
+      - 'governance/ABC_A2_ADR003_004_005_PREDEPLOYMENT_SECURITY_REVIEW_PACKET_20261105.md'
+      - 'docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md'
+      - 'infra/render/private_engine_services.staging.template.yaml'
+      - 'runtime/phase04/tests/test_private_engine_blueprint.py'
       - '.github/workflows/a2-spiffe-atomic-pg.yml'
   workflow_dispatch:
 permissions:

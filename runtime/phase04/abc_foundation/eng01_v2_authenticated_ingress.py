@@ -14,12 +14,17 @@ from .store import DomainError
 
 class ScopedV2Ingress:
     def __init__(self,*,identity_verifier,scope_authority,replay_ledger,
-                 caller_engine,consumer_id):
-        for obj,method in ((identity_verifier,"verify"),
-                           (scope_authority,"verify"),
-                           (replay_ledger,"claim")):
-            if not callable(getattr(obj,method,None)):
-                raise ValueError("external_identity_scope_replay_authority_required")
+                 caller_engine,consumer_id,transactional_admission=None):
+        # Opt-in atomic PostgreSQL G05 scope/consent/replay check; legacy
+        # v2 CI fixtures remain unchanged, never a fallback from G05.
+        if not callable(getattr(identity_verifier,"verify",None)):
+            raise ValueError("external_identity_scope_replay_authority_required")
+        if transactional_admission is None:
+            for obj,method in ((scope_authority,"verify"),(replay_ledger,"claim")):
+                if not callable(getattr(obj,method,None)):
+                    raise ValueError("external_identity_scope_replay_authority_required")
+        elif not callable(getattr(transactional_admission,"admit_and_execute",None)):
+            raise ValueError("g05_atomic_admission_authority_required")
         if (caller_engine not in ("ENG-01","ENG-03","ENG-04","ENG-05")
             or not isinstance(consumer_id,str) or not 3<=len(consumer_id)<=96):
             raise ValueError("approved_private_caller_binding_required")
@@ -28,6 +33,7 @@ class ScopedV2Ingress:
         self.replay=replay_ledger
         self.caller=caller_engine
         self.consumer=consumer_id
+        self.transactional_admission=transactional_admission
 
     def submit(self,*,message,token,verified_peer_certificate_der,
                knowledge_policy_gate=None,evidence_gate=None):
@@ -57,6 +63,16 @@ class ScopedV2Ingress:
             or not isinstance(identity.get("expires_at"),datetime)
             or identity["expires_at"].tzinfo is None):
             raise DomainError(401,"untrusted_workload_proof")
+        if self.transactional_admission is not None:
+            # Response is returned only after the protected DB transaction
+            # commits; identity, consent, scope, and JTI are checked in one
+            # fail-closed execution window, without a legacy v1 fallback.
+            return self.transactional_admission.admit_and_execute(
+                message=message,identity=identity,caller_engine=self.caller,
+                execute_fn=lambda: execute(
+                    message,engine=target,
+                    knowledge_policy_gate=knowledge_policy_gate,
+                    evidence_gate=evidence_gate))
         authorized=self.scope.verify(
             tenant_id=message["tenant_id"],branch_id=message["branch_id"],
             session_id=message["session_id"],

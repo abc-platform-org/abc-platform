@@ -15,10 +15,13 @@ BGW="https://www.bgw-online.de/resource/blob/20628/29cbf999ca5c2d91e741fa6964c6c
 
 class SchemaLineageTests(unittest.TestCase):
     def test_0029_canonical_digest_preserved_and_0030_additive(self):
-        self.assertEqual(FILENAMES[-3:-1],(
+        self.assertEqual(FILENAMES[28:30],(
             "0029_eng05_official_pdf_byte_receipts.sql",
             "0030_eng05_trgs530_byte_observations.sql"))
-        self.assertEqual(len(planned_migrations()),31)
+        self.assertEqual(len(planned_migrations()),len(FILENAMES))
+        self.assertEqual(FILENAMES[30],"0031_a1_six_adapter_bridge_quarantine.sql")
+        self.assertEqual(FILENAMES[31:],("0032_a2_g05_atomic_consent_replay_gate.sql",
+                                         "0033_a2_g05_synthetic_certificate_revocation.sql"))
         self.assertEqual(RECEIPT["raw_pdf_bytes_sha256"],
           "356fc7d7ef4d4dc56ae687c72dfbf00d156b65ae494553f15f0060d7b46b5628")
         self.assertFalse(RECEIPT["acceptance"]["eng05_to_eng06_dispatch_authorized"])

@@ -7,7 +7,8 @@
   "infrastructure_selection": "governance/phase04_infrastructure_selection.v1.json",
   "source_adr": [
     "ADR-ENG-003",
-    "ADR-ENG-004"
+    "ADR-ENG-004",
+    "ADR-ENG-005"
   ],
   "scope": "STAGING_SYNTHETIC_ONLY",
   "private_network_attested": false,
@@ -400,5 +401,9 @@
     }
   ],
   "quality_gate_policy": "ALL_G01_G10_OPEN",
-  "action_on_missing_evidence": "DENY_AND_DO_NOT_DEPLOY"
+  "action_on_missing_evidence": "DENY_AND_DO_NOT_DEPLOY",
+  "identity_adr": "ADR-ENG-005",
+  "identity_uri_normalization": "UNRESOLVED_EXTERNAL_IDP_REVIEW_REQUIRED",
+  "external_managed_replay_adapter_approved": false,
+  "adr_renumbering_independently_ratified": false
 }

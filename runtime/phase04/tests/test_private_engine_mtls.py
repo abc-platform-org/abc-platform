@@ -191,6 +191,11 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
         return jwt.encode(original,self.signer,algorithm="RS256",
                           headers={"kid":"ci-rotation-1",**(headers or {})})
 
+    def test_legacy_per_consumer_spiffe_subject_cannot_impersonate_engine(self):
+        old_subject="spiffe://abc.internal/"+self.source_engine.lower().replace("-","")+"/"+self.consumer
+        forged=self._reissue_with_claims({"sub":old_subject})
+        self.assertEqual(self.call(token=forged)["error"],"engine_request_rejected")
+
     def test_deny_multi_audience_token_even_if_expected_audience_included(self):
         altered=self._reissue_with_claims(
             {"aud":["abc-engine:"+self.target_engine,"abc-engine:ENG-19"]})

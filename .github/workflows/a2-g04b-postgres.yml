@@ -115,12 +115,25 @@ jobs:
             docker run -d --name "abc-g04c-$engine" --network abc-g04c-private --network-alias "engine-$engine" python:3.12-alpine python -u -m http.server 8765 --bind 0.0.0.0 >/dev/null
           done
           docker run -d --name abc-g04c-outsider --network abc-g04c-outside python:3.12-alpine sleep 120 >/dev/null
-          docker exec abc-g04c-04 python -c "import urllib.request,time; [(time.sleep(1) if not _ else None) for _ in []]; assert urllib.request.urlopen('http://engine-05:8765',timeout=5).status==200"
+          # Container start is asynchronous: require HTTP readiness, not just a running PID.
+          wait_http() {
+            local from="$1" target="$2"
+            for attempt in $(seq 1 40); do
+              if docker exec "$from" python -c "import urllib.request; assert urllib.request.urlopen('http://$target:8765',timeout=2).status==200" >/dev/null 2>&1; then
+                return 0
+              fi
+              sleep 0.25
+            done
+            echo "G04-C HTTP readiness failed for $target from $from" >&2
+            docker logs "abc-g04c-${target#engine-}" 2>&1 | tail -40 >&2 || true
+            return 1
+          }
+          wait_http abc-g04c-04 engine-05
           docker exec abc-g04c-outsider python -c "import socket; socket.getaddrinfo('engine-05',8765)" && { echo 'network isolation violated'; exit 1; } || echo 'outside DNS blocked'
           docker kill abc-g04c-05 >/dev/null
-          docker exec abc-g04c-04 python -c "import urllib.request; assert urllib.request.urlopen('http://engine-06:8765',timeout=5).status==200"
+          wait_http abc-g04c-04 engine-06
           docker start abc-g04c-05 >/dev/null
-          docker exec abc-g04c-04 python -c "import urllib.request; assert urllib.request.urlopen('http://engine-05:8765',timeout=5).status==200"
+          wait_http abc-g04c-04 engine-05
           printf 'container_network_isolation=PASS\npeer_failure_containment=PASS\npeer_restart=PASS\nmanaged_identity=NOT_TESTED\nreal_engine_deployment=NOT_TESTED\n' > a2/g04c/container-network.txt
       - name: G04-C actual engine code in separate network-disabled containers
         shell: bash
@@ -185,6 +198,29 @@ jobs:
           docker start abc-real-05 >/dev/null
           docker exec abc-real-05 python -c 'import abc_foundation.isolated_engine_service as e; assert "ENG-05" in e.ENGINES'
           printf 'real_engine_images=PASS\ncontainer_crash_containment=PASS\ncontainer_restart=PASS\nprivate_dns_isolation=PASS\nintercontainer_mtls=NOT_PROVEN\nmanaged_identity=NOT_PROVEN\n' > a2/g04c/real-engine-lifecycle.txt
+      - name: G04-C REAL inter-container mTLS JWT network isolation and fault recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          python runtime/phase04/tests/verify_g04c_container_mtls.py
+          python - <<'PY'
+          import json,pathlib,os
+          p=pathlib.Path("a2/g04c/intercontainer-mtls-evidence.json")
+          assert p.is_file(), "missing inter-container mTLS evidence"
+          e=json.loads(p.read_text())
+          required=("three_real_server_containers","private_container_networks",
+             "eng03_to_eng04_mtls","eng04_to_eng05_mtls","eng05_to_eng06_mtls",
+             "cert_bound_jwt_replay_audience_and_absent_auth_denied",
+             "client_certificate_required","untrusted_network_dns_and_ip_denied",
+             "peer_network_disconnect_reconnect_recovery",
+             "peer_crash_containment_and_restart","zero_published_engine_ports")
+          assert e["status"]=="PASS" and all(e.get(k) is True for k in required)
+          assert e["git_sha"]==os.environ["GITHUB_SHA"]
+          assert e["managed_identity_proven"] is False
+          assert e["independent_managed_deployment_proven"] is False
+          assert e["eng06_production_release_approved"] is False
+          PY
+          sha256sum a2/g04c/intercontainer-mtls-evidence.json > a2/g04c/intercontainer-mtls-evidence.sha256
       - name: G04-C TLS protocol suite in real engine container
         shell: bash
         run: |

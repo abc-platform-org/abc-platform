@@ -237,14 +237,14 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
             with self.subTest(change=change),self.assertRaises(ValueError):
                 configure_private_engine_service({**config,**change})
 
-    def test_private_staging_service_must_be_distinct_and_externally_provisioned(self):
+    def test_private_staging_requires_canonical_edges_and_durable_replay_provider(self):
         from unittest.mock import patch,Mock
         env={"ABC_ENV":"STAGING_PRIVATE",
              "ABC_NETWORK_BOUNDARY":"RENDER_PRIVATE_SERVICE",
              "ABC_RENDER_SERVICE_KIND":"PRIVATE",
              "ABC_STAGING_PURPOSE":"SYNTHETIC_NO_CLIENT_DATA",
              "ABC_ENGINE_SYNTHETIC_ONLY":"true",
-             "ABC_ENGINE_ID":"ENG-05","ABC_CALLER_ENGINE_ID":"ENG-03",
+             "ABC_ENGINE_ID":"ENG-05","ABC_CALLER_ENGINE_ID":"ENG-04",
              "ABC_ENGINE_CONSUMER_ID":"ci-consumer-01",
              "ABC_ENGINE_PORT":"11005",
              "ABC_TLS_CERT_FILE":"/run/secrets/engine.crt",
@@ -252,17 +252,27 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
              "ABC_TLS_CA_FILE":"/run/secrets/trust.crt",
              "ABC_WORKLOAD_ISSUER":"https://issuer.abc-ci.example",
              "ABC_WORKLOAD_JWKS_URL":"https://issuer.abc-ci.example/jwks"}
+        reserver=lambda identity,message: True  # disposable test stub only
         with patch("abc_foundation.private_engine_service_server.private_engine_server",
                    return_value=Mock()) as builder:
-            configure_private_engine_service(env)
+            with self.assertRaisesRegex(ValueError,"durable_replay"):
+                configure_private_engine_service(env)
+            builder.assert_not_called()
+            configure_private_engine_service(env,
+                 distributed_replay_reserver=reserver)
             self.assertEqual(builder.call_args.kwargs["host"],"0.0.0.0")
             self.assertTrue(builder.call_args.kwargs["managed_private"])
+            self.assertIs(builder.call_args.kwargs["distributed_replay_reserver"],
+                          reserver)
         for tamper in ({"ABC_RENDER_SERVICE_KIND":"WEB"},
                        {"ABC_NETWORK_BOUNDARY":"PUBLIC_HTTP"},
                        {"ABC_TLS_KEY_FILE":""},
-                       {"ABC_ENV":"PRODUCTION"}):
+                       {"ABC_ENV":"PRODUCTION"},
+                       {"ABC_CALLER_ENGINE_ID":"ENG-03"},
+                       {"ABC_ENGINE_ID":"ENG-04"}):
             with self.subTest(tamper=tamper),self.assertRaises(ValueError):
-                configure_private_engine_service({**env,**tamper})
+                configure_private_engine_service({**env,**tamper},
+                     distributed_replay_reserver=reserver)
 
     def test_managed_private_client_rejects_public_and_unpinned_dns(self):
         for host in ("public.example.com","abc-engine.onrender.com",

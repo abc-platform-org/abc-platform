@@ -403,5 +403,11 @@ class G05TransactionalWorkloadTests(unittest.TestCase):
             )
 
 
+def load_tests(loader, _standard_tests, _pattern):
+    # Prevent imported reusable TLS fixture TestCases from silently inflating
+    # the A2-G05 acceptance suite. Exactly the 14 G05-specific checks run.
+    return loader.loadTestsFromTestCase(G05TransactionalWorkloadTests)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,116 @@
+name: ABC A2 canonical SPIFFE and atomic multi-process PostgreSQL ingress (CI only)
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'runtime/phase04/abc_foundation/service_mesh_identity.py'
+      - 'runtime/phase04/abc_foundation/private_pg_atomic_admission.py'
+      - 'runtime/phase04/abc_foundation/private_engine_transport.py'
+      - 'runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql'
+      - 'runtime/phase04/tests/test_a2_private_spiffe_pg_multinstance.py'
+      - 'runtime/phase04/tests/bootstrap_postgres.py'
+      - 'governance/abc_w1_workload_trust_boundaries.v0.review.json'
+      - '.github/workflows/a2-spiffe-atomic-pg.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-atomic-multi-process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_TEST_PG_ADMIN_DSN: postgresql://postgres:abc-integration-only-password@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_DSN: postgresql://abc_app:integration-only-abc-app@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_WORKER_DSN: postgresql://abc_worker:integration-only-abc-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ORCHESTRATOR_DSN: postgresql://abc_orchestrator:integration-only-abc-orchestrator@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ANSWER_WORKER_DSN: postgresql://abc_answer_worker:integration-only-abc-answer-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG03_DSN: postgresql://abc_eng03_worker:integration-only-eng03-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_PIPELINE_DSN: postgresql://abc_pipeline_worker:integration-only-pipeline-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG04_LOGIN_DSN: postgresql://abc_eng04_ci_login:integration-only-eng04-review-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG06_LOGIN_DSN: postgresql://abc_eng06_ci_login:integration-only-eng06-review-login@127.0.0.1:5432/abc_phase04_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned local test dependencies
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Bootstrap disposable physical SQL logins and all migrations 0001-0034
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/spiffe-atomic
+          python runtime/phase04/tests/bootstrap_postgres.py 2>&1 | tee a2/spiffe-atomic/bootstrap.log
+          grep -q '0034_a2_private_spiffe_atomic_ingress.sql' a2/spiffe-atomic/bootstrap.log
+      - name: Run exact 16 negative and racing real PostgreSQL/TLS multi-process tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_private_spiffe_pg_multinstance.py' -v) \
+             2>&1 | tee a2/spiffe-atomic/multi-instance.log
+      - name: Additional canonical identity real TLS regression (18 cases)
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_private_engine_mtls.py' -v) \
+              2>&1 | tee a2/spiffe-atomic/private-mtls.log
+      - name: Verify absence of omitted/failed tests, SHA provenance and release hold
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,pathlib,re
+          d=pathlib.Path("a2/spiffe-atomic")
+          records=[]
+          for filename,count in (("multi-instance.log",16),("private-mtls.log",18)):
+              p=d/filename
+              data=p.read_bytes()
+              log=data.decode()
+              observed=re.findall(r"^Ran (\d+) tests? in ",log,re.M)
+              assert observed==[str(count)],(filename,observed)
+              assert re.search(r"^OK$",log,re.M)
+              assert not re.search(r"^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=",log,re.M)
+              records.append({"log":filename,"tests":count,
+                              "sha256":hashlib.sha256(data).hexdigest()})
+          manifest={
+              "gate":"A2_CANONICAL_SPIFFE_ATOMIC_POSTGRES_MULTI_INSTANCE_CI",
+              "head_sha":os.environ["GITHUB_SHA"],
+              "github_run_id":os.environ["GITHUB_RUN_ID"],
+              "tested_suites":records,"tested_count":34,
+              "independent_tls_listeners":3,
+              "independent_processes":8,
+              "postgres_service":"DISPOSABLE_CI_POSTGRES16",
+              "physical_managed_db_clientcert_proven":False,
+              "managed_identity_issued":False,
+              "external_staging_deployed":False,
+              "owner_billing_or_deployment_authorization":False,
+              "independent_security_sre_professional_signoff":False,
+              "eng06_production_release_approved":False,
+              "a2_operational_closed":False}
+          (d/"manifest.json").write_text(json.dumps(manifest,sort_keys=True,indent=2)+"\n")
+          print(json.dumps(manifest,sort_keys=True))
+          PY
+          sha256sum a2/spiffe-atomic/bootstrap.log a2/spiffe-atomic/multi-instance.log a2/spiffe-atomic/private-mtls.log a2/spiffe-atomic/manifest.json > a2/spiffe-atomic/SHA256SUMS
+      - name: Upload strict synthetic-only security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-spiffe-atomic-${{ github.run_id }}
+          path: a2/spiffe-atomic/
+          retention-days: 30
+          if-no-files-found: warn

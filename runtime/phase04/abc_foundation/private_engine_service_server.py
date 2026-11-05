@@ -18,8 +18,14 @@ def configure_private_engine_service(env=None, *, distributed_replay_reserver=No
            and env.get("ABC_NETWORK_BOUNDARY")=="RENDER_PRIVATE_SERVICE"
            and env.get("ABC_RENDER_SERVICE_KIND")=="PRIVATE"
            and env.get("ABC_STAGING_PURPOSE")=="SYNTHETIC_NO_CLIENT_DATA")
-    if (not (local or managed_private)
-        or env.get("ABC_ENGINE_SYNTHETIC_ONLY")!="true"):
+    # Owner has prohibited independent staging provisioning until cost/provider
+    # approval. A fake callback, private DNS string or CI root certificate
+    # cannot silently turn the test harness into an operational service.
+    # Replace this hard hold ONLY in a separately reviewed release change with
+    # externally attested Security/SRE and physical PostgreSQL client identity.
+    if managed_private:
+        raise ValueError("staging_owner_cost_and_external_identity_hold")
+    if (not local or env.get("ABC_ENGINE_SYNTHETIC_ONLY")!="true"):
         raise ValueError("private_synthetic_mtls_only")
     engine=env.get("ABC_ENGINE_ID")
     caller=env.get("ABC_CALLER_ENGINE_ID")

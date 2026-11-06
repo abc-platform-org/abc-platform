@@ -125,7 +125,7 @@ class FiveIndependentProcessSyntheticChain(unittest.TestCase):
         p.start()
         try:
             result=queue.get(timeout=14)
-            p.join(timeout=3)
+            p.join(timeout=getattr(self,"exit_timeout_seconds",3))
             if p.is_alive():
                 p.terminate()
                 p.join(timeout=3)

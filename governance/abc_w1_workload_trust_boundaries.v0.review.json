@@ -25,7 +25,7 @@
   "credential_requirements": {
     "spec": "SPIFFE_OR_EQUIVALENT_MANAGED_WORKLOAD_ATTESTATION",
     "target_tls_version": "TLSv1.3",
-    "maximum_proposed_assertion_ttl_seconds": 900,
+    "maximum_proposed_assertion_ttl_seconds": 120,
     "require_unique_principal_per_engine": true,
     "forbid_group_role_login": true,
     "require_peer_certificate_binding": true,

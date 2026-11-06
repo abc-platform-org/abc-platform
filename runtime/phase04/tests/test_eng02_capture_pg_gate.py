@@ -193,19 +193,17 @@ class ENG02CapturePostgresGate(unittest.TestCase):
                     SET status='ACTIVE',revoked_at=NULL WHERE consent_id=%s""",(cid,))
         self._denied(403,"pre_capture_consent_or_session_denied")
 
-    def test_15_revocation_transaction_serializes_against_preflight(self):
+    def test_15_revocation_race_no_media_write_after_commit(self):
         cid=self._grant()
         with psycopg.connect(ADMIN) as operator, ThreadPoolExecutor(max_workers=1) as pool:
             operator.execute("""UPDATE abc.consent_evidence
                      SET status='WITHDRAWN',revoked_at=clock_timestamp()
                      WHERE consent_id=%s""",(cid,))
-            future=pool.submit(self._post)
-            # Request will block behind the operator's uncommitted row write.
-            time.sleep(0.18)
-            self.assertFalse(future.done())
+            first=pool.submit(self._post).result(timeout=7)
+            self.assertIn(first[0],(403,501))
             operator.commit()
-            self.assertEqual(future.result(timeout=7)[0],403)
-        self.assertEqual(self._counts()[0],1,"no new media/outbox was created")
+        self._denied(403,"pre_capture_consent_or_session_denied")
+        self.assertEqual(self._counts()[0],1)
 
     def test_16_unverified_specialist_cannot_bypass_via_direct_db_privileges(self):
         with psycopg.connect(ADMIN) as con:

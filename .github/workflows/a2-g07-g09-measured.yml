@@ -1,0 +1,108 @@
+name: ABC A2 G07 performance and G09 recovery measured synthetic CI (no deploy)
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json'
+      - 'runtime/phase04/tests/a2_g07_five_process_benchmark.py'
+      - 'runtime/phase04/tests/test_a2_g09_recovery.py'
+      - 'runtime/phase04/tests/test_eng02_eng06_five_process_chain.py'
+      - '.github/workflows/a2-g07-g09-measured.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g07-g09-measured-local-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_A2_G07_REPORT: /tmp/abc-a2-g07-performance.json
+      ABC_A2_G09_REPORT: /tmp/abc-a2-g09-recovery.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install version-pinned local-only engine dependencies
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Validate proposed, unsigned G07/G09 review policy and no deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g07g09
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json")
+          x=json.loads(p.read_text())
+          assert x["schema_version"]=="a2.g07-g09.synthetic.v1"
+          assert x["scope"]=="LOCAL_INTEGRATION_ONLY"
+          assert x["decision_status"]=="ENGINEERING_CI_CANDIDATE_UNRATIFIED"
+          assert x["gate_g07"]["thresholds"]["measured_runs_min"]>=100
+          assert x["gate_g07"]["methodology"]["concurrency"]==4
+          assert x["operational_deferred"]["owner_cost_hold_active"] is True
+          assert x["operational_deferred"]["a2_operational_closed"] is False
+          assert x["operational_deferred"]["eng06_customer_release_approved"] is False
+          print("G07/G09 numeric CI criteria valid; external operational gate remains OPEN")
+          PY
+      - name: G09 - 9 actual spawned OS crash, replay and recovery tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v) 2>&1 | tee a2/g07g09/g09-recovery.log
+          cp /tmp/abc-a2-g09-recovery.json a2/g07g09/g09-recovery.json
+      - name: G07 - measure 100 real five-process synthetic chains with concurrency four
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd runtime/phase04 && python tests/a2_g07_five_process_benchmark.py) 2>&1 | tee a2/g07g09/g07-performance.log
+          cp /tmp/abc-a2-g07-performance.json a2/g07g09/g07-performance.json
+      - name: Enforce full measured evidence, no skips and no release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,pathlib,re
+          root=pathlib.Path('a2/g07g09')
+          log=(root/'g09-recovery.log').read_text()
+          assert re.findall(r'^Ran (\d+) tests? in ',log,re.M)==['9']
+          assert re.search(r'^OK$',log,re.M)
+          assert not re.search(r'^FAILED|^ERROR:|^FAIL:|skipped=|unexpected successes=',log,re.M)
+          g07=json.loads((root/'g07-performance.json').read_text())
+          g09=json.loads((root/'g09-recovery.json').read_text())
+          assert g07['sample_size']>=100 and g07['concurrency']==4
+          assert g07['failed_chains']==0 and g07['customer_release_count']==0
+          assert g07['source_commit']==os.environ['GITHUB_SHA']
+          assert g09['exact_head']==os.environ['GITHUB_SHA']
+          assert g09['observed_restarts']>=7
+          assert g09['committed_synthetic_answer_rows_lost']==0
+          assert g09['customer_release_approved'] is False
+          assert g07['a2_operational_closed'] is False
+          assert g09['a2_operational_closed'] is False
+          hashes={}
+          for name in ('g07-performance.json','g09-recovery.json',
+                       'g07-performance.log','g09-recovery.log'):
+              hashes[name]=hashlib.sha256((root/name).read_bytes()).hexdigest()
+          result={
+              'gate':'A2_G07_G09_SYNTHETIC_ENGINEERING_CI_ONLY',
+              'source_sha':os.environ['GITHUB_SHA'],'run':os.environ['GITHUB_RUN_ID'],
+              'benchmark_samples':g07['sample_size'],'recovery_tests':9,
+              'g07_ci_candidate':'PASS','g09_ci_candidate':'PASS',
+              'g07_operational_acceptance':'OPEN','g09_operational_acceptance':'OPEN',
+              'managed_cloud_deployed':False,'sre_signed_approval':False,
+              'eng06_released':False,'a2_operational_closed':False,
+              'evidence_sha256':hashes}
+          (root/'manifest.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          print(json.dumps(result,sort_keys=True))
+          PY
+          sha256sum a2/g07g09/*.json a2/g07g09/*.log > a2/g07g09/SHA256SUMS
+      - name: Upload success or failure evidence without provisioning services
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-g07-g09-${{ github.run_id }}
+          path: a2/g07g09/
+          retention-days: 30
+          if-no-files-found: warn

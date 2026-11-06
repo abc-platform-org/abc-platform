@@ -67,6 +67,9 @@ def _one_chain(_n):
     case=five.FiveIndependentProcessSyntheticChain(
         "test_01_full_five_process_chain_is_synthetic_only")
     case.setUp()
+    # Parallel startup can delay child queue-feeder teardown after the reply
+    # is received. Still bound the actual exit; never fake a successful join.
+    case.exit_timeout_seconds=10
     measurements={}
     stage=case.stage
 

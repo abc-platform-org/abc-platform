@@ -1,0 +1,82 @@
+name: ABC A2 80-gate independent review packet integrity (no deploy)
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'governance/ABC_A2_G01_G10_EVIDENCE_RECONCILIATION_v1.json'
+      - 'governance/ABC_A2_INDEPENDENT_RISK_REGISTER_v1.json'
+      - 'governance/ABC_A2_PREDEPLOYMENT_DECISION_PACKET_v1.md'
+      - 'scripts/validate_a2_closure_packet_v1.py'
+      - '.github/workflows/a2-closure-packet-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit-packet-fail-closed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      ABC_A2_EXIT_PACKET_REPORT: a2/decision-review/validated-evidence-index.json
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate 80 exact scope-gate references + 14 owner risks + 12 adversarial mutations
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/decision-review
+          python scripts/validate_a2_closure_packet_v1.py --verify-github-runs 2>&1 | tee a2/decision-review/integrity.log
+      - name: Refuse any false PASS or drift from six-source-SHA run; write evidence artifact hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          root=pathlib.Path("a2/decision-review")
+          d=json.loads((root/"validated-evidence-index.json").read_text())
+          assert d["gate_count"]==80
+          assert d["ci_subcriteria_indexed"]==55
+          assert d["no_direct_test_reference"]==25
+          assert d["open_risks"]==14
+          assert d["negative_mutations_rejected"]==12
+          assert d["revalidated_actual_github_runs"]==6
+          assert d["a2_operational_closed"] is False
+          assert d["customer_release_approved"] is False
+          assert d["owner_cost_hold"] is True
+          assert d["checkout_governance_only_changes"]
+          manifest={
+              "gate":"A2_G01_G10_REVIEW_PACKET_INTEGRITY_ONLY",
+              "packet_commit":os.environ["GITHUB_SHA"],
+              "code_baseline_commit":d["baseline_code_sha"],
+              "run_id":os.environ["GITHUB_RUN_ID"],
+              "indexed_gate_count":80,"ci_subcriteria":55,
+              "no_direct_scope_evidence":25,
+              "open_risk_count":14,"independent_approvals_received":0,
+              "external_staging_deployed":False,
+              "billing_authorized":False,
+              "eng06_release_approved":False,
+              "a2_operational_closed":False,
+              "evidence_index_sha256":hashlib.sha256(
+                  (root/"validated-evidence-index.json").read_bytes()).hexdigest(),
+              "validator_log_sha256":hashlib.sha256(
+                  (root/"integrity.log").read_bytes()).hexdigest()
+          }
+          (root/"manifest.json").write_text(json.dumps(manifest,sort_keys=True,indent=2)+"\n")
+          print(json.dumps(manifest,sort_keys=True))
+          PY
+          sha256sum a2/decision-review/*.json a2/decision-review/*.log > a2/decision-review/SHA256SUMS
+      - name: Upload unsigned audit evidence (never a reviewer approval)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-review-packet-${{ github.run_id }}
+          path: a2/decision-review/
+          if-no-files-found: warn
+          retention-days: 30

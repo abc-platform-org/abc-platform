@@ -39,6 +39,12 @@ class ENG14TransitionPolicy:
     def require_allowed(self,decision):
         if (not isinstance(decision,dict) or decision.get("decision")!="ALLOW"
             or decision.get("policy_version")!=self.VERSION
+            or decision.get("engine_id")!="ENG-14"
+            or decision.get("approval_scope")!="SYNTHETIC_LOCAL_ONLY"
+            or decision.get("risk_class")!="S0"
+            or set(decision)!={"engine_id","policy_version","source_state",
+                                  "target_state","decision","risk_class",
+                                  "reason","approval_scope"}
             or decision.get("reason")!="SYNTHETIC_S0_CHECKPOINT_ONLY"
             or (decision.get("source_state"),decision.get("target_state"))!=("CREATED","PAUSED")):
             raise DomainError(403,"eng14_transition_denied")

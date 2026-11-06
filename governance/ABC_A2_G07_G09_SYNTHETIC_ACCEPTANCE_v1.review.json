@@ -1,0 +1,121 @@
+{
+  "schema_version": "a2.g07-g09.synthetic.v1",
+  "decision_status": "ENGINEERING_CI_CANDIDATE_UNRATIFIED",
+  "scope": "LOCAL_INTEGRATION_ONLY",
+  "workflow": [
+    "ENG-02",
+    "ENG-03",
+    "ENG-04",
+    "ENG-05",
+    "ENG-06"
+  ],
+  "crosscutting": [
+    "ENG-14-S0"
+  ],
+  "media_accepted": false,
+  "professional_release_allowed": false,
+  "gate_g07": {
+    "objective": "Bounded performance for the actual five separately spawned OS-process synthetic non-media chain; NOT hosted-service latency SLO",
+    "methodology": {
+      "warmup_runs": 3,
+      "measured_runs_min": 100,
+      "concurrency": 4,
+      "monotonic_clock": "perf_counter_ns",
+      "quantile_method": "nearest_rank",
+      "repeat_policy": "single exact-SHA CI run; SRE must approve repeatability and platform configuration for real SLO",
+      "telemetry": "per-stage and end-to-end wall-clock seconds; full-chain successful receipts",
+      "runner_class": "GitHub-hosted ubuntu-latest; hardware not pinned; record CPU count, Python, OS"
+    },
+    "thresholds": {
+      "end_to_end_seconds": {
+        "p50_max": 8,
+        "p95_max": 14,
+        "p99_max": 25,
+        "max_max": 40
+      },
+      "throughput_chains_per_second_min": 0.3,
+      "failed_chains_max": 0,
+      "release_approved_max": 0,
+      "measured_runs_min": 100
+    },
+    "acceptance_evidence": [
+      "versioned thresholds",
+      "exact head SHA",
+      "100+ per-chain samples",
+      "p50/p95/p99 and per-stage quantiles",
+      "4-way parallel concurrency",
+      "all receipts marked release_approved=false",
+      "no media or private data",
+      "SHA256 logs and benchmark JSON"
+    ],
+    "ci_gate": "OPEN_UNTIL_MEASURED"
+  },
+  "gate_g09": {
+    "objective": "Synthetic local crash containment, persistent-answer receipt replay, bounded restart, and offline incident detection; not SRE operational readiness",
+    "thresholds": {
+      "local_process_recovery_seconds_max": 10,
+      "committed_answer_rpo_rows_lost_max": 0,
+      "duplicate_answer_rows_max": 0,
+      "stale_release_events_max": 0,
+      "aborted_process_exit_code": 75,
+      "timeout_cleanup_seconds_max": 3
+    },
+    "simulated_alert_rules": [
+      {
+        "code": "CHAIN_ERROR_RATE",
+        "expr": "error_count > 0",
+        "severity": "critical"
+      },
+      {
+        "code": "P95_LATENCY",
+        "expr": "p95_seconds > 14",
+        "severity": "warning"
+      },
+      {
+        "code": "RESTART_BUDGET",
+        "expr": "restart_seconds > 10",
+        "severity": "critical"
+      },
+      {
+        "code": "CONSENT_OR_RELEASE_VIOLATION",
+        "expr": "release_count > 0",
+        "severity": "critical"
+      }
+    ],
+    "acceptance_evidence": [
+      "real os._exit before response and after committed synthetic answer",
+      "recovery on independent spawned process",
+      "SQLite synthetic answer idempotency + zero lost committed receipts",
+      "bounded process kill after deadline",
+      "actual G06 PostgreSQL16 restart/lease fencing tests in existing CI",
+      "offline alert assertion tests; no actual alert pager claimed",
+      "artifacts with exact source SHA and SHA256"
+    ],
+    "ci_gate": "OPEN_UNTIL_MEASURED"
+  },
+  "operational_deferred": {
+    "review_required": [
+      "Architecture",
+      "Security",
+      "SRE",
+      "Qualified specialist"
+    ],
+    "operator_approval_issued": false,
+    "staging_environment_deployed": false,
+    "managed_workload_identities": false,
+    "true_network_partition_and_recovery_proven": false,
+    "real_managed_database_pitr_restore_proven": false,
+    "provider_issued_certificate_rotation_and_revocation_proven": false,
+    "external_alert_route_acknowledged": false,
+    "real_slo_and_oncall_coverage_ratified": false,
+    "eng06_customer_release_approved": false,
+    "a2_operational_closed": false,
+    "owner_cost_hold_active": true,
+    "sre_review_questions": [
+      "Approve real p95/p99/throughput targets and workload basis with pinned provider class and budgets",
+      "Measure real managed RTO and RPO against SRE-published objectives",
+      "Prove actual alert rule delivery and on-call ACK",
+      "Approve recovery drills and rollback SOP under independently issued service identity"
+    ]
+  }
+}

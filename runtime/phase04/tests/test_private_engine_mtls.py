@@ -64,7 +64,7 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
         self.target_engine=getattr(self,"target_engine_override","ENG-05")
         if (self.source_engine,self.target_engine) not in (("ENG-04","ENG-05"),("ENG-05","ENG-06")):
             raise ValueError("unapproved_ci_engine_pair")
-        self.client_uri="spiffe://abc.internal/"+self.source_engine.lower().replace("-","")+"/"+self.consumer
+        self.client_uri="spiffe://abc.internal/staging/"+self.source_engine.lower()
         def issue(common,san,is_server):
             private=key()
             subject=x509.Name([x509.NameAttribute(NameOID.COMMON_NAME,common)])
@@ -184,6 +184,46 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
                          "engine_request_rejected")
         self.assertEqual(self.call(token=self.token(expires=-30))["error"],
                          "engine_request_rejected")
+
+    def _reissue_with_claims(self, changes, headers=None):
+        original=jwt.decode(self.token(),options={"verify_signature":False})
+        original.update(changes)
+        return jwt.encode(original,self.signer,algorithm="RS256",
+                          headers={"kid":"ci-rotation-1",**(headers or {})})
+
+    def test_legacy_per_consumer_spiffe_subject_cannot_impersonate_engine(self):
+        old_subject="spiffe://abc.internal/"+self.source_engine.lower().replace("-","")+"/"+self.consumer
+        forged=self._reissue_with_claims({"sub":old_subject})
+        self.assertEqual(self.call(token=forged)["error"],"engine_request_rejected")
+
+    def test_deny_multi_audience_token_even_if_expected_audience_included(self):
+        altered=self._reissue_with_claims(
+            {"aud":["abc-engine:"+self.target_engine,"abc-engine:ENG-19"]})
+        self.assertEqual(self.call(token=altered)["error"],"engine_request_rejected")
+
+    def test_deny_malformed_or_non_uuid4_jti(self):
+        for jti in (str(uuid.uuid1()),"not-a-uuid",str(uuid.uuid4()).upper()):
+            with self.subTest(jti=jti):
+                altered=self._reissue_with_claims({"jti":jti})
+                self.assertEqual(self.call(token=altered)["error"],
+                                 "engine_request_rejected")
+
+    def test_deny_untrusted_token_header_key_locations(self):
+        for extra in ({"jku":"https://untrusted.example/jwks"},
+                      {"x5u":"https://untrusted.example/cert"},
+                      {"jwk":{"kty":"RSA"}},{"crit":["jku"],"jku":"https://untrusted.example/jwks"}):
+            with self.subTest(extra=list(extra)):
+                altered=self._reissue_with_claims({},extra)
+                self.assertEqual(self.call(token=altered)["error"],
+                                 "engine_request_rejected")
+
+    def test_deny_ambiguous_cnf_claims(self):
+        old=jwt.decode(self.token(),options={"verify_signature":False})
+        old["cnf"]["extra_untrusted_binding"]=True
+        altered=jwt.encode(old,self.signer,algorithm="RS256",
+                           headers={"kid":"ci-rotation-1"})
+        self.assertEqual(self.call(token=altered)["error"],"engine_request_rejected")
+
     def test_three_independent_servers_cannot_start_without_managed_material(self):
         config={"ABC_ENV":"LOCAL_INTEGRATION_ONLY",
                 "ABC_NETWORK_BOUNDARY":"LOOPBACK_ONLY",
@@ -202,14 +242,14 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
             with self.subTest(change=change),self.assertRaises(ValueError):
                 configure_private_engine_service({**config,**change})
 
-    def test_private_staging_service_must_be_distinct_and_externally_provisioned(self):
+    def test_private_staging_requires_canonical_edges_and_durable_replay_provider(self):
         from unittest.mock import patch,Mock
         env={"ABC_ENV":"STAGING_PRIVATE",
              "ABC_NETWORK_BOUNDARY":"RENDER_PRIVATE_SERVICE",
              "ABC_RENDER_SERVICE_KIND":"PRIVATE",
              "ABC_STAGING_PURPOSE":"SYNTHETIC_NO_CLIENT_DATA",
              "ABC_ENGINE_SYNTHETIC_ONLY":"true",
-             "ABC_ENGINE_ID":"ENG-05","ABC_CALLER_ENGINE_ID":"ENG-03",
+             "ABC_ENGINE_ID":"ENG-05","ABC_CALLER_ENGINE_ID":"ENG-04",
              "ABC_ENGINE_CONSUMER_ID":"ci-consumer-01",
              "ABC_ENGINE_PORT":"11005",
              "ABC_TLS_CERT_FILE":"/run/secrets/engine.crt",
@@ -217,17 +257,26 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
              "ABC_TLS_CA_FILE":"/run/secrets/trust.crt",
              "ABC_WORKLOAD_ISSUER":"https://issuer.abc-ci.example",
              "ABC_WORKLOAD_JWKS_URL":"https://issuer.abc-ci.example/jwks"}
+        reserver=lambda identity,message: True  # disposable test stub only
         with patch("abc_foundation.private_engine_service_server.private_engine_server",
                    return_value=Mock()) as builder:
-            configure_private_engine_service(env)
-            self.assertEqual(builder.call_args.kwargs["host"],"0.0.0.0")
-            self.assertTrue(builder.call_args.kwargs["managed_private"])
+            with self.assertRaisesRegex(ValueError,"staging_owner_cost_and_external_identity_hold"):
+                configure_private_engine_service(env)
+            # Even a malicious/inert replay callback can NEVER turn this
+            # zero-cost CI code into a staging service under the owner's hold.
+            with self.assertRaisesRegex(ValueError,"staging_owner_cost_and_external_identity_hold"):
+                configure_private_engine_service(env,
+                     distributed_replay_reserver=reserver)
+            builder.assert_not_called()
         for tamper in ({"ABC_RENDER_SERVICE_KIND":"WEB"},
                        {"ABC_NETWORK_BOUNDARY":"PUBLIC_HTTP"},
                        {"ABC_TLS_KEY_FILE":""},
-                       {"ABC_ENV":"PRODUCTION"}):
+                       {"ABC_ENV":"PRODUCTION"},
+                       {"ABC_CALLER_ENGINE_ID":"ENG-03"},
+                       {"ABC_ENGINE_ID":"ENG-04"}):
             with self.subTest(tamper=tamper),self.assertRaises(ValueError):
-                configure_private_engine_service({**env,**tamper})
+                configure_private_engine_service({**env,**tamper},
+                     distributed_replay_reserver=reserver)
 
     def test_managed_private_client_rejects_public_and_unpinned_dns(self):
         for host in ("public.example.com","abc-engine.onrender.com",

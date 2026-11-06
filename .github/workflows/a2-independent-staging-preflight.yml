@@ -1,0 +1,112 @@
+name: ABC A2 independent staging acceptance preflight (no deployment)
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'scripts/a2_external_staging_acceptance.py'
+      - 'runtime/phase04/tests/test_a2_external_staging_acceptance.py'
+      - 'governance/ABC_A2_EXTERNAL_STAGING_RELEASE_HOLD_20261105.md'
+      - '.github/workflows/a2-independent-staging-preflight.yml'
+  pull_request:
+    paths:
+      - 'scripts/a2_external_staging_acceptance.py'
+      - 'runtime/phase04/tests/test_a2_external_staging_acceptance.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight-only-no-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned offline validation dependency
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Enforce 16 rejection and signature validation cases without skips
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/external-staging
+          python -m unittest discover -s runtime/phase04/tests -p 'test_a2_external_staging_acceptance.py' -v 2>&1 | tee a2/external-staging/security-preflight.log
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          raw=Path("a2/external-staging/security-preflight.log").read_text()
+          assert re.findall(r"^Ran (\d+) tests? in",raw,re.M)==["16"], "expected 16 cases"
+          assert re.search(r"^OK$",raw,re.M), "preflight cases failed"
+          assert not re.search(r"^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=",raw,re.M)
+          PY
+      - name: Refuse missing external provider, signer roots and attestation
+        shell: bash
+        run: |
+          set -euo pipefail
+          outside="$(mktemp -d)"
+          set +e
+          python scripts/a2_external_staging_acceptance.py \
+            --packet "$outside/missing-provider.json" \
+            --trust "$outside/missing-trust.json" \
+            --evidence-dir "$outside" \
+            --head "$GITHUB_SHA" > a2/external-staging/no-external-approval.json
+          code=$?
+          set -e
+          test "$code" -eq 2
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path("a2/external-staging/no-external-approval.json").read_text())
+          assert d["status"]=="BLOCKED"
+          assert d["eng06_release_approved"] is False
+          assert d["reason"], "refusal must contain an explicit reason"
+          PY
+      - name: Verify repository provider decision remains a hard hold
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,pathlib
+          d=json.loads(pathlib.Path("governance/phase04_infrastructure_selection.v1.json").read_text())
+          assert d["deployment_authorized"] is False
+          assert d["billing_authorized"] is False
+          assert d["production_release_authorized"] is False
+          assert d["database"]["render_managed_postgres_acceptable"] is False
+          assert d["database"]["provisioned"] is False
+          assert d["identity"]["pki_provisioned"] is False
+          assert d["identity"]["oidc_jwks_provisioned"] is False
+          PY
+      - name: Produce scoped preflight record, never an external signoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          root=pathlib.Path("a2/external-staging")
+          raw=(root/"security-preflight.log").read_bytes()
+          d={"gate":"A2_STAGING_ACCEPTANCE_PREFLIGHT",
+             "preflight_code_tests":"PASS",
+             "runtime_staging_deployed":False,
+             "external_managed_ca_attested":False,
+             "external_postgres_clientcert_verified":False,
+             "independent_security_sre_professional_signoffs":False,
+             "a2_operational_gate":"BLOCKED",
+             "eng06_professional_release":"BLOCKED",
+             "exact_head":os.environ["GITHUB_SHA"],
+             "run_id":os.environ["GITHUB_RUN_ID"],
+             "synthetic_test_count":16,
+             "log_sha256":hashlib.sha256(raw).hexdigest(),
+             "required_action":"owner/provider/operator authorization, real private hosting, external signed evidence and independently verified reviewers"}
+          (root/"preflight-manifest.json").write_text(json.dumps(d,sort_keys=True,indent=2)+"\n")
+          print(json.dumps(d,sort_keys=True))
+          PY
+          sha256sum a2/external-staging/security-preflight.log a2/external-staging/no-external-approval.json a2/external-staging/preflight-manifest.json > a2/external-staging/SHA256SUMS
+      - name: Upload acceptance preflight evidence even when failing
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-external-staging-preflight-${{ github.run_id }}
+          path: a2/external-staging/
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,0 +1,276 @@
+name: ABC A2 G04-B PostgreSQL independence and recovery
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'runtime/phase04/**'
+      - '.github/workflows/a2-g04b-postgres.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g04b-real-postgres-fault-injection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_TEST_PG_ADMIN_DSN: postgresql://postgres:abc-integration-only-password@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_DSN: postgresql://abc_app:integration-only-abc-app@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_WORKER_DSN: postgresql://abc_worker:integration-only-abc-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ORCHESTRATOR_DSN: postgresql://abc_orchestrator:integration-only-abc-orchestrator@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ANSWER_WORKER_DSN: postgresql://abc_answer_worker:integration-only-abc-answer-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG03_DSN: postgresql://abc_eng03_worker:integration-only-eng03-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_PIPELINE_DSN: postgresql://abc_pipeline_worker:integration-only-pipeline-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG04_LOGIN_DSN: postgresql://abc_eng04_ci_login:integration-only-eng04-review-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG06_LOGIN_DSN: postgresql://abc_eng06_ci_login:integration-only-eng06-review-login@127.0.0.1:5432/abc_phase04_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned project dependencies
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Bootstrap disposable PostgreSQL 16 and scoped roles
+        run: python runtime/phase04/tests/bootstrap_postgres.py
+      - name: Run real durable worker isolation, crash, lease, consent and role tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04b
+          for test_file in test_eng03_durable_pipeline.py test_eng06_fault_injection_acceptance.py; do
+            (cd runtime/phase04 && python -m unittest discover -s tests -p "$test_file" -v) 2>&1 | tee "a2/g04b/$test_file.log"
+          done
+      - name: Fail closed on missing or skipped tests and generate evidence manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, pathlib, re
+          root=pathlib.Path("a2/g04b")
+          files=sorted(root.glob("test_*.py.log"))
+          if len(files)!=2:
+              raise SystemExit("G04-B missing required suite")
+          records=[]
+          for file in files:
+              raw=file.read_bytes()
+              log=raw.decode("utf-8")
+              counts=re.findall(r"^Ran (\d+) tests? in ",log,re.M)
+              if len(counts)!=1 or int(counts[0])<4:
+                  raise SystemExit("G04-B insufficient or ambiguous tests: "+file.name)
+              if not re.search(r"^OK$",log,re.M) or re.search(r"^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=",log,re.M):
+                  raise SystemExit("G04-B failure/skip/unclean suite: "+file.name)
+              records.append({"suite":file.name,"tests":int(counts[0]),"sha256":hashlib.sha256(raw).hexdigest()})
+          if sum(x["tests"] for x in records)<45:
+              raise SystemExit("G04-B required test coverage missing")
+          manifest={"gate":"G04-B","environment":"disposable PostgreSQL16; synthetic only",
+                    "github_sha":os.environ["GITHUB_SHA"],"github_run_id":os.environ["GITHUB_RUN_ID"],
+                    "independent_deployment_proven":False,"independent_attestation":"NONE",
+                    "eng06_production_release_approved":False,"suites":records}
+          (root/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
+          print(json.dumps(manifest,indent=2))
+          PY
+      - name: Upload G04-B evidence including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-g04b-${{ github.run_id }}
+          path: a2/g04b/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: G04-C local TLS and JWT negative security tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04c
+          (cd runtime/phase04 && python -m unittest discover -s tests -p test_private_engine_mtls.py -v) 2>&1 | tee a2/g04c/private-engine.log
+          grep -Eq '^Ran [1-9][0-9]* tests in' a2/g04c/private-engine.log
+          grep -Eq '^OK$' a2/g04c/private-engine.log
+          if grep -Eq 'skipped=|FAILED |^ERROR:|^FAIL:' a2/g04c/private-engine.log; then exit 1; fi
+          sha256sum a2/g04c/private-engine.log > a2/g04c/sha256.txt
+      - name: G04-C isolated container network fault and recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04c
+          docker network create abc-g04c-private
+          docker network create abc-g04c-outside
+          cleanup() { docker rm -f abc-g04c-04 abc-g04c-05 abc-g04c-06 abc-g04c-outsider >/dev/null 2>&1 || true; docker network rm abc-g04c-private abc-g04c-outside >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          for engine in 04 05 06; do
+            docker run -d --name "abc-g04c-$engine" --network abc-g04c-private --network-alias "engine-$engine" python:3.12-alpine python -u -m http.server 8765 --bind 0.0.0.0 >/dev/null
+          done
+          docker run -d --name abc-g04c-outsider --network abc-g04c-outside python:3.12-alpine sleep 120 >/dev/null
+          # Container start is asynchronous: require HTTP readiness, not just a running PID.
+          wait_http() {
+            local from="$1" target="$2"
+            for attempt in $(seq 1 40); do
+              if docker exec "$from" python -c "import urllib.request; assert urllib.request.urlopen('http://$target:8765',timeout=2).status==200" >/dev/null 2>&1; then
+                return 0
+              fi
+              sleep 0.25
+            done
+            echo "G04-C HTTP readiness failed for $target from $from" >&2
+            docker logs "abc-g04c-${target#engine-}" 2>&1 | tail -40 >&2 || true
+            return 1
+          }
+          wait_http abc-g04c-04 engine-05
+          docker exec abc-g04c-outsider python -c "import socket; socket.getaddrinfo('engine-05',8765)" && { echo 'network isolation violated'; exit 1; } || echo 'outside DNS blocked'
+          docker kill abc-g04c-05 >/dev/null
+          wait_http abc-g04c-04 engine-06
+          docker start abc-g04c-05 >/dev/null
+          wait_http abc-g04c-04 engine-05
+          printf 'container_network_isolation=PASS\npeer_failure_containment=PASS\npeer_restart=PASS\nmanaged_identity=NOT_TESTED\nreal_engine_deployment=NOT_TESTED\n' > a2/g04c/container-network.txt
+      - name: G04-C actual engine code in separate network-disabled containers
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f runtime/phase04/Dockerfile -t abc-g04c-engine:ci runtime/phase04
+          for engine in 04 05 06; do
+            set +e
+            printf '%s' '{"engine_id":"ENG-99"}' | docker run -i --rm --network none abc-g04c-engine:ci python -m abc_foundation.isolated_engine_service "ENG-$engine" > "a2/g04c/actual-engine-$engine.json"
+            code=$?
+            set -e
+            test "$code" -eq 3
+            python -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["release_approved"] is False and r["error"]=="invalid_engine_service_contract"' "a2/g04c/actual-engine-$engine.json"
+          done
+          python - <<'PY'
+          import json,uuid
+          request={"request_id":str(uuid.uuid4()),"engine_id":"ENG-05",
+                   "contract_version":"abc.internal.engine.synthetic.v1",
+                   "consumer_id":"g04c-ci-only","session_id":str(uuid.uuid4()),
+                   "payload":{"service_id":"synthetic:hair-color","fixture":None}}
+          with open("a2/g04c/eng05-valid-input.json","w") as f:
+              json.dump(request,f)
+          PY
+          docker run -i --rm --network none abc-g04c-engine:ci python -m abc_foundation.isolated_engine_service ENG-05 < a2/g04c/eng05-valid-input.json > a2/g04c/eng05-valid-output.json
+          python - <<'PY'
+          import json
+          request=json.load(open("a2/g04c/eng05-valid-input.json"))
+          response=json.load(open("a2/g04c/eng05-valid-output.json"))
+          assert response["engine_id"]=="ENG-05"
+          assert response["request_id"]==request["request_id"]
+          assert response["session_id"]==request["session_id"]
+          assert response["consumer_id"]==request["consumer_id"]
+          assert response["release_approved"] is False
+          assert response["result"]["unknowns"]==["SOURCE_UNVERIFIED"]
+          PY
+          printf 'actual_engine_code=PASS\ncontainer_network=NONE\nrelease_approved=false\n' > a2/g04c/actual-engine-boundary.txt
+      - name: G04-C real engine processes container lifecycle and fail-closed checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04c
+          docker network create abc-g04c-real-private
+          docker network create abc-g04c-real-outsider
+          cleanup() { docker rm -f abc-real-04 abc-real-05 abc-real-06 abc-real-outsider >/dev/null 2>&1 || true; docker network rm abc-g04c-real-private abc-g04c-real-outsider >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          for engine in 04 05 06; do
+            docker run -d --name "abc-real-$engine" --network abc-g04c-real-private --network-alias "abc-real-$engine" abc-g04c-engine:ci sleep 180 >/dev/null
+          done
+          docker run -d --name abc-real-outsider --network abc-g04c-real-outsider abc-g04c-engine:ci sleep 180 >/dev/null
+          docker exec abc-real-outsider python -c "import socket; socket.getaddrinfo('abc-real-05',80)" && { echo 'outsider resolved private engine'; exit 1; } || echo 'outsider blocked'
+          for engine in 04 05 06; do
+            set +e
+            printf '%s' '{"engine_id":"ENG-99"}' | docker exec -i "abc-real-$engine" python -m abc_foundation.isolated_engine_service "ENG-$engine" > "a2/g04c/lifecycle-$engine.json"
+            status=$?
+            set -e
+            test "$status" -eq 3
+            python -c 'import json,sys; x=json.load(open(sys.argv[1])); assert x=={"error":"invalid_engine_service_contract","release_approved":False}' "a2/g04c/lifecycle-$engine.json"
+          done
+          docker kill abc-real-05 >/dev/null
+          docker exec abc-real-04 python -c 'import abc_foundation.isolated_engine_service as e; assert "ENG-04" in e.ENGINES'
+          docker exec abc-real-06 python -c 'import abc_foundation.isolated_engine_service as e; assert "ENG-06" in e.ENGINES'
+          docker start abc-real-05 >/dev/null
+          docker exec abc-real-05 python -c 'import abc_foundation.isolated_engine_service as e; assert "ENG-05" in e.ENGINES'
+          printf 'real_engine_images=PASS\ncontainer_crash_containment=PASS\ncontainer_restart=PASS\nprivate_dns_isolation=PASS\nintercontainer_mtls=NOT_PROVEN\nmanaged_identity=NOT_PROVEN\n' > a2/g04c/real-engine-lifecycle.txt
+      - name: G04-C REAL inter-container mTLS JWT network isolation and fault recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          python runtime/phase04/tests/verify_g04c_container_mtls.py
+          python - <<'PY'
+          import json,pathlib,os
+          p=pathlib.Path("a2/g04c/intercontainer-mtls-evidence.json")
+          assert p.is_file(), "missing inter-container mTLS evidence"
+          e=json.loads(p.read_text())
+          required=("three_real_server_containers","private_container_networks",
+             "eng03_to_eng04_mtls","eng04_to_eng05_mtls","eng05_to_eng06_mtls",
+             "cert_bound_jwt_replay_audience_and_absent_auth_denied",
+             "client_certificate_required","untrusted_network_dns_and_ip_denied",
+             "peer_network_disconnect_reconnect_recovery",
+             "peer_crash_containment_and_restart","zero_published_engine_ports")
+          assert e["status"]=="PASS" and all(e.get(k) is True for k in required)
+          assert e["git_sha"]==os.environ["GITHUB_SHA"]
+          assert e["managed_identity_proven"] is False
+          assert e["independent_managed_deployment_proven"] is False
+          assert e["eng06_production_release_approved"] is False
+          PY
+          sha256sum a2/g04c/intercontainer-mtls-evidence.json > a2/g04c/intercontainer-mtls-evidence.sha256
+      - name: G04-C TLS protocol suite in real engine container
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g04c
+          docker run --rm --network none -v "$PWD/runtime/phase04/tests/test_private_engine_mtls.py:/srv/abc/test_private_engine_mtls.py:ro" abc-g04c-engine:ci python -m unittest -v test_private_engine_mtls 2>&1 | tee a2/g04c/engine-image-mtls.log
+          grep -Eq '^Ran [1-9][0-9]* tests in' a2/g04c/engine-image-mtls.log
+          grep -Eq '^OK$' a2/g04c/engine-image-mtls.log
+          if grep -Eq '^FAILED|^ERROR:|^FAIL:|skipped=' a2/g04c/engine-image-mtls.log; then exit 1; fi
+          echo 'scope=local-container-mtls; intercontainer=not-proven; managed-identity=not-proven' > a2/g04c/mTLS-scope.txt
+          sha256sum a2/g04c/engine-image-mtls.log > a2/g04c/engine-image-mtls.sha256
+      - name: A2-G05 real PostgreSQL consent, mTLS authorization, revocation and durable replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/g05
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g05_atomic_authorization.py' -v) 2>&1 | tee a2/g05/g05-atomic-authorization.log
+          python - <<'PY'
+          import hashlib,json,os,pathlib,re
+          out=pathlib.Path("a2/g05")
+          raw=(out/"g05-atomic-authorization.log").read_bytes()
+          data=raw.decode()
+          count=re.findall(r"^Ran (\d+) tests? in ",data,re.M)
+          if len(count)!=1 or int(count[0])!=14 or not re.search(r"^OK$",data,re.M):
+              raise SystemExit("G05 required tests missing or failed")
+          if re.search(r"^FAILED|^ERROR:|^FAIL:|skipped=|expected failures=|unexpected successes=",data,re.M):
+              raise SystemExit("G05 skips or negative suites are not accepted")
+          manifest={"gate":"A2-G05","status":"PASS","scope":"CI_ONLY_DISPOSABLE_PG16_LOCAL_MTLS",
+             "commit_sha":os.environ["GITHUB_SHA"],"run_id":os.environ["GITHUB_RUN_ID"],
+             "test_count":int(count[0]),"log_sha256":hashlib.sha256(raw).hexdigest(),
+             "operator_managed_identity_proven":False,
+             "independent_human_oidc_attestation_proven":False,
+             "managed_pg_clientcert_proven":False,
+             "production_release_approved":False,"eng06_professional_release":False}
+          (out/"manifest.json").write_text(json.dumps(manifest,sort_keys=True,indent=2)+"\n")
+          print(json.dumps(manifest,sort_keys=True))
+          PY
+      - name: Upload G05 synthetic-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-g05-${{ github.run_id }}
+          path: a2/g05/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload G04-C local-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-g04c-local-${{ github.run_id }}
+          path: a2/g04c/
+          if-no-files-found: warn
+          retention-days: 30

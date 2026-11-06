@@ -22,9 +22,13 @@ class StagingGuardTests(unittest.TestCase):
     def test_migration_manifest_complete_and_sha256(self):
         plan=planned_migrations()
         self.assertEqual(tuple(x[0] for x in plan),FILENAMES)
-        self.assertEqual(len(plan),30)
-        self.assertEqual(plan[-2][0],"0029_eng05_official_pdf_byte_receipts.sql")
-        self.assertEqual(plan[-1][0],"0030_eng05_trgs530_byte_observations.sql")
+        self.assertEqual(len(plan),len(FILENAMES))
+        self.assertEqual(plan[28][0],"0029_eng05_official_pdf_byte_receipts.sql")
+        self.assertEqual(plan[29][0],"0030_eng05_trgs530_byte_observations.sql")
+        self.assertEqual(plan[30][0],"0031_a1_six_adapter_bridge_quarantine.sql")
+        self.assertEqual(plan[31][0],"0032_a2_g05_atomic_consent_replay_gate.sql")
+        self.assertEqual(plan[32][0],"0033_a2_g05_synthetic_certificate_revocation.sql")
+        self.assertEqual(plan[33][0],"0034_a2_private_spiffe_atomic_ingress.sql")
         self.assertTrue(all(len(digest)==64 for _,digest in plan))
 
     def test_staging_dsn_rejects_admin_or_missing_tls(self):

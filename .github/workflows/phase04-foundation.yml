@@ -1,5 +1,13 @@
 name: ABC Phase 04 local foundation CI
 on:
+  push:
+    branches:
+      - 'implementation/w1-eng05-external-approval-gate-20261101'
+    paths:
+      - 'runtime/phase04/**'
+      - 'governance/**'
+      - 'scripts/validate_a2_evidence_ledger.py'
+      - '.github/workflows/phase04-foundation.yml'
   pull_request:
     paths:
       - 'runtime/phase04/**'
@@ -9,6 +17,10 @@ on:
       - 'scripts/validate_engine_quality.py'
       - 'scripts/validate_abc_v2_architecture.py'
       - 'scripts/validate_abc_19_engine_architecture.py'
+      - 'scripts/validate_abc_engine_completion_audit.py'
+      - 'scripts/build_abc_engine_evidence_inventory.py'
+      - 'scripts/a1_inventory_physical_namespaces.py'
+      - 'scripts/a1_legacy_adapter_quarantine.py'
       - 'scripts/validate_abc_w0_ratification_candidate.py'
       - 'scripts/validate_abc_w1w2_private_candidate.py'
       - 'scripts/validate_abc_w1_private_trust.py'
@@ -89,6 +101,27 @@ jobs:
         run: python scripts/validate_abc_v2_architecture.py
       - name: Validate 19 canonical logical owners, versioned handoffs and seven non-bypassable policy gates
         run: python scripts/validate_abc_19_engine_architecture.py
+      - name: Enforce canonical ownership, legacy namespace and audit completion invariants
+        run: python scripts/validate_abc_engine_completion_audit.py
+      - name: Build reproducible 19-engine evidence inventory and enforce no false completion
+        run: |
+          python scripts/build_abc_engine_evidence_inventory.py > /tmp/abc-engine-audit-inventory.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('/tmp/abc-engine-audit-inventory.json').read_text())
+          assert p['engine_count']==19 and p['open_gate_count']==190
+          assert p['release_authorized'] is False
+          assert len(p['legacy_namespace_collisions'])==7
+          assert all(not e['operational_completion_claim'] for e in p['engines'])
+          print('PASS: audit inventory and 190 unsigned gates remain explicit')
+          PY
+      - name: A1 capture fail-closed physical producer-consumer binding evidence
+        run: python scripts/a1_verify_adapter_runtime_bindings.py > /tmp/abc-a1-adapter-runtime-bindings.json
+      - name: A1 verify 30 migrations and six quarantined compatibility contracts
+        run: |
+          python scripts/a1_inventory_physical_namespaces.py > /tmp/abc-a1-physical-inventory.json
+          python -m compileall -q scripts/a1_legacy_adapter_quarantine.py
       - name: W0 ratification candidate integrity and ten fail-closed mutation tests
         run: python scripts/validate_abc_w0_ratification_candidate.py
       - name: Verify W1 W2 private readiness remains blocked with eight negative tests
@@ -126,6 +159,26 @@ jobs:
       - name: Execute integration, isolation, replay and persistence tests
         working-directory: runtime/phase04
         run: python -m unittest discover -s tests -v
+      - name: A1 six-adapter PostgreSQL acceptance must execute without skips
+        working-directory: runtime/phase04
+        run: |
+          python -m unittest discover -s tests -p 'test_a1_*.py' -v
+      - name: A1 prepare committed synthetic bridge rows for PostgreSQL service restart
+        run: python runtime/phase04/tests/a1_postgres_restart_probe.py prepare
+      - name: A1 restart disposable PostgreSQL service container
+        run: |
+          docker restart "${{ job.services.postgres.id }}"
+          for i in $(seq 1 40); do
+            if pg_isready -h 127.0.0.1 -p 5432 -U postgres -d abc_phase04_ci; then break; fi
+            sleep 2
+          done
+          pg_isready -h 127.0.0.1 -p 5432 -U postgres -d abc_phase04_ci
+      - name: A1 verify durable bridge and denied release after server restart
+        run: |
+          python runtime/phase04/tests/a1_postgres_restart_probe.py verify
+          python runtime/phase04/tests/a1_postgres_restart_probe.py cleanup
+      - name: Validate A2 eight-scope evidence ledger
+        run: python scripts/validate_a2_evidence_ledger.py
       - name: Verify dedicated staging migrator against isolated ephemeral PostgreSQL
         working-directory: runtime/phase04
         run: python tests/verify_staging_migration_ci.py

@@ -1,0 +1,2518 @@
+{
+  "schema": "abc.a2.g01-g10.evidence-reconciliation.v1",
+  "packet_status": "ENGINEERING_EVIDENCE_INDEX_READY_INDEPENDENT_RATIFICATION_PENDING",
+  "baseline_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+  "branch": "implementation/w1-eng05-external-approval-gate-20261101",
+  "pr_number": 78,
+  "source_scope": "LOCAL_INTEGRATION_ONLY / CI-DISPOSABLE_PG16 / SYNTHETIC_NON_MEDIA",
+  "canonical_evidence_policy": "Every gate remains OPEN until signed independent authority decision. Tests only establish bounded synthetic CI subcriteria. No false PASS.",
+  "legacy_v0_ledger": "governance/ABC_A2_EIGHT_SCOPE_EVIDENCE_LEDGER_v0.json",
+  "required_gates": [
+    "G01_ARCHITECTURE",
+    "G02_DOMAIN_CAPABILITY",
+    "G03_CONTRACTS",
+    "G04_INDEPENDENCE",
+    "G05_SECURITY_PRIVACY",
+    "G06_RELIABILITY",
+    "G07_PERFORMANCE",
+    "G08_PROFESSIONAL_VALIDATION",
+    "G09_OBSERVABILITY_OPERATIONS",
+    "G10_INDEPENDENT_SIGNOFF"
+  ],
+  "source_runs": {
+    "foundation": {
+      "id": 42208334348,
+      "job": 127860466822,
+      "sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd"
+    },
+    "scoped": {
+      "id": 42208334405,
+      "sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd"
+    },
+    "security": {
+      "id": 42208334526,
+      "job": 127860468056,
+      "sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd"
+    },
+    "transport": {
+      "id": 42208334592,
+      "job": 127860467943,
+      "sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd"
+    },
+    "durable": {
+      "id": 42208334762,
+      "job": 127860468712,
+      "sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd"
+    },
+    "perf": {
+      "id": 42208334598,
+      "job": 127860468134,
+      "sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd"
+    }
+  },
+  "scoped_job_ids": {
+    "ENG-01": 127860467762,
+    "ENG-02": 127860467667,
+    "ENG-03": 127860467855,
+    "ENG-04": 127860468314,
+    "ENG-05": 127860467712,
+    "ENG-06": 127860467847,
+    "ENG-14": 127860467793,
+    "LEGACY_REVIEW_TRANSPORT": 127860467673
+  },
+  "cloud_deployment_permitted": false,
+  "cloud_deployment_proven": false,
+  "cost_authorized": false,
+  "customer_media_enabled": false,
+  "eng06_release_approved": false,
+  "eng07_dispatch_authorized": false,
+  "independent_security_approved": false,
+  "independent_sre_approved": false,
+  "independent_specialist_approved": false,
+  "architecture_adr_ratified": false,
+  "a2_operational_closed": false,
+  "scopes": [
+    {
+      "scope_id": "ENG-01",
+      "capability": "Orchestration & Workflow Control",
+      "canonical_engine": true,
+      "implementation_status": "PARTIAL",
+      "contracts": [
+        "contracts/v1/engines/ENG-01.contract.json"
+      ],
+      "owner_risks": [
+        "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated."
+      ],
+      "managed_deployment_verified": false,
+      "gates": [
+        {
+          "gate_id": "G01_ARCHITECTURE",
+          "required_acceptance": "Approve canonical ownership, ADRs, trust boundaries and adapter isolation",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md"
+          ],
+          "reviewer_role": "Architecture owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Architecture owner must ratify ADR-ENG-003, adapter ADR-ENG-004 and proposed identity ADR-ENG-005 against exact commit; canonical contract hash freeze.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "architecture_ratification"
+        },
+        {
+          "gate_id": "G02_DOMAIN_CAPABILITY",
+          "required_acceptance": "Demonstrate exact scoped behavior with positive, negative and stop-condition scenarios",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng01_pg_command.py",
+              "assertion": "test_atomic_create_receipt_audit_and_replay",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467762,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py"
+          ],
+          "reviewer_role": "Domain owner and qualified specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Domain owner and qualified specialist must approve output scope, positive/negative cases and safety requirements; customer/model/media functionality is not proven.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "capability_validation"
+        },
+        {
+          "gate_id": "G03_CONTRACTS",
+          "required_acceptance": "Validate immutable versioned I/O, provenance, compatibility and malformed-request denial",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng01_pg_command.py",
+              "assertion": "test_same_command_changed_metadata_never_replays",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467762,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "contracts/v1/engines/ENG-01.contract.json"
+          ],
+          "reviewer_role": "Architecture / contract steward",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independent contract owner must inspect precise versioned schema/trace binding and all producer/consumer failure modes; full cross-service compatibility is not verified.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "contract_review"
+        },
+        {
+          "gate_id": "G04_INDEPENDENCE",
+          "required_acceptance": "Prove separate managed identities, private network, physical service isolation and failure boundaries",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng01_pg_command.py",
+              "assertion": "test_parallel_single_commit",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467762,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "runtime/phase04/abc_foundation/private_engine_transport.py"
+          ],
+          "reviewer_role": "Security and SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Real provider private services, independent managed credentials, physical PostgreSQL clientcert and network-denial/failure evidence missing; cost hold active.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "external_private_staging"
+        },
+        {
+          "gate_id": "G05_SECURITY_PRIVACY",
+          "required_acceptance": "Verify AuthN/AuthZ, tenant RLS, consent, revocation, identity/replay binding and privacy",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng01_pg_command.py",
+              "assertion": "test_worker_cannot_read_engine_command_receipts",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467762,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+          ],
+          "reviewer_role": "Independent Security and privacy reviewer",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Security/privacy reviewer must inspect actual PKI/JWT/DB permissions, consent semantics and negative cases on real provider; synthetic client secrets are not managed.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "independent_security"
+        },
+        {
+          "gate_id": "G06_RELIABILITY",
+          "required_acceptance": "Verify durable transaction, idempotency, lease/ACK/DLQ, crash and restart/fencing where applicable",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng01_pg_command.py",
+              "assertion": "test_stale_key_cannot_apply_second_pause",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467762,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "runtime/phase04/tests/test_a2_g06_durable_resilience.py"
+          ],
+          "reviewer_role": "SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "SRE must approve target failure scenarios, distributed transaction semantics and live DB/network recovery/rollback; disposable fault tests are not operational proof.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "reliability_review"
+        },
+        {
+          "gate_id": "G07_PERFORMANCE",
+          "required_acceptance": "Verify reproducible scoped p95/p99, capacity and error budget on approved target workload",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json"
+          ],
+          "reviewer_role": "SRE and performance owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Only synthetic five-process E2E CI p50/p95/p99 (100 samples, 4 concurrency) measured; no per-engine production SLA or pinned hosted capacity/real model load.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "slo_ratification"
+        },
+        {
+          "gate_id": "G08_PROFESSIONAL_VALIDATION",
+          "required_acceptance": "Independently validate professional rights/qualification, uncertainty, contraindications, stop conditions",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "governance/ENG06_ISOLATED_REVIEW_ACCEPTANCE_20261103.md"
+          ],
+          "reviewer_role": "Qualified independent specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independently qualified specialist must verify sources, licensing, contraindications and stop conditions with exact-scope signed review; none received.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "professional_signoff"
+        },
+        {
+          "gate_id": "G09_OBSERVABILITY_OPERATIONS",
+          "required_acceptance": "Verify meaningful traces, alert delivery/ACK, restore, RTO/RPO and rollback drills",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "runtime/phase04/tests/test_a2_g09_recovery.py"
+          ],
+          "reviewer_role": "Independent SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Actual provider tracing, alert routing/on-call ACK, backup/PITR, RPO/RTO and rollback runbook rehearsals not independently verified.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "operational_observability"
+        },
+        {
+          "gate_id": "G10_INDEPENDENT_SIGNOFF",
+          "required_acceptance": "Collect independent exact-SHA, artifact-digest, reviewer-identity/authority, expiry-bound decision",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng01_orchestrator.py",
+            "runtime/phase04/abc_foundation/eng01_pg.py",
+            "governance/ABC_A2_INDEPENDENT_ACCEPTANCE_RECORD_UNSIGNED_20261104.md"
+          ],
+          "reviewer_role": "Independent governance board",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "No verified independent reviewer identity, credential, exact-sha signed decision or expiry/revocation record. Open issue #58/#84/#85/#79.",
+          "scope_limit": "Only synthetic S0 orchestration; full canonical graph and managed operator identity are not validated.",
+          "blocker_type": "independent_acceptance"
+        }
+      ]
+    },
+    {
+      "scope_id": "ENG-02",
+      "capability": "Consultation / Consent pre-capture",
+      "canonical_engine": true,
+      "implementation_status": "PARTIAL",
+      "contracts": [
+        "contracts/v1/engines/ENG-02.contract.json"
+      ],
+      "owner_risks": [
+        "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required."
+      ],
+      "managed_deployment_verified": false,
+      "gates": [
+        {
+          "gate_id": "G01_ARCHITECTURE",
+          "required_acceptance": "Approve canonical ownership, ADRs, trust boundaries and adapter isolation",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md"
+          ],
+          "reviewer_role": "Architecture owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Architecture owner must ratify ADR-ENG-003, adapter ADR-ENG-004 and proposed identity ADR-ENG-005 against exact commit; canonical contract hash freeze.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "architecture_ratification"
+        },
+        {
+          "gate_id": "G02_DOMAIN_CAPABILITY",
+          "required_acceptance": "Demonstrate exact scoped behavior with positive, negative and stop-condition scenarios",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_capture_pg_gate.py",
+              "assertion": "test_05_both_purposes_verified_still_deny_actual_media_upload",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_capture_pg_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py"
+          ],
+          "reviewer_role": "Domain owner and qualified specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Domain owner and qualified specialist must approve output scope, positive/negative cases and safety requirements; customer/model/media functionality is not proven.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "capability_validation"
+        },
+        {
+          "gate_id": "G03_CONTRACTS",
+          "required_acceptance": "Validate immutable versioned I/O, provenance, compatibility and malformed-request denial",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_signed_pg.py",
+              "assertion": "test_out_of_order_question_and_malicious_answer_type_denied",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467667,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467667",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_signed_pg.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-02-42208334405",
+              "artifact_sha256": "c9c673e7c8626dbfba34b92f6b82edf63b5a8db1eef1abbe5bf142d363c68b7f"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "contracts/v1/engines/ENG-02.contract.json"
+          ],
+          "reviewer_role": "Architecture / contract steward",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independent contract owner must inspect precise versioned schema/trace binding and all producer/consumer failure modes; full cross-service compatibility is not verified.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "contract_review"
+        },
+        {
+          "gate_id": "G04_INDEPENDENCE",
+          "required_acceptance": "Prove separate managed identities, private network, physical service isolation and failure boundaries",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_eng06_five_process_chain.py",
+              "assertion": "test_01_full_five_process_chain_is_synthetic_only",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "runtime/phase04/abc_foundation/private_engine_transport.py"
+          ],
+          "reviewer_role": "Security and SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Real provider private services, independent managed credentials, physical PostgreSQL clientcert and network-denial/failure evidence missing; cost hold active.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "external_private_staging"
+        },
+        {
+          "gate_id": "G05_SECURITY_PRIVACY",
+          "required_acceptance": "Verify AuthN/AuthZ, tenant RLS, consent, revocation, identity/replay binding and privacy",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_capture_pg_gate.py",
+              "assertion": "test_10_withdrawn_consent_denied_no_media_persistence",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_capture_pg_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+          ],
+          "reviewer_role": "Independent Security and privacy reviewer",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Security/privacy reviewer must inspect actual PKI/JWT/DB permissions, consent semantics and negative cases on real provider; synthetic client secrets are not managed.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "independent_security"
+        },
+        {
+          "gate_id": "G06_RELIABILITY",
+          "required_acceptance": "Verify durable transaction, idempotency, lease/ACK/DLQ, crash and restart/fencing where applicable",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_g09_recovery.py",
+              "assertion": "test_02_hard_exit_after_committed_answer_before_ack_has_zero_rpo_and_replay",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "runtime/phase04/tests/test_a2_g06_durable_resilience.py"
+          ],
+          "reviewer_role": "SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "SRE must approve target failure scenarios, distributed transaction semantics and live DB/network recovery/rollback; disposable fault tests are not operational proof.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "reliability_review"
+        },
+        {
+          "gate_id": "G07_PERFORMANCE",
+          "required_acceptance": "Verify reproducible scoped p95/p99, capacity and error budget on approved target workload",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/a2_g07_five_process_benchmark.py",
+              "assertion": "bench",
+              "observed_ci_run_id": 42208334598,
+              "observed_ci_job_id": 127860468134,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
+              "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json"
+          ],
+          "reviewer_role": "SRE and performance owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Only synthetic five-process E2E CI p50/p95/p99 (100 samples, 4 concurrency) measured; no per-engine production SLA or pinned hosted capacity/real model load.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "slo_ratification"
+        },
+        {
+          "gate_id": "G08_PROFESSIONAL_VALIDATION",
+          "required_acceptance": "Independently validate professional rights/qualification, uncertainty, contraindications, stop conditions",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_capture_pg_gate.py",
+              "assertion": "test_08_membership_without_verified_specialist_qualification_denied",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_capture_pg_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "governance/ENG06_ISOLATED_REVIEW_ACCEPTANCE_20261103.md"
+          ],
+          "reviewer_role": "Qualified independent specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independently qualified specialist must verify sources, licensing, contraindications and stop conditions with exact-scope signed review; none received.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "professional_signoff"
+        },
+        {
+          "gate_id": "G09_OBSERVABILITY_OPERATIONS",
+          "required_acceptance": "Verify meaningful traces, alert delivery/ACK, restore, RTO/RPO and rollback drills",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_g09_recovery.py",
+              "assertion": "test_04_hung_worker_is_killed_and_replaced_inside_cleanup_budget",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "runtime/phase04/tests/test_a2_g09_recovery.py"
+          ],
+          "reviewer_role": "Independent SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Actual provider tracing, alert routing/on-call ACK, backup/PITR, RPO/RTO and rollback runbook rehearsals not independently verified.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "operational_observability"
+        },
+        {
+          "gate_id": "G10_INDEPENDENT_SIGNOFF",
+          "required_acceptance": "Collect independent exact-SHA, artifact-digest, reviewer-identity/authority, expiry-bound decision",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng02_consultation.py",
+            "runtime/phase04/abc_foundation/pg_store.py",
+            "governance/ABC_A2_INDEPENDENT_ACCEPTANCE_RECORD_UNSIGNED_20261104.md"
+          ],
+          "reviewer_role": "Independent governance board",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "No verified independent reviewer identity, credential, exact-sha signed decision or expiry/revocation record. Open issue #58/#84/#85/#79.",
+          "scope_limit": "Valid consent yields HTTP 501: no real media writer. Read-only preflight cannot atomically authorize future media persistence; same-write-tx recheck is required.",
+          "blocker_type": "independent_acceptance"
+        }
+      ]
+    },
+    {
+      "scope_id": "ENG-03",
+      "capability": "Evidence admission and provenance",
+      "canonical_engine": true,
+      "implementation_status": "PARTIAL",
+      "contracts": [
+        "contracts/v1/engines/ENG-03.contract.json"
+      ],
+      "owner_risks": [
+        "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection."
+      ],
+      "managed_deployment_verified": false,
+      "gates": [
+        {
+          "gate_id": "G01_ARCHITECTURE",
+          "required_acceptance": "Approve canonical ownership, ADRs, trust boundaries and adapter isolation",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md"
+          ],
+          "reviewer_role": "Architecture owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Architecture owner must ratify ADR-ENG-003, adapter ADR-ENG-004 and proposed identity ADR-ENG-005 against exact commit; canonical contract hash freeze.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "architecture_ratification"
+        },
+        {
+          "gate_id": "G02_DOMAIN_CAPABILITY",
+          "required_acceptance": "Demonstrate exact scoped behavior with positive, negative and stop-condition scenarios",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_eng06_five_process_chain.py",
+              "assertion": "test_01_full_five_process_chain_is_synthetic_only",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py"
+          ],
+          "reviewer_role": "Domain owner and qualified specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Domain owner and qualified specialist must approve output scope, positive/negative cases and safety requirements; customer/model/media functionality is not proven.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "capability_validation"
+        },
+        {
+          "gate_id": "G03_CONTRACTS",
+          "required_acceptance": "Validate immutable versioned I/O, provenance, compatibility and malformed-request denial",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+              "assertion": "test_database_rejects_forged_eng03_source_and_policy",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "contracts/v1/engines/ENG-03.contract.json"
+          ],
+          "reviewer_role": "Architecture / contract steward",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independent contract owner must inspect precise versioned schema/trace binding and all producer/consumer failure modes; full cross-service compatibility is not verified.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "contract_review"
+        },
+        {
+          "gate_id": "G04_INDEPENDENCE",
+          "required_acceptance": "Prove separate managed identities, private network, physical service isolation and failure boundaries",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+              "assertion": "test_eng04_actual_separate_os_process_from_verified_eng03_ledger",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "runtime/phase04/abc_foundation/private_engine_transport.py"
+          ],
+          "reviewer_role": "Security and SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Real provider private services, independent managed credentials, physical PostgreSQL clientcert and network-denial/failure evidence missing; cost hold active.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "external_private_staging"
+        },
+        {
+          "gate_id": "G05_SECURITY_PRIVACY",
+          "required_acceptance": "Verify AuthN/AuthZ, tenant RLS, consent, revocation, identity/replay binding and privacy",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+              "assertion": "test_revocation_denies_next_claim_and_proof_read",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+          ],
+          "reviewer_role": "Independent Security and privacy reviewer",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Security/privacy reviewer must inspect actual PKI/JWT/DB permissions, consent semantics and negative cases on real provider; synthetic client secrets are not managed.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "independent_security"
+        },
+        {
+          "gate_id": "G06_RELIABILITY",
+          "required_acceptance": "Verify durable transaction, idempotency, lease/ACK/DLQ, crash and restart/fencing where applicable",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+              "assertion": "test_crash_before_completion_and_stale_fencing",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "runtime/phase04/tests/test_a2_g06_durable_resilience.py"
+          ],
+          "reviewer_role": "SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "SRE must approve target failure scenarios, distributed transaction semantics and live DB/network recovery/rollback; disposable fault tests are not operational proof.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "reliability_review"
+        },
+        {
+          "gate_id": "G07_PERFORMANCE",
+          "required_acceptance": "Verify reproducible scoped p95/p99, capacity and error budget on approved target workload",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/a2_g07_five_process_benchmark.py",
+              "assertion": "bench",
+              "observed_ci_run_id": 42208334598,
+              "observed_ci_job_id": 127860468134,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
+              "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json"
+          ],
+          "reviewer_role": "SRE and performance owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Only synthetic five-process E2E CI p50/p95/p99 (100 samples, 4 concurrency) measured; no per-engine production SLA or pinned hosted capacity/real model load.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "slo_ratification"
+        },
+        {
+          "gate_id": "G08_PROFESSIONAL_VALIDATION",
+          "required_acceptance": "Independently validate professional rights/qualification, uncertainty, contraindications, stop conditions",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "governance/ENG06_ISOLATED_REVIEW_ACCEPTANCE_20261103.md"
+          ],
+          "reviewer_role": "Qualified independent specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independently qualified specialist must verify sources, licensing, contraindications and stop conditions with exact-scope signed review; none received.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "professional_signoff"
+        },
+        {
+          "gate_id": "G09_OBSERVABILITY_OPERATIONS",
+          "required_acceptance": "Verify meaningful traces, alert delivery/ACK, restore, RTO/RPO and rollback drills",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_g09_recovery.py",
+              "assertion": "test_01_all_five_engines_restart_after_forced_process_crash",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "runtime/phase04/tests/test_a2_g09_recovery.py"
+          ],
+          "reviewer_role": "Independent SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Actual provider tracing, alert routing/on-call ACK, backup/PITR, RPO/RTO and rollback runbook rehearsals not independently verified.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "operational_observability"
+        },
+        {
+          "gate_id": "G10_INDEPENDENT_SIGNOFF",
+          "required_acceptance": "Collect independent exact-SHA, artifact-digest, reviewer-identity/authority, expiry-bound decision",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng03_evidence.py",
+            "runtime/phase04/abc_foundation/eng03_executor.py",
+            "governance/ABC_A2_INDEPENDENT_ACCEPTANCE_RECORD_UNSIGNED_20261104.md"
+          ],
+          "reviewer_role": "Independent governance board",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "No verified independent reviewer identity, credential, exact-sha signed decision or expiry/revocation record. Open issue #58/#84/#85/#79.",
+          "scope_limit": "Evidence is synthetic non-media; no independent provider-issued workload identity or approved media collection.",
+          "blocker_type": "independent_acceptance"
+        }
+      ]
+    },
+    {
+      "scope_id": "ENG-04",
+      "capability": "Synthetic analysis / report",
+      "canonical_engine": true,
+      "implementation_status": "PARTIAL",
+      "contracts": [
+        "contracts/v1/engines/ENG-04.contract.json"
+      ],
+      "owner_risks": [
+        "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice."
+      ],
+      "managed_deployment_verified": false,
+      "gates": [
+        {
+          "gate_id": "G01_ARCHITECTURE",
+          "required_acceptance": "Approve canonical ownership, ADRs, trust boundaries and adapter isolation",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md"
+          ],
+          "reviewer_role": "Architecture owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Architecture owner must ratify ADR-ENG-003, adapter ADR-ENG-004 and proposed identity ADR-ENG-005 against exact commit; canonical contract hash freeze.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "architecture_ratification"
+        },
+        {
+          "gate_id": "G02_DOMAIN_CAPABILITY",
+          "required_acceptance": "Demonstrate exact scoped behavior with positive, negative and stop-condition scenarios",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng04_isolated_worker.py",
+              "assertion": "test_report_deterministic_shape_from_four_verified_sources",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860468314,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860468314",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng04_isolated_worker.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-04-42208334405",
+              "artifact_sha256": "de721d8ec741ad553a23c0feed122cd7ca3362f3e10160fa631bde89fabf1fb8"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py"
+          ],
+          "reviewer_role": "Domain owner and qualified specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Domain owner and qualified specialist must approve output scope, positive/negative cases and safety requirements; customer/model/media functionality is not proven.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "capability_validation"
+        },
+        {
+          "gate_id": "G03_CONTRACTS",
+          "required_acceptance": "Validate immutable versioned I/O, provenance, compatibility and malformed-request denial",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng04_isolated_worker.py",
+              "assertion": "test_report_schema_rejects_action_authority_and_modified_analysis",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860468314,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860468314",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng04_isolated_worker.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-04-42208334405",
+              "artifact_sha256": "de721d8ec741ad553a23c0feed122cd7ca3362f3e10160fa631bde89fabf1fb8"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "contracts/v1/engines/ENG-04.contract.json"
+          ],
+          "reviewer_role": "Architecture / contract steward",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independent contract owner must inspect precise versioned schema/trace binding and all producer/consumer failure modes; full cross-service compatibility is not verified.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "contract_review"
+        },
+        {
+          "gate_id": "G04_INDEPENDENCE",
+          "required_acceptance": "Prove separate managed identities, private network, physical service isolation and failure boundaries",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_private_spiffe_pg_multinstance.py",
+              "assertion": "test_03_eight_client_processes_three_receiver_processes_one_db_jti",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_private_spiffe_pg_multinstance.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "runtime/phase04/abc_foundation/private_engine_transport.py"
+          ],
+          "reviewer_role": "Security and SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Real provider private services, independent managed credentials, physical PostgreSQL clientcert and network-denial/failure evidence missing; cost hold active.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "external_private_staging"
+        },
+        {
+          "gate_id": "G05_SECURITY_PRIVACY",
+          "required_acceptance": "Verify AuthN/AuthZ, tenant RLS, consent, revocation, identity/replay binding and privacy",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng04_isolated_worker.py",
+              "assertion": "test_worker_denies_unproven_eng03_source_and_keeps_job_unleased",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860468314,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860468314",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng04_isolated_worker.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-04-42208334405",
+              "artifact_sha256": "de721d8ec741ad553a23c0feed122cd7ca3362f3e10160fa631bde89fabf1fb8"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+          ],
+          "reviewer_role": "Independent Security and privacy reviewer",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Security/privacy reviewer must inspect actual PKI/JWT/DB permissions, consent semantics and negative cases on real provider; synthetic client secrets are not managed.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "independent_security"
+        },
+        {
+          "gate_id": "G06_RELIABILITY",
+          "required_acceptance": "Verify durable transaction, idempotency, lease/ACK/DLQ, crash and restart/fencing where applicable",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+              "assertion": "test_eng04_worker_retry_then_terminal_dlq_without_handoff",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "runtime/phase04/tests/test_a2_g06_durable_resilience.py"
+          ],
+          "reviewer_role": "SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "SRE must approve target failure scenarios, distributed transaction semantics and live DB/network recovery/rollback; disposable fault tests are not operational proof.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "reliability_review"
+        },
+        {
+          "gate_id": "G07_PERFORMANCE",
+          "required_acceptance": "Verify reproducible scoped p95/p99, capacity and error budget on approved target workload",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/a2_g07_five_process_benchmark.py",
+              "assertion": "bench",
+              "observed_ci_run_id": 42208334598,
+              "observed_ci_job_id": 127860468134,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
+              "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json"
+          ],
+          "reviewer_role": "SRE and performance owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Only synthetic five-process E2E CI p50/p95/p99 (100 samples, 4 concurrency) measured; no per-engine production SLA or pinned hosted capacity/real model load.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "slo_ratification"
+        },
+        {
+          "gate_id": "G08_PROFESSIONAL_VALIDATION",
+          "required_acceptance": "Independently validate professional rights/qualification, uncertainty, contraindications, stop conditions",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "governance/ENG06_ISOLATED_REVIEW_ACCEPTANCE_20261103.md"
+          ],
+          "reviewer_role": "Qualified independent specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independently qualified specialist must verify sources, licensing, contraindications and stop conditions with exact-scope signed review; none received.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "professional_signoff"
+        },
+        {
+          "gate_id": "G09_OBSERVABILITY_OPERATIONS",
+          "required_acceptance": "Verify meaningful traces, alert delivery/ACK, restore, RTO/RPO and rollback drills",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_g09_recovery.py",
+              "assertion": "test_01_all_five_engines_restart_after_forced_process_crash",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "runtime/phase04/tests/test_a2_g09_recovery.py"
+          ],
+          "reviewer_role": "Independent SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Actual provider tracing, alert routing/on-call ACK, backup/PITR, RPO/RTO and rollback runbook rehearsals not independently verified.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "operational_observability"
+        },
+        {
+          "gate_id": "G10_INDEPENDENT_SIGNOFF",
+          "required_acceptance": "Collect independent exact-SHA, artifact-digest, reviewer-identity/authority, expiry-bound decision",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng04_analysis.py",
+            "runtime/phase04/abc_foundation/eng04_review_worker.py",
+            "governance/ABC_A2_INDEPENDENT_ACCEPTANCE_RECORD_UNSIGNED_20261104.md"
+          ],
+          "reviewer_role": "Independent governance board",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "No verified independent reviewer identity, credential, exact-sha signed decision or expiry/revocation record. Open issue #58/#84/#85/#79.",
+          "scope_limit": "No customer photo/model analysis and no real hosted ENG04 identity; synthetic report is not professional advice.",
+          "blocker_type": "independent_acceptance"
+        }
+      ]
+    },
+    {
+      "scope_id": "ENG-05",
+      "capability": "Versioned knowledge and specialist review",
+      "canonical_engine": true,
+      "implementation_status": "PARTIAL",
+      "contracts": [
+        "contracts/v1/engines/ENG-05.contract.json"
+      ],
+      "owner_risks": [
+        "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch."
+      ],
+      "managed_deployment_verified": false,
+      "gates": [
+        {
+          "gate_id": "G01_ARCHITECTURE",
+          "required_acceptance": "Approve canonical ownership, ADRs, trust boundaries and adapter isolation",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md"
+          ],
+          "reviewer_role": "Architecture owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Architecture owner must ratify ADR-ENG-003, adapter ADR-ENG-004 and proposed identity ADR-ENG-005 against exact commit; canonical contract hash freeze.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "architecture_ratification"
+        },
+        {
+          "gate_id": "G02_DOMAIN_CAPABILITY",
+          "required_acceptance": "Demonstrate exact scoped behavior with positive, negative and stop-condition scenarios",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng05_professional_sources.py",
+              "assertion": "test_conflicting_sources_do_not_rank_or_silently_pick_newest",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467712,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467712",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng05_professional_sources.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-05-42208334405",
+              "artifact_sha256": "4c169b03352c7277ca27fd007231bbb59c6a9dd7dbce9e1c51eb8fc1614904c4"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py"
+          ],
+          "reviewer_role": "Domain owner and qualified specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Domain owner and qualified specialist must approve output scope, positive/negative cases and safety requirements; customer/model/media functionality is not proven.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "capability_validation"
+        },
+        {
+          "gate_id": "G03_CONTRACTS",
+          "required_acceptance": "Validate immutable versioned I/O, provenance, compatibility and malformed-request denial",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng05_professional_sources.py",
+              "assertion": "test_contract_is_versioned_and_hash_stable",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467712,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467712",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng05_professional_sources.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-05-42208334405",
+              "artifact_sha256": "4c169b03352c7277ca27fd007231bbb59c6a9dd7dbce9e1c51eb8fc1614904c4"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "contracts/v1/engines/ENG-05.contract.json"
+          ],
+          "reviewer_role": "Architecture / contract steward",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independent contract owner must inspect precise versioned schema/trace binding and all producer/consumer failure modes; full cross-service compatibility is not verified.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "contract_review"
+        },
+        {
+          "gate_id": "G04_INDEPENDENCE",
+          "required_acceptance": "Prove separate managed identities, private network, physical service isolation and failure boundaries",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_private_spiffe_pg_multinstance.py",
+              "assertion": "test_03_eight_client_processes_three_receiver_processes_one_db_jti",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_private_spiffe_pg_multinstance.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "runtime/phase04/abc_foundation/private_engine_transport.py"
+          ],
+          "reviewer_role": "Security and SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Real provider private services, independent managed credentials, physical PostgreSQL clientcert and network-denial/failure evidence missing; cost hold active.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "external_private_staging"
+        },
+        {
+          "gate_id": "G05_SECURITY_PRIVACY",
+          "required_acceptance": "Verify AuthN/AuthZ, tenant RLS, consent, revocation, identity/replay binding and privacy",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_private_spiffe_pg_multinstance.py",
+              "assertion": "test_05_revoked_certificate_binding_denied",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_private_spiffe_pg_multinstance.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+          ],
+          "reviewer_role": "Independent Security and privacy reviewer",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Security/privacy reviewer must inspect actual PKI/JWT/DB permissions, consent semantics and negative cases on real provider; synthetic client secrets are not managed.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "independent_security"
+        },
+        {
+          "gate_id": "G06_RELIABILITY",
+          "required_acceptance": "Verify durable transaction, idempotency, lease/ACK/DLQ, crash and restart/fencing where applicable",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng03_durable_pipeline.py",
+              "assertion": "test_eng05_verified_queue_retries_then_dlq_and_no_eng06_outbox",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "runtime/phase04/tests/test_a2_g06_durable_resilience.py"
+          ],
+          "reviewer_role": "SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "SRE must approve target failure scenarios, distributed transaction semantics and live DB/network recovery/rollback; disposable fault tests are not operational proof.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "reliability_review"
+        },
+        {
+          "gate_id": "G07_PERFORMANCE",
+          "required_acceptance": "Verify reproducible scoped p95/p99, capacity and error budget on approved target workload",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/a2_g07_five_process_benchmark.py",
+              "assertion": "bench",
+              "observed_ci_run_id": 42208334598,
+              "observed_ci_job_id": 127860468134,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
+              "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json"
+          ],
+          "reviewer_role": "SRE and performance owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Only synthetic five-process E2E CI p50/p95/p99 (100 samples, 4 concurrency) measured; no per-engine production SLA or pinned hosted capacity/real model load.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "slo_ratification"
+        },
+        {
+          "gate_id": "G08_PROFESSIONAL_VALIDATION",
+          "required_acceptance": "Independently validate professional rights/qualification, uncertainty, contraindications, stop conditions",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng05_professional_sources.py",
+              "assertion": "test_safety_critical_requires_two_distinct_independent_reviews",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467712,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467712",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng05_professional_sources.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-05-42208334405",
+              "artifact_sha256": "4c169b03352c7277ca27fd007231bbb59c6a9dd7dbce9e1c51eb8fc1614904c4"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "governance/ENG06_ISOLATED_REVIEW_ACCEPTANCE_20261103.md"
+          ],
+          "reviewer_role": "Qualified independent specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independently qualified specialist must verify sources, licensing, contraindications and stop conditions with exact-scope signed review; none received.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "professional_signoff"
+        },
+        {
+          "gate_id": "G09_OBSERVABILITY_OPERATIONS",
+          "required_acceptance": "Verify meaningful traces, alert delivery/ACK, restore, RTO/RPO and rollback drills",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_g09_recovery.py",
+              "assertion": "test_05_recovered_chain_never_claims_unverified_professional_source",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "runtime/phase04/tests/test_a2_g09_recovery.py"
+          ],
+          "reviewer_role": "Independent SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Actual provider tracing, alert routing/on-call ACK, backup/PITR, RPO/RTO and rollback runbook rehearsals not independently verified.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "operational_observability"
+        },
+        {
+          "gate_id": "G10_INDEPENDENT_SIGNOFF",
+          "required_acceptance": "Collect independent exact-SHA, artifact-digest, reviewer-identity/authority, expiry-bound decision",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng05_knowledge.py",
+            "runtime/phase04/abc_foundation/eng05_professional_sources.py",
+            "governance/ABC_A2_INDEPENDENT_ACCEPTANCE_RECORD_UNSIGNED_20261104.md"
+          ],
+          "reviewer_role": "Independent governance board",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "No verified independent reviewer identity, credential, exact-sha signed decision or expiry/revocation record. Open issue #58/#84/#85/#79.",
+          "scope_limit": "Externally credentialed professional source rights/approval missing; unverified knowledge never authorizes real treatment or ENG06 dispatch.",
+          "blocker_type": "independent_acceptance"
+        }
+      ]
+    },
+    {
+      "scope_id": "ENG-06",
+      "capability": "Review-only decision / technical planning boundary",
+      "canonical_engine": true,
+      "implementation_status": "PARTIAL",
+      "contracts": [
+        "contracts/v1/engines/ENG-06.contract.json"
+      ],
+      "owner_risks": [
+        "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent."
+      ],
+      "managed_deployment_verified": false,
+      "gates": [
+        {
+          "gate_id": "G01_ARCHITECTURE",
+          "required_acceptance": "Approve canonical ownership, ADRs, trust boundaries and adapter isolation",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md"
+          ],
+          "reviewer_role": "Architecture owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Architecture owner must ratify ADR-ENG-003, adapter ADR-ENG-004 and proposed identity ADR-ENG-005 against exact commit; canonical contract hash freeze.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "architecture_ratification"
+        },
+        {
+          "gate_id": "G02_DOMAIN_CAPABILITY",
+          "required_acceptance": "Demonstrate exact scoped behavior with positive, negative and stop-condition scenarios",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_eng06_five_process_chain.py",
+              "assertion": "test_02_unknown_critical_answer_stops_question_and_candidate",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py"
+          ],
+          "reviewer_role": "Domain owner and qualified specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Domain owner and qualified specialist must approve output scope, positive/negative cases and safety requirements; customer/model/media functionality is not proven.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "capability_validation"
+        },
+        {
+          "gate_id": "G03_CONTRACTS",
+          "required_acceptance": "Validate immutable versioned I/O, provenance, compatibility and malformed-request denial",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_eng06_five_process_chain.py",
+              "assertion": "test_07_cross_session_analysis_denied_by_eng06",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "contracts/v1/engines/ENG-06.contract.json"
+          ],
+          "reviewer_role": "Architecture / contract steward",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independent contract owner must inspect precise versioned schema/trace binding and all producer/consumer failure modes; full cross-service compatibility is not verified.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "contract_review"
+        },
+        {
+          "gate_id": "G04_INDEPENDENCE",
+          "required_acceptance": "Prove separate managed identities, private network, physical service isolation and failure boundaries",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py",
+              "assertion": "test_eng06_runs_in_distinct_os_process_without_releasing_look",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "runtime/phase04/abc_foundation/private_engine_transport.py"
+          ],
+          "reviewer_role": "Security and SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Real provider private services, independent managed credentials, physical PostgreSQL clientcert and network-denial/failure evidence missing; cost hold active.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "external_private_staging"
+        },
+        {
+          "gate_id": "G05_SECURITY_PRIVACY",
+          "required_acceptance": "Verify AuthN/AuthZ, tenant RLS, consent, revocation, identity/replay binding and privacy",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_g06_durable_resilience.py",
+              "assertion": "test_g06_09_revoked_physical_worker_binding_fences_claim_and_ack",
+              "observed_ci_run_id": 42208334762,
+              "observed_ci_job_id": 127860468712,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334762/job/127860468712",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g06_durable_resilience.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-g06-42208334762",
+              "artifact_sha256": "aed97e6a397616b14eb7be363e28d26634905865cc7416cc8ab3b28fecf21eae"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+          ],
+          "reviewer_role": "Independent Security and privacy reviewer",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Security/privacy reviewer must inspect actual PKI/JWT/DB permissions, consent semantics and negative cases on real provider; synthetic client secrets are not managed.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "independent_security"
+        },
+        {
+          "gate_id": "G06_RELIABILITY",
+          "required_acceptance": "Verify durable transaction, idempotency, lease/ACK/DLQ, crash and restart/fencing where applicable",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_g06_durable_resilience.py",
+              "assertion": "test_g06_02_actual_worker_process_crash_then_fenced_reclaim",
+              "observed_ci_run_id": 42208334762,
+              "observed_ci_job_id": 127860468712,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334762/job/127860468712",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g06_durable_resilience.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-g06-42208334762",
+              "artifact_sha256": "aed97e6a397616b14eb7be363e28d26634905865cc7416cc8ab3b28fecf21eae"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "runtime/phase04/tests/test_a2_g06_durable_resilience.py"
+          ],
+          "reviewer_role": "SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "SRE must approve target failure scenarios, distributed transaction semantics and live DB/network recovery/rollback; disposable fault tests are not operational proof.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "reliability_review"
+        },
+        {
+          "gate_id": "G07_PERFORMANCE",
+          "required_acceptance": "Verify reproducible scoped p95/p99, capacity and error budget on approved target workload",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/a2_g07_five_process_benchmark.py",
+              "assertion": "bench",
+              "observed_ci_run_id": 42208334598,
+              "observed_ci_job_id": 127860468134,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
+              "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json"
+          ],
+          "reviewer_role": "SRE and performance owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Only synthetic five-process E2E CI p50/p95/p99 (100 samples, 4 concurrency) measured; no per-engine production SLA or pinned hosted capacity/real model load.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "slo_ratification"
+        },
+        {
+          "gate_id": "G08_PROFESSIONAL_VALIDATION",
+          "required_acceptance": "Independently validate professional rights/qualification, uncertainty, contraindications, stop conditions",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng02_eng06_five_process_chain.py",
+              "assertion": "test_04_no_professional_knowledge_yields_no_candidate",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "governance/ENG06_ISOLATED_REVIEW_ACCEPTANCE_20261103.md"
+          ],
+          "reviewer_role": "Qualified independent specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independently qualified specialist must verify sources, licensing, contraindications and stop conditions with exact-scope signed review; none received.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "professional_signoff"
+        },
+        {
+          "gate_id": "G09_OBSERVABILITY_OPERATIONS",
+          "required_acceptance": "Verify meaningful traces, alert delivery/ACK, restore, RTO/RPO and rollback drills",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_a2_g09_recovery.py",
+              "assertion": "test_01_all_five_engines_restart_after_forced_process_crash",
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "runtime/phase04/tests/test_a2_g09_recovery.py"
+          ],
+          "reviewer_role": "Independent SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Actual provider tracing, alert routing/on-call ACK, backup/PITR, RPO/RTO and rollback runbook rehearsals not independently verified.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "operational_observability"
+        },
+        {
+          "gate_id": "G10_INDEPENDENT_SIGNOFF",
+          "required_acceptance": "Collect independent exact-SHA, artifact-digest, reviewer-identity/authority, expiry-bound decision",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng06_decision.py",
+            "runtime/phase04/abc_foundation/eng06_review_worker.py",
+            "governance/ABC_A2_INDEPENDENT_ACCEPTANCE_RECORD_UNSIGNED_20261104.md"
+          ],
+          "reviewer_role": "Independent governance board",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "No verified independent reviewer identity, credential, exact-sha signed decision or expiry/revocation record. Open issue #58/#84/#85/#79.",
+          "scope_limit": "Operational ENG06 and customer/ENG07 release prohibited. Professional signoff and real managed custody absent.",
+          "blocker_type": "independent_acceptance"
+        }
+      ]
+    },
+    {
+      "scope_id": "ENG-14",
+      "capability": "Policy / governance gate",
+      "canonical_engine": true,
+      "implementation_status": "PARTIAL",
+      "contracts": [
+        "contracts/v1/engines/ENG-14.contract.json"
+      ],
+      "owner_risks": [
+        "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested."
+      ],
+      "managed_deployment_verified": false,
+      "gates": [
+        {
+          "gate_id": "G01_ARCHITECTURE",
+          "required_acceptance": "Approve canonical ownership, ADRs, trust boundaries and adapter isolation",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md"
+          ],
+          "reviewer_role": "Architecture owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Architecture owner must ratify ADR-ENG-003, adapter ADR-ENG-004 and proposed identity ADR-ENG-005 against exact commit; canonical contract hash freeze.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "architecture_ratification"
+        },
+        {
+          "gate_id": "G02_DOMAIN_CAPABILITY",
+          "required_acceptance": "Demonstrate exact scoped behavior with positive, negative and stop-condition scenarios",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng14_transition_gate.py",
+              "assertion": "test_all_102_edges_get_explicit_block_or_allow",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467793,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py"
+          ],
+          "reviewer_role": "Domain owner and qualified specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Domain owner and qualified specialist must approve output scope, positive/negative cases and safety requirements; customer/model/media functionality is not proven.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "capability_validation"
+        },
+        {
+          "gate_id": "G03_CONTRACTS",
+          "required_acceptance": "Validate immutable versioned I/O, provenance, compatibility and malformed-request denial",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng14_transition_gate.py",
+              "assertion": "test_bogus_policy_receipt_rejected",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467793,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "contracts/v1/engines/ENG-14.contract.json"
+          ],
+          "reviewer_role": "Architecture / contract steward",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independent contract owner must inspect precise versioned schema/trace binding and all producer/consumer failure modes; full cross-service compatibility is not verified.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "contract_review"
+        },
+        {
+          "gate_id": "G04_INDEPENDENCE",
+          "required_acceptance": "Prove separate managed identities, private network, physical service isolation and failure boundaries",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng14_transition_gate.py",
+              "assertion": "test_untrusted_direct_state_update_rejected",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467793,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "runtime/phase04/abc_foundation/private_engine_transport.py"
+          ],
+          "reviewer_role": "Security and SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Real provider private services, independent managed credentials, physical PostgreSQL clientcert and network-denial/failure evidence missing; cost hold active.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "external_private_staging"
+        },
+        {
+          "gate_id": "G05_SECURITY_PRIVACY",
+          "required_acceptance": "Verify AuthN/AuthZ, tenant RLS, consent, revocation, identity/replay binding and privacy",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng14_transition_gate.py",
+              "assertion": "test_forged_custom_guc_cannot_grant_direct_state_update",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467793,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+          ],
+          "reviewer_role": "Independent Security and privacy reviewer",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Security/privacy reviewer must inspect actual PKI/JWT/DB permissions, consent semantics and negative cases on real provider; synthetic client secrets are not managed.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "independent_security"
+        },
+        {
+          "gate_id": "G06_RELIABILITY",
+          "required_acceptance": "Verify durable transaction, idempotency, lease/ACK/DLQ, crash and restart/fencing where applicable",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng14_transition_gate.py",
+              "assertion": "test_paused_resume_denied_even_with_forged_db_scope",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467793,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "runtime/phase04/tests/test_a2_g06_durable_resilience.py"
+          ],
+          "reviewer_role": "SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "SRE must approve target failure scenarios, distributed transaction semantics and live DB/network recovery/rollback; disposable fault tests are not operational proof.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "reliability_review"
+        },
+        {
+          "gate_id": "G07_PERFORMANCE",
+          "required_acceptance": "Verify reproducible scoped p95/p99, capacity and error budget on approved target workload",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json"
+          ],
+          "reviewer_role": "SRE and performance owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Only synthetic five-process E2E CI p50/p95/p99 (100 samples, 4 concurrency) measured; no per-engine production SLA or pinned hosted capacity/real model load.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "slo_ratification"
+        },
+        {
+          "gate_id": "G08_PROFESSIONAL_VALIDATION",
+          "required_acceptance": "Independently validate professional rights/qualification, uncertainty, contraindications, stop conditions",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng14_transition_gate.py",
+              "assertion": "test_immutable_synthetic_s0_scope_cannot_be_promoted_to_release",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467793,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "governance/ENG06_ISOLATED_REVIEW_ACCEPTANCE_20261103.md"
+          ],
+          "reviewer_role": "Qualified independent specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independently qualified specialist must verify sources, licensing, contraindications and stop conditions with exact-scope signed review; none received.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "professional_signoff"
+        },
+        {
+          "gate_id": "G09_OBSERVABILITY_OPERATIONS",
+          "required_acceptance": "Verify meaningful traces, alert delivery/ACK, restore, RTO/RPO and rollback drills",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "runtime/phase04/tests/test_a2_g09_recovery.py"
+          ],
+          "reviewer_role": "Independent SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Actual provider tracing, alert routing/on-call ACK, backup/PITR, RPO/RTO and rollback runbook rehearsals not independently verified.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "operational_observability"
+        },
+        {
+          "gate_id": "G10_INDEPENDENT_SIGNOFF",
+          "required_acceptance": "Collect independent exact-SHA, artifact-digest, reviewer-identity/authority, expiry-bound decision",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng14_policy.py",
+            "runtime/phase04/abc_foundation/eng14_transition_policy.py",
+            "governance/ABC_A2_INDEPENDENT_ACCEPTANCE_RECORD_UNSIGNED_20261104.md"
+          ],
+          "reviewer_role": "Independent governance board",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "No verified independent reviewer identity, credential, exact-sha signed decision or expiry/revocation record. Open issue #58/#84/#85/#79.",
+          "scope_limit": "Only bounded synthetic S0 policy authority; real managed human authorization and specialist review not attested.",
+          "blocker_type": "independent_acceptance"
+        }
+      ]
+    },
+    {
+      "scope_id": "LEGACY_REVIEW_TRANSPORT",
+      "capability": "Legacy review transport (NOT canonical ENG-19)",
+      "canonical_engine": false,
+      "implementation_status": "PARTIAL",
+      "contracts": [
+        "contracts/review/engine19_handoff.v0.schema.json"
+      ],
+      "owner_risks": [
+        "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff."
+      ],
+      "managed_deployment_verified": false,
+      "gates": [
+        {
+          "gate_id": "G01_ARCHITECTURE",
+          "required_acceptance": "Approve canonical ownership, ADRs, trust boundaries and adapter isolation",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "docs/04-platform/ADR_ENG_003_CANONICAL_19_ENGINE_OWNERSHIP_AND_WORKFLOW_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_004_V2_TO_19_ADAPTER_COMPATIBILITY_2026-10-30.md",
+            "docs/04-platform/ADR_ENG_005_MANAGED_WORKLOAD_IDENTITY_AND_TRUST_BOUNDARIES_2026-11-05.md"
+          ],
+          "reviewer_role": "Architecture owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Architecture owner must ratify ADR-ENG-003, adapter ADR-ENG-004 and proposed identity ADR-ENG-005 against exact commit; canonical contract hash freeze.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "architecture_ratification"
+        },
+        {
+          "gate_id": "G02_DOMAIN_CAPABILITY",
+          "required_acceptance": "Demonstrate exact scoped behavior with positive, negative and stop-condition scenarios",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py",
+              "assertion": "test_real_tls13_jwt_consent_and_pg_review_receipt",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467673,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py"
+          ],
+          "reviewer_role": "Domain owner and qualified specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Domain owner and qualified specialist must approve output scope, positive/negative cases and safety requirements; customer/model/media functionality is not proven.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "capability_validation"
+        },
+        {
+          "gate_id": "G03_CONTRACTS",
+          "required_acceptance": "Validate immutable versioned I/O, provenance, compatibility and malformed-request denial",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py",
+              "assertion": "test_scope_wrong_engine_and_legacy_contract_denied",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467673,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "contracts/review/engine19_handoff.v0.schema.json"
+          ],
+          "reviewer_role": "Architecture / contract steward",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independent contract owner must inspect precise versioned schema/trace binding and all producer/consumer failure modes; full cross-service compatibility is not verified.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "contract_review"
+        },
+        {
+          "gate_id": "G04_INDEPENDENCE",
+          "required_acceptance": "Prove separate managed identities, private network, physical service isolation and failure boundaries",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py",
+              "assertion": "test_no_hosted_start_or_untrusted_public_endpoint",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467673,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "runtime/phase04/abc_foundation/private_engine_transport.py"
+          ],
+          "reviewer_role": "Security and SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Real provider private services, independent managed credentials, physical PostgreSQL clientcert and network-denial/failure evidence missing; cost hold active.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "external_private_staging"
+        },
+        {
+          "gate_id": "G05_SECURITY_PRIVACY",
+          "required_acceptance": "Verify AuthN/AuthZ, tenant RLS, consent, revocation, identity/replay binding and privacy",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py",
+              "assertion": "test_wrong_cert_binding_and_missing_client_cert_denied",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467673,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+          ],
+          "reviewer_role": "Independent Security and privacy reviewer",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Security/privacy reviewer must inspect actual PKI/JWT/DB permissions, consent semantics and negative cases on real provider; synthetic client secrets are not managed.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "independent_security"
+        },
+        {
+          "gate_id": "G06_RELIABILITY",
+          "required_acceptance": "Verify durable transaction, idempotency, lease/ACK/DLQ, crash and restart/fencing where applicable",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py",
+              "assertion": "test_worker_claim_lease_fencing_reacquire_and_exactly_one_ack",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467673,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "runtime/phase04/tests/test_a2_g06_durable_resilience.py"
+          ],
+          "reviewer_role": "SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "SRE must approve target failure scenarios, distributed transaction semantics and live DB/network recovery/rollback; disposable fault tests are not operational proof.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "reliability_review"
+        },
+        {
+          "gate_id": "G07_PERFORMANCE",
+          "required_acceptance": "Verify reproducible scoped p95/p99, capacity and error budget on approved target workload",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "governance/ABC_A2_G07_G09_SYNTHETIC_ACCEPTANCE_v1.review.json"
+          ],
+          "reviewer_role": "SRE and performance owner",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Only synthetic five-process E2E CI p50/p95/p99 (100 samples, 4 concurrency) measured; no per-engine production SLA or pinned hosted capacity/real model load.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "slo_ratification"
+        },
+        {
+          "gate_id": "G08_PROFESSIONAL_VALIDATION",
+          "required_acceptance": "Independently validate professional rights/qualification, uncertainty, contraindications, stop conditions",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
+          "covered_by_tests": [
+            {
+              "path": "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py",
+              "assertion": "test_source_artifact_tamper_is_rejected_before_job_creation",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467673,
+              "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
+            }
+          ],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "governance/ENG06_ISOLATED_REVIEW_ACCEPTANCE_20261103.md"
+          ],
+          "reviewer_role": "Qualified independent specialist",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Independently qualified specialist must verify sources, licensing, contraindications and stop conditions with exact-scope signed review; none received.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "professional_signoff"
+        },
+        {
+          "gate_id": "G09_OBSERVABILITY_OPERATIONS",
+          "required_acceptance": "Verify meaningful traces, alert delivery/ACK, restore, RTO/RPO and rollback drills",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "runtime/phase04/tests/test_a2_g09_recovery.py"
+          ],
+          "reviewer_role": "Independent SRE",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "Actual provider tracing, alert routing/on-call ACK, backup/PITR, RPO/RTO and rollback runbook rehearsals not independently verified.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "operational_observability"
+        },
+        {
+          "gate_id": "G10_INDEPENDENT_SIGNOFF",
+          "required_acceptance": "Collect independent exact-SHA, artifact-digest, reviewer-identity/authority, expiry-bound decision",
+          "operational_status": "OPEN",
+          "ci_evidence_class": "NO_DIRECT_SCOPED_TEST_EVIDENCE",
+          "covered_by_tests": [],
+          "source_paths": [
+            "runtime/phase04/abc_foundation/eng19_review_transport.py",
+            "runtime/phase04/abc_foundation/eng19_review_consumer.py",
+            "governance/ABC_A2_INDEPENDENT_ACCEPTANCE_RECORD_UNSIGNED_20261104.md"
+          ],
+          "reviewer_role": "Independent governance board",
+          "reviewer_identity": null,
+          "review_signature": null,
+          "review_status": "PENDING_INDEPENDENT_REVIEW",
+          "missing_evidence": "No verified independent reviewer identity, credential, exact-sha signed decision or expiry/revocation record. Open issue #58/#84/#85/#79.",
+          "scope_limit": "Historical ENG19 review inbox is NOT canonical ENG-19 automation and grants no professional signoff.",
+          "blocker_type": "independent_acceptance"
+        }
+      ]
+    }
+  ],
+  "artifact_inventory": [
+    {
+      "run_id": 42208334348,
+      "name": null,
+      "sha256": null,
+      "source": "GITHUB_ACTIONS_JOB_LOG_ONLY; no artifact returned"
+    },
+    {
+      "run_id": 42208334405,
+      "name": "a2-scoped-engines",
+      "sha256": null,
+      "source": "EACH_ENGINE_HAS_OWN_SHA256; see scoped_artifact_digests"
+    },
+    {
+      "run_id": 42208334526,
+      "name": "a2-adr-security-42208334526",
+      "sha256": "0a09b51f79771d2bb8c6dd94e42848bce41237f4eb46bf8bb725a7870dc3eaff"
+    },
+    {
+      "run_id": 42208334592,
+      "name": "a2-g04c-local-42208334592",
+      "sha256": "fd8f82a8f04f4a3b39ef5465bc60ff565ed8ea6d2b08e75af0a5aaf4555fb506"
+    },
+    {
+      "run_id": 42208334592,
+      "name": "a2-g05-42208334592",
+      "sha256": "8cd3d28cb71a4cb9e78b89238efbcb0752de63ea9e30d43251d1c8f1276cc188"
+    },
+    {
+      "run_id": 42208334592,
+      "name": "a2-g04b-42208334592",
+      "sha256": "c2916260e18038ab27130aa7889012d01a8f2d86f361a3100ff0eb4bc3f6bab9"
+    },
+    {
+      "run_id": 42208334762,
+      "name": "a2-g06-42208334762",
+      "sha256": "aed97e6a397616b14eb7be363e28d26634905865cc7416cc8ab3b28fecf21eae"
+    },
+    {
+      "run_id": 42208334598,
+      "name": "a2-g07-g09-42208334598",
+      "sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
+    }
+  ],
+  "scoped_artifact_digests": {
+    "ENG-01": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120",
+    "ENG-02": "c9c673e7c8626dbfba34b92f6b82edf63b5a8db1eef1abbe5bf142d363c68b7f",
+    "ENG-03": "e305c390c5692ecb3ed7b3e58ae0430931c477710b5c4893f8348170680f0efe",
+    "ENG-04": "de721d8ec741ad553a23c0feed122cd7ca3362f3e10160fa631bde89fabf1fb8",
+    "ENG-05": "4c169b03352c7277ca27fd007231bbb59c6a9dd7dbce9e1c51eb8fc1614904c4",
+    "ENG-06": "078b5cd23651eab703a78c6a7f8284a882e19a2564e84bb551535fc039773958",
+    "ENG-14": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e",
+    "LEGACY_REVIEW_TRANSPORT": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
+  },
+  "baseline_evidence_assertion": "Six workflows were observed completed/success on baseline_code_sha, not automatically run on later governance-only document commits. Exact test case attribution requires human review of job log; a suite-level green check alone does not certify any operational gate."
+}

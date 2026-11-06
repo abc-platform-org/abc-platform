@@ -17,6 +17,11 @@ from .service_mesh_identity import require_mtls_context
 from .store import DomainError
 
 LIMIT=262144
+# The only canonical synthetic review ingress edges; historical aliases cannot
+# authorize a private ENG-03→ENG-05 or ENG-03→ENG-06 bypass.
+_CANONICAL_PRIVATE_EDGES=frozenset({
+    ("ENG-03","ENG-04"), ("ENG-04","ENG-05"), ("ENG-05","ENG-06")
+})
 
 
 def _read_frame(sock):
@@ -91,12 +96,25 @@ class _Handler(socketserver.BaseRequestHandler):
                 request["token"],self.request.getpeercert(binary_form=True),
                 expected_engine=self.server.caller,
                 expected_consumer=self.server.consumer)
-            if not self.server.replay_window.reserve(identity.get("token_id")):
-                raise DomainError(401,"workload_token_replay_or_capacity_denied")
             message=request["message"]
             if not isinstance(message,dict) or message.get("consumer_id")!=identity["consumer_id"]:
                 raise DomainError(403,"cross_consumer_message")
-            response=dispatch(message,self.server.target)
+            # A managed multi-process service must use an external atomic,
+            # durable verifier/claim bound to the exact message and workload.
+            # A process-local JTI cache is never a managed-staging approval.
+            if self.server.atomic_admission is not None:
+                # Real database transaction owns admission, JTI uniqueness,
+                # ENG14 consent/state locks AND bounded execution/commit.
+                # Never also accept a process-local replay success.
+                response=self.server.atomic_admission.admit_and_execute(
+                    identity,message,lambda:dispatch(message,self.server.target))
+            else:
+                if self.server.distributed_replay_reserver is not None:
+                    if self.server.distributed_replay_reserver(identity,message) is not True:
+                        raise DomainError(401,"durable_workload_admission_denied")
+                elif not self.server.replay_window.reserve(identity.get("token_id")):
+                    raise DomainError(401,"workload_token_replay_or_capacity_denied")
+                response=dispatch(message,self.server.target)
             _write_frame(self.request,response)
         except (DomainError,ValueError,TypeError,KeyError):
             try:_write_frame(self.request,{"error":"engine_request_rejected","release_approved":False})
@@ -104,7 +122,8 @@ class _Handler(socketserver.BaseRequestHandler):
 
 
 def private_engine_server(*,host,port,target_engine,caller_engine,consumer_id,
-                          certfile,keyfile,ca_file,verifier,managed_private=False):
+                          certfile,keyfile,ca_file,verifier,managed_private=False,
+                          distributed_replay_reserver=None,atomic_admission=None):
     # The wildcard listener is ONLY for an externally verified private-only
     # hosting service; mTLS remains mandatory at the application protocol.
     if (not (host=="127.0.0.1" or (managed_private is True and host=="0.0.0.0"))
@@ -112,11 +131,22 @@ def private_engine_server(*,host,port,target_engine,caller_engine,consumer_id,
         raise ValueError("local_integration_private_only")
     if caller_engine==target_engine or verifier is None or not isinstance(consumer_id,str):
         raise ValueError("distinct_authenticated_caller_required")
+    if atomic_admission is not None and (
+        distributed_replay_reserver is not None
+        or not callable(getattr(atomic_admission,"admit_and_execute",None))):
+        raise ValueError("single_atomic_admission_authority_required")
+    if managed_private and (caller_engine,target_engine) not in _CANONICAL_PRIVATE_EDGES:
+        raise ValueError("canonical_managed_private_engine_route_required")
+    if managed_private and not (callable(distributed_replay_reserver)
+                                or atomic_admission is not None):
+        raise ValueError("managed_private_requires_external_atomic_replay_admission")
     context=require_mtls_context(certificate=certfile,key=keyfile,ca_file=ca_file,server=True)
     server=_Server((host,port),_Handler)
     server.context=context
     server.verifier=verifier
     server.replay_window=_LocalReplayWindow()
+    server.distributed_replay_reserver=distributed_replay_reserver
+    server.atomic_admission=atomic_admission
     server.caller=caller_engine
     server.target=target_engine
     server.consumer=consumer_id

@@ -63,6 +63,13 @@ with psycopg.connect(dsn,autocommit=True) as con:
         NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS
         PASSWORD 'integration-only-eng06-review-login'""")
     con.execute("GRANT abc_eng06_review_worker TO abc_eng06_ci_login")
+    # 0034: only dedicated physical CI logins may SET ROLE to execute the
+    # narrow atomic ingress. Their original session_user is still checked
+    # against an operator-owned scoped binding; shared credentials are denied.
+    for login in ("abc_eng04_ci_login","abc_eng05_ci_login",
+                  "abc_eng06_ci_login"):
+        con.execute("GRANT abc_private_ingress_exec TO "+login)
+
     assert con.execute("""SELECT rolcanlogin,rolsuper,rolbypassrls,rolinherit
       FROM pg_roles WHERE rolname='abc_eng06_ci_login'""").fetchone()==(True,False,False,False)
     assert con.execute("SELECT rolcanlogin FROM pg_roles WHERE rolname='abc_eng06_review_worker'").fetchone()==(False,)

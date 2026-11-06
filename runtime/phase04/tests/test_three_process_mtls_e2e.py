@@ -109,7 +109,7 @@ class IndependentPrivateEngineE2E(unittest.TestCase):
                 return (*save(name,private,certificate),certificate)
             client_cert,client_key,client=issue(
                 "eng03-client",x509.UniformResourceIdentifier(
-                    "spiffe://abc.internal/eng03/"+CONSUMER),False)
+                    "spiffe://abc.internal/staging/eng-03"),False)
             signing_key=key()
             pub_pem=signing_key.public_key().public_bytes(
                 serialization.Encoding.PEM,serialization.PublicFormat.SubjectPublicKeyInfo)
@@ -118,7 +118,7 @@ class IndependentPrivateEngineE2E(unittest.TestCase):
             def token(engine,consumer):
                 clock=int(datetime.now(timezone.utc).timestamp())
                 claims={"iss":ISSUER,"aud":"abc-engine:"+engine,
-                    "sub":"spiffe://abc.internal/eng03/"+CONSUMER,
+                    "sub":"spiffe://abc.internal/staging/eng-03",
                     "engine_id":CALLER,"consumer_id":consumer,
                     "token_use":"service","iat":clock,"nbf":clock,
                     "exp":clock+60,"jti":str(uuid.uuid4()),

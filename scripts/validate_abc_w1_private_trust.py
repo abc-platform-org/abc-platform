@@ -59,7 +59,19 @@ def inspect(trust,infra,registry,ratification):
          "ratification_ref")
     fail(trust["infrastructure_selection"]==str(INFRA.relative_to(ROOT)),
          "infrastructure_ref")
-    fail(trust["source_adr"]==["ADR-ENG-003","ADR-ENG-004"], "adr_refs")
+    fail(trust["source_adr"]==["ADR-ENG-003","ADR-ENG-004","ADR-ENG-005"], "adr_refs")
+    fail(trust.get("identity_adr")=="ADR-ENG-005", "identity_adr_is_distinct_from_004_adapter")
+    fail(trust.get("identity_uri_normalization")=="CANONICAL_PER_ENGINE_STAGING_URI_CI_VERIFIED_REVIEW_PENDING", "spiffe_ci_only_pending_approval")
+    fail(trust.get("canonical_spiffe_uri_template")=="spiffe://abc.internal/staging/eng-XX"
+         and trust.get("consumer_id_is_distinct_jwt_scope") is True,
+         "certificate_subject_must_be_engine_only")
+    fail(trust.get("private_ingress_atomic_pg_transaction")=="LOCAL_DISPOSABLE_CI_ONLY"
+         and trust.get("private_ingress_migration")==
+           "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql"
+         and trust.get("managed_postgres_physical_cert_binding_proven") is False,
+         "no_false_hosted_pg_identity")
+    fail(trust.get("external_managed_replay_adapter_approved") is False, "no_fake_distributed_replay")
+    fail(trust.get("adr_renumbering_independently_ratified") is False, "no_fabricated_adr_ratification")
     fail(trust["action_on_missing_evidence"]=="DENY_AND_DO_NOT_DEPLOY",
          "operator_denial")
     fail(trust["quality_gate_policy"]=="ALL_G01_G10_OPEN", "false_quality_pass")
@@ -183,11 +195,38 @@ def self_test(data):
             raise AssertionError("W1_MUTATION_ACCEPTED:"+str(i))
     return len(mutations)
 
+
+def inspect_inactive_private_blueprint(raw):
+    """Lock exact canonical caller->target tuple; template never provisions."""
+    import re
+    sections=raw.split("  - type: pserv\n")[1:]
+    fail(len(sections)==3 and "type: web" not in raw and
+         "autoDeployTrigger: \"off\"" in raw, "private_pserv_inventory")
+    actual=[]
+    for section in sections:
+        target=re.search(r"- key: ABC_ENGINE_ID\s*\n\s*value: (ENG-\d\d)",section)
+        source=re.search(r"- key: ABC_CALLER_ENGINE_ID\s*\n\s*value: (ENG-\d\d)",section)
+        fail(target is not None and source is not None, "template_missing_engine_binding")
+        actual.append((source.group(1),target.group(1)))
+    fail(actual==[("ENG-03","ENG-04"),("ENG-04","ENG-05"),
+                  ("ENG-05","ENG-06")], "noncanonical_private_mesh_shortcut")
+    return actual
+
 def main():
     data=[json.loads(p.read_text()) for p in
           (TRUST,INFRA,REGISTRY,RATIFICATION)]
     result=inspect(*data)
-    result["negative_tests"]=self_test(data)
+    blueprint=(ROOT/"infra/render/private_engine_services.staging.template.yaml").read_text()
+    result["template_private_edges"]=inspect_inactive_private_blueprint(blueprint)
+    for bad in (blueprint.replace("value: ENG-04\n      - key: ABC_ENGINE_PORT", "value: ENG-03\n      - key: ABC_ENGINE_PORT"),
+                blueprint.replace("type: pserv", "type: web",1)):
+        try:
+            inspect_inactive_private_blueprint(bad)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("unsafe_private_blueprint_accepted")
+    result["negative_tests"]=self_test(data)+2
     print(json.dumps(result,sort_keys=True))
 
 if __name__=="__main__":

@@ -4,6 +4,7 @@ Credentials/certificates are injected from an EXTERNAL credential provider.
 This module does NOT create a CA, sign tokens, enroll machines or deploy a
 real mesh. Bound RS256 JWT and mTLS certificate must BOTH verify.
 """
+import base64
 import hashlib
 import re
 import ssl
@@ -17,7 +18,16 @@ from jwt import PyJWKClient
 from .store import DomainError
 
 _ENGINES=frozenset(f"ENG-{i:02d}" for i in range(1,20))
-_SUB=re.compile(r"^spiffe://abc\.internal/(eng(?:0[1-9]|1[0-9]))/([a-zA-Z0-9-]{3,96})$")
+_SUB=re.compile(r"^spiffe://abc\.internal/staging/eng-(?:0[1-9]|1[0-9])$")
+
+
+def canonical_spiffe_id(engine_id):
+    """The only v1 predeployment workload URI; consumer is NOT a cert principal."""
+    if engine_id not in _ENGINES:
+        raise ValueError("unregistered_canonical_engine")
+    return "spiffe://abc.internal/staging/"+engine_id.lower()
+
+_KID=re.compile(r"^[A-Za-z0-9._-]{3,128}$")
 class BoundEngineIdentity:
     def __init__(self,*,issuer,audience,jwks_uri,jwks_client=None,clock=None):
         iss=urlparse(issuer); src=urlparse(jwks_uri)
@@ -39,12 +49,15 @@ class BoundEngineIdentity:
             raise DomainError(401,"workload_mutual_identity_required")
         try:
             header=jwt.get_unverified_header(token)
-            if header.get("alg")!="RS256" or header.get("crit") or not isinstance(header.get("kid"),str):
+            if (header.get("alg")!="RS256" or header.get("crit")
+                or not isinstance(header.get("kid"),str)
+                or not _KID.fullmatch(header["kid"]) or header.get("jku")
+                or header.get("jwk") or header.get("x5u") or header.get("x5c")):
                 raise ValueError("algorithm")
             cert=x509.load_der_x509_certificate(peer_der)
             uris=cert.extensions.get_extension_for_oid(
                 ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value.get_values_for_type(x509.UniformResourceIdentifier)
-            expected_uri=f"spiffe://abc.internal/{expected_engine.lower().replace('-','')}/{expected_consumer}"
+            expected_uri=canonical_spiffe_id(expected_engine)
             if uris!=[expected_uri] or _SUB.fullmatch(expected_uri) is None:
                 raise ValueError("unexpected_certificate_identity")
             now=self.clock()
@@ -62,15 +75,20 @@ class BoundEngineIdentity:
             if (any(type(k) is not int for k in (iat,nbf,exp)) or
                 iat>now_sec+5 or nbf>now_sec+5 or exp<=now_sec-5
                 or exp-iat>120 or exp<=iat or
+                type(claims.get("aud")) is not str or
+                claims["aud"]!=self.audience or
                 claims.get("engine_id")!=expected_engine or
                 claims.get("consumer_id")!=expected_consumer or
                 claims.get("sub")!=expected_uri or
                 claims.get("token_use")!="service" or
                 not isinstance(claims.get("cnf"),dict) or
+                set(claims["cnf"])!={"x5t#S256"} or
                 claims["cnf"].get("x5t#S256")!=
-                   __import__("base64").urlsafe_b64encode(
+                   base64.urlsafe_b64encode(
                      hashlib.sha256(peer_der).digest()).rstrip(b"=").decode("ascii") or
-                str(uuid.UUID(claims.get("jti","")))!=claims["jti"]):
+                not isinstance(claims.get("jti"),str) or
+                str(uuid.UUID(claims["jti"]))!=claims["jti"] or
+                uuid.UUID(claims["jti"]).version!=4):
                 raise ValueError("token_not_bound_to_cert_or_identity")
             return {"verified":True,"engine_id":expected_engine,
                     "consumer_id":expected_consumer,"subject":expected_uri,

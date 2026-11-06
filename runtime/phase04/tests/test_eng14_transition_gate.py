@@ -46,6 +46,21 @@ class ENG14AllTransitions(unittest.TestCase):
             ENG14TransitionPolicy().evaluate(from_state="CREATED",to_state="CLOSED",
                                                actor="SPECIALIST",expected_version=0)
 
+    def test_immutable_synthetic_s0_scope_cannot_be_promoted_to_release(self):
+        policy=ENG14TransitionPolicy()
+        original=policy.evaluate(from_state="CREATED",to_state="PAUSED",
+                                 actor="SPECIALIST",expected_version=0)
+        policy.require_allowed(original)
+        for altered in (
+            {"engine_id":"ENG-05"},
+            {"approval_scope":"STAGING_PRIVATE"},
+            {"risk_class":"S3"},
+            {"execution_authorized":True},
+            {"customer_release_approved":True},
+        ):
+            with self.subTest(altered=altered),self.assertRaises(DomainError):
+                policy.require_allowed({**original,**altered})
+
     def test_bogus_policy_receipt_rejected(self):
         with self.assertRaises(DomainError):
             ENG14TransitionPolicy().require_allowed({

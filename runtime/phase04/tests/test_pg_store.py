@@ -148,6 +148,14 @@ class PostgresRuntimeTests(unittest.TestCase):
         self.assertFalse(self.store.has_verified_consent(self.principal,sid,"AI_PROCESSING"))
 
     def test_precapture_requires_current_session_and_both_active_purposes(self):
+        # Image preflight now demands actual qualified specialist membership,
+        # not merely any active role; real qualification is not issued in CI.
+        with psycopg.connect(ADMIN) as con:
+            con.execute("""UPDATE abc.memberships
+                         SET verified_qualification=true
+                         WHERE tenant_id=%s AND branch_id=%s
+                           AND issuer=%s AND subject=%s AND role='SPECIALIST'""",
+                        (self.tenant,self.branch,ISS,self.subject))
         client="synthetic-client-"+uuid.uuid4().hex[:12]
         s=self.store.create(self.principal,{**self.body(),"client_id":client},
                             "capture-guard-01")

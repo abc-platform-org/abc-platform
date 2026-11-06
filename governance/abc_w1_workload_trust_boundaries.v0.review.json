@@ -7,7 +7,8 @@
   "infrastructure_selection": "governance/phase04_infrastructure_selection.v1.json",
   "source_adr": [
     "ADR-ENG-003",
-    "ADR-ENG-004"
+    "ADR-ENG-004",
+    "ADR-ENG-005"
   ],
   "scope": "STAGING_SYNTHETIC_ONLY",
   "private_network_attested": false,
@@ -400,5 +401,14 @@
     }
   ],
   "quality_gate_policy": "ALL_G01_G10_OPEN",
-  "action_on_missing_evidence": "DENY_AND_DO_NOT_DEPLOY"
+  "action_on_missing_evidence": "DENY_AND_DO_NOT_DEPLOY",
+  "identity_adr": "ADR-ENG-005",
+  "identity_uri_normalization": "CANONICAL_PER_ENGINE_STAGING_URI_CI_VERIFIED_REVIEW_PENDING",
+  "external_managed_replay_adapter_approved": false,
+  "adr_renumbering_independently_ratified": false,
+  "canonical_spiffe_uri_template": "spiffe://abc.internal/staging/eng-XX",
+  "consumer_id_is_distinct_jwt_scope": true,
+  "private_ingress_atomic_pg_transaction": "LOCAL_DISPOSABLE_CI_ONLY",
+  "private_ingress_migration": "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql",
+  "managed_postgres_physical_cert_binding_proven": false
 }

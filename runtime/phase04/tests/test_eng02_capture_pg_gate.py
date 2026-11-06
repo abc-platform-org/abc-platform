@@ -59,9 +59,9 @@ class ENG02CapturePostgresGate(unittest.TestCase):
         self.server=create_oidc_pg_http_server(self.store,StaticCIIdentity(self.subject))
         th=threading.Thread(target=self.server.serve_forever,daemon=True)
         th.start()
+        self.addCleanup(th.join,3)
         self.addCleanup(self.server.server_close)
         self.addCleanup(self.server.shutdown)
-        self.addCleanup(th.join,3)
         self.path="/v1/consultations/"+self.sid+"/media"
         self.consent_id=None
 

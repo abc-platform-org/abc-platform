@@ -18,6 +18,9 @@ import sys
 import time
 import uuid
 
+# Standalone python tests/*.py uses tests/ (not phase04/) as sys.path[0].
+# Resolve the module root exactly as unittest discover does.
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import test_eng02_eng06_five_process_chain as five
 
 ROOT=Path(__file__).resolve().parents[3]

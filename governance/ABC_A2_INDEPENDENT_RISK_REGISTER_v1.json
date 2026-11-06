@@ -1,0 +1,253 @@
+{
+  "schema": "abc.a2.risk-register.v1",
+  "as_of": "2026-11-06",
+  "base_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+  "repository": "saleheebrahimi2029-hub/abc-platform",
+  "decision": "OPEN_RISKS_NOT_CLOSED",
+  "risks": [
+    {
+      "id": "A2-R001",
+      "priority": "P0",
+      "category": "ARCHITECTURE",
+      "linked_gates": [
+        "G01_ARCHITECTURE",
+        "G03_CONTRACTS"
+      ],
+      "owner_role": "Architecture owner",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "No independently ratified ADR-ENG-003/004 or proposed ADR-ENG-005; trust-domain identity decision is code-consistent but issuer governance is open.",
+      "mitigation": "Independent architectural review with exact SHA, canonical 19-owner semantic contract, six quarantined adapters, SPIFFE naming and bounded v1/v2 vs proposed v3.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/58",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R002",
+      "priority": "P0",
+      "category": "SECURITY",
+      "linked_gates": [
+        "G05_SECURITY_PRIVACY",
+        "G10_INDEPENDENT_SIGNOFF"
+      ],
+      "owner_role": "Independent Security reviewer",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "No authenticated qualified independent Security signoff for JWT/mTLS/SQL/RLS/ENG14 threat model; local CI test roots are not managed PKI.",
+      "mitigation": "Name real independent reviewer; assess code and threat model now, provider PKI/physical SSL after authorized provisioning; sign exact SHA/artifact digest.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/84",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R003",
+      "priority": "P0",
+      "category": "PROFESSIONAL",
+      "linked_gates": [
+        "G08_PROFESSIONAL_VALIDATION",
+        "G10_INDEPENDENT_SIGNOFF"
+      ],
+      "owner_role": "Credentialed professional specialist",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "No human verified qualification, professional source legal rights, contraindication SOP and scoped review; ENG06 remains bounded synthetic only.",
+      "mitigation": "Obtain external credential verification, reference rights and professional decision tied to service/jurisdiction and artifact hash; never simulate approval.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/79",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R004",
+      "priority": "P0",
+      "category": "COST_OWNER_DECISION",
+      "linked_gates": [
+        "G04_INDEPENDENCE",
+        "G09_OBSERVABILITY_OPERATIONS"
+      ],
+      "owner_role": "Project owner and operator",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": true,
+      "description": "Owner explicitly forbids independent staging deployment/provisioning pending cost and provider approval; zero actual private services discovered.",
+      "mitigation": "No deployment. Prepare compatible private provider/region/plan/spend cap/billing/operator/rollback decision only; require explicit written owner consent to resume.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/63",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R005",
+      "priority": "P0",
+      "category": "MANAGED_IDENTITY",
+      "linked_gates": [
+        "G04_INDEPENDENCE",
+        "G05_SECURITY_PRIVACY"
+      ],
+      "owner_role": "Security and infrastructure operator",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": true,
+      "description": "Externally managed service certificate issuer, human OIDC/JWKS, nonshared SPIFFE issuance, clientcert physical PostgreSQL authentication and trust rotation not provisioned.",
+      "mitigation": "Review PKI/key custody and protocol offline; after authorized infrastructure, prove physical sessions, ACL, rotation/revocation and negative tests from provider logs.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/84",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R006",
+      "priority": "P0",
+      "category": "EXTERNAL_NETWORK",
+      "linked_gates": [
+        "G04_INDEPENDENCE",
+        "G06_RELIABILITY"
+      ],
+      "owner_role": "SRE and operator",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": true,
+      "description": "Docker-bridge isolation does not prove actual external private VLAN, egress allowlist, DNS/direct-IP denial, managed-service fault independence.",
+      "mitigation": "Prove actual provider routes and denied cross-boundary connections, service crash, peer survival, fail closed and no public fallback after deployment authorization.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/85",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R007",
+      "priority": "P1",
+      "category": "CI_QUALITY_COVERAGE",
+      "linked_gates": [
+        "G01_ARCHITECTURE",
+        "G02_DOMAIN_CAPABILITY",
+        "G03_CONTRACTS",
+        "G06_RELIABILITY"
+      ],
+      "owner_role": "Engineering leads and QA",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "Old 80-gate ledger has no gate-specific attestations; green 752-test foundation does not establish individual production acceptance.",
+      "mitigation": "Use v1 supplemental 80-gate file for exact test-method/job/SHA mappings, flag missing evidence, obtain signed adjudications and targeted regressions as needed.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/81",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R008",
+      "priority": "P1",
+      "category": "PERFORMANCE",
+      "linked_gates": [
+        "G07_PERFORMANCE"
+      ],
+      "owner_role": "SRE and performance owner",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "100 local synthetic E2E samples (p95 3.481149s, p99 3.534534s) are not production SLA/actual model-image load; unpinned runner class.",
+      "mitigation": "Independently ratify SLO, workload, error budget and performance targets; run target private provider later; CI numbers remain candidate evidence.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/85",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R009",
+      "priority": "P0",
+      "category": "OPERATIONS",
+      "linked_gates": [
+        "G09_OBSERVABILITY_OPERATIONS",
+        "G06_RELIABILITY"
+      ],
+      "owner_role": "Independent SRE",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": true,
+      "description": "Offline synthetic alert rules and SQLite backup are not real managed Postgres PITR/RTO/RPO, pager ACK, on-call/rollback.",
+      "mitigation": "Review runbook and targets now; execute provider restore, alert delivery and rollback drill after authorized environment; sign measured results.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/85",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R010",
+      "priority": "P1",
+      "category": "PRIVACY_MEDIA_WRITER",
+      "linked_gates": [
+        "G02_DOMAIN_CAPABILITY",
+        "G05_SECURITY_PRIVACY"
+      ],
+      "owner_role": "ENG02 owner and privacy/Security",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "Read-only consent preflight returns HTTP501 and cannot grant atomic media-write permission; future writer could have revoke TOCTOU if enabled without transactional check.",
+      "mitigation": "Keep media ingestion DISABLED in synthetic A2. Before any real image capability, implement writer-side same-transaction consent/session/version/qualification recheck, retention/deletion and negative race tests.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/58",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R011",
+      "priority": "P0",
+      "category": "GOVERNANCE",
+      "linked_gates": [
+        "G10_INDEPENDENT_SIGNOFF"
+      ],
+      "owner_role": "Governance owner",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "Independent author/implementer separation, reviewer credentials, signed exact-commit verdict and expiry/waiver controls are not evidenced.",
+      "mitigation": "Request human Architecture, Security, SRE, professional reviews with original signatures, scope and artifact digests; no AI self-attestation.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/81",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R012",
+      "priority": "P1",
+      "category": "NAMESPACE_LEGACY",
+      "linked_gates": [
+        "G01_ARCHITECTURE",
+        "G03_CONTRACTS",
+        "G04_INDEPENDENCE"
+      ],
+      "owner_role": "Architecture owner",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "Legacy ENG19 review transport might be mistaken for canonical ENG-19 automation or v2 alias might bypass protected service ownership.",
+      "mitigation": "Explicitly segregate LEGACY_REVIEW_TRANSPORT as noncanonical scope and keep six A1 adapters read-only/quarantined until signed ADR.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/58",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R013",
+      "priority": "P0",
+      "category": "PRODUCTION_RELEASE",
+      "linked_gates": [
+        "G05_SECURITY_PRIVACY",
+        "G08_PROFESSIONAL_VALIDATION",
+        "G10_INDEPENDENT_SIGNOFF"
+      ],
+      "owner_role": "Product governance and specialist",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "ENG06 could be incorrectly promoted from bounded synthetic reviewer to real treatment advice or ENG07 dispatch on green CI.",
+      "mitigation": "Hard freeze release=false, no customer information, no staged auto-dispatch; a separate professional, privacy, Security and owner-approved release PR is mandatory.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/79",
+      "accepted_risk": false
+    },
+    {
+      "id": "A2-R014",
+      "priority": "P1",
+      "category": "PROVENANCE_DRIFT",
+      "linked_gates": [
+        "G03_CONTRACTS",
+        "G10_INDEPENDENT_SIGNOFF"
+      ],
+      "owner_role": "Release engineering and QA",
+      "status": "OPEN",
+      "reviewer_decision": "NOT_RECEIVED",
+      "depends_on_authorized_infrastructure": false,
+      "description": "The new decision packet SHA differs from the previously tested code SHA; source changes might accidentally inherit old green CI labels.",
+      "mitigation": "Validate six baseline run SHAs and 80 gate paths/tests; enforce git diff from tested SHA contains only governance/validation/docs. Re-run affected code tests on any runtime change.",
+      "tracking_issue": "https://github.com/saleheebrahimi2029-hub/abc-platform/issues/81",
+      "accepted_risk": false
+    }
+  ],
+  "a2_closed": false,
+  "independent_signoffs_attested": false,
+  "owner_cost_hold": true,
+  "eng06_customer_release_approved": false
+}

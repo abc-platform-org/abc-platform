@@ -120,7 +120,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
             }
           ],
           "source_paths": [
@@ -149,7 +151,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
             }
           ],
           "source_paths": [
@@ -179,7 +183,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
             }
           ],
           "source_paths": [
@@ -209,7 +215,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
             }
           ],
           "source_paths": [
@@ -239,7 +247,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467762",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng01_pg_command.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-01-42208334405",
+              "artifact_sha256": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120"
             }
           ],
           "source_paths": [
@@ -381,7 +391,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_capture_pg_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -410,7 +423,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -440,7 +456,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -470,7 +489,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_capture_pg_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -500,7 +522,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -530,7 +555,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
               "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
-              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA."
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
             }
           ],
           "source_paths": [
@@ -560,7 +587,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_capture_pg_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -590,7 +620,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -675,7 +708,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -704,7 +740,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -734,7 +773,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -764,7 +806,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -794,7 +839,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -824,7 +872,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
               "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
-              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA."
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
             }
           ],
           "source_paths": [
@@ -873,7 +923,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -958,7 +1011,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860468314",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng04_isolated_worker.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-04-42208334405",
+              "artifact_sha256": "de721d8ec741ad553a23c0feed122cd7ca3362f3e10160fa631bde89fabf1fb8"
             }
           ],
           "source_paths": [
@@ -987,7 +1042,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860468314",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng04_isolated_worker.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-04-42208334405",
+              "artifact_sha256": "de721d8ec741ad553a23c0feed122cd7ca3362f3e10160fa631bde89fabf1fb8"
             }
           ],
           "source_paths": [
@@ -1017,7 +1074,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_private_spiffe_pg_multinstance.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1047,7 +1107,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860468314",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng04_isolated_worker.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-04-42208334405",
+              "artifact_sha256": "de721d8ec741ad553a23c0feed122cd7ca3362f3e10160fa631bde89fabf1fb8"
             }
           ],
           "source_paths": [
@@ -1077,7 +1139,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1107,7 +1172,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
               "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
-              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA."
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
             }
           ],
           "source_paths": [
@@ -1156,7 +1223,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1241,7 +1311,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467712",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng05_professional_sources.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-05-42208334405",
+              "artifact_sha256": "4c169b03352c7277ca27fd007231bbb59c6a9dd7dbce9e1c51eb8fc1614904c4"
             }
           ],
           "source_paths": [
@@ -1270,7 +1342,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467712",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng05_professional_sources.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-05-42208334405",
+              "artifact_sha256": "4c169b03352c7277ca27fd007231bbb59c6a9dd7dbce9e1c51eb8fc1614904c4"
             }
           ],
           "source_paths": [
@@ -1300,7 +1374,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_private_spiffe_pg_multinstance.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1330,7 +1407,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_private_spiffe_pg_multinstance.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1360,7 +1440,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng03_durable_pipeline.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1390,7 +1473,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
               "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
-              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA."
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
             }
           ],
           "source_paths": [
@@ -1420,7 +1505,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467712",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng05_professional_sources.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-05-42208334405",
+              "artifact_sha256": "4c169b03352c7277ca27fd007231bbb59c6a9dd7dbce9e1c51eb8fc1614904c4"
             }
           ],
           "source_paths": [
@@ -1450,7 +1537,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1535,7 +1625,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1564,7 +1657,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1594,7 +1690,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467847",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-06-42208334405",
+              "artifact_sha256": "078b5cd23651eab703a78c6a7f8284a882e19a2564e84bb551535fc039773958"
             }
           ],
           "source_paths": [
@@ -1624,7 +1722,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334762/job/127860468712",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g06_durable_resilience.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-g06-42208334762",
+              "artifact_sha256": "aed97e6a397616b14eb7be363e28d26634905865cc7416cc8ab3b28fecf21eae"
             }
           ],
           "source_paths": [
@@ -1654,7 +1754,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334762/job/127860468712",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g06_durable_resilience.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-g06-42208334762",
+              "artifact_sha256": "aed97e6a397616b14eb7be363e28d26634905865cc7416cc8ab3b28fecf21eae"
             }
           ],
           "source_paths": [
@@ -1684,7 +1786,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334598/job/127860468134",
               "reproduction": "(cd runtime/phase04 && ABC_ENV=LOCAL_INTEGRATION_ONLY python tests/a2_g07_five_process_benchmark.py)",
-              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA."
+              "scope_limit": "Global five-process end-to-end latency (100 measured + 3 warmups), not separately approved per-engine SLA.",
+              "artifact_name": "a2-g07-g09-42208334598",
+              "artifact_sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
             }
           ],
           "source_paths": [
@@ -1714,7 +1818,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1744,7 +1851,10 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_a2_g09_recovery.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [
@@ -1829,7 +1939,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
             }
           ],
           "source_paths": [
@@ -1858,7 +1970,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
             }
           ],
           "source_paths": [
@@ -1888,7 +2002,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
             }
           ],
           "source_paths": [
@@ -1918,7 +2034,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
             }
           ],
           "source_paths": [
@@ -1948,7 +2066,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
             }
           ],
           "source_paths": [
@@ -1997,7 +2117,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467793",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng14_transition_gate.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-ENG-14-42208334405",
+              "artifact_sha256": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e"
             }
           ],
           "source_paths": [
@@ -2101,7 +2223,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
             }
           ],
           "source_paths": [
@@ -2130,7 +2254,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
             }
           ],
           "source_paths": [
@@ -2160,7 +2286,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
             }
           ],
           "source_paths": [
@@ -2190,7 +2318,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
             }
           ],
           "source_paths": [
@@ -2220,7 +2350,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
             }
           ],
           "source_paths": [
@@ -2269,7 +2401,9 @@
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
               "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467673",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
-              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation."
+              "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
+              "artifact_name": "a2-LEGACY_REVIEW_TRANSPORT-42208334405",
+              "artifact_sha256": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
             }
           ],
           "source_paths": [
@@ -2325,5 +2459,60 @@
         }
       ]
     }
-  ]
+  ],
+  "artifact_inventory": [
+    {
+      "run_id": 42208334348,
+      "name": null,
+      "sha256": null,
+      "source": "GITHUB_ACTIONS_JOB_LOG_ONLY; no artifact returned"
+    },
+    {
+      "run_id": 42208334405,
+      "name": "a2-scoped-engines",
+      "sha256": null,
+      "source": "EACH_ENGINE_HAS_OWN_SHA256; see scoped_artifact_digests"
+    },
+    {
+      "run_id": 42208334526,
+      "name": "a2-adr-security-42208334526",
+      "sha256": "0a09b51f79771d2bb8c6dd94e42848bce41237f4eb46bf8bb725a7870dc3eaff"
+    },
+    {
+      "run_id": 42208334592,
+      "name": "a2-g04c-local-42208334592",
+      "sha256": "fd8f82a8f04f4a3b39ef5465bc60ff565ed8ea6d2b08e75af0a5aaf4555fb506"
+    },
+    {
+      "run_id": 42208334592,
+      "name": "a2-g05-42208334592",
+      "sha256": "8cd3d28cb71a4cb9e78b89238efbcb0752de63ea9e30d43251d1c8f1276cc188"
+    },
+    {
+      "run_id": 42208334592,
+      "name": "a2-g04b-42208334592",
+      "sha256": "c2916260e18038ab27130aa7889012d01a8f2d86f361a3100ff0eb4bc3f6bab9"
+    },
+    {
+      "run_id": 42208334762,
+      "name": "a2-g06-42208334762",
+      "sha256": "aed97e6a397616b14eb7be363e28d26634905865cc7416cc8ab3b28fecf21eae"
+    },
+    {
+      "run_id": 42208334598,
+      "name": "a2-g07-g09-42208334598",
+      "sha256": "abc7502832e3c0be53fa7d74a8258fcd744629ee6fcc2c881fb5bc9f413eacb5"
+    }
+  ],
+  "scoped_artifact_digests": {
+    "ENG-01": "c09d1c3441e695d2a8d7eaf9242ca7e98ce91dee3d4ac917cfee00782ce3e120",
+    "ENG-02": "c9c673e7c8626dbfba34b92f6b82edf63b5a8db1eef1abbe5bf142d363c68b7f",
+    "ENG-03": "e305c390c5692ecb3ed7b3e58ae0430931c477710b5c4893f8348170680f0efe",
+    "ENG-04": "de721d8ec741ad553a23c0feed122cd7ca3362f3e10160fa631bde89fabf1fb8",
+    "ENG-05": "4c169b03352c7277ca27fd007231bbb59c6a9dd7dbce9e1c51eb8fc1614904c4",
+    "ENG-06": "078b5cd23651eab703a78c6a7f8284a882e19a2564e84bb551535fc039773958",
+    "ENG-14": "459158e3fe15fac7e875a473a5c94c46a7102f35b7bd8d83403749be846b5a5e",
+    "LEGACY_REVIEW_TRANSPORT": "02bef48f661c9d51f568e97f3b7fecf686cf3e0d00fabeb0b9f33dde474f77a5"
+  },
+  "baseline_evidence_assertion": "Six workflows were observed completed/success on baseline_code_sha, not automatically run on later governance-only document commits. Exact test case attribution requires human review of job log; a suite-level green check alone does not certify any operational gate."
 }

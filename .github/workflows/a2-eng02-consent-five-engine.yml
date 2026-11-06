@@ -1,0 +1,112 @@
+name: ABC A2 ENG02 pre-capture consent and 5-engine synthetic OS chain (CI only)
+on:
+  push:
+    branches:
+      - implementation/w1-eng05-external-approval-gate-20261101
+    paths:
+      - 'runtime/phase04/abc_foundation/pg_store.py'
+      - 'runtime/phase04/abc_foundation/http_api.py'
+      - 'runtime/phase04/tests/test_eng02_capture_pg_gate.py'
+      - 'runtime/phase04/tests/test_eng02_eng06_five_process_chain.py'
+      - '.github/workflows/a2-eng02-consent-five-engine.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-only-consent-and-five-process-chain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc-integration-only-password
+          POSTGRES_DB: abc_phase04_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abc_phase04_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      ABC_ENV: LOCAL_INTEGRATION_ONLY
+      ABC_TEST_PG_ADMIN_DSN: postgresql://postgres:abc-integration-only-password@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_DSN: postgresql://abc_app:integration-only-abc-app@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_WORKER_DSN: postgresql://abc_worker:integration-only-abc-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ORCHESTRATOR_DSN: postgresql://abc_orchestrator:integration-only-abc-orchestrator@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ANSWER_WORKER_DSN: postgresql://abc_answer_worker:integration-only-abc-answer-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG03_DSN: postgresql://abc_eng03_worker:integration-only-eng03-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_PIPELINE_DSN: postgresql://abc_pipeline_worker:integration-only-pipeline-worker@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG04_LOGIN_DSN: postgresql://abc_eng04_ci_login:integration-only-eng04-review-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG05_LOGIN_DSN: postgresql://abc_eng05_ci_login:integration-only-eng05-physical-login@127.0.0.1:5432/abc_phase04_ci
+      ABC_TEST_PG_ENG06_LOGIN_DSN: postgresql://abc_eng06_ci_login:integration-only-eng06-review-login@127.0.0.1:5432/abc_phase04_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned synthetic-test dependencies
+        run: python -m pip install -r runtime/phase04/requirements.txt
+      - name: Bootstrap disposable Postgres16 migrations (no client data)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p a2/eng02-chain
+          python runtime/phase04/tests/bootstrap_postgres.py 2>&1 | tee a2/eng02-chain/bootstrap.log
+      - name: Run 16 real PostgreSQL and HTTP ENG02 capture-denial tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_capture_pg_gate.py' -v) 2>&1 | tee a2/eng02-chain/consent.log
+      - name: Run 10 five-independent-OS-process synthetic integration/negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v) 2>&1 | tee a2/eng02-chain/five-process.log
+      - name: Enforce exact count, no skip and no customer-release manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,pathlib,re
+          p=pathlib.Path('a2/eng02-chain')
+          items=[]
+          for name,expected in (('consent.log',16),('five-process.log',10)):
+              raw=(p/name).read_bytes()
+              s=raw.decode()
+              assert re.findall(r'^Ran (\d+) tests? in ',s,re.M)==[str(expected)],name
+              assert re.search(r'^OK$',s,re.M),name
+              assert not re.search(r'^FAILED|^ERROR:|^FAIL:|skipped=|unexpected successes=',s,re.M),name
+              items.append({'name':name,'passed':expected,'sha256':hashlib.sha256(raw).hexdigest()})
+          d={'scope':'ABC_A2_ENG02_CONSENT_AND_FIVE_PROCESS_SYNTHETIC_ONLY',
+             'exact_head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],
+             'tests':items,'count':26,'engine_processes':['ENG-02','ENG-03','ENG-04','ENG-05','ENG-06'],
+             'real_customer_media_ingress_enabled':False,
+             'real_customer_media_persisted':False,
+             'captured_image_consent_issuer_attested':False,
+             'external_managed_identity_attested':False,
+             'authenticated_managed_network_handoff_proven':False,
+             'security_sre_specialist_signoff':False,
+             'a2_operational_closed':False,
+             'eng06_customer_release_approved':False}
+          (p/'manifest.json').write_text(json.dumps(d,indent=2,sort_keys=True)+'\n')
+          print(json.dumps(d,sort_keys=True))
+          PY
+          sha256sum a2/eng02-chain/bootstrap.log a2/eng02-chain/consent.log a2/eng02-chain/five-process.log a2/eng02-chain/manifest.json > a2/eng02-chain/SHA256SUMS
+      - name: Upload even failed synthetic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-eng02-five-process-${{ github.run_id }}
+          path: a2/eng02-chain/
+          retention-days: 30
+          if-no-files-found: warn

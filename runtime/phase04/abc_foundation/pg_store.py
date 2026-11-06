@@ -166,9 +166,11 @@ class PostgresStore:
 
         This read-only check does not enable media storage or remove the need
         for a same-transaction authorization check in a future upload writer.
-        The current version locks scoped session, verified specialist membership
-        and ACTIVE consent together to serialize concurrent revocation until
-        the preflight transaction ends. It is NEVER a media-write capability.
+        The current version checks scoped session, verified specialist membership
+        and ACTIVE consent in one read-only SQL snapshot. This check does NOT
+        lock evidence rows or protect a future media writer from a revocation
+        race: that writer must re-authorize within its own write transaction.
+        This preflight NEVER issues a bearer capture capability or accepts bytes.
         """
         if type(expected_version) is not int or expected_version < 0:
             raise DomainError(400, "expected_version_required")
@@ -204,7 +206,6 @@ class PostgresStore:
                       AND ce.purpose @> ARRAY['CAPTURE','AI_PROCESSING']::text[]
                     ORDER BY ce.consent_id
                     LIMIT 1
-                    FOR SHARE OF s,m,ce
                 """, (issuer,sid,scope["tenant_id"],scope["branch_id"],
                       sub,expected_version)).fetchone()
                 if verified:

@@ -416,17 +416,16 @@
           "ci_evidence_class": "SYNTHETIC_SUBCRITERION_EVIDENCED",
           "covered_by_tests": [
             {
-              "path": "runtime/phase04/tests/test_eng02_eng06_five_process_chain.py",
-              "assertion": "test_09_bad_contract_version_denied_by_independent_engine",
-              "observed_ci_run_id": 42208334348,
-              "observed_ci_job_id": 127860466822,
+              "path": "runtime/phase04/tests/test_eng02_signed_pg.py",
+              "assertion": "test_out_of_order_question_and_malicious_answer_type_denied",
+              "observed_ci_run_id": 42208334405,
+              "observed_ci_job_id": 127860467667,
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
-              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
-              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_eng06_five_process_chain.py' -v)",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467667",
+              "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng02_signed_pg.py' -v)",
               "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
-              "artifact_name": null,
-              "artifact_sha256": null,
-              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
+              "artifact_name": "a2-ENG-02-42208334405",
+              "artifact_sha256": "c9c673e7c8626dbfba34b92f6b82edf63b5a8db1eef1abbe5bf142d363c68b7f"
             }
           ],
           "source_paths": [
@@ -767,7 +766,7 @@
           "covered_by_tests": [
             {
               "path": "runtime/phase04/tests/test_eng03_durable_pipeline.py",
-              "assertion": "test_verified_eng05_processes_real_eng04_source_in_separate_os_process",
+              "assertion": "test_eng04_actual_separate_os_process_from_verified_eng03_ledger",
               "observed_ci_run_id": 42208334348,
               "observed_ci_job_id": 127860466822,
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
@@ -1685,14 +1684,15 @@
             {
               "path": "runtime/phase04/tests/test_eng19_actual_mtls_handoff_pg.py",
               "assertion": "test_eng06_runs_in_distinct_os_process_without_releasing_look",
-              "observed_ci_run_id": 42208334405,
-              "observed_ci_job_id": 127860467847,
+              "observed_ci_run_id": 42208334348,
+              "observed_ci_job_id": 127860466822,
               "observed_code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
-              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334405/job/127860467847",
+              "job_url": "https://github.com/saleheebrahimi2029-hub/abc-platform/actions/runs/42208334348/job/127860466822",
               "reproduction": "(cd runtime/phase04 && python -m unittest discover -s tests -p 'test_eng19_actual_mtls_handoff_pg.py' -v)",
               "scope_limit": "Synthetic/local test of this subcriterion; exact test attribution requires reviewing job logs; no independent attestation.",
-              "artifact_name": "a2-ENG-06-42208334405",
-              "artifact_sha256": "078b5cd23651eab703a78c6a7f8284a882e19a2564e84bb551535fc039773958"
+              "artifact_name": null,
+              "artifact_sha256": null,
+              "evidence_kind": "GITHUB_ACTIONS_JOB_LOG_ONLY"
             }
           ],
           "source_paths": [

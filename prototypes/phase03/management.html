@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ABC · محیط مدیریت سالن — نمونهٔ فاز ۳</title><link rel="stylesheet" href="management.css"></head>
+<body>
+<a class="skip" href="#main">رفتن به محتوای اصلی</a>
+<div class="sandbox">نمونهٔ تعاملی طراحی فاز ۳ · فقط داده‌های ساختگی · بدون اتصال به نوبت، مشتری، پرداخت یا هوش مصنوعی واقعی</div>
+<header>
+  <div class="identity"><b class="brand">ABC</b><span>فضای مدیریت سالن · نمونهٔ قابل بررسی</span></div>
+  <div class="controls">
+    <label>نقش آزمایشی <select id="role"><option value="Client">مشتری</option><option value="Specialist">متخصص</option><option value="Reception">پذیرش</option><option value="SalonManager">مدیر سالن</option><option value="OrganizationOwner">مالک سازمان</option><option value="PlatformOperator">اپراتور زیرساخت</option></select></label>
+    <label>شعبه <select id="branch"><option value="DEMO-BRANCH-01">شعبهٔ نمونهٔ ۱</option><option value="DEMO-BRANCH-02">شعبهٔ نمونهٔ ۲</option></select></label>
+    <a href="./index.html">استودیوی نمونه</a>
+  </div>
+</header>
+<div class="layout">
+  <nav aria-label="ماژول‌های قابل نمایش"><h2>بخش‌های کاری</h2><div id="navigation"></div>
+    <p>تغییر نقش در این نمونه فقط برای آزمون نمایش است؛ مجوزهای واقعی باید در سرور اعمال شوند.</p>
+  </nav>
+  <main id="main" tabindex="-1">
+    <div class="pagehead"><div><div class="eyebrow" id="section-id"></div><h1 id="heading"></h1></div><span class="status">SYNTHETIC · NOT RELEASED</span></div>
+    <p id="explanation"></p><div id="notice" role="status" aria-live="polite"></div><div id="content"></div>
+  </main>
+</div>
+<script type="module" src="management.mjs"></script>
+</body></html>

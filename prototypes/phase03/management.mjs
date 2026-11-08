@@ -1,0 +1,40 @@
+import {MODULES,freshManagement,managementReduce,managementProjection} from './management-model.mjs';
+let state=freshManagement();
+const $=id=>document.getElementById(id);
+const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const card=(title,body)=>'<section class="card"><h2>'+esc(title)+'</h2>'+body+'</section>';
+const noData='<p class="muted">هیچ دادهٔ کسب‌وکار واقعی به این نمونه متصل نیست.</p>';
+function dispatch(action){const prev=state.module;state=managementReduce(state,action);render();if(state.module!==prev)$('main').focus();}
+function render(){
+ const v=managementProjection(state);
+ $('role').value=state.role;$('branch').value=state.branch;$('branch').disabled=state.role!=='OrganizationOwner';
+ $('navigation').innerHTML=v.modules.map(m=>'<button type="button" data-module="'+m.id+'" aria-current="'+(v.module===m.id?'page':'false')+'">'+esc(m.name)+'<small>'+m.id+' · '+m.phase+'</small></button>').join('')||'<p>ماژول مدیریتی برای این نقش وجود ندارد.</p>';
+ document.querySelectorAll('[data-module]').forEach(b=>{b.onclick=()=>dispatch({type:'navigate',module:b.dataset.module});});
+ const selected=MODULES.find(x=>x.id===v.module);
+ $('section-id').textContent=selected?.id||'ACCESS DENIED';
+ $('heading').textContent=selected?.name||'نمایش محدود';
+ $('explanation').textContent=selected?'فاز هدف: '+selected.phase+' · دسترسی نمایشی با نقش و شعبهٔ مشخص':'این نقش مجوز مشاهدهٔ محیط مدیریت را ندارد.';
+ $('notice').textContent=v.notice||'';
+ let html='';
+ if(v.denied)html=card('دسترسی رد شد','<p>هیچ رکورد یا فرم مدیریتی در این نما نمایش داده نمی‌شود.</p>');
+ else if(v.module==='ABC-F01')html=card('شاخص‌های عملکرد',noData+'<div class="empty">درآمد، ظرفیت، نرخ تبدیل: دادهٔ قابل تأیید وجود ندارد.</div>')+card('جلسه‌های نمایشی',v.schedule.map(x=>'<p>'+esc(x.id)+' · '+esc(x.slot)+' · صرفاً نمونه</p>').join(''));
+ else if(v.module==='ABC-F02')html=card('جست‌وجوی کنترل‌شده','<label>جست‌وجو در دادهٔ آزمایشی <input id="search" maxlength="80" value="'+esc(v.search)+'" placeholder="عبارت آزمایشی"></label><button id="searchSubmit">جست‌وجو</button><div class="results">'+(v.results.length?v.results.map(x=>'<p>'+esc(x.id)+' · '+esc(x.label)+'</p>').join(''):'<p>نتیجه‌ای موجود نیست.</p>')+'</div>');
+ else if(v.module==='ABC-F03')html=card('تقویم و تداخل نوبت', '<p>بازه‌های Fixture: ۱۰:۰۰ برای نیروی ۱ و ۱۱:۳۰ برای نیروی ۲ اشغال‌اند.</p><div class="fields"><label>ساعت<select id="slot"><option>10:00</option><option>11:30</option><option>14:00</option><option>16:00</option></select></label><label>نیرو<select id="staff"><option>DEMO-STAFF-01</option><option>DEMO-STAFF-02</option></select></label></div><button id="draft">ساخت پیش‌نویس نوبت</button><p>'+(v.draft?'پیش‌نویس: '+esc(v.draft.slot)+' · '+esc(v.draft.staff)+' · منتظر رسید':'پیش‌نویسی ثبت نشده است.')+'</p><button id="confirm" '+(v.draft?'':'disabled')+'>درخواست تأیید (بدون API)</button>')+card('نوبت‌های ساختگی',v.appointments.map(x=>'<p>'+esc(x.id)+' · '+esc(x.slot)+' · '+esc(x.staff)+' · DEMO</p>').join(''));
+ else if(v.module==='ABC-F04')html=card('پرونده و رضایت مشتری',v.clients.map(x=>'<div class="record"><b>'+esc(x.id)+'</b><p>رضایت عکس: ثبت نشده · تاریخچه: بارگذاری نشده</p><p>فاقد تصویر یا اطلاعات شناسایی فردی</p></div>').join(''));
+ else if(v.module==='ABC-F07')html=card('تیم و صلاحیت‌ها',v.team.map(x=>'<p>'+esc(x.id)+' · صلاحیت حرفه‌ای احراز نشده؛ تأیید برنامهٔ فنی مجاز نیست.</p>').join(''));
+ else if(v.module==='ABC-F08')html=card('وضعیت خدمات',v.services.map(x=>'<p>'+esc(x.title)+' ('+esc(x.id)+') · <strong>NOT_RELEASED</strong></p>').join(''));
+ else if(v.module==='ABC-F11')html=card('پیشنهاد کمپین',noData+'<p>برای ارسال واقعی به رضایت بازاریابی، تأیید انسانی، مجوز دامنه و رسید معتبر نیاز است.</p><button id="campaign">ایجاد پیشنهاد نمایشی</button><p>'+(v.draft?'در انتظار رضایت و مجوز؛ ارسال نشده است.':'هنوز پیشنهادی ساخته نشده است.')+'</p><button id="execute">آزمون ممنوعیت ارسال</button>');
+ else if(v.module==='ABC-F16')html=card('اعلان‌ها',v.notifications.map(n=>'<p>'+esc(n.text)+'</p>').join(''));
+ else if(v.module==='ABC-F05'||v.module==='ABC-F06')html=card('مسیر کاری استودیو','<p>این لینک نمونهٔ مشاوره است؛ اختیار متخصص یا مدیریت را به کاربر منتقل نمی‌کند.</p><p>تأیید برنامهٔ فنی فقط پس از احراز صلاحیت و تأیید نسخهٔ دقیق مجاز است.</p><a class="link" href="./index.html">ورود به نمونهٔ استودیو</a>');
+ else html=card('وضعیت طراحی ماژول','<p>'+esc(v.empty)+'</p>'+noData+'<button id="execute">آزمون جلوگیری از اقدام عملیاتی</button>');
+ $('content').innerHTML=html;
+ if($('searchSubmit'))$('searchSubmit').onclick=()=>dispatch({type:'search',query:$('search').value});
+ if($('search'))$('search').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();dispatch({type:'search',query:e.target.value});}};
+ if($('draft'))$('draft').onclick=()=>dispatch({type:'draftBooking',slot:$('slot').value,staff:$('staff').value});
+ if($('confirm'))$('confirm').onclick=()=>dispatch({type:'requestConfirmation'});
+ if($('campaign'))$('campaign').onclick=()=>dispatch({type:'proposeCampaign'});
+ if($('execute'))$('execute').onclick=()=>dispatch({type:'executeSensitive'});
+}
+$('role').onchange=e=>dispatch({type:'simulateRole',role:e.target.value});
+$('branch').onchange=e=>dispatch({type:'switchBranch',branch:e.target.value});
+render();

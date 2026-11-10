@@ -79,9 +79,12 @@ class BoundMTLSHTTPServer(ThreadingHTTPServer):
             verify_private_api_client_certificate(
                 sock.getpeercert(),self.allowed_client_uris)
             return sock,address
-        except BaseException:
+        except Exception as exc:
+            # BaseServer._handle_request_noblock catches OSError, not ValueError.
+            # Preserve the fail-closed disconnect without terminating the
+            # server's accept loop after a rejected certificate/URI SAN.
             sock.close()
-            raise
+            raise OSError("private_api_peer_rejected") from exc
 
 
 def create_private_api_server(address,handler,env):

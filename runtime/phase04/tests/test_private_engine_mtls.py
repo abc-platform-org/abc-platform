@@ -196,6 +196,49 @@ class ManagedWorkloadMTLSTests(unittest.TestCase):
         forged=self._reissue_with_claims({"sub":old_subject})
         self.assertEqual(self.call(token=forged)["error"],"engine_request_rejected")
 
+    def test_api_gateway_certificate_cannot_impersonate_engine(self):
+        # This certificate is from the SAME trusted disposable CA as the
+        # canonical engine client. Reject by principal namespace, not CA.
+        gateway_uri="spiffe://abc.internal/gateway/approved-client"
+        gateway_key=rsa.generate_private_key(public_exponent=65537,key_size=2048)
+        gateway_cert=(x509.CertificateBuilder()
+            .subject_name(x509.Name([
+                x509.NameAttribute(NameOID.COMMON_NAME,"test-api-gateway")]))
+            .issuer_name(self.ca_cert.subject).public_key(gateway_key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(self.now-timedelta(minutes=5))
+            .not_valid_after(self.now+timedelta(minutes=30))
+            .add_extension(x509.BasicConstraints(ca=False,path_length=None),critical=True)
+            .add_extension(x509.SubjectAlternativeName([
+                x509.UniformResourceIdentifier(gateway_uri)]),critical=False)
+            .add_extension(x509.ExtendedKeyUsage([
+                ExtendedKeyUsageOID.CLIENT_AUTH]),critical=False)
+            .sign(self.ca,hashes.SHA256()))
+        cert_path=_write(self.root/"gateway-cert.pem",
+            gateway_cert.public_bytes(serialization.Encoding.PEM))
+        key_path=_write(self.root/"gateway-key.pem",
+            gateway_key.private_bytes(serialization.Encoding.PEM,
+                serialization.PrivateFormat.PKCS8,serialization.NoEncryption()))
+        thumb=base64.urlsafe_b64encode(hashlib.sha256(
+            gateway_cert.public_bytes(serialization.Encoding.DER)
+            ).digest()).rstrip(b"=").decode()
+        for subject in (self.client_uri,gateway_uri):
+            with self.subTest(subject=subject):
+                # A correctly CA-signed mTLS client certificate and bound
+                # RS256 JWT cannot bridge the API gateway to ENG-05.
+                forged=self._reissue_with_claims({
+                    "sub":subject,"cnf":{"x5t#S256":thumb}})
+                reply=send_private_engine_message(
+                    host="127.0.0.1",port=self.port,server_name="localhost",
+                    certfile=cert_path,keyfile=key_path,ca_file=self.ca_path,
+                    token=forged,message=self.message)
+                self.assertEqual(reply["error"],"engine_request_rejected")
+
+    def test_wrong_single_audience_does_not_authorize_engine(self):
+        forged=self._reissue_with_claims({"aud":"abc-engine:ENG-14"})
+        self.assertEqual(self.call(token=forged)["error"],
+                         "engine_request_rejected")
+
     def test_deny_multi_audience_token_even_if_expected_audience_included(self):
         altered=self._reissue_with_claims(
             {"aud":["abc-engine:"+self.target_engine,"abc-engine:ENG-19"]})

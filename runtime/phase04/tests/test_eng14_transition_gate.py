@@ -41,6 +41,23 @@ class ENG14AllTransitions(unittest.TestCase):
         with self.assertRaises(DomainError):
             p.require_allowed(d)
 
+    def test_spiffe_gateway_or_engine_identity_cannot_replace_human_actor(self):
+        # TLS workload identity is NOT an ENG14 specialist authorization.
+        # A caller-supplied SPIFFE URI must never authorize a state change.
+        policy=ENG14TransitionPolicy()
+        for claimed_actor in (
+            "spiffe://abc.internal/gateway/approved-client",
+            "spiffe://abc.internal/eng03/eng03-worker",
+            "spiffe://abc.internal/staging/eng-03",
+            "ENG-03",
+        ):
+            with self.subTest(actor=claimed_actor):
+                d=policy.evaluate(from_state="CREATED",to_state="PAUSED",
+                                  actor=claimed_actor,expected_version=0)
+                self.assertEqual(d["decision"],"BLOCK")
+                with self.assertRaises(DomainError):
+                    policy.require_allowed(d)
+
     def test_unsupported_transition_cannot_be_claimed(self):
         with self.assertRaises(DomainError):
             ENG14TransitionPolicy().evaluate(from_state="CREATED",to_state="CLOSED",

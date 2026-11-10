@@ -2,34 +2,51 @@
 
 The issuer/CA is provisioned and rotated by an external operator. A successful
 TLS handshake alone is not a bearer principal: the verified client certificate
-URI SAN is additionally pinned to a declared trusted internal caller. Regular
-end-user OIDC verification and PostgreSQL RLS remain independent requirements.
+URI SAN is additionally pinned to an approved GATEWAY principal only.
+Legacy per-engine HTTP caller identities and the new canonical engine mesh
+are separate trust surfaces: never alias either into this gateway allowlist.
+End-user OIDC verification and PostgreSQL RLS remain independent requirements.
 """
 import re
 from http.server import ThreadingHTTPServer
 
 from .service_mesh_identity import require_mtls_context
 
-_URI=re.compile(
-    r"^spiffe://abc\.internal/(?:gateway|eng(?:0[1-9]|1[0-9]))/[A-Za-z0-9-]{3,96}$"
+_GATEWAY_URI=re.compile(
+    r"^spiffe://abc\.internal/gateway/[A-Za-z0-9-]{3,96}$"
 )
+
+
+def _require_gateway_callers(allowed):
+    """Fail closed even if a caller bypasses the environment parser.
+
+    Legacy /engXX/name and canonical /staging/eng-XX service identities
+    belong to other trust domains and cannot authenticate to this HTTP API.
+    """
+    if (not isinstance(allowed,frozenset) or
+        not 1<=len(allowed)<=16 or
+        any(type(uri) is not str or _GATEWAY_URI.fullmatch(uri) is None
+            for uri in allowed)):
+        raise ValueError("api_gateway_only_client_identity_required")
+    return allowed
 
 
 def parse_allowed_private_callers(value):
     if not isinstance(value,str) or not value or len(value)>4096:
         raise ValueError("api_client_certificate_uri_pins_required")
     parts=value.split(",")
-    if (len(parts)>16 or not all(x and x==x.strip() and _URI.fullmatch(x)
+    if (len(parts)>16 or not all(x and x==x.strip() and _GATEWAY_URI.fullmatch(x)
                                for x in parts) or len(set(parts))!=len(parts)):
         raise ValueError("api_client_certificate_uri_pins_invalid")
-    return frozenset(parts)
+    return _require_gateway_callers(frozenset(parts))
 
 
 def verify_private_api_client_certificate(cert,allowed):
     # Python's getpeercert() only reports this after successful CA verification.
     # Never accept a CN fallback or multiple identities in one certificate.
-    if not isinstance(cert,dict) or not isinstance(allowed,frozenset) or not allowed:
+    if not isinstance(cert,dict):
         raise ValueError("api_client_certificate_unverifiable")
+    _require_gateway_callers(allowed)
     names=cert.get("subjectAltName",())
     if (not isinstance(names,(tuple,list)) or
         len([value for kind,value in names if kind=="URI"])!=1 or
@@ -45,7 +62,7 @@ class BoundMTLSHTTPServer(ThreadingHTTPServer):
     daemon_threads=True
 
     def __init__(self,address,handler,*,context,allowed_client_uris):
-        self.allowed_client_uris=allowed_client_uris
+        self.allowed_client_uris=_require_gateway_callers(allowed_client_uris)
         super().__init__(address,handler,bind_and_activate=False)
         try:
             self.server_bind()
@@ -62,9 +79,12 @@ class BoundMTLSHTTPServer(ThreadingHTTPServer):
             verify_private_api_client_certificate(
                 sock.getpeercert(),self.allowed_client_uris)
             return sock,address
-        except BaseException:
+        except Exception as exc:
+            # BaseServer._handle_request_noblock catches OSError, not ValueError.
+            # Preserve the fail-closed disconnect without terminating the
+            # server's accept loop after a rejected certificate/URI SAN.
             sock.close()
-            raise
+            raise OSError("private_api_peer_rejected") from exc
 
 
 def create_private_api_server(address,handler,env):

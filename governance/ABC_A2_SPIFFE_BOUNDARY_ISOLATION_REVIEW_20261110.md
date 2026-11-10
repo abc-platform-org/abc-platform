@@ -19,7 +19,8 @@ This correction **does not establish two independent managed CAs or a live mesh*
 1. Tighten the private HTTP API mTLS caller allowlist to **gateway namespace only**, while preserving support for multiple exact approved gateway IDs (maximum 16). Reject unknown, mixed, duplicated, wildcard, whitespace and engine SAN entries.
 2. Validate the allowlist **again** at the certificate-check boundary and server constructor; caller-supplied or manually assembled `frozenset` objects must never authorize obsolete engine SANs.
 3. Preserve the exact canonical engine verifier with issuer/audience/subject/certificate bindings and PostgreSQL atomic authorization. No relaxation, auto-alias or implicit compatibility bridge. Old v1/v2 engine protocols remain frozen.
-4. Preserve the staging cost hold and ENG-06 review-only release guard. A valid private API mTLS gateway certificate is **not** a human professional identity, ENG-14 consent approval or right to execute a salon treatment.
+4. Convert invalid mTLS peer URI failure to a **closed socket plus OSError**, which Python `socketserver.BaseServer._handle_request_noblock` handles without terminating `serve_forever`. An unapproved but CA-trusted peer previously raised a ValueError out of `get_request` and terminated the local accept-loop thread in a reproduced TLS negative test. This is an availability/security correction and is **not** evidence of an exploited deployed system.
+5. Preserve the staging cost hold and ENG-06 review-only release guard. A valid private API mTLS gateway certificate is **not** a human professional identity, ENG-14 consent approval or right to execute a salon treatment.
 
 This decision is fail-closed for previously permitted legacy private-API engine callers. An operator who currently relies on `spiffe://abc.internal/eng03/eng03-worker` **must not migrate via permissive alias**. Any legitimate engine-to-API communication requires a separate reviewed gateway-proxy architecture with independently authenticated source identity, explicit role delegation, scope proof and replay-safe policy checks.
 
@@ -27,13 +28,32 @@ This decision is fail-closed for previously permitted legacy private-API engine 
 
 | Evidence file | Acceptance cases | Current execution |
 |---|---|---|
-| `test_private_api_mtls.py` | two approved gateway IDs allowed; reject legacy and canonical engine SANs, wildcard, malformed/cross-domain/mixed allowlists; direct forged allowlist denied before server bind; unauthorized socket closed | CODE COMMITTED, **NOT RUN** on current GitHub head |
-| `test_private_api_network_mtls.py` | disposable TLS1.3 real gateway certificate allowed; no certificate, unapproved gateway, CA-signed legacy engine and CA-signed canonical engine rejected | CODE COMMITTED, **NOT RUN** |
+| `test_private_api_mtls.py` | two approved gateway IDs allowed; reject legacy and canonical engine SANs, wildcard, malformed/cross-domain/mixed allowlists; direct forged allowlist denied before server bind; unauthorized socket closed; approved gateway socket still accepted | **6/6 PASS** in hash-verified isolated local test; GitHub CI not run |
+| `test_private_api_network_mtls.py` | disposable TLS1.3 real gateway certificate allowed; no certificate, unapproved gateway, CA-signed legacy engine and CA-signed canonical engine rejected; valid gateway continues working after each rejection | **1/1 PASS** in hash-verified isolated local TLS test; GitHub CI not run |
 | `test_private_engine_mtls.py` | CA-signed **gateway certificate** cannot cross into independent engine even with cryptographically bound signed JWT; wrong single JWT audience rejected; existing signed identity/consumer/multi-audience/replay/JTI controls retained | CODE COMMITTED, **NOT RUN** |
 | `test_eng14_transition_gate.py` | Gateway URI, legacy engine URI, canonical engine URI and ENG-03 engine name cannot substitute for the qualified human actor on S0 checkpoint | CODE COMMITTED, **NOT RUN** |
 | `test_a2_adr005_candidate_contract_consistency.py` (parent PR #88) | candidate JWT TTL 120 seconds, seven unissued principals and all unapproved routes/proofs fail closed | CODE COMMITTED, **NOT RUN** |
 
 Static source comparison and bounded previously successful synthetic CI tests **are not** execution evidence for these newly added cases. PostgreSQL16 integration, real operator-managed issuer, cert rotation/revocation, independent Security and SRE signoff remain unresolved.
+
+
+## 3a. Local execution evidence and test fixture hardening
+
+**Executed on 2026-11-10** using Python 3.13 with an isolated copy of the exact source blob bytes fetched through the connected private GitHub repository. `git hash-object` matches the remote GitHub blob IDs for all three files:
+
+| Reconstructed file | Exact Git blob SHA |
+|---|---|
+| `runtime/phase04/abc_foundation/private_api_mtls.py` | `36b36ebf517e1b8ad9291d8a35ae8235118f9100` |
+| `runtime/phase04/tests/test_private_api_mtls.py` | `2698d594d6191fd4b8a293e0cd14d7d3b205cf37` |
+| `runtime/phase04/tests/test_private_api_network_mtls.py` | `196a7ca66fefaa8b72445e48865066a9370d4d77` |
+
+Command `PYTHONPATH=. python -m unittest discover -s tests -p 'test_private_api*.py' -v`: **7 tests run, 7 PASS, zero failures/errors**. The local isolated package substituted only `service_mesh_identity.require_mtls_context` with the same source function from the repo; **it did not execute** the complete production package, engine-JWT/ENG14 newly added tests, PostgreSQL16 integration, original CI workflows, managed external CA or staging.
+
+**Detected and fixed during the local negative test:** a CA-trusted but unauthorized client certificate raised `ValueError` from `get_request`, terminating the `serve_forever` accept thread; the corrected version closes the denied socket and raises `OSError` so subsequent valid gateway requests succeed. Regression now asserts the listener thread remains alive and an approved gateway can still complete TLS+HTTP after each rejected attempt.
+
+**OpenSSL/X.509 strict local verifier compatibility:** disposable CA/client/server test certificates now specify CA `keyCertSign`, `KeyUsage`, `SKI` and `AKI`; no verification downgrade is used. Initial strict local handshake had failed on missing AKI and then missing CA key usage; corrected fixture passes with verifier defaults unchanged. These are synthetic test certificates only.
+
+**All broader security acceptance remains pending**: new gateway-to-engine JWT tests and ENG14 spoofed actor tests are committed but NOT executed in this local subset; independent full-repo checkout/CI, security audit, professional review and managed deployment are still required. **No customer-data processing or release permission has changed.**
 
 ## 4. Review and release dependencies
 

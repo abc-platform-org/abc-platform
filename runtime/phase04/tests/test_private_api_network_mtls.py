@@ -81,6 +81,10 @@ class RealPrivateAPIHandshake(unittest.TestCase):
             client_cert,client_key=issue("allowed",CALLER,False)
             wrong_cert,wrong_key=issue("unapproved",
                 "spiffe://abc.internal/gateway/unapproved-client",False)
+            old_engine_cert,old_engine_key=issue("legacy-engine",
+                "spiffe://abc.internal/eng03/eng03-worker",False)
+            canonical_engine_cert,canonical_engine_key=issue("canonical-engine",
+                "spiffe://abc.internal/staging/eng-03",False)
             server=BoundMTLSHTTPServer(("127.0.0.1",0),_Handler,
                 context=require_mtls_context(certificate=srv_cert,
                     key=srv_key,ca_file=str(ca_path),server=True),
@@ -105,7 +109,12 @@ class RealPrivateAPIHandshake(unittest.TestCase):
                 finally:con.close()
             self.assertEqual(request(client_cert,client_key),
                              (200,b"synthetic-protected"))
-            for creds in ((None,None),(wrong_cert,wrong_key)):
+            for creds in (
+                (None,None),
+                (wrong_cert,wrong_key),
+                (old_engine_cert,old_engine_key),
+                (canonical_engine_cert,canonical_engine_key),
+            ):
                 with self.subTest(credentials=creds),self.assertRaises(
                     (OSError,ssl.SSLError,http.client.HTTPException)):
                     request(*creds)

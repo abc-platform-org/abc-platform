@@ -98,6 +98,19 @@ class PrivateApiMTLSTests(unittest.TestCase):
                     "subjectAltName":(("URI",illegal),)}
                 with patch("http.server.ThreadingHTTPServer.get_request",
                            return_value=(sock,("127.0.0.1",30000))):
-                    with self.assertRaises(ValueError):
+                    with self.assertRaisesRegex(OSError,"private_api_peer_rejected"):
                         listener.get_request()
                 sock.close.assert_called_once()
+
+    def test_approved_gateway_socket_remains_accepted(self):
+        listener=BoundMTLSHTTPServer.__new__(BoundMTLSHTTPServer)
+        listener.allowed_client_uris=frozenset([A])
+        sock=Mock()
+        sock.getpeercert.return_value={"subjectAltName":(("URI",A),)}
+        address=("127.0.0.1",30000)
+        with patch("http.server.ThreadingHTTPServer.get_request",
+                   return_value=(sock,address)):
+            accepted,peer=listener.get_request()
+        self.assertIs(accepted,sock)
+        self.assertEqual(peer,address)
+        sock.close.assert_not_called()

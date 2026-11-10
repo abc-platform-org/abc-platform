@@ -50,6 +50,15 @@ class RealPrivateAPIHandshake(unittest.TestCase):
                 .not_valid_before(now-timedelta(minutes=2))
                 .not_valid_after(now+timedelta(hours=1))
                 .add_extension(x509.BasicConstraints(ca=True,path_length=0),critical=True)
+                # OpenSSL strict TLS verification: CA keyCertSign and SKI/AKI.
+                .add_extension(x509.KeyUsage(digital_signature=True,content_commitment=False,
+                    key_encipherment=False,data_encipherment=False,key_agreement=False,
+                    key_cert_sign=True,crl_sign=True,encipher_only=False,
+                    decipher_only=False),critical=True)
+                .add_extension(x509.SubjectKeyIdentifier.from_public_key(
+                    cak.public_key()),critical=False)
+                .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                    cak.public_key()),critical=False)
                 .sign(cak,hashes.SHA256()))
             ca_path=root/"ca.crt"
             ca_path.write_bytes(ca.public_bytes(serialization.Encoding.PEM))
@@ -64,6 +73,14 @@ class RealPrivateAPIHandshake(unittest.TestCase):
                     .not_valid_after(now+timedelta(minutes=20))
                     .add_extension(x509.BasicConstraints(ca=False,path_length=None),
                                    critical=True)
+                    .add_extension(x509.KeyUsage(digital_signature=True,content_commitment=False,
+                        key_encipherment=True,data_encipherment=False,key_agreement=False,
+                        key_cert_sign=False,crl_sign=False,encipher_only=False,
+                        decipher_only=False),critical=True)
+                    .add_extension(x509.SubjectKeyIdentifier.from_public_key(
+                        k.public_key()),critical=False)
+                    .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                        cak.public_key()),critical=False)
                     .add_extension(x509.SubjectAlternativeName([
                         x509.DNSName(subject_name) if server
                         else x509.UniformResourceIdentifier(subject_name)]),
@@ -118,3 +135,8 @@ class RealPrivateAPIHandshake(unittest.TestCase):
                 with self.subTest(credentials=creds),self.assertRaises(
                     (OSError,ssl.SSLError,http.client.HTTPException)):
                     request(*creds)
+                # Unauthorized-but-CA-trusted clients must not terminate the
+                # listener. A legitimate pinned gateway still works afterward.
+                self.assertTrue(thread.is_alive(),"rejected_peer_killed_api_accept_loop")
+                self.assertEqual(request(client_cert,client_key),
+                                 (200,b"synthetic-protected"))

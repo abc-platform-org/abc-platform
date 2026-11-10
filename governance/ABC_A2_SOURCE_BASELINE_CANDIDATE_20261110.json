@@ -1,0 +1,132 @@
+{
+  "schema": "abc.a2.rebaseline.review-candidate.v1",
+  "as_of": "2026-11-10",
+  "repository": "saleheebrahimi2029-hub/abc-platform",
+  "status": "CANDIDATE_SOURCE_LOCKED_NOT_VALIDATED",
+  "admissible_as_operational_baseline": false,
+  "candidate_code_commit_sha": "cfd57ecf29cd0b002270f4ac160fc0c6193a3c6b",
+  "candidate_pr": 89,
+  "candidate_stack": {
+    "a2_packet_pr": 78,
+    "a2_packet_sha": "026e1fb174919278e3c2d73442be10b4f11675a4",
+    "adr005_ttl_pr": 88,
+    "adr005_ttl_sha": "f99109dfd4d2147287bdf704beeb93d202a88e41",
+    "spiffe_boundary_pr": 89
+  },
+  "source_tree": {
+    "tracked_entries": 661,
+    "blobs": 616,
+    "total_blob_bytes": 3667128,
+    "truncated": false
+  },
+  "locked_git_blob_shas": {
+    "runtime/phase04/abc_foundation/private_api_mtls.py": "36b36ebf517e1b8ad9291d8a35ae8235118f9100",
+    "runtime/phase04/abc_foundation/service_mesh_identity.py": "b6ca5b454e0deea7a2a5e15b4edd79a913b462f7",
+    "runtime/phase04/abc_foundation/staging_api.py": "7d1766e6690aedaa4d143411fb63bd1279f0b99d",
+    "runtime/phase04/abc_foundation/eng14_transition_policy.py": "8ec3909ff731a943e770e35aa5b62ade594b5da2",
+    "runtime/phase04/abc_foundation/private_pg_atomic_admission.py": "82a6e0b9c8e03d05864c1253d0ba50c46630d460",
+    "runtime/phase04/tests/test_private_api_mtls.py": "2698d594d6191fd4b8a293e0cd14d7d3b205cf37",
+    "runtime/phase04/tests/test_private_api_network_mtls.py": "196a7ca66fefaa8b72445e48865066a9370d4d77",
+    "runtime/phase04/tests/test_private_engine_mtls.py": "1a1fdba77e0918a47ec412f62b1c3bd90205d0f9",
+    "runtime/phase04/tests/test_eng14_transition_gate.py": "0d83d94689d7e8264c597cddf6b5dae1fc4a41df",
+    "runtime/phase04/tests/test_a2_adr005_candidate_contract_consistency.py": "78b19e1d89a33a12d347ed8ed6f76f4490371368",
+    "runtime/phase04/migrations/0034_a2_private_spiffe_atomic_ingress.sql": "12f1cc2515012c43022b2f45c9d3bee4ee7be686",
+    "governance/abc_w1_workload_trust_boundaries.v0.review.json": "f3b974560445c8dc1a0ff6c9ff61bf3db2b2e002",
+    "governance/ABC_A2_G01_G10_EVIDENCE_RECONCILIATION_v1.json": "c9fb15323b6e530122de92673ee85e996efca20c",
+    "governance/ABC_A2_INDEPENDENT_RISK_REGISTER_v1.json": "b053861c9c4fed871ff998a900313a0f642d47b5",
+    "scripts/validate_a2_closure_packet_v1.py": "2cba26f07f88b164cebd6c2f9df5520fb5a7a35b"
+  },
+  "prior_approved_ci_source": {
+    "code_sha": "d8c7698bc060b859f5f4db52d572a00db656a2cd",
+    "coverage_class": "HISTORICAL_SYNTHETIC_TEST_EVIDENCE_NOT_VALID_FOR_CANDIDATE",
+    "success_run_ids": [
+      42208334348,
+      42208334405,
+      42208334526,
+      42208334592,
+      42208334762,
+      42208334598
+    ],
+    "historical_mapped_jobs": 55
+  },
+  "current_evidence": {
+    "operational_gate_count": 80,
+    "operational_gate_status": "OPEN",
+    "historical_test_mapped_count": 55,
+    "unmapped_direct_test_count": 25,
+    "open_risk_count": 14,
+    "signatures_count": 0,
+    "local_isolated_repo_tests": {
+      "executed": 7,
+      "passed": 7
+    },
+    "local_non_repository_probes": {
+      "executed": 15,
+      "passed": 15,
+      "scope": "MOCKED_OR_ISOLATED_NOT_CI"
+    },
+    "full_checkout_repo_tests": "NOT_RUN",
+    "new_jwt_eng14_native_tests": "NOT_RUN",
+    "postgresql16_suite": "NOT_RUN",
+    "ci_at_candidate_sha": "NOT_RUN",
+    "real_private_staging": "NOT_PROVISIONED"
+  },
+  "findings": [
+    {
+      "id": "A2-SEC-01",
+      "risk": "STAGING_API_OWNER_HOLD_AND_LEGACY_DB_MODE",
+      "status": "OPEN_P0_REVIEW",
+      "description": "staging_api.py allows STAGING_PRIVATE mode with LEGACY_SYNTHETIC when env flag is true; separate engine bootstrap has explicit owner hold. Operator authorization and physical DB identity may be bypassed at API launcher if deployed; no live exploit claimed."
+    },
+    {
+      "id": "A2-SEC-02",
+      "risk": "NO_EXTERNAL_PRIVATE_TRUST_ATTESTATION",
+      "status": "OPEN",
+      "description": "SPIFFE/gateway code uses synthetic CA tests; managed CA, cert rotation, provider isolation and operator-signed evidence missing."
+    },
+    {
+      "id": "A2-SEC-03",
+      "risk": "CURRENT_CODE_SHA_DIFFERS_FROM_SUCCESSFUL_CI_SHA",
+      "status": "BLOCKING",
+      "description": "do not promote 55 historical CI mappings into current SHA acceptance."
+    }
+  ],
+  "design_recommendation": {
+    "adr": "ADR-ENG-005",
+    "status": "RECOMMEND_APPROVE_DESIGN_ONLY_WITH_CONDITIONS_NOT_RATIFIED",
+    "reviewer_id": null,
+    "reviewer_signature": null,
+    "reviewed_commit": "cfd57ecf29cd0b002270f4ac160fc0c6193a3c6b",
+    "conditions": [
+      "approve and isolate gateway namespace and core engine identity",
+      "resolve staging_api legacy SQL and owner cost hold",
+      "complete full source checkout and execute all mandatory native tests",
+      "independent Architecture and Security signatures bound to final immutable SHA",
+      "operator PKI and SRE proof separately after cost authorization"
+    ]
+  },
+  "approvals": {
+    "architecture": "NOT_RECEIVED",
+    "security": "NOT_RECEIVED",
+    "sre": "NOT_RECEIVED",
+    "professional": "NOT_RECEIVED",
+    "owner_staging_cost": "NOT_AUTHORIZED"
+  },
+  "release_policy": {
+    "a2_operational_closed": false,
+    "eng06_customer_release": false,
+    "eng07_dispatch": false,
+    "cloud_deployment_authorized": false,
+    "managed_identity_proven": false,
+    "real_customer_media_allowed": false,
+    "merge_to_main_authorized": false
+  },
+  "validation_requirements": {
+    "direct_source_blob_hashes": true,
+    "code_sha_bound_native_ci": false,
+    "independent_signature_checks": false,
+    "full_checkout_required": true,
+    "full_ci_rerun_required": true,
+    "retire_old_five_file_allowlist_only_after_rebuilt_evidence": true
+  }
+}

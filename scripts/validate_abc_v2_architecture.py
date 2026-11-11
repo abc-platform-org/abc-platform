@@ -1,10 +1,13 @@
 """Architectural freeze, offline salon UX and zero-trust backbone preflight.
 
-Static source controls protect version boundaries. They are NOT a live provider
-attestation or proof that all security/quality gates have passed.
+Static source controls protect version boundaries. The staging bootstrap
+check runs locally with synthetic inputs and verifies that startup is denied.
+Live provider attestation and release approval are outside this check.
 """
 import hashlib
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -25,6 +28,19 @@ TARGET={
 
 def git_blob_sha(contents):
     return hashlib.sha1(b"blob "+str(len(contents)).encode()+b"\0"+contents).hexdigest()
+
+
+def validate_staging_owner_hold():
+    runtime = ROOT / "runtime/phase04"
+    suite = "tests/test_a2_staging_api_owner_hold.py"
+    if not (runtime / suite).is_file():
+        raise AssertionError("staging_owner_hold_suite_missing")
+    subprocess.run(
+        [sys.executable, "-m", "unittest", suite],
+        cwd=runtime,
+        check=True,
+        timeout=30,
+    )
 
 
 def validate():
@@ -55,13 +71,13 @@ def validate():
       "eng03_executor.py":("stale_or_expired_lease",
          "consumer_login_binding_denied","ON CONFLICT DO NOTHING"),
       "eng14_transition_policy.py":("POLICY_AND_EXECUTOR_NOT_APPROVED",
-         "SYNTHETIC_S0_CHECKPOINT_ONLY","eng14_transition_denied"),
-      "staging_api.py":("create_private_api_server",
-         "MANAGED_MTLS","unapproved_database_auth_mode")
+         "SYNTHETIC_S0_CHECKPOINT_ONLY","eng14_transition_denied")
     }
     for filename,needles in core.items():
         text=(src/filename).read_text()
         assert all(needle in text for needle in needles), "backbone_guard_drift:"+filename
+
+    validate_staging_owner_hold()
 
     proto=ROOT/"prototypes/abc-ai-studio-v2"
     html=(proto/"index.html").read_text()
@@ -82,7 +98,7 @@ def validate():
         assert forbidden not in js, "offline_prototype_violation:"+forbidden
     return {"engine_v2_port_count":len(manifest),
       "v1_frozen_artifacts":len(LOCKED),
-      "secure_core_preflight":sorted(core),
+      "secure_core_preflight":sorted([*core, "staging_api.py"]),
       "offline_ai_studio":"SYNTHETIC_ONLY",
       "real_engine_execution":False,"customer_release_approved":False}
 

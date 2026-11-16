@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-src 'self'; form-action 'none'; base-uri 'none'">
+  <title>ABC AI Studio | جلسهٔ آزمایشی</title>
+  <link rel="stylesheet" href="/studio/style.css">
+  <link rel="stylesheet" href="/session.css">
+  <script src="/session.js" defer></script>
+</head>
+<body>
+  <main>
+    <section class="panel session-panel" aria-labelledby="session-title">
+      <div>
+        <p class="eyebrow" lang="en">ABC / AI STUDIO</p>
+        <h1 id="session-title">جلسهٔ آزمایشی مشاوره</h1>
+        <p>این محیط فقط برای جلسهٔ حضوری با دادهٔ مصنوعی است.</p>
+      </div>
+      <button class="primary" id="session-action" type="button" disabled>ایجاد جلسه</button>
+      <p id="session-status" role="status">در حال بررسی جلسهٔ ذخیره‌شده…</p>
+      <dl id="session-details" hidden>
+        <div><dt>شناسهٔ جلسه</dt><dd><bdi id="session-id"></bdi></dd></div>
+        <div><dt>وضعیت و نسخه</dt><dd id="session-state"></dd></div>
+      </dl>
+    </section>
+    <iframe src="/studio/index.html" title="پیش‌نمایش طراحی AI Studio"></iframe>
+  </main>
+</body>
+</html>

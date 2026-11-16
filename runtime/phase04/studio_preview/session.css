@@ -1,0 +1,12 @@
+.session-panel {
+  margin: 1rem auto;
+  max-width: 90rem;
+  padding: 1.25rem;
+  width: calc(100% - 2rem);
+}
+.session-panel h1 { margin: 0.25rem 0; }
+.session-panel button { margin-block: 0.5rem; }
+.session-panel button:disabled { opacity: 0.65; cursor: default; }
+.session-panel dl:not([hidden]) { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+.session-panel dd { margin: 0.25rem 0 0; overflow-wrap: anywhere; }
+iframe { display: block; border: 0; width: 100%; min-height: 75vh; }

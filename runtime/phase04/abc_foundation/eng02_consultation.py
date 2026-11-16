@@ -151,19 +151,31 @@ class ConsultationEngine:
                 "session_id":s["session_id"],"profile_version":self.profile["profile_version"],
                 "stop_reason":"SYNTHETIC_QUESTION_BUDGET_COMPLETE" if question is None else None}
 
-    def record(self,principal,session_id,*,question_id,value,source,operation_key):
+    def record(self,principal,session_id,*,question_id,value,source,operation_key,
+               expected_version=None, authorize_version=None, question_policy=None):
         s=self._authorized(principal,session_id)
-        if (question_id not in self.questions or source not in ("CLIENT","SPECIALIST")
+        if (not isinstance(question_id,str) or question_id not in self.questions
+                or source not in ("CLIENT","SPECIALIST")
                 or not isinstance(value,str) or value not in self.questions[question_id]["allowed_values"]):
             raise DomainError(400,"invalid_synthetic_answer")
         if not isinstance(operation_key,str) or not 8<=len(operation_key)<=128:
             raise DomainError(400,"invalid_idempotency_key")
         request={"question_id":question_id,"value":value,"source":source,
                  "session_id":s["session_id"],"profile_version":self.profile["profile_version"]}
+        guarded = any(value is not None for value in (expected_version, authorize_version, question_policy))
+        if guarded:
+            if type(expected_version) is not int or expected_version < 0:
+                raise DomainError(400, "invalid_expected_state_version")
+            if not callable(authorize_version) or question_policy is None:
+                raise DomainError(503, "question_authority_unavailable")
+            request["expected_state_version"] = expected_version
         fingerprint=_digest(request)
         with self._connect() as con:
             con.execute("BEGIN IMMEDIATE")
             try:
+                if guarded:
+                    # The scoped lookup and answer/receipt use the same SQLite write lock.
+                    s = authorize_version(con, s["session_id"], expected_version)
                 key=(s["tenant_id"],s["session_id"],principal.subject,operation_key)
                 prior=con.execute("""SELECT fingerprint,response_json FROM eng02_receipts
                            WHERE tenant_id=? AND session_id=? AND actor_id=? AND operation_key=?""",
@@ -181,6 +193,15 @@ class ConsultationEngine:
                     raise DomainError(409,"question_already_answered_use_original_key")
                 # Enforce question order, including critical-first priority.
                 expected=self.next_question_in_transaction(answers)
+                if guarded:
+                    decision = question_policy.evaluate(
+                        command_id=f'{s["tenant_id"]}:{s["session_id"]}:{operation_key}',
+                        tenant_id=s["tenant_id"], session_id=s["session_id"],
+                        service_id=s["service_id"], state=s["state"],
+                        answers={qid: answer["value"] for qid, answer in answers.items()},
+                        question_id=question_id, expected_question=expected,
+                        profile_version=self.profile["profile_version"])
+                    question_policy.require_allow(decision)
                 if expected!=question_id:
                     raise DomainError(409,"question_sequence_or_safety_block")
                 aid=str(uuid.uuid4())

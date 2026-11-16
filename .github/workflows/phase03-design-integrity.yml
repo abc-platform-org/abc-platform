@@ -21,7 +21,7 @@ jobs:
       - run: node --test tests/phase03/model.test.mjs tests/phase03/management.test.mjs tests/phase03/contrast.test.mjs
 
   browser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4

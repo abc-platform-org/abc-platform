@@ -163,12 +163,14 @@ class Store:
         finally:
             con.close()
 
-    def get(self, actor, session_id):
-        con = self.connect()
-        try:
-            row = con.execute("SELECT * FROM sessions WHERE session_id=?", (session_id,)).fetchone()
+    def get(self, actor, session_id, *, connection=None):
+        if connection is not None:
+            row = connection.execute("SELECT * FROM sessions WHERE session_id=?", (session_id,)).fetchone()
             self._authorize(actor, row)
             return self._public(row)
+        con = self.connect()
+        try:
+            return self.get(actor, session_id, connection=con)
         finally:
             con.close()
 

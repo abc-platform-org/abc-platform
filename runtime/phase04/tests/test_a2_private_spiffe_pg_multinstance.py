@@ -11,15 +11,18 @@ import json
 from pathlib import Path
 import multiprocessing
 import os
+import socket
 import threading
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
+from urllib.parse import urlencode, quote
 
 import psycopg
 from cryptography.hazmat.primitives import serialization
+from psycopg.conninfo import conninfo_to_dict
 
 from abc_foundation.isolated_engine_service import dispatch
 from abc_foundation.private_engine_transport import (
@@ -342,10 +345,23 @@ class PrivateAtomicPostgresMultiInstanceTests(unittest.TestCase):
                     ("abc."+name,)).fetchone()[0])
 
     def test_12_db_connection_failure_is_closed(self):
-        bad_dsn=self.eng05.replace(":5432/",":59999/")+"?connect_timeout=1"
-        port=self._start(bad_dsn)
-        self.assertEqual(self.call(port=port)["error"],"engine_request_rejected")
-        self.assertEqual(self.audit_count(),0)
+        token = self.fixture.token()
+        self.assertEqual(self.audit_count(), 0)
+        # Reserve a loopback port without listening so libpq gets a real
+        # connection refusal and another process cannot claim the port.
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as unavailable:
+            unavailable.bind(("127.0.0.1", 0))
+            options = conninfo_to_dict(self.eng05)
+            options.update(host="127.0.0.1", hostaddr="127.0.0.1",
+                           port=str(unavailable.getsockname()[1]), connect_timeout="1")
+            bad_dsn = "postgresql://?" + urlencode(options, quote_via=quote)
+            port = self._start(bad_dsn)
+            self.assertEqual(self.call(token=token, port=port)["error"], "engine_request_rejected")
+            self.assertEqual(self.audit_count(), 0)
+
+        # The failed attempt must not consume the signed request's replay key.
+        self.assertEqual(self.call(token=token)["engine_id"], "ENG-05")
+        self.assertEqual(self.audit_count(), 1)
 
     def test_13_atomic_rollback_on_bounded_execution_error(self):
         token=self.fixture.token()

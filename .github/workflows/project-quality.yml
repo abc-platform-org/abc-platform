@@ -10,7 +10,7 @@ permissions:
 jobs:
   quality:
     name: PQE (${{ matrix.scope }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:
       fail-fast: false
@@ -19,7 +19,9 @@ jobs:
           - scope: current
             ref: ${{ github.sha }}
           - scope: phase03
-            ref: e92533c68240d8fefda73556d38f0a9706fb13e2
+            ref: 3f36b6610cec7ec2f1420939d68f19fae3327ee2
+          - scope: phase04
+            ref: 41dcc3aa102c712cf567838fff29449876817d78
           - scope: a2
             ref: 7a41f9bc13c0e4ffdbe33561816eae3b86db1823
     steps:
@@ -36,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: saleheebrahimi2029-hub/Qullity-engine
-          ref: 67f3693c5ca3593a1a1eb52f3de54aac40be1cb2
+          ref: d4930d54880c9f855a9c2e5b5e98ff4cfc6b7e7b
           path: engine
           persist-credentials: false
       - uses: actions/setup-python@v5
@@ -98,6 +100,28 @@ jobs:
           finally:
               if started:
                   subprocess.run(['docker', 'stop', 'abc-pqe-postgres'], check=False)
+          PY
+      - name: Verify the browser audit completed at three viewports
+        if: matrix.scope == 'phase03' || matrix.scope == 'phase04'
+        env:
+          EXPECTED_ABC_REVISION: ${{ matrix.ref }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report = json.loads(Path('pqe-report/report.json').read_text())
+          if report.get('abc_target_commit') != os.environ['EXPECTED_ABC_REVISION']:
+              raise SystemExit('The browser audit ran on the wrong ABC revision')
+          checks = {c['check_id']: c for c in report['checks']}
+          for name in ('ui.interaction', 'ui.responsive', 'ui.accessibility'):
+              status = checks.get(name, {}).get('status', 'MISSING')
+              print(f'{name}: {status}')
+              if status != 'PASS':
+                  raise SystemExit(f'{name} did not pass')
+          if checks['ui.interaction'].get('metrics', {}).get('viewports') != 3:
+              raise SystemExit('Expected three viewport sizes')
           PY
       - name: Publish check statuses
         if: always()

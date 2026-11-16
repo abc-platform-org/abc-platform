@@ -1,0 +1,38 @@
+✔ no consent means no progression (1.836561ms)
+✔ text-only path allowed without media permission (0.172096ms)
+✔ unavailable service rejected (0.212906ms)
+✔ missing consultation answers block (0.415428ms)
+✔ input quality failure blocks (0.23523ms)
+✔ positive full synthetic journey requires exact approval and receipt (0.479924ms)
+✔ QA FAIL never publishes a selectable look (0.930564ms)
+✔ QA INDETERMINATE never publishes a selectable look (0.263121ms)
+✔ stale job cannot replace active job (0.292224ms)
+✔ revocation rejects queued results and clears projections (1.001229ms)
+✔ pause and resume preserve checkpoint (0.251964ms)
+✔ safety block is not recoverable with resume (0.266296ms)
+✔ offline mutations denied (0.17467ms)
+✔ recoverable failure resumes last good step (0.28287ms)
+✔ shared projection excludes private properties (0.197013ms)
+✔ role switch requires private handling (0.142652ms)
+✔ return to shared clears private projection (0.247258ms)
+✔ favorite is not selection or approval (0.274628ms)
+✔ new version preserves previous version immutably (0.292344ms)
+✔ closing without decision does not invent validation (0.18787ms)
+✔ terminal state cannot advance (0.20873ms)
+✔ generic set cannot grant protected authority (0.206347ms)
+✔ all declared happy transitions exist in accepted contract (11.419119ms)
+✔ pause during job clears pending and allows retry after resume (0.35634ms)
+✔ undo redo changes pointer without mutating versions (0.283612ms)
+✔ branching pins reviewed parent (0.337252ms)
+✔ proposed revision extension invalidates dependent approvals (0.245324ms)
+✔ shared mode cannot revise selected look (0.170033ms)
+✔ committed handoff cannot silently revise (0.207239ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 131.365118
+PASS: 15 screen contracts; 64 requirement dispositions; additive revision proposal; no live data APIs.

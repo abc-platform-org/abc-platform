@@ -1,0 +1,233 @@
+[
+  {
+    "screen_id": "UX-01",
+    "state": "CREATED",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "createConsultation",
+        "path": "/v1/consultations"
+      },
+      {
+        "operation_id": "recordConsent",
+        "path": "/v1/consultations/{session_id}/consents"
+      }
+    ],
+    "guard": "No media without consent",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-02",
+    "state": "CONSENTED",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "listServices",
+        "path": "/v1/services"
+      },
+      {
+        "operation_id": "getServicePack",
+        "path": "/v1/service-packs/{service_id}"
+      }
+    ],
+    "guard": "Unreleased service disabled",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-03",
+    "state": "INTENT_DEFINED",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "nextConsultationQuestion",
+        "path": "/v1/consultations/{session_id}/questions/next"
+      },
+      {
+        "operation_id": "recordConsultationAnswer",
+        "path": "/v1/consultations/{session_id}/answers"
+      }
+    ],
+    "guard": "Missing required answers blocks",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-04",
+    "state": "INPUTS_COLLECTING",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "requestMediaUpload",
+        "path": "/v1/consultations/{session_id}/media-upload-intents"
+      },
+      {
+        "operation_id": "getMediaReadIntent",
+        "path": "/v1/media/{asset_id}/read-intent"
+      }
+    ],
+    "guard": "No upload in prototype; quality failure",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-05",
+    "state": "INPUT_READY",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "requestBeautyAnalysis",
+        "path": "/v1/consultations/{session_id}/analysis-requests"
+      }
+    ],
+    "guard": "Observed versus unknown evidence",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-06",
+    "state": "ANALYZED",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "requestRecommendations",
+        "path": "/v1/consultations/{session_id}/recommendations"
+      }
+    ],
+    "guard": "No invented alternatives",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-07",
+    "state": "OPTIONS_READY",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "createLookVersion",
+        "path": "/v1/consultations/{session_id}/looks"
+      },
+      {
+        "operation_id": "requestVisualPreview",
+        "path": "/v1/looks/{look_version_id}/visual-jobs"
+      }
+    ],
+    "guard": "QA PASS required",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-08",
+    "state": "PREVIEW_REVIEW",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "getVisualJob",
+        "path": "/v1/visual-jobs/{job_id}"
+      },
+      {
+        "operation_id": "listSessionLookVersions",
+        "path": "/v1/consultations/{session_id}/looks"
+      },
+      {
+        "operation_id": "recordLookPreference",
+        "path": "/v1/consultations/{session_id}/shortlist"
+      }
+    ],
+    "guard": "Invalid preview cannot be selected",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-09",
+    "state": "REVISION_REQUESTED",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "createLookVersion",
+        "path": "/v1/consultations/{session_id}/looks"
+      },
+      {
+        "operation_id": "requestVisualPreview",
+        "path": "/v1/looks/{look_version_id}/visual-jobs"
+      }
+    ],
+    "guard": "Immutable parent; addendum for selected revision",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-10",
+    "state": "LOOK_SELECTED",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "selectLookVersion",
+        "path": "/v1/consultations/{session_id}/selected-looks"
+      }
+    ],
+    "guard": "Selection is not execution approval",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-11",
+    "state": "FEASIBILITY_REVIEW",
+    "projection": "SPECIALIST",
+    "api_operations": [
+      {
+        "operation_id": "requestFeasibilityReview",
+        "path": "/v1/consultations/{session_id}/feasibility"
+      }
+    ],
+    "guard": "Private projection",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-12",
+    "state": "PLAN_DRAFTED",
+    "projection": "SPECIALIST",
+    "api_operations": [
+      {
+        "operation_id": "draftTechnicalPlan",
+        "path": "/v1/consultations/{session_id}/technical-plans"
+      },
+      {
+        "operation_id": "getPrivilegedTechnicalPlan",
+        "path": "/v1/technical-plans/{plan_id}"
+      }
+    ],
+    "guard": "Missing SOP blocks",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-13",
+    "state": "SPECIALIST_REVIEW",
+    "projection": "SPECIALIST",
+    "api_operations": [
+      {
+        "operation_id": "validateTechnicalPlan",
+        "path": "/v1/technical-plans/{plan_id}/validations"
+      }
+    ],
+    "guard": "Eligible specialist and exact versions",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-14",
+    "state": "HANDOFF",
+    "projection": "SPECIALIST",
+    "api_operations": [
+      {
+        "operation_id": "createInternalHandoff",
+        "path": "/v1/consultations/{session_id}/handoffs"
+      }
+    ],
+    "guard": "Receipt required",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  },
+  {
+    "screen_id": "UX-15",
+    "state": "CLOSED",
+    "projection": "SHARED",
+    "api_operations": [
+      {
+        "operation_id": "getConsultation",
+        "path": "/v1/consultations/{session_id}"
+      }
+    ],
+    "guard": "No invented transaction",
+    "implementation": "SYNTHETIC_PROTOTYPE"
+  }
+]

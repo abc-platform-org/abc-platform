@@ -1,0 +1,65 @@
+requirement_id,feature,release,design_surface,evidence_level,runtime_status
+ABC-F01,Home Dashboard,MVP,Salon OS synthetic dashboard with honest no-data KPI state,READ_ONLY_SYNTHETIC,NOT_IMPLEMENTED
+ABC-F02,Global Search,MVP,Salon OS role-scoped synthetic search and empty state,INTERACTIVE_SYNTHETIC,NOT_IMPLEMENTED
+ABC-F03,Calendar,MVP,Salon OS tentative booking conflict and no-receipt workflow,INTERACTIVE_SYNTHETIC,NOT_IMPLEMENTED
+ABC-F04,Clients,MVP,Salon OS synthetic client consent and private data omission,READ_ONLY_SYNTHETIC,NOT_IMPLEMENTED
+ABC-F05,AI Studio,MVP,Shared synthetic Studio and three-zone design,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+ABC-F06,Technical Roadmap,MVP,Private synthetic technical and handoff workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+ABC-F07,Team,MVP,Salon OS qualification-unverified team projection,READ_ONLY_SYNTHETIC,NOT_IMPLEMENTED
+ABC-F08,Services,MVP,Salon OS service packs all marked NOT_RELEASED,READ_ONLY_SYNTHETIC,NOT_IMPLEMENTED
+ABC-F09,Sales/POS,V2,Salon OS POS placeholder and blocked sensitive execution,DESIGN_PROJECTION_ONLY,NOT_IMPLEMENTED
+ABC-F10,Inventory,V2,Salon OS inventory placeholder and blocked sensitive execution,DESIGN_PROJECTION_ONLY,NOT_IMPLEMENTED
+ABC-F11,Marketing,V2,Salon OS synthetic campaign proposal and blocked send,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+ABC-F12,Analytics,V2,Salon OS analytics empty state and data provenance design,DESIGN_PROJECTION_ONLY,NOT_IMPLEMENTED
+ABC-F13,Automations,V2,Salon OS automation no-execution projection,DESIGN_PROJECTION_ONLY,NOT_IMPLEMENTED
+ABC-F14,Reviews,V2,Salon OS reviews no-data projection,DESIGN_PROJECTION_ONLY,NOT_IMPLEMENTED
+ABC-F15,Ask ABC,V2,Salon OS Ask ABC read recommend execute boundary projection,DESIGN_PROJECTION_ONLY,NOT_IMPLEMENTED
+ABC-F16,Notifications,MVP,Salon OS synthetic notifications projection,READ_ONLY_SYNTHETIC,NOT_IMPLEMENTED
+ABC-F17,Multi-Branch,V3,Salon OS owner-only branch switch synthetic control,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+ABC-F18,Settings/Governance,MVP,Salon OS permission gated settings projection,DESIGN_PROJECTION_ONLY,NOT_IMPLEMENTED
+AIS-001,Session initialization,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-002,Image intake / consent,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-003,Input quality gate,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-004,Consultation / adaptive questioning,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-005,Service-aware controls,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-006,Reference interpretation,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-007,Grounded recommendation,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-008,Look specification,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-009,Transform,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-010,Try On,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-011,Multiple valid generated looks,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-012,Before / After viewer,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-013,Compare workspace,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-014,Region locking,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-015,Iterative refinement,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-016,Version history,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-017,Favorites / shortlist,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-018,Inspiration,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-019,Palette intelligence,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-020,Visual QA,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-021,Feasibility review,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-022,Selected look lock,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-023,Technical plan generation,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-024,Specialist review,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-025,Operational handoff,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+AIS-026,Recovery & resume,MVP,Shared Studio / specialist workflow,INTERACTIVE_SYNTHETIC_PARTIAL,NOT_IMPLEMENTED
+PRD-001,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-002,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-003,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-004,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-005,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-006,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-007,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-008,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-009,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-010,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-011,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-012,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-013,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-014,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-015,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-016,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-017,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-018,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-019,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED
+PRD-020,Acceptance contract; see PRD source,MVP,Design system and Salon OS surface specification,SPECIFIED_ONLY,NOT_IMPLEMENTED

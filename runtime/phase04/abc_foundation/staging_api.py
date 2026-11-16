@@ -1,13 +1,12 @@
-"""Private-only staging API process. Hosting provider MUST enforce private network."""
+"""Private staging API: fail-closed bootstrap under owner cost and identity hold.
+
+Design-only SQL helpers remain available for isolated validation; neither a
+managed database config nor an injected fake store can authorize a listener.
+A separate independently ratified release change is required to lift this hold.
+"""
 import os
 
 from psycopg.conninfo import conninfo_to_dict
-from .http_api import handler_factory
-from .oidc import OIDCVerifier
-from .pg_store import PostgresStore
-from .managed_pg_store import ManagedMTLSPostgresStore
-from .private_api_mtls import create_private_api_server
-
 
 def validate_staging_dsn(dsn, expected_role):
     if not dsn or not isinstance(dsn, str):
@@ -43,53 +42,35 @@ def assert_staging_database(store, expected_role, required_tables, *, expected_l
 
 
 def make_private_server(environ=None, store=None, verifier=None):
+    """Refuse all actual private API server construction until authorized.
+
+    The owner has not approved a provider, cost or externally managed service
+    identity. Unlike the earlier staging launcher, this function MUST NOT
+    accept ABC_DB_AUTH_MODE=LEGACY_SYNTHETIC, environment override flags,
+    injected store/verifier objects or seemingly valid managed credentials
+    as sufficient authority to construct a listener.
+    """
     env = os.environ if environ is None else environ
-    if env.get("ABC_ENV") != "STAGING_PRIVATE" or env.get("ABC_STAGING_PURPOSE") != "SYNTHETIC_NO_CLIENT_DATA":
+    if (env.get("ABC_ENV") != "STAGING_PRIVATE"
+        or env.get("ABC_STAGING_PURPOSE") != "SYNTHETIC_NO_CLIENT_DATA"):
         raise ValueError("private_staging_gate_not_approved")
     if env.get("ABC_NETWORK_BOUNDARY") != "RENDER_PRIVATE_SERVICE":
         raise ValueError("private_network_boundary_not_declared")
-    port = int(env.get("PORT", "10000"))
-    if port < 1024 or port > 65535:
+    try:
+        port = int(env.get("PORT", "10000"))
+    except (ValueError, TypeError):
+        raise ValueError("invalid_staging_port") from None
+    if not 1024 <= port <= 65535:
         raise ValueError("invalid_staging_port")
-    if store is None:
-        dsn=env.get("ABC_PG_DSN")
-        auth_mode=env.get("ABC_DB_AUTH_MODE","UNCONFIGURED")
-        if auth_mode=="MANAGED_MTLS":
-            required=("ABC_DB_WORKLOAD_LOGIN","ABC_DB_CLIENT_DN",
-                      "ABC_DB_ISSUER_DN","ABC_DB_CERT_SERIAL")
-            if any(not env.get(item) for item in required):
-                raise ValueError("managed_mtls_database_identity_pins_required")
-            store=ManagedMTLSPostgresStore(
-                dsn,expected_login=env["ABC_DB_WORKLOAD_LOGIN"],
-                client_dn=env["ABC_DB_CLIENT_DN"],issuer_dn=env["ABC_DB_ISSUER_DN"],
-                certificate_serial=env["ABC_DB_CERT_SERIAL"])
-        elif auth_mode=="LEGACY_SYNTHETIC":
-            if env.get("ABC_SYNTHETIC_LEGACY_DB_COMPAT")!="true":
-                raise ValueError("legacy_shared_database_login_not_explicitly_approved")
-            validate_staging_dsn(dsn,"abc_app")
-            store=PostgresStore(dsn)
-        else:
-            raise ValueError("unapproved_database_auth_mode")
-        # The database role is abc_app *after SET ROLE*, while the
-        # physical session_user must be a distinct managed workload LOGIN.
-        expected_login=(env["ABC_DB_WORKLOAD_LOGIN"]
-            if auth_mode=="MANAGED_MTLS" else "abc_app")
-        assert_staging_database(store,"abc_app",
-            ["abc.sessions","abc.memberships","abc.consent_evidence"],
-            expected_login=expected_login)
-    if verifier is None:
-        for key in ("ABC_OIDC_ISSUER", "ABC_OIDC_AUDIENCE", "ABC_OIDC_JWKS_URI"):
-            if not env.get(key):
-                raise ValueError("missing_"+key)
-        verifier = OIDCVerifier(
-            issuer=env["ABC_OIDC_ISSUER"], audience=env["ABC_OIDC_AUDIENCE"],
-            jwks_uri=env["ABC_OIDC_JWKS_URI"])
-    # Private hosting is necessary but insufficient: the listener itself
-    # must validate a managed client certificate before parsing HTTP/OIDC.
-    # No plaintext fallback, even if the database is synthetic-only.
-    return create_private_api_server(
-        ("0.0.0.0",port), handler_factory(store,None,verifier),env)
+    if (env.get("ABC_DB_AUTH_MODE") == "LEGACY_SYNTHETIC"
+        or "ABC_SYNTHETIC_LEGACY_DB_COMPAT" in env):
+        raise ValueError("legacy_shared_database_login_forbidden_in_staging")
 
+    # Must run BEFORE any TLS binding, DB connection, OIDC verification or
+    # application handler construction. A string in an environment variable
+    # cannot attest Security/SRE approval, an external CA or owner spending.
+    # Unconditionally locked even with injected store/verifier test doubles.
+    raise ValueError("staging_owner_cost_and_external_identity_hold")
 
 def main():
     http = make_private_server()

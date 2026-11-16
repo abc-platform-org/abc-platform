@@ -5,7 +5,7 @@ All 102 canonical transitions get a decision; only synthetic S0 pause can ALLOW.
 Decision in Python is not the security authority: PostgreSQL trigger is a
 separate atomic validation against the authenticated specialist and CAS.
 """
-from .eng01_orchestrator import WorkflowMachine
+from .consultation_workflow import WorkflowMachine
 from .store import DomainError
 
 

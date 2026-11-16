@@ -201,24 +201,44 @@ class StagingGuardTests(unittest.TestCase):
                 validate_migrator_config({**base,**bad})
 
     def test_staging_cannot_implicitly_fall_back_to_shared_database_login(self):
-        with self.assertRaisesRegex(ValueError,"unapproved_database_auth_mode"):
-            make_private_server(environ={**STAGING_ENV,
-                "ABC_PG_DSN":"postgresql://abc_app:synthetic@db.private/abc_staging?sslmode=require"},
-                verifier=Mock())
-        with self.assertRaisesRegex(ValueError,"legacy_shared_database_login"):
-            make_private_server(environ={**STAGING_ENV,
-                "ABC_DB_AUTH_MODE":"LEGACY_SYNTHETIC",
-                "ABC_PG_DSN":"postgresql://abc_app:synthetic@db.private/abc_staging?sslmode=require"},
-                verifier=Mock())
-        with self.assertRaisesRegex(ValueError,"managed_mtls_database_identity_pins"):
-            make_private_server(environ={**STAGING_ENV,
-                "ABC_DB_AUTH_MODE":"MANAGED_MTLS",
-                "ABC_PG_DSN":"postgresql://abc_api_ci@db.private/abc_staging?sslmode=verify-full"},
-                verifier=Mock())
+        # The previous implicit and explicit legacy modes are not permitted to
+        # create private staging services, even with matching auth env flags.
+        for extra in (
+            {},
+            {"ABC_DB_AUTH_MODE":"MANAGED_MTLS",
+             "ABC_PG_DSN":"postgresql://abc_api_ci@db.private/abc_staging?sslmode=verify-full"},
+        ):
+            with self.subTest(extra=extra),self.assertRaisesRegex(
+                    ValueError,"staging_owner_cost_and_external_identity_hold"):
+                make_private_server(environ={**STAGING_ENV,**extra},
+                                    verifier=Mock())
+        for extra in (
+            {"ABC_DB_AUTH_MODE":"LEGACY_SYNTHETIC"},
+            {"ABC_DB_AUTH_MODE":"LEGACY_SYNTHETIC",
+             "ABC_SYNTHETIC_LEGACY_DB_COMPAT":"true"},
+            {"ABC_DB_AUTH_MODE":"MANAGED_MTLS",
+             "ABC_SYNTHETIC_LEGACY_DB_COMPAT":"true"},
+        ):
+            with self.subTest(extra=extra),self.assertRaisesRegex(
+                    ValueError,"legacy_shared_database_login_forbidden_in_staging"):
+                make_private_server(environ={**STAGING_ENV,**extra,
+                    "ABC_PG_DSN":"postgresql://abc_app:synthetic@db.private/abc_staging?sslmode=require"},
+                    verifier=Mock())
 
     def test_private_staging_refuses_plaintext_http_even_with_injected_store(self):
-        with self.assertRaisesRegex(ValueError,"api_mutual_tls13_required"):
-            make_private_server(environ=STAGING_ENV,store=Mock(),verifier=Mock())
-        with self.assertRaisesRegex(ValueError,"api_externally_managed_tls_material_required"):
-            make_private_server(environ={**STAGING_ENV,
-                "ABC_API_TRANSPORT":"MTLS_TLS13"},store=Mock(),verifier=Mock())
+        # No service is built even when a caller supplies apparently valid
+        # transport pins and replaces the real dependencies with test doubles.
+        for extra in (
+            {},
+            {"ABC_API_TRANSPORT":"MTLS_TLS13"},
+            {"ABC_DB_AUTH_MODE":"MANAGED_MTLS",
+             "ABC_API_TRANSPORT":"MTLS_TLS13",
+             "ABC_API_TLS_CERT_FILE":"/mounted/server.crt",
+             "ABC_API_TLS_KEY_FILE":"/mounted/server.key",
+             "ABC_API_TLS_CA_FILE":"/mounted/ca.crt",
+             "ABC_API_ALLOWED_CLIENT_URIS":"spiffe://abc.internal/gateway/approved-client"},
+        ):
+            with self.subTest(extra=extra),self.assertRaisesRegex(
+                    ValueError,"staging_owner_cost_and_external_identity_hold"):
+                make_private_server(environ={**STAGING_ENV,**extra},
+                                    store=Mock(),verifier=Mock())

@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = 'governance/ABC_A2_SOURCE_BASELINE_CANDIDATE_20261110.json'
 OLD = 'd8c7698bc060b859f5f4db52d572a00db656a2cd'
-CURRENT = 'cfd57ecf29cd0b002270f4ac160fc0c6193a3c6b'
+CURRENT = '3cdb34df68da9a6c5c0be8c79a96627f71faaa99'
 RUNS = [42208334348,42208334405,42208334526,42208334592,42208334762,42208334598]
 
 
@@ -30,10 +30,13 @@ def validate(data, *, root=None, check_files=False):
     require(data.get('status') == 'CANDIDATE_SOURCE_LOCKED_NOT_VALIDATED', 'candidate_status')
     require(data.get('admissible_as_operational_baseline') is False, 'not_operational')
     require(data.get('candidate_code_commit_sha') == CURRENT, 'candidate_code_sha')
+    require(data.get('candidate_pr') == 91, 'candidate_pr')
+    require(data.get('parent_candidate_code_sha') ==
+            'cfd57ecf29cd0b002270f4ac160fc0c6193a3c6b', 'stacked_parent_source')
     require(data.get('candidate_stack') == {
         'a2_packet_pr':78, 'a2_packet_sha':'026e1fb174919278e3c2d73442be10b4f11675a4',
         'adr005_ttl_pr':88, 'adr005_ttl_sha':'f99109dfd4d2147287bdf704beeb93d202a88e41',
-        'spiffe_boundary_pr':89
+        'spiffe_boundary_pr':89, 'staging_api_hard_hold_pr':91
     }, 'stacked_pr_lineage')
     previous=data.get('prior_approved_ci_source',{})
     require(previous.get('code_sha') == OLD and OLD != CURRENT, 'old_ci_only')
@@ -44,6 +47,18 @@ def validate(data, *, root=None, check_files=False):
     require(evid.get('operational_gate_count') == 80 and evid.get('operational_gate_status') == 'OPEN', 'gate_states')
     require(evid.get('historical_test_mapped_count') == 55 and evid.get('unmapped_direct_test_count') == 25, 'mapping_counts')
     require(evid.get('open_risk_count') == 14 and evid.get('signatures_count') == 0, 'risk_signature_counts')
+    staged=evid.get('staging_api_hard_hold_isolated',{})
+    require(staged.get('executed') == 7 and staged.get('passed') == 7,
+            'staging_isolated_test_count')
+    require(staged.get('execution_mode') ==
+            'LOCAL_PYTHON_3_STUBBED_PSYCOPG_CONNINFO_NOT_FULL_CHECKOUT_OR_PG',
+            'staging_isolated_test_scope')
+    require(staged.get('independent_attestation') is False, 'no_synthetic_signoff')
+    require(staged.get('source_blobs') == {
+        'runtime/phase04/abc_foundation/staging_api.py':
+            'a40102bff728004d61d0d5908331362014c5e6f7',
+        'runtime/phase04/tests/test_a2_staging_api_owner_hold.py':
+            'bf4c6b0c797c5e5e7dfdcaff4b77d1d6481701fe'}, 'staging_local_blob_ids')
     for key in ('full_checkout_repo_tests','new_jwt_eng14_native_tests','postgresql16_suite','ci_at_candidate_sha'):
         require(evid.get(key) == 'NOT_RUN', 'false_test_pass:'+key)
     for name, expected in (('local_isolated_repo_tests',7),('local_non_repository_probes',15)):
@@ -63,7 +78,7 @@ def validate(data, *, root=None, check_files=False):
     tree=data.get('source_tree',{})
     require(tree.get('truncated') is False and tree.get('blobs',0) >= 600,'source_tree')
     blobs=data.get('locked_git_blob_shas',{})
-    require(len(blobs)==15,'locked_file_count')
+    require(len(blobs)==17,'locked_file_count')
     for path,blob in blobs.items():
         require(isinstance(path,str) and path and not path.startswith('/') and '..' not in Path(path).parts,'unsafe_file_path')
         require(re.fullmatch(r'[0-9a-f]{40}',blob or '') is not None,'invalid_blob_sha')
@@ -101,7 +116,9 @@ def self_test(value):
         ('fake_eng06',lambda o:o['release_policy'].__setitem__('eng06_customer_release',True)),
         ('fake_cost',lambda o:o['approvals'].__setitem__('owner_staging_cost','APPROVED')),
         ('fake_ci_sha',lambda o:o['prior_approved_ci_source'].__setitem__('code_sha',CURRENT)),
-        ('missing_blob',lambda o:o['locked_git_blob_shas'].pop(next(iter(o['locked_git_blob_shas']))))
+        ('missing_blob',lambda o:o['locked_git_blob_shas'].pop(next(iter(o['locked_git_blob_shas'])))),
+        ('fake_staging_suite',lambda o:o['current_evidence']['staging_api_hard_hold_isolated'].__setitem__('passed',999)),
+        ('fake_staging_attestation',lambda o:o['current_evidence']['staging_api_hard_hold_isolated'].__setitem__('independent_attestation',True))
     ]
     rejected=0
     for name,mutate in mutations:

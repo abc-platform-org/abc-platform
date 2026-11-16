@@ -92,3 +92,17 @@ Before integration:
 5. Only after successful checks propose promotion of the candidate into the canonical A2 matrix by a **separate reviewed commit**. No automatic merge or deployment.
 
 **This document is an engineering review artifact; it is not an independent approval or a readiness certificate.**
+
+---
+
+## F. 2026-11-10 post-review P0 staging bootstrap correction (stacked child proposal)
+
+**Code candidate SHA:** `3cdb34df68da9a6c5c0be8c79a96627f71faaa99` on `audit/a2-staging-api-hard-hold-20261110` (child of Draft PR #90).
+
+**Previous Section C finding A2-SEC-P0-API-BOOT is CODE-MITIGATED in this candidate, NOT operationally closed.** `runtime/phase04/abc_foundation/staging_api.py` no longer constructs any listener or connects to a database under current `STAGING_PRIVATE` launch: after checking intended synthetic/private-scope config it unconditionally raises `staging_owner_cost_and_external_identity_hold`. The previously explicit `LEGACY_SYNTHETIC` and `ABC_SYNTHETIC_LEGACY_DB_COMPAT` path is now rejected with `legacy_shared_database_login_forbidden_in_staging`. Injected Store/Verifier objects, fabricated approval env flags and plausible externally managed TLS paths cannot authorize startup.
+
+**Executed evidence:** local isolated Python3 `unittest` ran **7/7** new real repository test functions from `test_a2_staging_api_owner_hold.py`, with exact source and test file bytes verified against Git blobs `a40102bff728004d61d0d5908331362014c5e6f7` and `bf4c6b0c797c5e5e7dfdcaff4b77d1d6481701fe`. Runtime lacked `psycopg`, so a minimal `psycopg.conninfo` parser/connect stub was injected; no true PostgreSQL integration, full repository checkout, GitHub Actions or external CA was executed. The amended 14 pre-existing staging guard test methods have **not** been rerun as a suite. No paid CI was initiated.
+
+**Residual P0 acceptance:** full dependency-faithful checkout tests and PostgreSQL16/identity regression, independent Architecture/Security review of the **final** code SHA, externally managed provider identity/hostssl cert evidence and explicit owner cost permission are required **before a separately authorized code change may lift the hard hold**.
+
+**ADR-ENG-005:** remains `NOT_RATIFIED`; engineering guidance remains `RECOMMEND_DESIGN_WITH_CONDITIONS`, never an independent reviewer signature. Canonical A2 G01–G10 risk/gate ledger and historical successful CI SHA have **not** been promoted.

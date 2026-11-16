@@ -17,7 +17,7 @@ only and binds to 127.0.0.1.
 Run the browser verification from the same directory:
 
 ```bash
-python -m pip install playwright==1.56.0 jsonschema==4.25.1
+python -m pip install -r requirements.txt playwright==1.56.0
 python -m playwright install chromium
 ABC_ENV=LOCAL_INTEGRATION_ONLY python -m studio_preview.verify_browser
 ```

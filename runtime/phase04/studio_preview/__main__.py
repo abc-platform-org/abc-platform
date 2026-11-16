@@ -7,8 +7,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from abc_foundation.auth import mint_test_token
+from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
 from abc_foundation.http_api import SESSION_RE, handler_factory
 from abc_foundation.store import DomainError, Store
+from .questions import QUESTION_ROUTE, StudioQuestions
 
 PREVIEW = Path(__file__).resolve().parent
 STUDIO_DESIGN = PREVIEW.parents[2] / "prototypes" / "abc-ai-studio-v2"
@@ -19,6 +21,7 @@ CREATE_PATH = "/v1/consultations"
 STATIC_FILES = {
     "/": (PREVIEW / "index.html", "text/html; charset=utf-8"),
     "/session.js": (PREVIEW / "session.js", "text/javascript; charset=utf-8"),
+    "/questions.js": (PREVIEW / "questions.js", "text/javascript; charset=utf-8"),
     "/session.css": (PREVIEW / "session.css", "text/css; charset=utf-8"),
     **{
         f"/studio/{file}": (STUDIO_DESIGN / file, content_type)
@@ -35,7 +38,9 @@ def create_studio_server(database, port=0):
     if os.environ.get("ABC_ENV") != "LOCAL_INTEGRATION_ONLY":
         raise ValueError("studio_preview_requires_local_integration")
     secret = secrets.token_urlsafe(48)
-    api_handler = handler_factory(Store(database), secret)
+    store = Store(database)
+    api_handler = handler_factory(store, secret)
+    questions = StudioQuestions(database, store, {"sub": SPECIALIST, "tenant_id": TENANT, "branch_ids": (BRANCH,)})
 
     class StudioHandler(api_handler):
         def _trusted_host(self):
@@ -54,15 +59,29 @@ def create_studio_server(database, port=0):
 
         def _body(self):
             body = super()._body()
+            if self.path != CREATE_PATH:
+                return body
             if body != {"scope": "IN_SALON_SHARED_SCREEN"}:
                 raise DomainError(400, "synthetic_session_request_required")
-            return {**body, "branch_id": BRANCH}
+            return {**body, "branch_id": BRANCH, "service_id": SYNTHETIC_SERVICE}
+
+        def _question_request(self, match):
+            self._actor()
+            session_id, operation = match.groups()
+            if operation == "answers":
+                response = questions.answer(session_id, self._body(), self._expected(), self.headers.get("Idempotency-Key"))
+            else:
+                response = questions.read(session_id, operation)
+            return self._json(200, response)
 
         def do_GET(self):
             if not self._trusted_host():
                 return self._json(403, {"error": "host_forbidden"})
             if SESSION_RE.fullmatch(self.path):
                 return super().do_GET()
+            match = QUESTION_ROUTE.fullmatch(self.path)
+            if match and match[2] != "answers":
+                return self._attempt(lambda: self._question_request(match))
             asset = STATIC_FILES.get(self.path)
             if asset is None:
                 return self._json(404, {"error": "not_found"})
@@ -81,9 +100,12 @@ def create_studio_server(database, port=0):
         def do_POST(self):
             if not self._trusted_host():
                 return self._json(403, {"error": "host_forbidden"})
-            if self.path != CREATE_PATH:
-                return self._json(404, {"error": "not_found"})
-            return super().do_POST()
+            if self.path == CREATE_PATH:
+                return super().do_POST()
+            match = QUESTION_ROUTE.fullmatch(self.path)
+            if match and match[2] == "answers":
+                return self._attempt(lambda: self._question_request(match))
+            return self._json(404, {"error": "not_found"})
 
     return ThreadingHTTPServer(("127.0.0.1", port), StudioHandler)
 

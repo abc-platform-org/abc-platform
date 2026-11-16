@@ -7,6 +7,7 @@
   <title>ABC AI Studio | جلسهٔ آزمایشی</title>
   <link rel="stylesheet" href="/studio/style.css">
   <link rel="stylesheet" href="/session.css">
+  <script src="/questions.js" defer></script>
   <script src="/session.js" defer></script>
 </head>
 <body>
@@ -23,6 +24,20 @@
         <div><dt>شناسهٔ جلسه</dt><dd><bdi id="session-id"></bdi></dd></div>
         <div><dt>وضعیت و نسخه</dt><dd id="session-state"></dd></div>
       </dl>
+      <section id="consultation-questions" aria-labelledby="questions-title" hidden>
+        <h2 id="questions-title">پرسش‌وپاسخ آزمایشی مشاوره</h2>
+        <p id="question-status" role="status"></p>
+        <details id="question-catalog" hidden>
+          <summary>فهرست سؤال‌های این مشاوره</summary>
+          <ol id="question-list" lang="en" dir="ltr"></ol>
+        </details>
+        <form id="answer-form" novalidate hidden>
+          <p id="next-question" lang="en" dir="ltr"></p>
+          <label for="answer-value">پاسخ مصنوعی</label>
+          <select id="answer-value" aria-describedby="next-question" required></select>
+          <button class="primary" id="answer-action" type="submit">ثبت پاسخ</button>
+        </form>
+      </section>
     </section>
     <iframe src="/studio/index.html" title="پیش‌نمایش طراحی AI Studio"></iframe>
   </main>

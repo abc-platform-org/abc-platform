@@ -18,6 +18,7 @@ function showSession(data, recovered) {
   document.querySelector("#session-id").textContent = data.session_id;
   document.querySelector("#session-state").textContent = `${data.state} · ${data.state_version}`;
   details.hidden = false;
+  document.dispatchEvent(new CustomEvent("studio:session", {detail: data}));
   statusLine.textContent = recovered ? "جلسه از سرور بازیابی شد." : "جلسه در سرور ایجاد شد.";
 }
 
@@ -26,6 +27,7 @@ async function submit() {
   busy = true;
   action.disabled = true;
   details.hidden = true;
+  document.dispatchEvent(new CustomEvent("studio:session", {detail: null}));
   const recovering = Boolean(reference.sessionId);
   statusLine.textContent = recovering ? "در حال بازیابی جلسه…" : "در حال ایجاد جلسه…";
   try {

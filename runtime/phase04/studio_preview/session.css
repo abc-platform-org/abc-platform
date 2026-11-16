@@ -10,3 +10,8 @@
 .session-panel dl:not([hidden]) { display: flex; flex-wrap: wrap; gap: 1.5rem; }
 .session-panel dd { margin: 0.25rem 0 0; overflow-wrap: anywhere; }
 iframe { display: block; border: 0; width: 100%; min-height: 75vh; }
+#consultation-questions { border-block-start: 1px solid currentColor; margin-block-start: 1rem; padding-block-start: 1rem; }
+#question-list, #next-question { text-align: start; }
+#question-list { padding-inline-start: 1.5rem; }
+#answer-value { font: inherit; padding: 0.45rem; }
+#answer-action { margin-inline-start: 0.5rem; }

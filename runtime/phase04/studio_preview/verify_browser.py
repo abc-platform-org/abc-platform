@@ -2,6 +2,7 @@
 
 import json
 import os
+from contextlib import closing
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Thread
@@ -9,6 +10,7 @@ from threading import Thread
 from jsonschema import Draft202012Validator
 from playwright.sync_api import expect, sync_playwright
 
+from abc_foundation.eng02_consultation import SYNTHETIC_SERVICE
 from abc_foundation.store import Store
 from .__main__ import BRANCH, SPECIALIST, TENANT, create_studio_server
 
@@ -94,6 +96,86 @@ def verify(page, database, origin):
           "401, 409, cross-origin and synthetic input gates verified.")
 
 
+def verify_questions(page, database, origin):
+    page.goto(origin)
+    with page.expect_response(lambda r: r.url == origin + PATH and r.request.method == "POST") as created:
+        page.locator("#session-action").click()
+    created_response = created.value
+    assert created_response.status == 200
+    session = created_response.json()
+    assert session["service_id"] == SYNTHETIC_SERVICE
+    sid = session["session_id"]
+    root = f"{origin}/_studio/consultations/{sid}"
+    answers_url = root + "/answers"
+    browser_prompt = page.locator("#next-question")
+    answer_button = page.locator("#answer-action")
+    answer_status = page.locator("#question-status")
+    headers = {"X-ABC-Studio-Preview": "1", "Origin": origin, "X-Expected-State-Version": "0"}
+    first = {"question_id": "synthetic:prior-treatment", "value": "NO"}
+    expect(browser_prompt).to_contain_text("previous chemical hair treatment")
+    page.locator("#question-catalog summary").click()
+    expect(page.locator("#question-list li")).to_have_count(4)
+    assert page.request.get(root + "/questions").status == 401
+    assert page.request.post(answers_url, headers={**headers, "Idempotency-Key": "invalid-version",
+                                                   "X-Expected-State-Version": "9"}, data=first).status == 409
+    assert page.request.post(answers_url, headers={**headers, "Idempotency-Key": "wrong-order"},
+                             data={"question_id": "synthetic:sensitivity", "value": "NO"}).json()["error"] == "eng14_policy_blocked"
+    assert page.request.post(answers_url, headers={**headers, "Idempotency-Key": "foreign-origin",
+                                                   "Origin": "https://untrusted.invalid"}, data=first).status == 403
+
+    committed = {}
+
+    def lose_recorded_response(route):
+        response = route.fetch()
+        assert response.status == 200
+        committed.update(key=route.request.headers["idempotency-key"], receipt=response.json())
+        route.abort()
+
+    page.route(answers_url, lose_recorded_response, times=1)
+    page.locator("#answer-value").select_option("NO")
+    answer_button.click()
+    expect(answer_status).to_contain_text("تأیید پاسخ دریافت نشد")
+    page.reload()
+    expect(answer_button).to_have_text("تلاش دوباره برای ثبت پاسخ")
+    with page.expect_response(lambda r: r.url == answers_url) as retry:
+        answer_button.click()
+    replay = retry.value
+    assert replay.status == 200
+    assert replay.request.headers["idempotency-key"] == committed["key"]
+    assert replay.json() == committed["receipt"]
+    expect(browser_prompt).to_contain_text("reported sensitivity")
+    page.reload()
+    expect(browser_prompt).to_contain_text("reported sensitivity")
+
+    store = Store(database)
+    actor = {"tenant_id": TENANT, "sub": SPECIALIST, "branch_ids": [BRANCH]}
+    request = {"branch_id": BRANCH, "scope": "IN_SALON_SHARED_SCREEN", "service_id": SYNTHETIC_SERVICE}
+    foreign = store.create({**actor, "tenant_id": "studio-foreign-tenant"}, request, "foreign-tenant-questions")
+    other_branch = "studio-other-branch"
+    other = store.create({**actor, "branch_ids": [other_branch]}, {**request, "branch_id": other_branch}, "foreign-branch-questions")
+    for out_of_scope in (foreign, other):
+        other_root = f"{origin}/_studio/consultations/{out_of_scope['session_id']}"
+        assert page.request.get(other_root + "/next-question", headers=headers).status == 404
+        assert page.request.post(other_root + "/answers", headers={**headers, "Idempotency-Key": "unscoped-answer"},
+                                 data=first).status == 404
+
+    page.locator("#answer-value").select_option("YES")
+    answer_button.click()
+    expect(answer_status).to_contain_text("به بررسی متخصص نیاز دارد")
+    expect(answer_button).to_be_hidden()
+    assert page.request.post(answers_url, headers={**headers, "Idempotency-Key": "safety-stop"},
+                             data={"question_id": "synthetic:desired-goal", "value": "SUBTLE"}).json()["error"] == "eng14_policy_blocked"
+
+    with closing(store.connect()) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM eng02_answers WHERE session_id=?", (sid,)).fetchone()[0] == 2
+        assert connection.execute("SELECT COUNT(*) FROM eng02_receipts WHERE session_id=?", (sid,)).fetchone()[0] == 2
+        # Remove the existing specialist's branch scope before retrying a committed operation.
+        connection.execute("UPDATE sessions SET branch_id=? WHERE session_id=?", (other_branch, sid))
+    assert page.request.post(answers_url, headers={**headers, "Idempotency-Key": committed["key"]},
+                             data=first).status == 404
+    print("PASS: ENG-02 question catalog/next/answer, ENG-14 safety stop, refresh/replay, stale version, revoked scope")
+
+
 def main():
     with TemporaryDirectory(prefix="abc-studio-browser-") as directory:
         database = Path(directory) / "session.sqlite"
@@ -107,7 +189,9 @@ def main():
                         args=os.environ.get("ABC_STUDIO_CHROMIUM_ARGS", "").split(),
                     )
                     with browser:
-                        verify(browser.new_page(), database, f"http://127.0.0.1:{server.server_port}")
+                        origin = f"http://127.0.0.1:{server.server_port}"
+                        verify(browser.new_page(), database, origin)
+                        verify_questions(browser.new_page(), database, origin)
             finally:
                 server.shutdown()
                 thread.join()

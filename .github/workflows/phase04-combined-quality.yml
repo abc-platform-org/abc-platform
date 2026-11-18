@@ -1,0 +1,144 @@
+name: ABC Phase 04 combined quality audit
+on:
+  pull_request:
+    branches: [fix/abc-94-phase04-studio-a11y]
+    paths:
+      - '.github/workflows/phase04-combined-quality.yml'
+      - 'scripts/run_project_quality.py'
+      - 'scripts/validate_phase04_integration_baseline.py'
+      - 'governance/**'
+      - 'runtime/phase04/**'
+permissions:
+  contents: read
+jobs:
+  quality:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: target
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: saleheebrahimi2029-hub/Qullity-engine
+          ref: d4930d54880c9f855a9c2e5b5e98ff4cfc6b7e7b
+          path: engine
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned engine and test dependencies
+        run: |
+          python -m pip install './engine[security,ui]' pytest 'jsonschema==4.25.1' 'pypdf==5.9.0' 'PyYAML==6.0.2'
+          if [[ -f target/runtime/phase04/requirements.txt ]]; then
+            python -m pip install -r target/runtime/phase04/requirements.txt
+          fi
+          if [[ -f target/prototypes/abc-ai-studio-v2/index.html || -f target/prototypes/phase03/index.html ]]; then
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Run PQE with disposable local fixtures
+        run: |
+          python - <<'PY'
+          import os
+          import secrets
+          import subprocess
+          import time
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          import yaml
+
+          env = dict(os.environ, ABC_ENV='LOCAL_INTEGRATION_ONLY')
+          bootstrap = Path('target/runtime/phase04/tests/bootstrap_postgres.py')
+          started = False
+          try:
+              if bootstrap.is_file():
+                  existing = Path('target/.github/workflows/phase04-foundation.yml')
+                  fixtures = yaml.safe_load(existing.read_text())['jobs']['foundation']['env']
+                  password = secrets.token_hex(24)
+                  for key, value in fixtures.items():
+                      if not key.startswith('ABC_TEST_PG_') or key == 'ABC_TEST_PG_ADMIN_DSN':
+                          continue
+                      parsed = urlsplit(value)
+                      if (parsed.scheme, parsed.hostname, parsed.port, parsed.path) != ('postgresql', '127.0.0.1', 5432, '/abc_phase04_ci') or parsed.query or parsed.fragment:
+                          raise SystemExit('Expected a local synthetic PostgreSQL fixture')
+                      env[key] = value
+                      if parsed.password:
+                          print(f'::add-mask::{parsed.password}', flush=True)
+                  print(f'::add-mask::{password}', flush=True)
+                  env['ABC_TEST_PG_ADMIN_DSN'] = f'postgresql://postgres:{password}@127.0.0.1:5432/abc_phase04_ci'
+                  subprocess.run(['docker', 'run', '--detach', '--rm', '--name', 'abc-pqe-postgres', '--publish', '127.0.0.1:5432:5432', '--env', 'POSTGRES_PASSWORD', '--env', 'POSTGRES_DB=abc_phase04_ci', 'postgres:16'], env=dict(os.environ, POSTGRES_PASSWORD=password), check=True)
+                  started = True
+                  for _ in range(30):
+                      ready = subprocess.run(['docker', 'exec', 'abc-pqe-postgres', 'pg_isready', '-h', '127.0.0.1', '-U', 'postgres', '-d', 'abc_phase04_ci'], capture_output=True)
+                      if ready.returncode == 0:
+                          break
+                      time.sleep(1)
+                  else:
+                      raise SystemExit('Synthetic PostgreSQL did not become ready')
+                  subprocess.run(['python', str(bootstrap)], env=env, check=True)
+              subprocess.run(['python', 'target/scripts/run_project_quality.py', 'target', 'pqe-report'], env=env, check=True)
+          finally:
+              if started:
+                  subprocess.run(['docker', 'stop', 'abc-pqe-postgres'], check=False)
+          PY
+      - name: Confirm exact commit and required PQE evidence
+        env:
+          EXPECTED_ABC_REVISION: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report = json.loads(Path('pqe-report/report.json').read_text())
+          if report.get('abc_target_commit') != os.environ['EXPECTED_ABC_REVISION']:
+              raise SystemExit('The browser audit ran on the wrong ABC revision')
+          checks = {c['check_id']: c for c in report['checks']}
+          required = (
+              'ui.interaction', 'ui.responsive', 'ui.accessibility',
+              'functional.pytest', 'docs.references', 'api.contract',
+              'api.security.headers', 'api.robustness',
+              'api.scenario.local-auth-denial', 'api.scenario.unknown-route-auth-order',
+              'command.validate_phase04_integration_baseline',
+              'command.historical_validate_a2_rebaseline_candidate',
+              'command.historical_validate_a2_closure_packet_v1',
+          )
+          for name in required:
+              status = checks.get(name, {}).get('status', 'MISSING')
+              print(f'{name}: {status}')
+              if status != 'PASS':
+                  raise SystemExit(f'{name} did not pass')
+          if report['decision']['decision'] == 'NO_GO':
+              raise SystemExit('PQE returned NO_GO')
+          if checks['ui.interaction'].get('metrics', {}).get('viewports') != 3:
+              raise SystemExit('Expected three viewport sizes')
+          PY
+      - name: Publish check statuses
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          path = Path('pqe-report/report.json')
+          if path.is_file():
+              report = json.loads(path.read_text())
+              rows = [f"{report['abc_target_commit']} | {report['decision']['decision']}", '', '| Check | Status |', '|---|---|']
+              rows.extend(f"| {check['check_id']} | {check['status']} |" for check in report['checks'])
+              text = '\n'.join(rows) + '\n'
+              Path('pqe-summary.md').write_text(text)
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+                  output.write(text)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: abc-phase04-combined-pqe
+          path: pqe-summary.md

@@ -8,6 +8,7 @@ import unittest
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+from http.client import HTTPConnection
 
 from abc_foundation.auth import AuthError, mint_test_token, verify_bearer
 from abc_foundation.http_api import create_http_server
@@ -239,6 +240,26 @@ class HttpTests(unittest.TestCase):
     def test_healthz_local_status_only(self):
         with urllib.request.urlopen(self.base+"/healthz",timeout=3) as resp:
             self.assertEqual(json.loads(resp.read())["capability"],"LOCAL_INTEGRATION_ONLY")
+            self.assertEqual(resp.headers["Referrer-Policy"], "no-referrer")
+            self.assertEqual(resp.headers["Server"].strip(), "ABC-Foundation")
+
+    def test_healthz_patch_returns_json_method_not_allowed(self):
+        conn = HTTPConnection("127.0.0.1", self.http.server_port, timeout=3)
+        try:
+            conn.request("PATCH", "/healthz")
+            with conn.getresponse() as response:
+                self.assertEqual(response.status, 405)
+                self.assertEqual(response.headers["Allow"], "GET")
+                self.assertEqual(response.headers.get_content_type(), "application/json")
+                self.assertEqual(response.headers["Referrer-Policy"], "no-referrer")
+                self.assertEqual(json.load(response), {"error": "method_not_allowed"})
+        finally:
+            conn.close()
+
+    def test_unknown_route_authenticates_before_returning_not_found(self):
+        path = "/unknown-route"
+        self.assertEqual(self.call("GET", path, token="invalid")[0], 401)
+        self.assertEqual(self.call("GET", path)[0], 404)
 
 
 

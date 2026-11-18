@@ -21,7 +21,7 @@ jobs:
           - scope: phase03
             ref: 3f36b6610cec7ec2f1420939d68f19fae3327ee2
           - scope: phase04
-            ref: 41dcc3aa102c712cf567838fff29449876817d78
+            ref: 77b94e84af94453ae8eadf8f9924960861aad126
           - scope: a2
             ref: 7a41f9bc13c0e4ffdbe33561816eae3b86db1823
     steps:
@@ -105,6 +105,7 @@ jobs:
         if: matrix.scope == 'phase03' || matrix.scope == 'phase04'
         env:
           EXPECTED_ABC_REVISION: ${{ matrix.ref }}
+          ABC_AUDIT_SCOPE: ${{ matrix.scope }}
         run: |
           python - <<'PY'
           import json
@@ -120,6 +121,12 @@ jobs:
               print(f'{name}: {status}')
               if status != 'PASS':
                   raise SystemExit(f'{name} did not pass')
+          if os.environ['ABC_AUDIT_SCOPE'] == 'phase04':
+              for name in ('command.validate_phase04_integration_baseline',
+                           'command.historical_validate_a2_rebaseline_candidate',
+                           'command.historical_validate_a2_closure_packet_v1'):
+                  if checks.get(name, {}).get('status') != 'PASS':
+                      raise SystemExit(f'{name} did not pass')
           if checks['ui.interaction'].get('metrics', {}).get('viewports') != 3:
               raise SystemExit('Expected three viewport sizes')
           PY

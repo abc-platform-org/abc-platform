@@ -1,0 +1,245 @@
+{
+  "status": "PROPOSED_FOR_ARCHITECTURE_OWNER_REVIEW",
+  "architecture_owner_approval": null,
+  "baseline_sha": "982b4171c19e4ab538818072da8074c9ef0aee41",
+  "operating_scope": "LOCAL_INTEGRATION_ONLY",
+  "live_dispatch_enabled": false,
+  "customer_release_approved": false,
+  "ownership": {
+    "ENG-06": {
+      "logical_owner_key": "DECISION_RECOMMENDATION",
+      "canonical_output": "AUDITABLE_RECOMMENDATION_DECISION",
+      "implementation_module": "eng06_decision.py"
+    },
+    "ENG-15": {
+      "logical_owner_key": "TECHNICAL_PLANNING",
+      "canonical_output": "SPECIALIST_REVIEWABLE_TECHNICAL_PLAN",
+      "implementation_module": "eng06_technical_plan_v2.py"
+    },
+    "ENG-19": {
+      "logical_owner_key": "OPPORTUNITY_AUTOMATION",
+      "canonical_output": "POLICY_APPROVED_SALON_ACTION",
+      "implementation_module": null
+    }
+  },
+  "legacy_bindings": [
+    {
+      "module": "eng04_recommendation_v2.py",
+      "historical_engine": "ENG-04",
+      "historical_role": "RECOMMENDATION_INTELLIGENCE",
+      "canonical_owner": "ENG-06",
+      "adapter": "A04_TO_06_DECISION_INPUT",
+      "migration_status": "UNMIGRATED"
+    },
+    {
+      "module": "eng05_decision_v2.py",
+      "historical_engine": "ENG-05",
+      "historical_role": "DECISION_INTELLIGENCE",
+      "canonical_owner": "ENG-06",
+      "adapter": "A05_TO_06_DECISION_EVIDENCE",
+      "migration_status": "UNMIGRATED"
+    },
+    {
+      "module": "eng06_technical_plan_v2.py",
+      "historical_engine": "ENG-06",
+      "historical_role": "TECHNICAL_PLANNING_INTELLIGENCE",
+      "canonical_owner": "ENG-15",
+      "adapter": "A06_TO_15_PLAN_CANDIDATE",
+      "migration_status": "UNMIGRATED"
+    },
+    {
+      "module": "eng04_visual_qa.py",
+      "historical_engine": "ENG-04",
+      "historical_role": "EMBEDDED_PIXEL_QA",
+      "canonical_owner": "ENG-11",
+      "adapter": "A04_PIXEL_TO_11_QA_EVIDENCE",
+      "migration_status": "UNMIGRATED"
+    },
+    {
+      "module": "eng19_review_consumer.py",
+      "historical_engine": "ENG-19",
+      "historical_role": "REVIEW_TRANSPORT",
+      "canonical_owner": null,
+      "adapter": null,
+      "migration_status": "LEGACY_TRANSPORT_ONLY"
+    },
+    {
+      "module": "eng19_review_producer.py",
+      "historical_engine": "ENG-19",
+      "historical_role": "REVIEW_TRANSPORT",
+      "canonical_owner": null,
+      "adapter": null,
+      "migration_status": "LEGACY_TRANSPORT_ONLY"
+    },
+    {
+      "module": "eng19_review_transport.py",
+      "historical_engine": "ENG-19",
+      "historical_role": "REVIEW_TRANSPORT",
+      "canonical_owner": null,
+      "adapter": null,
+      "migration_status": "LEGACY_TRANSPORT_ONLY"
+    }
+  ],
+  "physical_bindings": [
+    {
+      "owner": "ENG-04",
+      "module": "eng04_review_worker.py",
+      "migrations": [
+        "0023"
+      ],
+      "objects": [
+        "abc.eng04_ci_jobs",
+        "abc.eng04_ci_results"
+      ],
+      "roles": [
+        "abc_eng04_worker"
+      ]
+    },
+    {
+      "owner": "ENG-05",
+      "module": "eng05_review_worker.py",
+      "migrations": [
+        "0020",
+        "0022",
+        "0025"
+      ],
+      "objects": [
+        "abc.eng19_synthetic_jobs",
+        "abc.eng19_synthetic_results",
+        "abc.eng19_synthetic_outbox",
+        "abc.eng05_ci_source_receipts"
+      ],
+      "roles": [
+        "abc_eng05_worker"
+      ],
+      "legacy_queue_namespace": "eng19_synthetic"
+    },
+    {
+      "owner": "ENG-06",
+      "module": "eng06_review_worker.py",
+      "migrations": [
+        "0021"
+      ],
+      "objects": [
+        "abc.eng06_ci_jobs",
+        "abc.eng06_ci_results"
+      ],
+      "roles": [
+        "abc_eng06_review_worker"
+      ],
+      "ingress": "CI_ADMIN_SEEDED_ONLY"
+    },
+    {
+      "owner": null,
+      "module": "eng19_review_transport.py",
+      "migrations": [
+        "0019"
+      ],
+      "objects": [
+        "abc.eng19_review_edges",
+        "abc.eng19_review_inbox"
+      ],
+      "roles": [],
+      "legacy_queue_namespace": "eng19_review",
+      "ingress": "LOCAL_REVIEW_ONLY"
+    }
+  ],
+  "technical_plan_adapter": {
+    "adapter_id": "A06_TO_15_PLAN_CANDIDATE",
+    "source_protocol": "abc.internal.engine.v2.draft",
+    "projection_protocol": "abc.bridge.v2-to-19.v0.review",
+    "target_protocol": "abc.internal.capability.v3.review",
+    "source_identity": "ENG-06",
+    "target_owner": "ENG-15",
+    "source_module": "v2_to_19_projection.py",
+    "output_status": "REVIEW_ONLY_UNWIRED",
+    "implicit_routing": false,
+    "runtime_enabled": false
+  },
+  "review_handoffs": [
+    {
+      "from": "ENG-04",
+      "to": "ENG-05",
+      "artifact": "BEAUTY_ANALYSIS_REPORT",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-05",
+      "to": "ENG-06",
+      "artifact": "PROFESSIONAL_KNOWLEDGE_BUNDLE",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    },
+    {
+      "from": "ENG-06",
+      "to": "ENG-07",
+      "artifact": "AUDITABLE_RECOMMENDATION_DECISION",
+      "contract_version": "abc.internal.capability.v3.review",
+      "scope_keys": [
+        "tenant_id",
+        "branch_id",
+        "session_id",
+        "state_version",
+        "correlation_id"
+      ],
+      "required_guards": [
+        "VALIDATED_PROVENANCE",
+        "SIGNED_SERVICE_PRINCIPAL",
+        "TENANT_SESSION_SCOPE",
+        "ENG14_POLICY_IF_APPLICABLE"
+      ],
+      "status": "SPEC_ONLY_UNWIRED"
+    }
+  ],
+  "eng07_boundary": {
+    "runtime_dispatch_authorized": false,
+    "candidate_status": "CANDIDATE_FOR_EXTERNAL_AUTHORIZATION",
+    "rejected_statuses": [
+      "BLOCKED",
+      "REVIEW_ONLY",
+      "REVIEW_ONLY_UNWIRED"
+    ],
+    "unknown_version": "REJECT",
+    "legacy_v2_projection": "REJECT",
+    "valid_candidate_effect": "CONTRACT_PREFLIGHT_ONLY"
+  },
+  "legacy_runtime_release_constraints": {
+    "ingress": "Synthetic process dispatcher supports only ENG-04, ENG-05 and ENG-06. No canonical ENG-15 or ENG-19 endpoint is bound.",
+    "compatibility": "Preserve existing role names, durable queue and inbox IDs, replay keys and table bindings. Any future migration needs explicit versioned backfill, dual-read and rollback proof.",
+    "coverage": "An ENG-04 to ENG-05 durable receipt and isolated ENG-06 with synthetic fixtures are covered independently. The process chain exercises all five stages under a synthetic harness. ENG-05 does not dispatch automatically to ENG-06; ENG-06 requires isolated admin-seeded jobs.",
+    "release": "An accepted candidate cannot grant authority. Security, SRE and professional approval are tracked separately."
+  },
+  "tracking": {
+    "architecture": 80,
+    "evidence_matrix": 81,
+    "synthetic_chain": 82,
+    "specialist_release": 79
+  }
+}

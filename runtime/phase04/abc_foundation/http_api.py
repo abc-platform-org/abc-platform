@@ -15,20 +15,26 @@ MAX_BODY = 4096
 
 def handler_factory(store, signing_secret, identity_verifier=None):
     class Handler(BaseHTTPRequestHandler):
-        server_version = "ABC-Foundation-Local/0.1"
+        server_version = "ABC-Foundation"
         sys_version = ""
 
         def log_message(self, fmt, *args):
             # Do not log authorization headers, request payload, or client identifiers.
             return
 
-        def _json(self, status, payload):
+        def end_headers(self):
+            self.send_header("Referrer-Policy", "no-referrer")
+            super().end_headers()
+
+        def _json(self, status, payload, *, allow=None):
             raw = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Content-Length", str(len(raw)))
+            if allow is not None:
+                self.send_header("Allow", allow)
             self.end_headers()
             self.wfile.write(raw)
 
@@ -79,6 +85,11 @@ def handler_factory(store, signing_secret, identity_verifier=None):
                     raise DomainError(404, "not_found")
                 return self._json(200, store.get(actor, match.group(1)))
             self._attempt(action)
+
+        def do_PATCH(self):
+            if self.path == "/healthz":
+                return self._json(405, {"error": "method_not_allowed"}, allow="GET")
+            self.send_error(501, "Unsupported method ('PATCH')")
 
         def do_POST(self):
             def action():
